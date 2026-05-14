@@ -1501,35 +1501,90 @@ function sendBadgeEmail(emp){
 }
 
 // ═══════ SCANNER ═══════
-let scanStream=null,scanInt=null;
-function openScanner(){
-  document.getElementById('scan-wrap').classList.add('open');
-  navigator.mediaDevices?.getUserMedia({video:{facingMode:'environment'}})
-    .then(stream=>{
-      scanStream=stream;
-      const v=document.getElementById('sv');v.srcObject=stream;v.play();
-      const c=document.getElementById('sc');
-      scanInt=setInterval(()=>{
-        if(v.readyState!==v.HAVE_ENOUGH_DATA)return;
-        c.width=v.videoWidth;c.height=v.videoHeight;
-        const ctx=c.getContext('2d');ctx.drawImage(v,0,0);
-        if(typeof jsQR==='undefined')return;
+let scanStream=null,scanLoopId=null,scanBusy=false,scanDetector=null;
+async function openScanner(){
+  const wrap=document.getElementById('scan-wrap');
+  wrap.classList.add('open');
+  if(!navigator.mediaDevices?.getUserMedia){
+    closeScanner();toast('Scanner non disponible sur ce navigateur','#ef4444');return;
+  }
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},
+      audio:false
+    });
+    scanStream=stream;
+    const v=document.getElementById('sv');
+    v.srcObject=stream;
+    await v.play();
+    scanDetector='BarcodeDetector' in window?new BarcodeDetector({formats:['qr_code']}):null;
+    scanLoop();
+  }catch(e){
+    console.error('Camera error',e);
+    closeScanner();toast('Caméra inaccessible','#ef4444');
+  }
+}
+async function scanLoop(){
+  const wrap=document.getElementById('scan-wrap'),v=document.getElementById('sv'),c=document.getElementById('sc');
+  if(!scanStream||!wrap.classList.contains('open'))return;
+  if(!scanBusy&&v.readyState>=2&&v.videoWidth&&v.videoHeight){
+    scanBusy=true;
+    try{
+      c.width=v.videoWidth;c.height=v.videoHeight;
+      const ctx=c.getContext('2d',{willReadFrequently:true});
+      ctx.drawImage(v,0,0,c.width,c.height);
+      if(scanDetector){
+        const codes=await scanDetector.detect(c);
+        const raw=codes?.[0]?.rawValue||codes?.[0]?.rawValueText;
+        if(raw){await handleQR(raw);return;}
+      }
+      if(typeof jsQR!=='undefined'){
         const img=ctx.getImageData(0,0,c.width,c.height);
-        const code=jsQR(img.data,img.width,img.height);
-        if(code){clearInterval(scanInt);handleQR(code.data);}
-      },200);
-    }).catch(()=>{closeScanner();toast('Caméra inaccessible','#ef4444');});
+        const code=jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});
+        if(code?.data){await handleQR(code.data);return;}
+      }
+    }catch(e){console.warn('QR scan error',e);}
+    scanBusy=false;
+  }
+  scanLoopId=requestAnimationFrame(scanLoop);
 }
 function closeScanner(){
-  clearInterval(scanInt);
+  if(scanLoopId)cancelAnimationFrame(scanLoopId);
+  scanLoopId=null;scanBusy=false;scanDetector=null;
   if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}
   document.getElementById('scan-wrap').classList.remove('open');
 }
-function handleQR(data){
+function parseEmpQR(data){
+  const raw=String(data||'').trim();
+  const direct=raw.match(/^EMP:(.+)$/i);
+  if(direct)return direct[1].trim();
+  try{
+    const url=new URL(raw);
+    const fromQuery=url.searchParams.get('emp')||url.searchParams.get('employee')||url.searchParams.get('employee_id');
+    if(fromQuery)return fromQuery.trim();
+    const fromHash=(url.hash||'').match(/EMP:([^&]+)/i);
+    if(fromHash)return decodeURIComponent(fromHash[1]).trim();
+  }catch(e){}
+  return null;
+}
+function empFromSBRow(x){
+  return {id:x.id,name:x.name,last:x.last_name||'',num:x.employee_number||'',position:x.position||'',dept:x.department||'',phone:x.phone||'',email:x.email||'',startDate:x.start_date||'',contract:x.contract_type||'CDI',payType:x.pay_type||'hourly',rate:x.hourly_rate||0,salary:x.monthly_salary||0,vacWeeks:x.vacation_weeks||5,avs:x.avs_number||'',emergency:x.emergency_contact||'',notes:x.notes||'',status:x.status||'active',photo:x.photo_url||null,color:x.color||'#4f6ef7',schedules:x.schedules||{},pin:x.pin||'0000'};
+}
+async function handleQR(data){
   closeScanner();
-  if(!data.startsWith('EMP:')){toast('QR non reconnu','#ef4444');return;}
-  const emp=DB.employees.find(e=>e.id===data.replace('EMP:',''));
-  if(!emp){toast('Employé non trouvé','#ef4444');return;}
+  const empId=parseEmpQR(data);
+  if(!empId){toast('QR non reconnu','#ef4444');return;}
+  let emp=DB.employees.find(e=>String(e.id)===String(empId));
+  if(!emp){
+    try{
+      const r=await sb.from('employees').select('*').eq('id',empId).maybeSingle();
+      if(!r.error&&r.data){
+        emp=empFromSBRow(r.data);
+        DB.employees.push(emp);saveLocal();
+      }
+    }catch(e){console.warn('Employee QR lookup error',e);}
+  }
+  if(!emp){toast('Employé non trouvé dans ce restaurant','#ef4444');return;}
   showQRAction(emp);
 }
 function showQRAction(emp){
