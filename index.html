@@ -867,13 +867,18 @@ const LANGS={
 let lang='fr';
 const L=()=>LANGS[lang]||LANGS.fr;
 const UI={
-  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',password:'Mot de passe',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin',sub:'Gestion du personnel · Fribourg CH'},dash:{active:'Employés actifs',present:'Présents / Prévus',absent:'Absents',vacation:'En vacances',live:'Présents en ce moment',alerts:'Alertes du jour',allGood:'Tout est en ordre',missing:'Entrée non pointée',late:'Arrivé en retard',scan:'Scanner QR',addEmp:'+ Employé'},emp:{search:'Rechercher un employé...',all:'Tous',active:'Actifs',inactive:'Inactifs',new:'Nouvel employé',edit:'Modifier',none:'Aucun employé',noResult:'Aucun résultat',addFirst:'Ajoutez votre premier employé',in:'Entrée',out:'Sortie'}},
+  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',password:'Mot de passe',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin',sub:'Gestion du personnel · Fribourg CH'},dash:{active:'Employés actifs',present:'Présents / Prévus',absent:'Absents',vacation:'En vacances',live:'Présents en ce moment',alerts:'Alertes du jour',allGood:'Tout est en ordre',missing:'Entrée non pointée',late:'Arrivé en retard',scan:'Scanner QR',addEmp:'+ Employé'},emp:{search:'Rechercher un employé...',all:'Tous',active:'Actifs',inactive:'Inactifs',new:'Nouvel employé',edit:'Modifier',none:'Aucun employé',noResult:'Aucun résultat',addFirst:'Ajoutez votre premier employé',in:'Entrée',out:'Sortie'},att:{today:'Pointages du jour',scheduled:'Programmés aujourd’hui',manual:'Manuel',present:'Présents',absent:'Absents',none:'Personne de prévu',manualTitle:'Pointage manuel',employee:'Employé',date:'Date',reason:'Motif',save:'Enregistrer',cancel:'Annuler'},shift:{title:'Planification',morning:'Matin',afternoon:'Après-midi',evening:'Soir',night:'Nuit',rest:'Repos',off:'Libre',none:'Aucun employé actif',scheduleSaved:'Horaire enregistré'},vac:{pending:'En attente',approved:'Approuvés',balance:'Soldes',new:'+ Nouvelle absence',title:'Nouvelle absence',none:'Aucune demande',noneApproved:'Aucun congé approuvé',nonePending:'Aucune demande en attente',remaining:'restants',used:'jours utilisés'}},
   es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Restaurante',email:'Email',password:'Contraseña',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del restaurante',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin',sub:'Gestión de personal · Friburgo CH'},dash:{active:'Empleados activos',present:'Presentes / Previstos',absent:'Ausentes',vacation:'De vacaciones',live:'Presentes ahora',alerts:'Alertas del día',allGood:'Todo está en orden',missing:'Entrada no registrada',late:'Llegó tarde',scan:'Escanear QR',addEmp:'+ Empleado'},emp:{search:'Buscar empleado...',all:'Todos',active:'Activos',inactive:'Inactivos',new:'Nuevo empleado',edit:'Modificar',none:'Sin empleados',noResult:'Sin resultados',addFirst:'Agrega tu primer empleado',in:'Entrada',out:'Salida'}},
   en:{pages:{dashboard:'Dashboard',attendance:'Attendance',employees:'Employees',shifts:'Shifts',vacations:'Leave',payroll:'Payroll',reports:'Reports',history:'History',settings:'Settings',master:'Master Admin'},nav:{principal:'Main',planning:'Planning',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employee',restaurant:'Restaurant',email:'Email',password:'Password',signin:'Sign in',forgot:'Forgot password?',demo:'Demo access (no account)',restName:'Restaurant name',adminEmail:'Admin email',createAdmin:'Create admin account',sub:'Staff management · Fribourg CH'},dash:{active:'Active employees',present:'Present / Scheduled',absent:'Absent',vacation:'On vacation',live:'Present now',alerts:'Daily alerts',allGood:'Everything is fine',missing:'Clock-in missing',late:'Arrived late',scan:'Scan QR',addEmp:'+ Employee'},emp:{search:'Search employee...',all:'All',active:'Active',inactive:'Inactive',new:'New employee',edit:'Edit',none:'No employees',noResult:'No results',addFirst:'Add your first employee',in:'Clock in',out:'Clock out'}},
   de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Personalverwaltung · Freiburg CH'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
   it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione personale · Friburgo CH'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
 };
 const T=()=>UI[lang]||UI.fr;
+const TL=section=>({...UI.fr[section],...(T()[section]||{})});
+Object.assign(UI.es,{att:{today:'Fichajes del día',scheduled:'Programados hoy',manual:'Manual',present:'Presentes',absent:'Ausentes',none:'Nadie programado',manualTitle:'Fichaje manual',employee:'Empleado',date:'Fecha',reason:'Motivo',save:'Guardar',cancel:'Cancelar'},shift:{title:'Planificación',morning:'Mañana',afternoon:'Tarde',evening:'Noche',night:'Madrugada',rest:'Descanso',off:'Libre',none:'Sin empleados activos',scheduleSaved:'Horario guardado'},vac:{pending:'Pendientes',approved:'Aprobados',balance:'Saldos',new:'+ Nueva ausencia',title:'Nueva ausencia',none:'Sin solicitudes',noneApproved:'Ninguna ausencia aprobada',nonePending:'Ninguna solicitud pendiente',remaining:'restantes',used:'días usados'}});
+Object.assign(UI.en,{att:{today:'Today’s punches',scheduled:'Scheduled today',manual:'Manual',present:'Present',absent:'Absent',none:'Nobody scheduled',manualTitle:'Manual attendance',employee:'Employee',date:'Date',reason:'Reason',save:'Save',cancel:'Cancel'},shift:{title:'Planning',morning:'Morning',afternoon:'Afternoon',evening:'Evening',night:'Night',rest:'Rest',off:'Off',none:'No active employees',scheduleSaved:'Shift saved'},vac:{pending:'Pending',approved:'Approved',balance:'Balances',new:'+ New absence',title:'New absence',none:'No requests',noneApproved:'No approved leave',nonePending:'No pending requests',remaining:'remaining',used:'days used'}});
+Object.assign(UI.de,{att:{today:'Heutige Buchungen',scheduled:'Heute geplant',manual:'Manuell',present:'Anwesend',absent:'Abwesend',none:'Niemand geplant',manualTitle:'Manuelle Buchung',employee:'Mitarbeiter',date:'Datum',reason:'Grund',save:'Speichern',cancel:'Abbrechen'},shift:{title:'Planung',morning:'Morgen',afternoon:'Nachmittag',evening:'Abend',night:'Nacht',rest:'Ruhezeit',off:'Frei',none:'Keine aktiven Mitarbeiter',scheduleSaved:'Dienst gespeichert'},vac:{pending:'Ausstehend',approved:'Genehmigt',balance:'Salden',new:'+ Neue Abwesenheit',title:'Neue Abwesenheit',none:'Keine Anträge',noneApproved:'Keine genehmigten Abwesenheiten',nonePending:'Keine offenen Anträge',remaining:'übrig',used:'Tage genutzt'}});
+Object.assign(UI.it,{att:{today:'Timbrature del giorno',scheduled:'Programmato oggi',manual:'Manuale',present:'Presenti',absent:'Assenti',none:'Nessuno programmato',manualTitle:'Timbratura manuale',employee:'Dipendente',date:'Data',reason:'Motivo',save:'Salva',cancel:'Annulla'},shift:{title:'Pianificazione',morning:'Mattina',afternoon:'Pomeriggio',evening:'Sera',night:'Notte',rest:'Riposo',off:'Libero',none:'Nessun dipendente attivo',scheduleSaved:'Turno salvato'},vac:{pending:'In attesa',approved:'Approvati',balance:'Saldi',new:'+ Nuova assenza',title:'Nuova assenza',none:'Nessuna richiesta',noneApproved:'Nessuna assenza approvata',nonePending:'Nessuna richiesta in attesa',remaining:'rimanenti',used:'giorni usati'}});
 
 // ═══════ DB ═══════
 let DB={
@@ -1063,6 +1068,20 @@ function applyUITexts(){
   const dashBtns=document.querySelectorAll('#pg-dashboard .btn');if(dashBtns[0])dashBtns[0].textContent='📷 '+t.dash.scan;if(dashBtns[1])dashBtns[1].textContent=t.dash.addEmp;
   const empTabs=document.querySelectorAll('#pg-employees .tab');if(empTabs[0])empTabs[0].textContent=t.emp.all;if(empTabs[1])empTabs[1].textContent=t.emp.active;if(empTabs[2])empTabs[2].textContent=t.emp.inactive;
   const empAdd=document.querySelector('#pg-employees .btn-primary.mt12');if(empAdd)empAdd.lastChild.textContent=' '+t.emp.new;
+  const at=TL('att'),sh=TL('shift'),vc=TL('vac');
+  const attSub=document.querySelector('#pg-attendance .muted');if(attSub)attSub.textContent=at.today;
+  const attManual=document.querySelector('[onclick="openManualModal()"]');if(attManual)attManual.textContent=at.manual;
+  const attLbl=document.querySelector('#pg-attendance .section-lbl');if(attLbl)attLbl.textContent=at.scheduled;
+  const shiftTitle=document.querySelector('#pg-shifts .fw7.fs14');if(shiftTitle)shiftTitle.textContent=sh.title;
+  const chips=document.querySelectorAll('#pg-shifts .chip');if(chips[0])chips[0].textContent='🌅 '+sh.morning;if(chips[1])chips[1].textContent='☀️ '+sh.afternoon;if(chips[2])chips[2].textContent='🌆 '+sh.evening;if(chips[3])chips[3].textContent='🌙 '+sh.night;if(chips[4])chips[4].textContent='✅ '+sh.rest;if(chips[5])chips[5].textContent='❌ '+sh.off;
+  const vacTabs=document.querySelectorAll('#pg-vacations .tab');if(vacTabs[0])vacTabs[0].textContent=vc.pending;if(vacTabs[1])vacTabs[1].textContent=vc.approved;if(vacTabs[2])vacTabs[2].textContent=vc.balance;
+  const vacBtn=document.querySelector('#pg-vacations .btn-ghost.mt12');if(vacBtn)vacBtn.textContent=vc.new;
+  const manTitle=document.querySelector('#manual-modal .modal-title');if(manTitle)manTitle.textContent=at.manualTitle;
+  const manLabels=document.querySelectorAll('#manual-modal label');if(manLabels[0])manLabels[0].textContent=at.employee;if(manLabels[1])manLabels[1].textContent=at.date;if(manLabels[2])manLabels[2].textContent=t.emp.in;if(manLabels[3])manLabels[3].textContent=t.emp.out;if(manLabels[4])manLabels[4].textContent=at.reason;
+  const manButtons=document.querySelectorAll('#manual-modal .modal-actions .btn');if(manButtons[0])manButtons[0].textContent=at.cancel;if(manButtons[1])manButtons[1].textContent=at.save;
+  const absTitle=document.querySelector('#abs-modal .modal-title');if(absTitle)absTitle.textContent=vc.title;
+  const absButtons=document.querySelectorAll('#abs-modal .modal-actions .btn');if(absButtons[0])absButtons[0].textContent=at.cancel;if(absButtons[1])absButtons[1].textContent=at.save;
+  const shiftButtons=document.querySelectorAll('#shift-modal .modal-actions .btn');if(shiftButtons[0])shiftButtons[0].textContent=at.cancel;if(shiftButtons[1])shiftButtons[1].textContent=at.save;
 }
 function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();applyUITexts();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);}
 
@@ -1201,6 +1220,7 @@ function openManualModal(empId=null){
   document.getElementById('man-emp').innerHTML=active.map(e=>`<option value="${esc(e.id)}" ${e.id===empId?'selected':''}>${safeEmpName(e)}</option>`).join('');
   document.getElementById('man-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('man-note').value='Correction manager';
+  applyUITexts();
   openModal('manual-modal');
 }
 async function saveManualAttendance(){
@@ -1495,6 +1515,7 @@ function renderDash(){
 
 // ═══════ ATTENDANCE ═══════
 function renderAtt(){
+  const tx=TL('att'),ex=T().emp;
   const now=new Date(),dow=now.getDay();
   document.getElementById('att-date').textContent=now.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
   const active=DB.employees.filter(e=>e.status==='active');
@@ -1503,11 +1524,11 @@ function renderAtt(){
   document.getElementById('att-kpi').innerHTML=`
     <div class="kpi"><div class="kpi-glow" style="background:var(--green)"></div>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-      <div class="kpi-val" style="color:var(--green)">${present.length}</div><div class="kpi-sub">Présents</div></div>
+      <div class="kpi-val" style="color:var(--green)">${present.length}</div><div class="kpi-sub">${tx.present}</div></div>
     <div class="kpi"><div class="kpi-glow" style="background:var(--red)"></div>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      <div class="kpi-val" style="color:var(--red)">${sched.filter(e=>!present.some(p=>p.id===e.id)&&!getAbs(e.id,now)).length}</div><div class="kpi-sub">Absents</div></div>`;
-  if(!sched.length){document.getElementById('att-list').innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><h3>Personne de prévu</h3></div>`;return;}
+      <div class="kpi-val" style="color:var(--red)">${sched.filter(e=>!present.some(p=>p.id===e.id)&&!getAbs(e.id,now)).length}</div><div class="kpi-sub">${tx.absent}</div></div>`;
+  if(!sched.length){document.getElementById('att-list').innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><h3>${tx.none}</h3></div>`;return;}
   document.getElementById('att-list').innerHTML=sched.map(emp=>{
     const sch=emp.schedules[dow];
     const recs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,now)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
@@ -1519,8 +1540,8 @@ function renderAtt(){
         <div style="font-weight:700;font-size:14px">${safeEmpName(emp)}</div>
         <div style="font-size:11px;color:var(--text2)">${esc(emp.position)} · ${esc(sch.entry)}–${esc(sch.exit)}</div>
         ${abs?`<div style="font-size:11px;color:var(--orange);margin-top:2px">🌴 ${abs.type}</div>`:''}
-        ${inn?`<div style="font-size:11px;color:var(--green);margin-top:2px">✅ Entrée ${fmtTime(inn.ts)}${late?' ⚠️ retard':''}</div>`:''}
-        ${out?`<div style="font-size:11px;color:var(--red);margin-top:2px">🔴 Sortie ${fmtTime(out.ts)}</div>`:''}
+        ${inn?`<div style="font-size:11px;color:var(--green);margin-top:2px">✅ ${ex.in} ${fmtTime(inn.ts)}${late?' ⚠️ retard':''}</div>`:''}
+        ${out?`<div style="font-size:11px;color:var(--red);margin-top:2px">🔴 ${ex.out} ${fmtTime(out.ts)}</div>`:''}
         ${w?`<div style="font-size:11px;color:var(--brand);margin-top:2px">⏱ ${w.toFixed(2)}h</div>`:''}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px" onclick="event.stopPropagation()">
@@ -1692,12 +1713,13 @@ function deleteEmp(id){if(!confirm('Supprimer cet employé?'))return;DB.employee
 let shiftWS=getMonday(new Date()),shiftKey=null,shiftType='morning';
 function shiftWN(dir){shiftWS=new Date(shiftWS.getTime()+dir*7*86400000);renderShifts();}
 function renderShifts(){
+  const tx=TL('shift');
   const dates=Array.from({length:7},(_,i)=>new Date(shiftWS.getTime()+i*86400000));
   document.getElementById('shift-wlbl').textContent=`${fmtDate(dates[0])} — ${fmtDate(dates[6])}`;
   const active=DB.employees.filter(e=>e.status==='active'),days=L().days,cols=`88px repeat(7,1fr)`;
   document.getElementById('shift-hdr').style.gridTemplateColumns=cols;
   document.getElementById('shift-hdr').innerHTML=`<div></div>`+dates.map((d,i)=>`<div style="text-align:center"><div style="font-size:10px;font-weight:700;color:var(--text3)">${days[d.getDay()]}</div><div style="font-size:12px;font-weight:${sameDay(d,new Date())?'800':'400'};color:${sameDay(d,new Date())?'var(--orange)':'var(--text)'}">${d.getDate()}</div></div>`).join('');
-  if(!active.length){document.getElementById('shift-grid').innerHTML=`<div class="empty-state" style="padding:24px"><h3>Aucun employé actif</h3></div>`;return;}
+  if(!active.length){document.getElementById('shift-grid').innerHTML=`<div class="empty-state" style="padding:24px"><h3>${tx.none}</h3></div>`;return;}
   document.getElementById('shift-grid').innerHTML=active.map(emp=>{
     let row=`<div class="shift-row" style="grid-template-columns:${cols}"><div style="display:flex;align-items:center;gap:6px;min-width:0">${mkAv(emp,'av-28')}<span style="font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${emp.name}</span></div>`;
     dates.forEach(d=>{const key=`${emp.id}_${d.toISOString().split('T')[0]}`,sh=DB.shifts[key],abs=getAbs(emp.id,d);let type='off',lbl='—';if(abs){type='abs';lbl='ABS';}else if(sh){type=sh.type;const m={morning:'AM',afternoon:'PM',evening:'SOI',night:'NOC',rest:'DSC',off:'—'};lbl=m[sh.type]||'?';}else if(emp.schedules?.[d.getDay()]?.enabled){type='morning';lbl='?';}row+=`<div class="s-cell ${type}" onclick="openShiftModal('${emp.id}','${d.toISOString().split('T')[0]}')">${lbl}</div>`;});
@@ -1712,9 +1734,11 @@ function openShiftModal(empId,dateStr){
   document.getElementById('sh-in').value=sh?.in||emp?.schedules?.[new Date(dateStr).getDay()]?.entry||'09:00';
   document.getElementById('sh-out').value=sh?.out||emp?.schedules?.[new Date(dateStr).getDay()]?.exit||'17:00';
   document.getElementById('sh-notes').value=sh?.notes||'';
-  const opts=[{v:'morning',l:'🌅 Matin',c:'#06b6d4'},{v:'afternoon',l:'☀️ Après-midi',c:'#f59e0b'},{v:'evening',l:'🌆 Soir',c:'#7c3aed'},{v:'night',l:'🌙 Nuit',c:'#4f6ef7'},{v:'rest',l:'✅ Repos',c:'#10b981'},{v:'off',l:'❌ Libre',c:'#5a5e78'}];
+  const tx=TL('shift');
+  const opts=[{v:'morning',l:'🌅 '+tx.morning,c:'#06b6d4'},{v:'afternoon',l:'☀️ '+tx.afternoon,c:'#f59e0b'},{v:'evening',l:'🌆 '+tx.evening,c:'#7c3aed'},{v:'night',l:'🌙 '+tx.night,c:'#4f6ef7'},{v:'rest',l:'✅ '+tx.rest,c:'#10b981'},{v:'off',l:'❌ '+tx.off,c:'#5a5e78'}];
   document.getElementById('shift-type-grid').innerHTML=opts.map(o=>`<button id="stype-${o.v}" onclick="selST('${o.v}')" style="padding:10px 12px;border-radius:10px;border:2px solid ${shiftType===o.v?o.c:'var(--border)'};background:${shiftType===o.v?o.c+'22':'var(--s3)'};color:${shiftType===o.v?o.c:'var(--text2)'};font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;text-align:left">${o.l}</button>`).join('');
   document.getElementById('shift-times').style.display=['rest','off'].includes(shiftType)?'none':'grid';
+  applyUITexts();
   openModal('shift-modal');
 }
 function selST(type){
@@ -1723,20 +1747,21 @@ function selST(type){
   document.querySelectorAll('[id^="stype-"]').forEach(btn=>{const t=btn.id.replace('stype-',''),c=colors[t];btn.style.borderColor=t===type?c:'var(--border)';btn.style.background=t===type?c+'22':'var(--s3)';btn.style.color=t===type?c:'var(--text2)';});
   document.getElementById('shift-times').style.display=['rest','off'].includes(type)?'none':'grid';
 }
-function saveShift(){if(!shiftKey)return;DB.shifts[shiftKey]={type:shiftType,in:document.getElementById('sh-in').value,out:document.getElementById('sh-out').value,notes:document.getElementById('sh-notes').value};saveLocal();closeModal('shift-modal');renderShifts();toast('✅ Horaire enregistré');sbSaveShift(shiftKey,DB.shifts[shiftKey]).catch(console.error);}
+function saveShift(){if(!shiftKey)return;DB.shifts[shiftKey]={type:shiftType,in:document.getElementById('sh-in').value,out:document.getElementById('sh-out').value,notes:document.getElementById('sh-notes').value};saveLocal();closeModal('shift-modal');renderShifts();toast('✅ '+TL('shift').scheduleSaved);sbSaveShift(shiftKey,DB.shifts[shiftKey]).catch(console.error);}
 
 // ═══════ VACATIONS ═══════
 let vacT='pending';
 function setVT(f,el){vacT=f;setAT(el.closest('.tabs'),el);renderVacs();}
 function renderVacs(){
+  const tx=TL('vac');
   const c=document.getElementById('vac-content');
   if(vacT==='balance'){
     const active=DB.employees.filter(e=>e.status==='active');
-    if(!active.length){c.innerHTML=`<div class="empty-state"><h3>Aucun employé</h3></div>`;return;}
-    c.innerHTML=active.map(emp=>{const total=(emp.vacWeeks||4)*5,used=vacUsed(emp.id),left=Math.max(0,total-used),pct=Math.min(100,(used/total)*100);return`<div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">${mkAv(emp,'av-36')}<div style="flex:1"><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--orange);font-size:18px">${left}j</div><div style="font-size:10px;color:var(--text2)">restants</div></div></div><div class="prog"><div class="prog-fill" style="width:${pct}%;background:var(--orange)"></div></div><div style="font-size:10px;color:var(--text2);margin-top:5px">${used}/${total} jours utilisés</div></div>`;}).join('');return;
+    if(!active.length){c.innerHTML=`<div class="empty-state"><h3>${T().emp.none}</h3></div>`;return;}
+    c.innerHTML=active.map(emp=>{const total=(emp.vacWeeks||4)*5,used=vacUsed(emp.id),left=Math.max(0,total-used),pct=Math.min(100,(used/total)*100);return`<div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">${mkAv(emp,'av-36')}<div style="flex:1"><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--orange);font-size:18px">${left}j</div><div style="font-size:10px;color:var(--text2)">${tx.remaining}</div></div></div><div class="prog"><div class="prog-fill" style="width:${pct}%;background:var(--orange)"></div></div><div style="font-size:10px;color:var(--text2);margin-top:5px">${used}/${total} ${tx.used}</div></div>`;}).join('');return;
   }
   const isAppr=vacT==='approved',filtered=DB.absences.filter(a=>a.approved===isAppr);
-  if(!filtered.length){c.innerHTML=`<div class="empty-state"><h3>Aucune demande</h3><p>${isAppr?'Aucun congé approuvé':'Aucune demande en attente'}</p></div>`;return;}
+  if(!filtered.length){c.innerHTML=`<div class="empty-state"><h3>${tx.none}</h3><p>${isAppr?tx.noneApproved:tx.nonePending}</p></div>`;return;}
   const icons={vacation:'🌴',medical:'🏥',personal:'👤',dayOff:'💤',training:'📚',maternity:'🤱',holiday:'⭐'};
   c.innerHTML=filtered.map(a=>{const emp=DB.employees.find(e=>e.id===a.empId),days=Math.round((new Date(a.end)-new Date(a.start))/86400000)+1;
     return`<div class="card"><div style="display:flex;align-items:center;gap:10px">${emp?mkAv(emp,'av-36'):''}<div style="flex:1"><div style="font-weight:700;font-size:13px">${emp?safeEmpName(emp):'?'}</div><div style="font-size:11px;color:var(--text2)">${icons[a.type]||'📋'} ${esc(a.type)} · ${days}j</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${fmtDate(a.start)} — ${fmtDate(a.end)}</div></div><div style="display:flex;flex-direction:column;gap:6px">${!isAppr?`<button class="btn btn-success btn-sm" style="width:34px;height:32px;padding:0" onclick="apprAbs('${esc(a.id)}')">✓</button>`:''}<button class="btn btn-ghost btn-sm" style="width:34px;height:32px;padding:0;color:var(--red)" onclick="delAbs('${esc(a.id)}')">🗑</button></div></div>${a.notes?`<div style="font-size:11px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${esc(a.notes)}</div>`:''}</div>`;}).join('');
@@ -1754,6 +1779,7 @@ function openAbsModal(empId){
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('abs-start').value=today;document.getElementById('abs-end').value=today;
   document.getElementById('abs-notes').value='';document.getElementById('abs-appr').classList.add('on');
+  applyUITexts();
   openModal('abs-modal');
 }
 function saveAbs(){
