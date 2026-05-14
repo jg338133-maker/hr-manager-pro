@@ -1000,6 +1000,15 @@ async function sbEmployeeRegister(emp,type){
   const {error}=await sb.rpc('employee_register_attendance',{p_email:emp.email,p_pin:emp.pin,p_type:type});
   if(error)throw error;
 }
+async function sbEmployeePortalData(emp){
+  const {data,error}=await sb.rpc('employee_portal_data',{p_email:emp.email,p_pin:emp.pin});
+  if(error)throw error;
+  return data||{};
+}
+async function sbEmployeeRequestAbsence(emp,type,start,end,notes){
+  const {error}=await sb.rpc('employee_request_absence',{p_email:emp.email,p_pin:emp.pin,p_type:type,p_start:start,p_end:end,p_notes:notes||''});
+  if(error)throw error;
+}
 
 // ═══════ UTILS ═══════
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
@@ -1267,6 +1276,7 @@ async function checkPin(){
     setRestaurantId(row.restaurant_id);
     DB.employees=[emp];DB.history=[];DB.absences=[];DB.shifts={};
     DB.settings={...DB.settings,company:row.restaurant_name||DB.settings.company,emoji:row.restaurant_emoji||DB.settings.emoji,currency:row.currency||'CHF',lateTol:row.late_tolerance||10,maxHours:row.max_hours_week||45,lang:row.lang||lang,brandColor:row.brand_color||DB.settings.brandColor,brandColor2:row.brand_color2||DB.settings.brandColor2};
+    await loadEmployeePortal(emp);
     lang=DB.settings.lang||lang;applyBrand();applyUITexts();
     currentUser={role:'employee',name:fullName(emp),emp};
     showEmpUI(emp);err.textContent='';
@@ -1305,6 +1315,16 @@ function showEmpUI(emp){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('emp-view').classList.add('open');
   renderEmpView(emp);
+}
+
+async function loadEmployeePortal(emp){
+  try{
+    const data=await sbEmployeePortalData(emp);
+    DB.history=(data.attendance||[]).map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||fullName(emp),type:x.type,ts:x.timestamp}));
+    DB.absences=(data.absences||[]).map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
+    DB.shifts={};
+    (data.shifts||[]).forEach(x=>{DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,notes:x.notes||''};});
+  }catch(e){console.warn('Employee portal data error:',e);}
 }
 
 // ═══════ ATTENDANCE ═══════
@@ -1404,19 +1424,57 @@ function renderQRCodes(root=document){
       return;
     }
     try{
-      const qr=qrcode(0,'M');
-      qr.addData(text);
-      qr.make();
-      const cell=Math.max(2,Math.floor(size/qr.getModuleCount()));
-      const url=qr.createDataURL(cell,0);
+      const url=makeQRDataURL(text,size);
       el.innerHTML=`<img src="${url}" alt="QR" style="display:block;width:${size}px;height:${size}px;image-rendering:pixelated">`;
     }catch(e){
       el.innerHTML=`<div style="width:${size}px;height:${size}px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:10px">QR indisponible</div>`;
     }
   });
 }
+function makeQRDataURL(text,size=240){
+  if(typeof qrcode==='undefined')return '';
+  const qr=qrcode(0,'M');
+  qr.addData(String(text));
+  qr.make();
+  const cell=Math.max(2,Math.floor(size/qr.getModuleCount()));
+  return qr.createDataURL(cell,0);
+}
 function badgeQRUrl(emp){
   return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent('EMP:'+emp.id)}`;
+}
+function downloadBadge(emp){
+  if(!emp){toast('Employé non trouvé','#ef4444');return;}
+  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+  canvas.width=640;canvas.height=960;
+  const restaurant=DB.settings?.company||'Mon Restaurant',qrUrl=makeQRDataURL('EMP:'+emp.id,300);
+  const qrImg=new Image();
+  qrImg.onload=()=>{
+    const grad=ctx.createLinearGradient(0,0,640,960);
+    grad.addColorStop(0,DB.settings?.brandColor||'#4f6ef7');
+    grad.addColorStop(1,DB.settings?.brandColor2||'#7c3aed');
+    ctx.fillStyle=grad;ctx.fillRect(0,0,640,960);
+    ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(560,80,140,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#ffffff';ctx.textAlign='center';
+    ctx.font='700 28px DM Sans, Arial';ctx.fillText(restaurant.toUpperCase(),320,88);
+    ctx.font='500 22px DM Sans, Arial';ctx.fillText(APP_PUBLIC_URL.replace(/^https?:\/\//,''),320,126);
+    ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='800 44px DM Sans, Arial';ctx.fillText(fullName(emp),320,230);
+    ctx.fillStyle='rgba(255,255,255,.78)';ctx.font='600 28px DM Sans, Arial';ctx.fillText(emp.position||'-',320,274);
+    ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='500 22px DM Sans, Arial';ctx.fillText(`N° ${emp.num||emp.id}`,320,315);
+    roundRect(ctx,150,380,340,340,28,'#ffffff');
+    if(qrUrl)ctx.drawImage(qrImg,170,400,300,300);
+    ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='500 20px DM Sans, Arial';ctx.fillText('Scanner pour pointer',320,770);
+    ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,880,640,80);
+    ctx.fillStyle='#ffffff';ctx.font='700 22px DM Sans, Arial';ctx.fillText('HR Manager Pro',320,928);
+    const a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download=`carnet_${clean(fullName(emp)).replace(/\s+/g,'_')}.png`;
+    a.click();
+  };
+  qrImg.onerror=()=>toast('QR indisponible pour le téléchargement','#ef4444');
+  qrImg.src=qrUrl||badgeQRUrl(emp);
+}
+function roundRect(ctx,x,y,w,h,r,fill){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();ctx.fillStyle=fill;ctx.fill();
 }
 function sendBadgeEmail(emp){
   if(!emp?.email){toast('Ajoutez un email à cet employé','#f59e0b');return;}
@@ -1497,11 +1555,53 @@ function showQRAction(emp){
   openModal('qr-modal');
 }
 
+function monthHours(emp,date=new Date()){
+  const y=date.getFullYear(),m=date.getMonth();
+  const days=new Set(DB.history.filter(h=>h.empId===emp.id&&new Date(h.ts).getFullYear()===y&&new Date(h.ts).getMonth()===m).map(h=>new Date(h.ts).toDateString()));
+  let hrs=0;days.forEach(ds=>{const w=workedOn(emp.id,new Date(ds));if(w)hrs+=w;});
+  return hrs;
+}
+function empCalendarHTML(emp,date=new Date()){
+  const y=date.getFullYear(),m=date.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0);
+  const start=(first.getDay()+6)%7,days=[];
+  for(let i=0;i<start;i++)days.push(null);
+  for(let d=1;d<=last.getDate();d++)days.push(new Date(y,m,d));
+  const names=L().days;
+  return `<div class="card">
+    <div class="flex-b mb12"><div class="section-lbl" style="margin:0">Calendrier · ${fmtMonth(date)}</div><div class="chip chip-blue">${monthHours(emp,date).toFixed(1)}h mois</div></div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:6px">${[1,2,3,4,5,6,0].map(i=>`<div class="fs11 muted tc fw7">${names[i]}</div>`).join('')}</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">${days.map(d=>{
+      if(!d)return`<div style="min-height:46px"></div>`;
+      const sh=emp.schedules?.[d.getDay()],abs=getAbs(emp.id,d),w=workedOn(emp.id,d),today=sameDay(d,new Date());
+      const bg=abs?'rgba(245,158,11,.18)':w?'rgba(16,185,129,.16)':sh?.enabled?'var(--s3)':'rgba(91,95,120,.08)';
+      const bd=today?'var(--orange)':'var(--border)';
+      const sub=abs?abs.type:w?`${w.toFixed(1)}h`:sh?.enabled?`${sh.entry}-${sh.exit}`:'Libre';
+      return`<div style="min-height:54px;border:1px solid ${bd};background:${bg};border-radius:8px;padding:6px 5px;text-align:center;overflow:hidden">
+        <div class="fw8 fs13">${d.getDate()}</div>
+        <div class="fs11 muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>
+      </div>`;
+    }).join('')}</div>
+  </div>`;
+}
+async function requestEmpAbsence(){
+  const emp=currentUser?.emp;if(!emp)return;
+  const type=document.getElementById('emp-abs-type').value,start=document.getElementById('emp-abs-start').value,end=document.getElementById('emp-abs-end').value,notes=clean(document.getElementById('emp-abs-notes').value);
+  if(!start||!end){toast('Sélectionnez les dates','#ef4444');return;}
+  try{
+    await sbEmployeeRequestAbsence(emp,type,start,end,notes);
+    const a={id:uid(),empId:emp.id,type,start,end,approved:false,notes};
+    DB.absences.unshift(a);
+    renderEmpView(emp);
+    toast('Demande envoyée');
+  }catch(e){console.error(e);toast('Impossible d’envoyer la demande','#ef4444');}
+}
+
 // ═══════ EMP VIEW ═══════
 function renderEmpView(emp){
   if(empClockTimer){clearInterval(empClockTimer);empClockTimer=null;}
   const now=new Date(),dow=now.getDay(),last=lastAction(emp.id),w=workedOn(emp.id,now),sch=emp.schedules?.[dow];
   const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));
+  const monthHrs=monthHours(emp,now);
   const sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
   const c=empColor(emp);
   const weekDays=Array.from({length:7},(_,i)=>new Date(getMonday(now).getTime()+i*86400000));
@@ -1538,6 +1638,19 @@ function renderEmpView(emp){
       <div class="emp-stat"><div class="emp-stat-val" style="color:var(--orange)">${wkHrs.toFixed(1)}h</div><div class="emp-stat-lbl">Cette semaine</div></div>
       <div class="emp-stat"><div class="emp-stat-val" style="color:var(--green)">${vacLeft}j</div><div class="emp-stat-lbl">Vacances</div></div>
     </div>
+    <div class="card" style="margin-bottom:12px;text-align:center">
+      <div class="section-lbl" style="margin-top:0">Heures du mois</div>
+      <div style="font-size:34px;font-weight:800;color:var(--brand)">${monthHrs.toFixed(1)}h</div>
+      <div class="fs12 muted">${fmtMonth(now)}</div>
+    </div>
+    ${empCalendarHTML(emp,now)}
+    <div class="card">
+      <div class="section-lbl" style="margin-top:0">Demander une absence</div>
+      <div class="fg"><label>Type</label><select id="emp-abs-type"><option value="vacation">🌴 Vacances</option><option value="medical">🏥 Incapacité / maladie</option><option value="personal">👤 Personnel</option></select></div>
+      <div class="frow"><div class="fg"><label>Début</label><input type="date" id="emp-abs-start"></div><div class="fg"><label>Fin</label><input type="date" id="emp-abs-end"></div></div>
+      <div class="fg"><label>Note</label><input id="emp-abs-notes" placeholder="Facultatif"></div>
+      <button class="btn btn-primary" onclick="requestEmpAbsence()">Envoyer la demande</button>
+    </div>
     ${sch?.enabled?`<div class="card" style="margin-bottom:12px">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Horaire d'aujourd'hui</div>
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -1560,6 +1673,7 @@ function renderEmpView(emp){
       <div style="text-align:center">
         <div class="qr-wrap" style="margin:0 auto">${genQR('EMP:'+emp.id,150)}</div>
         <div style="font-size:11px;color:var(--text2);margin-top:8px">Présentez ce QR pour pointer</div>
+        <button class="btn btn-ghost mt12" onclick="downloadBadge(currentUser.emp)">⬇️ Télécharger mon carnet</button>
       </div>
     </div>`;
   renderQRCodes(document.getElementById('evs'));
@@ -1793,7 +1907,6 @@ function saveEmp(){
   saveLocal();closeModal('emp-modal');renderPage(currentPage);
   toast((editEmpId?'✅ Employé mis à jour':'✅ Employé ajouté')+(!typedPin&&!existing?.pin?` · PIN ${generatedPin}`:''));
   sbSaveEmp(data).catch(console.error);
-  if(!editEmpId)setTimeout(()=>sendBadgeEmail(data),400);
 }
 
 // ═══════ DETAIL ═══════
@@ -1857,7 +1970,7 @@ function openDetail(empId){
         </div>
       </div>
       <div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px;font-size:11px;color:var(--text2);text-align:center">🔮 Compatible NFC — badge physique prévu</div>
-      <button class="btn btn-ghost mt12" onclick="sendBadgeEmail(DB.employees.find(e=>e.id==='${empId}'))">✉️ Envoyer carnet par email</button>
+      <button class="btn btn-ghost mt12" onclick="downloadBadge(DB.employees.find(e=>e.id==='${empId}'))">⬇️ Télécharger carnet</button>
     </div>
     <div id="dt-info" style="display:none">
       <div class="card">

@@ -223,6 +223,109 @@ begin
 end;
 $$;
 
+create or replace function public.employee_portal_data(p_email text, p_pin text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_emp record;
+  v_payload jsonb;
+begin
+  select e.id, e.restaurant_id
+  into v_emp
+  from public.employees e
+  where lower(e.email) = lower(trim(p_email))
+    and e.pin = p_pin
+    and e.status = 'active'
+  limit 1;
+
+  if v_emp.id is null then
+    raise exception 'Employee not found';
+  end if;
+
+  select jsonb_build_object(
+    'attendance', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'id', a.id::text,
+        'employee_id', a.employee_id::text,
+        'employee_name', a.employee_name,
+        'type', a.type,
+        'timestamp', a.timestamp
+      ) order by a.timestamp desc)
+      from public.attendance a
+      where a.employee_id = v_emp.id
+        and a.restaurant_id = v_emp.restaurant_id
+        and a.timestamp >= date_trunc('year', now())
+    ), '[]'::jsonb),
+    'absences', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'id', ab.id::text,
+        'employee_id', ab.employee_id::text,
+        'type', ab.type,
+        'start_date', ab.start_date,
+        'end_date', ab.end_date,
+        'approved', ab.approved,
+        'notes', ab.notes
+      ) order by ab.start_date desc)
+      from public.absences ab
+      where ab.employee_id = v_emp.id
+        and ab.restaurant_id = v_emp.restaurant_id
+        and ab.start_date >= (current_date - interval '90 days')
+    ), '[]'::jsonb),
+    'shifts', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'employee_id', s.employee_id::text,
+        'shift_date', s.shift_date,
+        'shift_type', s.shift_type,
+        'start_time', s.start_time,
+        'end_time', s.end_time,
+        'notes', s.notes
+      ) order by s.shift_date)
+      from public.shifts s
+      where s.employee_id = v_emp.id
+        and s.restaurant_id = v_emp.restaurant_id
+        and s.shift_date between (current_date - interval '90 days') and (current_date + interval '180 days')
+    ), '[]'::jsonb)
+  ) into v_payload;
+
+  return v_payload;
+end;
+$$;
+
+create or replace function public.employee_request_absence(p_email text, p_pin text, p_type text, p_start date, p_end date, p_notes text default '')
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_emp record;
+begin
+  if p_start is null or p_end is null or p_end < p_start then
+    raise exception 'Invalid absence dates';
+  end if;
+
+  select e.id, e.restaurant_id
+  into v_emp
+  from public.employees e
+  where lower(e.email) = lower(trim(p_email))
+    and e.pin = p_pin
+    and e.status = 'active'
+  limit 1;
+
+  if v_emp.id is null then
+    raise exception 'Employee not found';
+  end if;
+
+  insert into public.absences (restaurant_id, employee_id, type, start_date, end_date, approved, notes)
+  values (v_emp.restaurant_id, v_emp.id, p_type, p_start, p_end, false, coalesce(p_notes,''));
+end;
+$$;
+
 grant execute on function public.employee_login(text,text) to anon, authenticated;
 grant execute on function public.employee_register_attendance(text,text,text) to anon, authenticated;
+grant execute on function public.employee_portal_data(text,text) to anon, authenticated;
+grant execute on function public.employee_request_absence(text,text,text,date,date,text) to anon, authenticated;
 
