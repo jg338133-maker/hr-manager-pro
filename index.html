@@ -468,7 +468,10 @@ input[type=date],input[type=time]{color-scheme:dark}
 <div class="page" id="pg-attendance">
   <div class="flex-b mb12">
     <div><div class="fw7 fs14" id="att-date"></div><div class="fs12 muted">Pointages du jour</div></div>
-    <button class="btn btn-primary btn-sm" onclick="openScanner()">📷</button>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost btn-sm" onclick="openManualModal()">Manuel</button>
+      <button class="btn btn-primary btn-sm" onclick="openScanner()">📷</button>
+    </div>
   </div>
   <div class="kpi-grid" id="att-kpi"></div>
   <div class="section-lbl">Programmés aujourd'hui</div>
@@ -773,6 +776,25 @@ input[type=date],input[type=time]{color-scheme:dark}
 </div>
 </div>
 
+<!-- Manual Attendance -->
+<div class="ov" id="manual-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title">Pointage manuel</div>
+  <div class="fg"><label>Employé</label><select id="man-emp"></select></div>
+  <div class="fg"><label>Date</label><input type="date" id="man-date"></div>
+  <div class="frow">
+    <div class="fg"><label>Entrée</label><input type="time" id="man-in" value="09:00"></div>
+    <div class="fg"><label>Sortie</label><input type="time" id="man-out" value="17:00"></div>
+  </div>
+  <div class="fg"><label>Motif</label><input id="man-note" placeholder="Correction manager"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('manual-modal')">Annuler</button>
+    <button class="btn btn-primary" onclick="saveManualAttendance()">Enregistrer</button>
+  </div>
+</div>
+</div>
+
 <!-- Shift -->
 <div class="ov" id="shift-modal">
 <div class="modal">
@@ -924,6 +946,11 @@ async function sbSaveEmp(emp){
 }
 async function sbDelEmp(id){await Promise.all([sb.from('employees').delete().eq('id',id),sb.from('attendance').delete().eq('employee_id',id),sb.from('absences').delete().eq('employee_id',id),sb.from('shifts').delete().eq('employee_id',id)]);}
 async function sbReg(empId,empName,type){await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:new Date().toISOString()});}
+async function sbRegAt(empId,empName,type,ts){await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:ts});}
+async function sbDelAttendanceDay(empId,dateStr){
+  const start=localDateTimeISO(dateStr,'00:00'),end=localDateTimeISO(dateStr,'23:59');
+  await sb.from('attendance').delete().eq('restaurant_id',REST_ID).eq('employee_id',empId).gte('timestamp',start).lte('timestamp',end);
+}
 async function sbSaveAbs(a){await sb.from('absences').upsert({id:a.id,restaurant_id:REST_ID,employee_id:a.empId,type:a.type,start_date:a.start,end_date:a.end,approved:a.approved,notes:a.notes||''});}
 async function sbSaveShift(key,sh){const[eId,date]=key.split('_');await sb.from('shifts').upsert({restaurant_id:REST_ID,employee_id:eId,shift_date:date,shift_type:sh.type,start_time:sh.in||null,end_time:sh.out||null,notes:sh.notes||''},{onConflict:'employee_id,shift_date'});}
 async function sbSaveSettings(s){await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2}).eq('id',REST_ID);}
@@ -1157,6 +1184,33 @@ async function register(empId,type){
   toast((type==='in'?'✅ Entrée':'🔴 Sortie')+' — '+emp.name);
   renderPage(currentPage);
   sbReg(empId,fullName(emp),type).catch(console.error);
+}
+function localDateTimeISO(dateStr,timeStr){
+  const [y,m,d]=dateStr.split('-').map(Number),[hh,mm]=timeStr.split(':').map(Number);
+  return new Date(y,m-1,d,hh,mm,0,0).toISOString();
+}
+function openManualModal(empId=null){
+  const active=DB.employees.filter(e=>e.status==='active');
+  if(!active.length){toast('Aucun employé actif','#ef4444');return;}
+  document.getElementById('man-emp').innerHTML=active.map(e=>`<option value="${esc(e.id)}" ${e.id===empId?'selected':''}>${safeEmpName(e)}</option>`).join('');
+  document.getElementById('man-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('man-note').value='Correction manager';
+  openModal('manual-modal');
+}
+async function saveManualAttendance(){
+  const empId=document.getElementById('man-emp').value,date=document.getElementById('man-date').value;
+  const tin=document.getElementById('man-in').value,tout=document.getElementById('man-out').value,note=clean(document.getElementById('man-note').value)||'Correction manager';
+  const emp=DB.employees.find(e=>e.id===empId);
+  if(!emp||!date||!tin||!tout){toast('Complétez employé, date et heures','#ef4444');return;}
+  const inTs=localDateTimeISO(date,tin),outTs=localDateTimeISO(date,tout);
+  if(new Date(outTs)<=new Date(inTs)){toast('La sortie doit être après l’entrée','#ef4444');return;}
+  const oldLen=DB.history.length;
+  DB.history=DB.history.filter(h=>!(h.empId===empId&&sameDay(h.ts,new Date(inTs))&&(h.type==='in'||h.type==='out')));
+  const recIn={id:uid(),empId,empName:fullName(emp),type:'in',ts:inTs,manual:true,note};
+  const recOut={id:uid(),empId,empName:fullName(emp),type:'out',ts:outTs,manual:true,note};
+  DB.history.unshift(recOut,recIn);saveLocal();closeModal('manual-modal');renderPage(currentPage);
+  toast(`✅ Heures enregistrées (${oldLen-DB.history.length+2} pointages)`);
+  sbDelAttendanceDay(empId,date).then(()=>Promise.all([sbRegAt(empId,fullName(emp),'in',inTs),sbRegAt(empId,fullName(emp),'out',outTs)])).catch(console.error);
 }
 const lastAction=empId=>DB.history.find(h=>h.empId===empId);
 function workedOn(empId,date){
@@ -1465,6 +1519,7 @@ function renderAtt(){
       <div style="display:flex;flex-direction:column;gap:6px" onclick="event.stopPropagation()">
         <button class="btn btn-success btn-sm" style="width:36px;height:34px;padding:0" onclick="register('${emp.id}','in')">↗</button>
         <button class="btn btn-danger btn-sm" style="width:36px;height:34px;padding:0" onclick="register('${emp.id}','out')">↙</button>
+        <button class="btn btn-ghost btn-sm" style="width:36px;height:34px;padding:0" onclick="openManualModal('${emp.id}')">✎</button>
       </div>
     </div></div>`;
   }).join('');
