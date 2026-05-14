@@ -257,7 +257,7 @@ input[type=date],input[type=time]{color-scheme:dark}
 .mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
 .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}
 .tc{text-align:center}
-.col-green{color:var(--green)}.col-red{color:var(--red)}.col-orange{color:var(--orange)}.col-brand{color:var(--brand)}
+.col-green{color:var(--green)}.col-red{color:var(--red)}.col-orange{color:var(--orange)}.col-brand{color:var(--brand)}.col-cyan{color:var(--cyan)}
 .empty-state{text-align:center;padding:48px 20px;color:var(--text2)}
 .empty-state h3{font-size:16px;color:var(--text);margin-bottom:6px;font-weight:700;margin-top:14px}
 .empty-state p{font-size:13px;line-height:1.6}
@@ -637,25 +637,38 @@ input[type=date],input[type=time]{color-scheme:dark}
 </div>
 
 <div class="page" id="pg-master">
-  <div class="card" style="background:linear-gradient(135deg,#0d1228,#111835);border-color:#1e2548">
-    <div class="card-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
-      Cuenta maestra
+  <div class="card" style="background:linear-gradient(135deg,#10162f,#0b1022);border-color:#27335f">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div class="card-header" style="margin-bottom:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+          Consola maestra
+        </div>
+        <div class="fw8" style="font-size:24px;margin-bottom:5px">Master Admin</div>
+        <div class="fs12 muted" id="master-version"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="exportMasterJSON()">Respaldo global</button>
+        <button class="btn btn-ghost btn-sm" onclick="renderMaster()">Actualizar</button>
+      </div>
     </div>
-    <div class="fw8" style="font-size:20px;margin-bottom:4px">Panel Master Admin</div>
-    <div class="fs12 muted" id="master-version"></div>
   </div>
   <div class="kpi-grid" id="master-kpi"></div>
   <div class="card">
-    <div class="card-header">Restaurantes</div>
+    <div class="card-header" style="justify-content:space-between">
+      <span>Restaurantes gestionados</span>
+      <span class="chip chip-blue" id="master-active-chip"></span>
+    </div>
     <div id="master-restaurants"></div>
   </div>
   <div class="card">
-    <div class="card-header">Mantenimiento</div>
-    <button class="btn btn-ghost mb8" onclick="exportMasterJSON()">⬇️ Respaldo global JSON</button>
-    <button class="btn btn-ghost mb8" onclick="openMaintenance('github')">GitHub repo</button>
-    <button class="btn btn-ghost mb8" onclick="openMaintenance('pages')">GitHub Pages</button>
-    <button class="btn btn-ghost" onclick="openMaintenance('supabase')">Supabase dashboard</button>
+    <div class="card-header">Centro de mantenimiento</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">
+      <button class="btn btn-ghost" onclick="openMaintenance('github')">GitHub repo</button>
+      <button class="btn btn-ghost" onclick="openMaintenance('pages')">Sitio público</button>
+      <button class="btn btn-ghost" onclick="openMaintenance('supabase')">Supabase</button>
+      <button class="btn btn-ghost" onclick="exportMasterJSON()">Backup JSON</button>
+    </div>
   </div>
 </div>
 
@@ -1765,20 +1778,28 @@ async function renderMaster(){
   const restaurants=MASTER.restaurants||[],profiles=MASTER.profiles||[];
   const emps=MASTER.stats?.employees||[],atts=MASTER.stats?.attendance||[];
   const today=todayStart();
-  document.getElementById('master-version').textContent=`Versión ${APP_VERSION} · Build ${APP_BUILD} · Restaurante activo: ${REST_ID}`;
+  const activeRest=restaurants.find(r=>r.id===REST_ID);
+  document.getElementById('master-version').textContent=`Versión ${APP_VERSION} · Build ${APP_BUILD} · ${currentUser?.email||currentUser?.name||'Super Admin'}`;
+  document.getElementById('master-active-chip').textContent=`Activo: ${activeRest?.name||'sin restaurante'}`;
   document.getElementById('master-kpi').innerHTML=`
-    <div class="kpi"><div class="kpi-val" style="color:var(--brand)">${restaurants.length}</div><div class="kpi-sub">Restaurantes</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--green)">${profiles.length}</div><div class="kpi-sub">Usuarios</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${emps.length}</div><div class="kpi-sub">Empleados</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--cyan)">${atts.filter(a=>sameDay(a.timestamp,today)).length}</div><div class="kpi-sub">Pointages hoy</div></div>`;
+    <div class="kpi"><div class="kpi-glow" style="background:var(--brand)"></div><div class="fs11 muted fw7">Red</div><div class="kpi-val" style="color:var(--brand)">${restaurants.length}</div><div class="kpi-sub">Restaurantes</div></div>
+    <div class="kpi"><div class="kpi-glow" style="background:var(--green)"></div><div class="fs11 muted fw7">Accesos</div><div class="kpi-val" style="color:var(--green)">${profiles.length}</div><div class="kpi-sub">Usuarios registrados</div></div>
+    <div class="kpi"><div class="kpi-glow" style="background:var(--orange)"></div><div class="fs11 muted fw7">Operación</div><div class="kpi-val" style="color:var(--orange)">${emps.length}</div><div class="kpi-sub">Empleados totales</div></div>
+    <div class="kpi"><div class="kpi-glow" style="background:var(--cyan)"></div><div class="fs11 muted fw7">Hoy</div><div class="kpi-val" style="color:var(--cyan)">${atts.filter(a=>sameDay(a.timestamp,today)).length}</div><div class="kpi-sub">Fichajes registrados</div></div>`;
   document.getElementById('master-restaurants').innerHTML=restaurants.length?restaurants.map(r=>{
     const count=emps.filter(e=>e.restaurant_id===r.id).length;
     const admins=profiles.filter(p=>p.restaurant_id===r.id).length;
-    return `<div class="emp-row" onclick="switchRestaurant('${esc(r.id)}')">
-      <div class="sb-resto-logo">${esc(r.emoji||'🍽️')}</div>
-      <div style="flex:1;min-width:0">
-        <div class="fw7 fs14">${esc(r.name||'Restaurant')}</div>
-        <div class="fs11 muted">${count} empleados · ${admins} usuarios · ${esc(r.id)}</div>
+    const todayAtt=atts.filter(a=>a.restaurant_id===r.id&&sameDay(a.timestamp,today)).length;
+    return `<div class="emp-row" onclick="switchRestaurant('${esc(r.id)}')" style="align-items:flex-start">
+      <div class="sb-resto-logo" style="margin-top:2px">${esc(r.emoji||'🍽️')}</div>
+      <div style="flex:1;min-width:0;display:grid;grid-template-columns:minmax(150px,1.2fr) repeat(3,minmax(70px,.5fr));gap:8px;align-items:center">
+        <div style="min-width:0">
+          <div class="fw7 fs14" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name||'Restaurant')}</div>
+          <div class="fs11 muted" style="font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.id)}</div>
+        </div>
+        <div><div class="fs11 muted">Empleados</div><div class="fw8">${count}</div></div>
+        <div><div class="fs11 muted">Usuarios</div><div class="fw8">${admins}</div></div>
+        <div><div class="fs11 muted">Hoy</div><div class="fw8 col-cyan">${todayAtt}</div></div>
       </div>
       <span class="chip ${r.id===REST_ID?'chip-green':'chip-blue'}">${r.id===REST_ID?'Activo':'Abrir'}</span>
     </div>`;
