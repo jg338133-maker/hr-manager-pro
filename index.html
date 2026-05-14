@@ -1320,13 +1320,8 @@ function renderQRCodes(root=document){
     if(el.dataset.ready==='1')return;
     const text=el.dataset.qr||'',size=parseInt(el.dataset.size,10)||180;
     el.dataset.ready='1';
-    if(typeof QRCode==='undefined'){
-      el.innerHTML=`<div style="width:${size}px;height:${size}px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:10px">QR indisponible</div>`;
-      return;
-    }
-    el.innerHTML='';
-    new QRCode(el,{text,width:size,height:size,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
-    el.querySelectorAll('canvas,img').forEach(node=>{node.style.display='block';node.style.width=size+'px';node.style.height=size+'px';});
+    const src=`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=0&data=${encodeURIComponent(text)}`;
+    el.innerHTML=`<img src="${src}" alt="QR" referrerpolicy="no-referrer" style="display:block;width:${size}px;height:${size}px;image-rendering:pixelated" onerror="this.parentNode.innerHTML='<div style=&quot;width:${size}px;height:${size}px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:10px&quot;>QR indisponible</div>'">`;
   });
 }
 
