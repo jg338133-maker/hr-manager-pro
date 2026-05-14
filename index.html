@@ -296,6 +296,7 @@ input[type=date],input[type=time]{color-scheme:dark}
     <div id="login-manager">
       <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="manager@restaurant.ch"></div>
       <div class="fg"><label>Mot de passe</label><input type="password" id="login-password" placeholder="••••••••"></div>
+      <button class="btn btn-ghost" onclick="recoverPassword()" style="margin-bottom:12px;padding:9px 12px;font-size:12px">Mot de passe oublié ?</button>
       <button class="btn btn-primary" onclick="loginManager()" style="margin-bottom:12px">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
         Se connecter
@@ -786,9 +787,10 @@ const SB_URL='https://grztncvdsvtrwekekpss.supabase.co';
 const SB_KEY='sb_publishable_hERziVqtGfUc-EYHDCJ8nQ_0TjBvNZq';
 const APP_VERSION='2.2.0';
 const APP_BUILD='2026-05-14';
+const APP_PUBLIC_URL='https://jg338133-maker.github.io/hr-manager-pro/';
 const MAINTENANCE_LINKS={
   github:'https://github.com/jg338133-maker/hr-manager-pro',
-  pages:'https://jg338133-maker.github.io/hr-manager-pro/',
+  pages:APP_PUBLIC_URL,
   supabase:'https://supabase.com/dashboard/project/grztncvdsvtrwekekpss'
 };
 let REST_ID=localStorage.getItem('hrm_restaurant_id')||'3f99dc38-0771-4bb6-b307-474ccc80f86e';
@@ -1025,6 +1027,19 @@ async function loginManager(){
   }catch(e){
     toast('Identifiants invalides. Utilisez le mode démo si besoin.','#ef4444');
     console.warn('Login error:',e);
+  }
+}
+
+async function recoverPassword(){
+  const email=document.getElementById('login-email').value.trim();
+  if(!email){toast('Entrez votre email','#ef4444');return;}
+  try{
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:APP_PUBLIC_URL});
+    if(error)throw error;
+    toast('Email de récupération envoyé');
+  }catch(e){
+    console.error(e);
+    toast('Impossible d’envoyer la récupération','#ef4444');
   }
 }
 
