@@ -867,11 +867,11 @@ const LANGS={
 let lang='fr';
 const L=()=>LANGS[lang]||LANGS.fr;
 const UI={
-  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',password:'Mot de passe',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin'}},
-  es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Restaurante',email:'Email',password:'Contraseña',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del restaurante',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin'}},
-  en:{pages:{dashboard:'Dashboard',attendance:'Attendance',employees:'Employees',shifts:'Shifts',vacations:'Leave',payroll:'Payroll',reports:'Reports',history:'History',settings:'Settings',master:'Master Admin'},nav:{principal:'Main',planning:'Planning',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employee',restaurant:'Restaurant',email:'Email',password:'Password',signin:'Sign in',forgot:'Forgot password?',demo:'Demo access (no account)',restName:'Restaurant name',adminEmail:'Admin email',createAdmin:'Create admin account'}},
-  de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen'}},
-  it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin'}}
+  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',password:'Mot de passe',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin',sub:'Gestion du personnel · Fribourg CH'},dash:{active:'Employés actifs',present:'Présents / Prévus',absent:'Absents',vacation:'En vacances',live:'Présents en ce moment',alerts:'Alertes du jour',allGood:'Tout est en ordre',missing:'Entrée non pointée',late:'Arrivé en retard',scan:'Scanner QR',addEmp:'+ Employé'},emp:{search:'Rechercher un employé...',all:'Tous',active:'Actifs',inactive:'Inactifs',new:'Nouvel employé',edit:'Modifier',none:'Aucun employé',noResult:'Aucun résultat',addFirst:'Ajoutez votre premier employé',in:'Entrée',out:'Sortie'}},
+  es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Restaurante',email:'Email',password:'Contraseña',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del restaurante',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin',sub:'Gestión de personal · Friburgo CH'},dash:{active:'Empleados activos',present:'Presentes / Previstos',absent:'Ausentes',vacation:'De vacaciones',live:'Presentes ahora',alerts:'Alertas del día',allGood:'Todo está en orden',missing:'Entrada no registrada',late:'Llegó tarde',scan:'Escanear QR',addEmp:'+ Empleado'},emp:{search:'Buscar empleado...',all:'Todos',active:'Activos',inactive:'Inactivos',new:'Nuevo empleado',edit:'Modificar',none:'Sin empleados',noResult:'Sin resultados',addFirst:'Agrega tu primer empleado',in:'Entrada',out:'Salida'}},
+  en:{pages:{dashboard:'Dashboard',attendance:'Attendance',employees:'Employees',shifts:'Shifts',vacations:'Leave',payroll:'Payroll',reports:'Reports',history:'History',settings:'Settings',master:'Master Admin'},nav:{principal:'Main',planning:'Planning',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employee',restaurant:'Restaurant',email:'Email',password:'Password',signin:'Sign in',forgot:'Forgot password?',demo:'Demo access (no account)',restName:'Restaurant name',adminEmail:'Admin email',createAdmin:'Create admin account',sub:'Staff management · Fribourg CH'},dash:{active:'Active employees',present:'Present / Scheduled',absent:'Absent',vacation:'On vacation',live:'Present now',alerts:'Daily alerts',allGood:'Everything is fine',missing:'Clock-in missing',late:'Arrived late',scan:'Scan QR',addEmp:'+ Employee'},emp:{search:'Search employee...',all:'All',active:'Active',inactive:'Inactive',new:'New employee',edit:'Edit',none:'No employees',noResult:'No results',addFirst:'Add your first employee',in:'Clock in',out:'Clock out'}},
+  de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Personalverwaltung · Freiburg CH'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
+  it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione personale · Friburgo CH'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
 };
 const T=()=>UI[lang]||UI.fr;
 
@@ -1057,6 +1057,12 @@ function applyUITexts(){
   const demo=document.querySelector('[onclick="loginDemo()"]');if(demo)demo.textContent='🎯 '+t.login.demo;
   const regLabels=document.querySelectorAll('#login-register .fg label');if(regLabels[0])regLabels[0].textContent=t.login.restName;if(regLabels[1])regLabels[1].textContent=t.login.adminEmail;if(regLabels[2])regLabels[2].textContent=t.login.password;
   const create=document.querySelector('[onclick="registerRestaurant()"]');if(create)create.textContent=t.login.createAdmin;
+  const sub=document.querySelector('.login-sub');if(sub)sub.textContent=t.login.sub;
+  const empSearch=document.getElementById('emp-search');if(empSearch)empSearch.placeholder=t.emp.search;
+  const topNew=document.querySelector('.top-btn.primary');if(topNew)topNew.lastChild.textContent=' '+t.emp.new.split(' ')[0];
+  const dashBtns=document.querySelectorAll('#pg-dashboard .btn');if(dashBtns[0])dashBtns[0].textContent='📷 '+t.dash.scan;if(dashBtns[1])dashBtns[1].textContent=t.dash.addEmp;
+  const empTabs=document.querySelectorAll('#pg-employees .tab');if(empTabs[0])empTabs[0].textContent=t.emp.all;if(empTabs[1])empTabs[1].textContent=t.emp.active;if(empTabs[2])empTabs[2].textContent=t.emp.inactive;
+  const empAdd=document.querySelector('#pg-employees .btn-primary.mt12');if(empAdd)empAdd.lastChild.textContent=' '+t.emp.new;
 }
 function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();applyUITexts();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);}
 
@@ -1411,6 +1417,7 @@ function renderAll(){renderDash();renderEmps();renderHistory();renderSettings();
 
 // ═══════ DASHBOARD ═══════
 function renderDash(){
+  const tx=T().dash;
   const now=new Date(),dow=now.getDay();
   const active=DB.employees.filter(e=>e.status==='active');
   const present=active.filter(e=>DB.history.some(h=>h.empId===e.id&&sameDay(h.ts,now)));
@@ -1426,22 +1433,22 @@ function renderDash(){
   document.getElementById('kpi-grid').innerHTML=`
     <div class="kpi"><div class="kpi-glow" style="background:var(--brand)"></div>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <div class="kpi-val" style="color:var(--brand)">${active.length}</div><div class="kpi-sub">Employés actifs</div></div>
+      <div class="kpi-val" style="color:var(--brand)">${active.length}</div><div class="kpi-sub">${tx.active}</div></div>
     <div class="kpi"><div class="kpi-glow" style="background:var(--green)"></div>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-      <div class="kpi-val" style="color:var(--green)">${present.length}<span style="font-size:14px;font-weight:400;color:var(--text2)">/${scheduled.length}</span></div><div class="kpi-sub">Présents / Prévus</div></div>
+      <div class="kpi-val" style="color:var(--green)">${present.length}<span style="font-size:14px;font-weight:400;color:var(--text2)">/${scheduled.length}</span></div><div class="kpi-sub">${tx.present}</div></div>
     <div class="kpi"><div class="kpi-glow" style="background:var(--red)"></div>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      <div class="kpi-val" style="color:var(--red)">${missing.length}</div><div class="kpi-sub">Absents</div></div>
+      <div class="kpi-val" style="color:var(--red)">${missing.length}</div><div class="kpi-sub">${tx.absent}</div></div>
     <div class="kpi"><div class="kpi-glow" style="background:var(--orange)"></div>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M2 20h20M5 20V8.5L12 3l7 5.5V20"/></svg>
-      <div class="kpi-val" style="color:var(--orange)">${onVac.length}</div><div class="kpi-sub">En vacances</div></div>`;
+      <div class="kpi-val" style="color:var(--orange)">${onVac.length}</div><div class="kpi-sub">${tx.vacation}</div></div>`;
 
   let liveHTML='';
   if(present.length>0){
     liveHTML=`<div class="card" style="margin-bottom:10px"><div class="card-header">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      Présents en ce moment</div>
+      ${tx.live}</div>
       <div style="display:flex;flex-wrap:wrap;gap:12px">`;
     present.forEach(emp=>{
       const w=workedOn(emp.id,now);
@@ -1461,18 +1468,18 @@ function renderDash(){
   const alerts=[];
   active.forEach(emp=>{
     const ds=dayStatus(emp,now);
-    if(ds.type==='missing')alerts.push({emp,msg:'Entrée non pointée',color:'var(--orange)'});
-    if(isLate(emp,now))alerts.push({emp,msg:'Arrivé en retard',color:'var(--red)'});
+    if(ds.type==='missing')alerts.push({emp,msg:tx.missing,color:'var(--orange)'});
+    if(isLate(emp,now))alerts.push({emp,msg:tx.late,color:'var(--red)'});
   });
 
   let aHTML=`<div class="card"><div class="card-header" style="justify-content:space-between">
     <div style="display:flex;align-items:center;gap:8px">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      Alertes du jour
+      ${tx.alerts}
     </div>
     ${alerts.length>0?`<span style="background:rgba(239,68,68,.15);color:var(--red);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700">${alerts.length}</span>`:''}
   </div>`;
-  if(!alerts.length)aHTML+=`<div style="text-align:center;padding:14px 0;color:var(--green);font-size:13px;font-weight:600">✅ Tout est en ordre</div>`;
+  if(!alerts.length)aHTML+=`<div style="text-align:center;padding:14px 0;color:var(--green);font-size:13px;font-weight:600">✅ ${tx.allGood}</div>`;
   else alerts.forEach(a=>{aHTML+=`<div class="alert-item">
     <div class="alert-icon" style="background:${a.color}22;color:${a.color};font-size:16px">⚠️</div>
     <div><div style="font-weight:700;font-size:13px">${safeEmpName(a.emp)}</div><div style="font-size:11px;color:${a.color}">${esc(a.msg)}</div></div>
@@ -1529,9 +1536,10 @@ function renderAtt(){
 let empF='all';
 function setEF(f,el){empF=f;setAT(el.closest('.tabs'),el);renderEmps();}
 function renderEmps(){
+  const tx=T().emp;
   const search=(document.getElementById('emp-search')?.value||'').toLowerCase();
   const filtered=DB.employees.filter(e=>empF==='all'?true:e.status===empF).filter(e=>!search||fullName(e).toLowerCase().includes(search)||e.position.toLowerCase().includes(search));
-  if(!filtered.length){document.getElementById('emp-list').innerHTML=`<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h3>${search?'Aucun résultat':'Aucun employé'}</h3><p>Ajoutez votre premier employé</p></div>`;return;}
+  if(!filtered.length){document.getElementById('emp-list').innerHTML=`<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h3>${search?tx.noResult:tx.none}</h3><p>${tx.addFirst}</p></div>`;return;}
   document.getElementById('emp-list').innerHTML=filtered.map(emp=>{
     const last=lastAction(emp.id),w=workedOn(emp.id,new Date()),sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
     return`<div class="emp-row" onclick="openDetail('${emp.id}')">
@@ -1539,7 +1547,7 @@ function renderEmps(){
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${safeEmpName(emp)}</div>
         <div style="font-size:11px;color:var(--text2);margin-top:2px">${esc(emp.position)} · ${esc(emp.dept)}</div>
-        <div style="font-size:11px;color:${sc};margin-top:3px">${last?`${last.type==='in'?'Entrée':'Sortie'} ${fmtTime(last.ts)}${w?' · '+w.toFixed(1)+'h':''}`:'-'}</div>
+        <div style="font-size:11px;color:${sc};margin-top:3px">${last?`${last.type==='in'?tx.in:tx.out} ${fmtTime(last.ts)}${w?' · '+w.toFixed(1)+'h':''}`:'-'}</div>
       </div>
       <div style="display:flex;gap:5px" onclick="event.stopPropagation()">
         <button class="btn btn-success btn-sm" style="width:34px;height:34px;padding:0" onclick="register('${emp.id}','in')">↗</button>
@@ -1554,7 +1562,7 @@ let editEmpId=null,photoData=null;
 function openEmpModal(id){
   editEmpId=id;photoData=null;
   const emp=id?DB.employees.find(e=>e.id===id):null;
-  document.getElementById('emp-modal-title').textContent=emp?'Modifier — '+emp.name:'Nouvel employé';
+  document.getElementById('emp-modal-title').textContent=emp?`${T().emp.edit} — ${emp.name}`:T().emp.new;
   const fields={name:'name',last:'last',num:'num',start:'startDate',phone:'phone',email:'email',vac:'vacWeeks',avs:'avs',emergency:'emergency',notes:'notes'};
   Object.entries(fields).forEach(([f,k])=>{const el=document.getElementById('ef-'+f);if(el)el.value=emp?.[k]||'';});
   document.getElementById('ef-start').value=emp?.startDate||new Date().toISOString().split('T')[0];
