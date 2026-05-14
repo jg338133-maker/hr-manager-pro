@@ -1,0 +1,1800 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#07080f">
+<title>HR Manager Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --bg:#07080f; --s1:#0d0f1c; --s2:#12152a; --s3:#181b32; --s4:#1e2238;
+  --border:#252840; --border2:#2e3455;
+  --accent:#4f6ef7; --accent2:#7c3aed; --cyan:#06b6d4;
+  --green:#10b981; --red:#ef4444; --orange:#f59e0b;
+  --text:#e8eaf5; --text2:#7c82a0; --text3:#4a5070;
+  --r:16px; --r2:12px; --r3:10px; --r4:8px;
+  --brand:#4f6ef7; --brand2:#7c3aed; --brand-light:rgba(79,110,247,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+/* TOPBAR */
+#topbar{height:56px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:100}
+.menu-btn{background:none;border:none;color:var(--text2);cursor:pointer;padding:8px;border-radius:var(--r4);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.menu-btn:active{background:var(--s3)}
+.top-title{font-size:15px;font-weight:700;flex:1}
+.top-actions{display:flex;gap:6px}
+.top-btn{background:var(--s3);border:1px solid var(--border);border-radius:var(--r3);color:var(--text2);padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;white-space:nowrap;transition:all .15s}
+.top-btn:active{opacity:.7}
+.top-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+/* SIDEBAR */
+#sb-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:299;display:none;backdrop-filter:blur(4px)}
+#sidebar{position:fixed;top:0;left:0;width:260px;height:100%;background:var(--s1);border-right:1px solid var(--border);z-index:300;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+#sidebar.open{transform:translateX(0)}
+.sb-head{padding:18px 14px 14px;border-bottom:1px solid var(--border)}
+.sb-brand{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.sb-logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;box-shadow:0 4px 12px rgba(79,110,247,.3)}
+.sb-app{font-size:15px;font-weight:800}
+.sb-ver{font-size:10px;color:var(--text3);margin-top:1px}
+.sb-resto{background:var(--s3);border:1px solid var(--border);border-radius:var(--r3);padding:10px 12px;display:flex;align-items:center;gap:9px}
+.sb-resto-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sb-resto-name{font-size:13px;font-weight:700}
+.sb-resto-plan{font-size:10px;color:var(--orange);font-weight:600;margin-top:1px}
+.sb-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.sb-section{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:12px 10px 5px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r3);cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:2px;transition:all .15s;border-left:2px solid transparent}
+.sb-item:hover{background:var(--s3);color:var(--text)}
+.sb-item.active{background:var(--brand-light);color:var(--brand);border-left-color:var(--brand)}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;display:none}
+.sb-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-user-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.sb-user-name{font-size:13px;font-weight:600}
+.sb-user-role{font-size:10px;color:var(--text2);margin-top:1px}
+.sb-logout{margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;padding:6px;border-radius:var(--r4);display:flex;align-items:center;transition:all .15s}
+.sb-logout:hover{color:var(--red);background:rgba(239,68,68,.1)}
+
+/* MAIN */
+#main{flex:1;overflow-y:auto;padding:16px;padding-bottom:32px;-webkit-overflow-scrolling:touch}
+.page{display:none;animation:fadeIn .2s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.card-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;color:var(--text2);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.card-header svg{color:var(--brand)}
+
+/* KPIs */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.kpi{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px;position:relative;overflow:hidden}
+.kpi-glow{position:absolute;top:-20px;right:-20px;width:70px;height:70px;border-radius:50%;opacity:.07}
+.kpi-val{font-size:28px;font-weight:800;line-height:1;margin-top:8px}
+.kpi-sub{font-size:11px;color:var(--text2);margin-top:4px}
+
+/* EMP ROW */
+.emp-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:all .15s}
+.emp-row:hover{border-color:var(--border2);background:var(--s3)}
+.emp-row:active{opacity:.8;transform:scale(.99)}
+
+/* AVATAR */
+.av{display:flex;align-items:center;justify-content:center;font-weight:800;overflow:hidden;color:#fff;flex-shrink:0;position:relative}
+.av-44{width:44px;height:44px;border-radius:12px;font-size:14px}
+.av-36{width:36px;height:36px;border-radius:10px;font-size:12px}
+.av-32{width:32px;height:32px;border-radius:9px;font-size:11px}
+.av-28{width:28px;height:28px;border-radius:8px;font-size:9px}
+.av-72{width:72px;height:72px;border-radius:18px;font-size:24px}
+.av img{width:100%;height:100%;object-fit:cover}
+.av-dot{position:absolute;bottom:-2px;right:-2px;width:11px;height:11px;border-radius:50%;border:2px solid var(--bg)}
+
+/* CHIPS */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.chip-blue{background:rgba(79,110,247,.15);color:var(--accent)}
+.chip-green{background:rgba(16,185,129,.15);color:var(--green)}
+.chip-red{background:rgba(239,68,68,.15);color:var(--red)}
+.chip-orange{background:rgba(245,158,11,.15);color:var(--orange)}
+.chip-purple{background:rgba(124,58,237,.15);color:var(--accent2)}
+.chip-gray{background:rgba(91,95,120,.15);color:var(--text2)}
+.chip-cyan{background:rgba(6,182,212,.15);color:var(--cyan)}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:var(--r2);border:none;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;width:100%;transition:all .15s}
+.btn:active{transform:scale(.97);opacity:.9}
+.btn-primary{background:var(--brand);color:#fff;box-shadow:0 4px 14px rgba(79,110,247,.3)}
+.btn-success{background:var(--green);color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.25)}
+.btn-danger{background:var(--red);color:#fff;box-shadow:0 4px 14px rgba(239,68,68,.25)}
+.btn-ghost{background:var(--s3);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--border2)}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:var(--r3);width:auto}
+
+/* FORMS */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600}
+.fg input,.fg select,.fg textarea{width:100%;padding:11px 13px;background:var(--s3);border:1.5px solid var(--border);border-radius:var(--r3);color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(79,110,247,.12)}
+.fg textarea{resize:vertical;min-height:70px}
+.fg select option{background:var(--s2)}
+input[type=date],input[type=time]{color-scheme:dark}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* TOGGLE */
+.tgl-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.tgl-row:last-child{border-bottom:none}
+.tgl{width:46px;height:26px;background:var(--border);border-radius:13px;position:relative;cursor:pointer;transition:background .25s;flex-shrink:0}
+.tgl.on{background:var(--brand)}
+.tgl::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tgl.on::after{transform:translateX(20px)}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;display:none;align-items:flex-end;backdrop-filter:blur(8px)}
+.ov.open{display:flex}
+.modal{background:var(--s1);border-radius:22px 22px 0 0;width:100%;max-height:94vh;overflow-y:auto;padding:20px 16px calc(28px + env(safe-area-inset-bottom));border-top:1px solid var(--border);animation:slideUp .25s cubic-bezier(.4,0,.2,1)}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:38px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-size:19px;font-weight:800;margin-bottom:20px}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+
+/* TABS */
+.tabs{display:flex;background:var(--s3);border-radius:var(--r2);padding:3px;margin-bottom:16px;gap:2px;overflow-x:auto}
+.tab{flex:0 0 auto;padding:8px 14px;border-radius:var(--r3);border:none;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;background:transparent;color:var(--text2);white-space:nowrap;transition:all .2s}
+.tab.active{background:var(--s2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+
+/* PROGRESS */
+.prog{height:6px;background:var(--s3);border-radius:3px;overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* SHIFTS */
+.shift-wrap{overflow-x:auto}
+.shift-table{min-width:580px}
+.shift-hdr{display:grid;gap:3px;margin-bottom:8px;align-items:center}
+.shift-row{display:grid;gap:3px;margin-bottom:3px;align-items:center}
+.s-cell{height:36px;border-radius:var(--r4);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;cursor:pointer;border:1px solid transparent;transition:all .15s;letter-spacing:.5px}
+.s-cell:hover{filter:brightness(1.15)}
+.s-cell.morning{background:rgba(6,182,212,.2);color:var(--cyan);border-color:rgba(6,182,212,.3)}
+.s-cell.afternoon{background:rgba(245,158,11,.2);color:var(--orange);border-color:rgba(245,158,11,.3)}
+.s-cell.evening{background:rgba(124,58,237,.2);color:var(--accent2);border-color:rgba(124,58,237,.3)}
+.s-cell.night{background:rgba(79,110,247,.2);color:var(--accent);border-color:rgba(79,110,247,.3)}
+.s-cell.rest{background:rgba(16,185,129,.15);color:var(--green);border-color:rgba(16,185,129,.25)}
+.s-cell.off{background:var(--s3);color:var(--text3)}
+.s-cell.abs{background:rgba(245,158,11,.12);color:var(--orange);border-color:rgba(245,158,11,.2)}
+
+/* PAY HERO */
+.pay-hero{background:linear-gradient(135deg,#0d1228,#111835);border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden}
+.pay-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:var(--brand);opacity:.06}
+.pay-total{font-size:38px;font-weight:800;margin:10px 0 6px}
+.pay-lbl{font-size:12px;color:var(--text2)}
+
+/* SCANNER */
+#scan-wrap{position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column}
+#scan-wrap.open{display:flex}
+#sv{width:100%;height:100%;object-fit:cover}
+#sc{display:none}
+.scan-ui{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.scan-frame{width:230px;height:230px;position:relative}
+.scan-frame::before,.scan-frame::after,.sf-bl,.sf-br{content:'';position:absolute;width:28px;height:28px;border-color:var(--brand);border-style:solid}
+.scan-frame::before{top:0;left:0;border-width:3px 0 0 3px;border-radius:10px 0 0 0}
+.scan-frame::after{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 10px 0 0}
+.sf-bl{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 10px}
+.sf-br{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 10px 0}
+.scan-line{position:absolute;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--brand),transparent);animation:scanAnim 2s linear infinite}
+@keyframes scanAnim{0%{top:0}100%{top:100%}}
+.scan-close-btn{position:absolute;top:52px;right:18px;pointer-events:all;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:11px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:600;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:90vw}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* LOADING */
+#loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:var(--bg);z-index:800;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
+.login-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:20px;box-shadow:0 8px 32px rgba(79,110,247,.4)}
+.login-title{font-size:26px;font-weight:800;margin-bottom:4px}
+.login-sub{font-size:14px;color:var(--text2);margin-bottom:36px;text-align:center}
+.login-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:24px;width:100%;max-width:360px}
+.login-tabs{display:flex;background:var(--s3);border-radius:var(--r3);padding:3px;margin-bottom:20px;gap:2px}
+.login-tab{flex:1;padding:8px;border-radius:var(--r4);border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s}
+.login-tab.active{background:var(--s2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.pin-display{display:flex;gap:10px;justify-content:center;margin-bottom:20px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);transition:all .2s}
+.pin-dot.filled{background:var(--brand);border-color:var(--brand)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.pin-key{background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:16px;font-size:20px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit;color:var(--text)}
+.pin-key:active{background:var(--brand);color:#fff;transform:scale(.95)}
+
+/* EMP VIEW */
+#emp-view{position:fixed;inset:0;background:var(--bg);z-index:700;display:none;flex-direction:column;overflow-y:auto}
+#emp-view.open{display:flex}
+.emp-view-header{padding:60px 24px 28px;text-align:center}
+.emp-view-actions{padding:0 20px 20px;display:flex;flex-direction:column;gap:10px}
+.emp-view-section{padding:0 20px;margin-bottom:20px}
+.emp-clock{font-size:48px;font-weight:800;text-align:center;margin:16px 0;font-variant-numeric:tabular-nums;letter-spacing:-2px}
+.emp-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.emp-stat{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 10px;text-align:center}
+.emp-stat-val{font-size:20px;font-weight:800}
+.emp-stat-lbl{font-size:10px;color:var(--text2);margin-top:3px}
+
+/* BADGE */
+.badge-card{background:var(--s1);border:1px solid var(--border);border-radius:22px;overflow:hidden;margin-bottom:16px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.badge-header{padding:28px 24px 22px;text-align:center;position:relative}
+.badge-emp-name{font-size:22px;font-weight:800;margin-top:14px}
+.badge-emp-role{font-size:13px;opacity:.8;margin-top:4px}
+.badge-status-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border-radius:20px;padding:6px 14px;margin-top:12px;font-size:12px;font-weight:600;backdrop-filter:blur(10px)}
+.badge-body{padding:20px 24px 24px}
+.qr-wrap{background:#fff;border-radius:16px;padding:14px;display:inline-block;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+
+/* ALERT */
+.alert-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:8px;transition:border-color .15s}
+.alert-item:hover{border-color:var(--border2)}
+.alert-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* SEARCH */
+.search-wrap{position:relative;margin-bottom:12px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.search-wrap input{width:100%;padding:11px 14px 11px 38px;background:var(--s2);border:1.5px solid var(--border);border-radius:var(--r2);color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.search-wrap input:focus{border-color:var(--brand)}
+
+/* PHOTO RING */
+.photo-ring{width:80px;height:80px;border-radius:18px;background:var(--s3);border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;margin:0 auto 14px;transition:border-color .2s}
+.photo-ring:hover{border-color:var(--brand)}
+.photo-ring img{width:100%;height:100%;object-fit:cover}
+
+/* MISC */
+.divider{height:1px;background:var(--border);margin:12px 0}
+.flex-b{display:flex;justify-content:space-between;align-items:center}
+.fw8{font-weight:800}.fw7{font-weight:700}.fw6{font-weight:600}
+.fs11{font-size:11px}.fs12{font-size:12px}.fs13{font-size:13px}.fs14{font-size:14px}
+.muted{color:var(--text2)}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}
+.tc{text-align:center}
+.col-green{color:var(--green)}.col-red{color:var(--red)}.col-orange{color:var(--orange)}.col-brand{color:var(--brand)}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text2)}
+.empty-state h3{font-size:16px;color:var(--text);margin-bottom:6px;font-weight:700;margin-top:14px}
+.empty-state p{font-size:13px;line-height:1.6}
+.section-lbl{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin:16px 0 8px;padding:0 2px}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+.rrow:last-child{border-bottom:none}
+.color-opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.color-opt{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .2s}
+.color-opt.sel{border-color:#fff;transform:scale(1.1)}
+.lang-btn{padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:var(--s2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.lang-btn.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-overlay">
+  <div style="width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 8px 32px rgba(79,110,247,.4)">🍽️</div>
+  <div style="font-size:19px;font-weight:800;margin-top:8px">HR Manager Pro</div>
+  <div class="spinner" style="margin-top:12px"></div>
+  <div id="loading-msg" style="font-size:13px;color:var(--text2);margin-top:12px">Connexion...</div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-logo">🍽️</div>
+  <div class="login-title">HR Manager Pro</div>
+  <div class="login-sub">Gestion du personnel · Fribourg 🇨🇭</div>
+  <div class="login-card">
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="setLoginTab('manager',this)">👔 Manager</button>
+      <button class="login-tab" onclick="setLoginTab('employee',this)">👤 Employé</button>
+      <button class="login-tab" onclick="setLoginTab('register',this)">➕ Restaurant</button>
+    </div>
+    <!-- Manager -->
+    <div id="login-manager">
+      <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="manager@restaurant.ch"></div>
+      <div class="fg"><label>Mot de passe</label><input type="password" id="login-password" placeholder="••••••••"></div>
+      <button class="btn btn-primary" onclick="loginManager()" style="margin-bottom:12px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Se connecter
+      </button>
+      <div class="divider"></div>
+      <button class="btn btn-ghost" onclick="loginDemo()">🎯 Accès démo (sans compte)</button>
+    </div>
+    <!-- Employee PIN -->
+    <div id="login-employee" style="display:none">
+      <div style="text-align:center;margin-bottom:14px;font-size:13px;color:var(--text2)">Entrez votre code PIN à 4 chiffres</div>
+      <div class="pin-display">
+        <div class="pin-dot" id="pd0"></div>
+        <div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div>
+        <div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-grid">
+        <button class="pin-key" onclick="pinKey('1')">1</button>
+        <button class="pin-key" onclick="pinKey('2')">2</button>
+        <button class="pin-key" onclick="pinKey('3')">3</button>
+        <button class="pin-key" onclick="pinKey('4')">4</button>
+        <button class="pin-key" onclick="pinKey('5')">5</button>
+        <button class="pin-key" onclick="pinKey('6')">6</button>
+        <button class="pin-key" onclick="pinKey('7')">7</button>
+        <button class="pin-key" onclick="pinKey('8')">8</button>
+        <button class="pin-key" onclick="pinKey('9')">9</button>
+        <button class="pin-key" onclick="pinKey('del')" style="font-size:14px">⌫</button>
+        <button class="pin-key" onclick="pinKey('0')">0</button>
+        <button class="pin-key" onclick="openScanner()" style="font-size:18px">📷</button>
+      </div>
+      <div id="pin-error" style="text-align:center;color:var(--red);font-size:12px;min-height:18px"></div>
+    </div>
+    <!-- Restaurant Register -->
+    <div id="login-register" style="display:none">
+      <div class="fg"><label>Nom du restaurant</label><input id="reg-rest-name" placeholder="Restaurant Bellevue"></div>
+      <div class="fg"><label>Email administrateur</label><input type="email" id="reg-email" placeholder="admin@restaurant.ch"></div>
+      <div class="fg"><label>Mot de passe</label><input type="password" id="reg-password" placeholder="Minimum 6 caractères"></div>
+      <button class="btn btn-primary" onclick="registerRestaurant()" style="margin-bottom:10px">Créer compte admin</button>
+      <div style="font-size:11px;color:var(--text2);line-height:1.5">Crée le restaurant et lie cet utilisateur comme administrateur. Si Supabase demande confirmation email, confirmez avant de vous connecter.</div>
+    </div>
+  </div>
+</div>
+
+<!-- EMPLOYEE SIMPLE VIEW -->
+<div id="emp-view">
+  <div class="emp-view-header" id="evh"></div>
+  <div class="emp-view-actions" id="eva"></div>
+  <div class="emp-view-section" id="evs"></div>
+</div>
+
+<!-- SCANNER -->
+<div id="scan-wrap">
+  <video id="sv" playsinline autoplay muted></video>
+  <canvas id="sc"></canvas>
+  <div class="scan-ui">
+    <div class="scan-frame"><div class="sf-bl"></div><div class="sf-br"></div><div class="scan-line"></div></div>
+    <p style="color:#fff;font-size:14px;margin-top:24px;opacity:.8;font-weight:500">Pointez vers le badge QR</p>
+  </div>
+  <button class="scan-close-btn" onclick="closeScanner()">✕</button>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- SIDEBAR -->
+<div id="sb-overlay" onclick="closeSB()"></div>
+<nav id="sidebar">
+  <div class="sb-head">
+    <div class="sb-brand">
+      <div class="sb-logo">🍽️</div>
+      <div><div class="sb-app">HR Manager Pro</div><div class="sb-ver">v2.0 · Fribourg 🇨🇭</div></div>
+    </div>
+    <div class="sb-resto">
+      <div class="sb-resto-logo" id="sb-rl">🍽️</div>
+      <div><div class="sb-resto-name" id="sb-rn">Mon Restaurant</div><div class="sb-resto-plan">✨ Période d'essai</div></div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">Principal</div>
+    <div class="sb-item active" onclick="nav('dashboard',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="sb-item" onclick="nav('attendance',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Présences</span>
+      <span class="sb-badge" id="sb-badge">0</span>
+    </div>
+    <div class="sb-item" onclick="nav('employees',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Employés</span>
+    </div>
+    <div class="sb-section">Planification</div>
+    <div class="sb-item" onclick="nav('shifts',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Horaires</span>
+    </div>
+    <div class="sb-item" onclick="nav('vacations',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M5 20V8.5L12 3l7 5.5V20M9 20v-5h6v5"/></svg>
+      <span>Congés</span>
+    </div>
+    <div class="sb-section">Finance</div>
+    <div class="sb-item" onclick="nav('payroll',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Salaires</span>
+    </div>
+    <div class="sb-item" onclick="nav('reports',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Rapports</span>
+    </div>
+    <div class="sb-item" onclick="nav('history',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+      <span>Historique</span>
+    </div>
+    <div class="sb-section">Configuration</div>
+    <div class="sb-item" onclick="nav('settings',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span>Paramètres</span>
+    </div>
+    <div id="master-nav" style="display:none">
+      <div class="sb-section">Master</div>
+      <div class="sb-item" onclick="nav('master',this)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+        <span>Master Admin</span>
+      </div>
+    </div>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-user-av" id="sb-uav">M</div>
+    <div><div class="sb-user-name" id="sb-un">Manager</div><div class="sb-user-role" id="sb-ur">Admin</div></div>
+    <button class="sb-logout" onclick="logout()" title="Déconnexion">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<div id="topbar" style="display:none">
+  <button class="menu-btn" onclick="toggleSB()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div class="top-title" id="page-title">Dashboard</div>
+  <div class="top-actions">
+    <button class="top-btn" onclick="openScanner()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      QR
+    </button>
+    <button class="top-btn primary" onclick="openEmpModal(null)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nouveau
+    </button>
+  </div>
+</div>
+
+<!-- PAGES -->
+<div id="main" style="display:none">
+
+<div class="page active" id="pg-dashboard">
+  <div id="dash-hero" class="card" style="margin-bottom:12px;background:linear-gradient(135deg,#0d1228,#111835);border-color:#1e2548"></div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div id="dash-live"></div>
+  <div id="dash-alerts"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+    <button class="btn btn-primary" onclick="openScanner()">📷 Scanner QR</button>
+    <button class="btn btn-ghost" onclick="openEmpModal(null)">+ Employé</button>
+  </div>
+</div>
+
+<div class="page" id="pg-attendance">
+  <div class="flex-b mb12">
+    <div><div class="fw7 fs14" id="att-date"></div><div class="fs12 muted">Pointages du jour</div></div>
+    <button class="btn btn-primary btn-sm" onclick="openScanner()">📷</button>
+  </div>
+  <div class="kpi-grid" id="att-kpi"></div>
+  <div class="section-lbl">Programmés aujourd'hui</div>
+  <div id="att-list"></div>
+</div>
+
+<div class="page" id="pg-employees">
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="emp-search" placeholder="Rechercher un employé..." oninput="renderEmps()">
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="setEF('all',this)">Tous</button>
+    <button class="tab" onclick="setEF('active',this)">Actifs</button>
+    <button class="tab" onclick="setEF('inactive',this)">Inactifs</button>
+  </div>
+  <div id="emp-list"></div>
+  <button class="btn btn-primary mt12" onclick="openEmpModal(null)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Nouvel employé
+  </button>
+</div>
+
+<div class="page" id="pg-shifts">
+  <div class="flex-b mb12">
+    <div><div class="fw7 fs14">Planification</div><div class="fs12 muted" id="shift-wlbl"></div></div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost btn-sm" onclick="shiftWN(-1)">‹</button>
+      <button class="btn btn-ghost btn-sm" onclick="shiftWN(1)">›</button>
+    </div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
+    <span class="chip chip-cyan">🌅 Matin</span>
+    <span class="chip chip-orange">☀️ Après-midi</span>
+    <span class="chip chip-purple">🌆 Soir</span>
+    <span class="chip chip-blue">🌙 Nuit</span>
+    <span class="chip chip-green">✅ Repos</span>
+    <span class="chip chip-gray">❌ Libre</span>
+  </div>
+  <div class="card" style="padding:10px">
+    <div class="shift-wrap"><div class="shift-table"><div class="shift-hdr" id="shift-hdr"></div><div id="shift-grid"></div></div></div>
+  </div>
+</div>
+
+<div class="page" id="pg-vacations">
+  <div class="tabs">
+    <button class="tab active" onclick="setVT('pending',this)">En attente</button>
+    <button class="tab" onclick="setVT('approved',this)">Approuvés</button>
+    <button class="tab" onclick="setVT('balance',this)">Soldes</button>
+  </div>
+  <div id="vac-content"></div>
+  <button class="btn btn-ghost mt12" onclick="openAbsModal(null)">+ Nouvelle absence</button>
+</div>
+
+<div class="page" id="pg-payroll">
+  <div class="flex-b mb12">
+    <div class="fw7 fs14">Salaires</div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn btn-ghost btn-sm" onclick="payMN(-1)">‹</button>
+      <span class="fw6 fs12" id="pay-mlbl"></span>
+      <button class="btn btn-ghost btn-sm" onclick="payMN(1)">›</button>
+    </div>
+  </div>
+  <div class="pay-hero">
+    <div class="pay-lbl">Total masse salariale</div>
+    <div class="pay-total" id="pay-total">CHF 0.00</div>
+    <div class="pay-lbl" id="pay-msub"></div>
+  </div>
+  <div id="pay-list"></div>
+  <button class="btn btn-ghost mt12" onclick="exportPayCSV()">⬇️ Exporter CSV</button>
+</div>
+
+<div class="page" id="pg-reports">
+  <div class="flex-b mb12">
+    <div class="fw7 fs14">Rapports</div>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn btn-ghost btn-sm" onclick="repMN(-1)">‹</button>
+      <span class="fw6 fs12" id="rep-mlbl"></span>
+      <button class="btn btn-ghost btn-sm" onclick="repMN(1)">›</button>
+    </div>
+  </div>
+  <div id="rep-content"></div>
+  <button class="btn btn-ghost mt12" onclick="exportRepCSV()">⬇️ Exporter CSV</button>
+</div>
+
+<div class="page" id="pg-history">
+  <div class="search-wrap">
+    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="hist-search" placeholder="Rechercher..." oninput="renderHistory()">
+  </div>
+  <button class="btn btn-ghost btn-sm mb12" onclick="clearHist()">🗑 Effacer</button>
+  <div id="hist-list"></div>
+</div>
+
+<div class="page" id="pg-settings">
+  <div class="card">
+    <div class="card-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M5 20V8.5L12 3l7 5.5V20M9 20v-5h6v5"/></svg>
+      Votre restaurant
+    </div>
+    <div class="fg"><label>Nom du restaurant</label><input id="cfg-company" oninput="saveCfg('company',this.value)"></div>
+    <div class="fg"><label>Emoji du restaurant</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🍽️')">🍽️</span>
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🍕')">🍕</span>
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🍣')">🍣</span>
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🍔')">🍔</span>
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🥗')">🥗</span>
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🍷')">🍷</span>
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('☕')">☕</span>
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🏨')">🏨</span>
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🌮')">🌮</span>
+        <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🥩')">🥩</span>
+      </div>
+    </div>
+    <div class="fg"><label>Couleur principale</label>
+      <div class="color-opts" id="color-picker">
+        <div class="color-opt sel" style="background:#4f6ef7" onclick="setBrand('#4f6ef7','#7c3aed',this)"></div>
+        <div class="color-opt" style="background:#10b981" onclick="setBrand('#10b981','#059669',this)"></div>
+        <div class="color-opt" style="background:#ef4444" onclick="setBrand('#ef4444','#dc2626',this)"></div>
+        <div class="color-opt" style="background:#f59e0b" onclick="setBrand('#f59e0b','#d97706',this)"></div>
+        <div class="color-opt" style="background:#ec4899" onclick="setBrand('#ec4899','#db2777',this)"></div>
+        <div class="color-opt" style="background:#06b6d4" onclick="setBrand('#06b6d4','#0891b2',this)"></div>
+        <div class="color-opt" style="background:#8b5cf6" onclick="setBrand('#8b5cf6','#7c3aed',this)"></div>
+        <div class="color-opt" style="background:#d4a800" onclick="setBrand('#d4a800','#b8900a',this)"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Configuration
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Tolérance retard (min)</label><input type="number" id="cfg-late" min="0" max="60" oninput="saveCfg('lateTol',parseInt(this.value)||10)"></div>
+      <div class="fg"><label>Max h/semaine</label><input type="number" id="cfg-maxh" min="20" max="50" oninput="saveCfg('maxHours',parseInt(this.value)||45)"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Langue
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px" id="lang-bar"></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Loi suisse (LTr)
+    </div>
+    <div class="rrow"><span class="muted">Heures max/semaine</span><span class="fw6 col-brand">45h (art. 9)</span></div>
+    <div class="rrow"><span class="muted">Heures supplémentaires</span><span class="fw6 col-brand">+25% (art. 13)</span></div>
+    <div class="rrow"><span class="muted">Travail nocturne</span><span class="fw6 col-brand">+25% après 23h</span></div>
+    <div class="rrow"><span class="muted">Dimanches & fériés</span><span class="fw6 col-brand">+50%</span></div>
+    <div class="rrow"><span class="muted">Repos entre 2 jours</span><span class="fw6 col-brand">11h minimum</span></div>
+    <div class="rrow"><span class="muted">Vacances légales</span><span class="fw6 col-brand">4 semaines min.</span></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      Données
+    </div>
+    <button class="btn btn-ghost mb8" onclick="exportAllJSON()">⬇️ Exporter tout (JSON)</button>
+    <button class="btn btn-danger" onclick="deleteAllConfirm()">🗑 Supprimer toutes les données</button>
+  </div>
+</div>
+
+<div class="page" id="pg-master">
+  <div class="card" style="background:linear-gradient(135deg,#0d1228,#111835);border-color:#1e2548">
+    <div class="card-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16.8 5.5 21l2-7.5L2 9h7z"/></svg>
+      Cuenta maestra
+    </div>
+    <div class="fw8" style="font-size:20px;margin-bottom:4px">Panel Master Admin</div>
+    <div class="fs12 muted" id="master-version"></div>
+  </div>
+  <div class="kpi-grid" id="master-kpi"></div>
+  <div class="card">
+    <div class="card-header">Restaurantes</div>
+    <div id="master-restaurants"></div>
+  </div>
+  <div class="card">
+    <div class="card-header">Mantenimiento</div>
+    <button class="btn btn-ghost mb8" onclick="exportMasterJSON()">⬇️ Respaldo global JSON</button>
+    <button class="btn btn-ghost mb8" onclick="openMaintenance('github')">GitHub repo</button>
+    <button class="btn btn-ghost mb8" onclick="openMaintenance('pages')">GitHub Pages</button>
+    <button class="btn btn-ghost" onclick="openMaintenance('supabase')">Supabase dashboard</button>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- MODALS -->
+
+<!-- Employee Form -->
+<div class="ov" id="emp-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="emp-modal-title">Nouvel employé</div>
+  <div onclick="document.getElementById('photo-input').click()" style="cursor:pointer">
+    <div class="photo-ring" id="photo-ring">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    </div>
+  </div>
+  <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+  <div class="frow">
+    <div class="fg"><label>Prénom *</label><input id="ef-name" placeholder="Marie"></div>
+    <div class="fg"><label>Nom</label><input id="ef-last" placeholder="Dupont"></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label>N° Employé</label><input id="ef-num" placeholder="EMP-001"></div>
+    <div class="fg"><label>Début contrat</label><input type="date" id="ef-start"></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label>Poste</label><select id="ef-pos"></select></div>
+    <div class="fg"><label>Département</label><select id="ef-dept"></select></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label>Contrat</label><select id="ef-contract"></select></div>
+    <div class="fg"><label>Statut</label>
+      <select id="ef-status"><option value="active">Actif</option><option value="inactive">Inactif</option></select>
+    </div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label>Téléphone</label><input type="tel" id="ef-phone" placeholder="+41 79 000 00 00"></div>
+    <div class="fg"><label>Email</label><input type="email" id="ef-email"></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label>Type salaire</label>
+      <select id="ef-paytype" onchange="updatePL()">
+        <option value="hourly">Horaire</option>
+        <option value="monthly">Mensuel fixe</option>
+      </select>
+    </div>
+    <div class="fg"><label id="ef-paylbl">Taux/h (CHF)</label><input type="number" id="ef-rate" placeholder="22.50" step="0.50"></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label>Semaines vacances</label><input type="number" id="ef-vac" value="5" min="4" max="8"></div>
+    <div class="fg"><label>PIN (4 chiffres)</label><input type="number" id="ef-pin" placeholder="1234" maxlength="4"></div>
+  </div>
+  <div class="fg"><label>N° AVS</label><input id="ef-avs" placeholder="756.xxxx.xxxx.xx"></div>
+  <div class="fg"><label>Contact urgence</label><input id="ef-emergency"></div>
+  <div class="fg"><label>Notes</label><textarea id="ef-notes" rows="2"></textarea></div>
+  <div class="section-lbl">Horaire hebdomadaire</div>
+  <div id="ef-sched"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('emp-modal')">Annuler</button>
+    <button class="btn btn-primary" onclick="saveEmp()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Enregistrer
+    </button>
+  </div>
+</div>
+</div>
+
+<!-- Detail -->
+<div class="ov" id="detail-modal"><div class="modal" id="detail-content"></div></div>
+
+<!-- Absence -->
+<div class="ov" id="abs-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title">Nouvelle absence</div>
+  <div class="fg"><label>Employé</label><select id="abs-emp"></select></div>
+  <div class="fg"><label>Type</label>
+    <select id="abs-type">
+      <option value="vacation">🌴 Vacances</option>
+      <option value="medical">🏥 Maladie</option>
+      <option value="personal">👤 Permis personnel</option>
+      <option value="dayOff">💤 Jour libre</option>
+      <option value="training">📚 Formation</option>
+      <option value="maternity">🤱 Maternité</option>
+      <option value="holiday">⭐ Jour férié</option>
+    </select>
+  </div>
+  <div class="frow">
+    <div class="fg"><label>Début</label><input type="date" id="abs-start"></div>
+    <div class="fg"><label>Fin</label><input type="date" id="abs-end"></div>
+  </div>
+  <div class="tgl-row">
+    <span class="fs13">Approuvé</span>
+    <div class="tgl on" id="abs-appr" onclick="this.classList.toggle('on')"></div>
+  </div>
+  <div class="fg mt12"><label>Notes</label><input id="abs-notes" placeholder="Facultatif..."></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('abs-modal')">Annuler</button>
+    <button class="btn btn-primary" onclick="saveAbs()">Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<!-- Shift -->
+<div class="ov" id="shift-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="shift-mtitle">Horaire</div>
+  <div id="shift-type-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px"></div>
+  <div class="frow" id="shift-times">
+    <div class="fg"><label>Entrée</label><input type="time" id="sh-in" value="08:00"></div>
+    <div class="fg"><label>Sortie</label><input type="time" id="sh-out" value="17:00"></div>
+  </div>
+  <div class="fg"><label>Notes</label><input id="sh-notes"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('shift-modal')">Annuler</button>
+    <button class="btn btn-primary" onclick="saveShift()">Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<!-- QR Action -->
+<div class="ov" id="qr-modal"><div class="modal" id="qr-content"></div></div>
+
+<script>
+// ═══════ SUPABASE ═══════
+const SB_URL='https://grztncvdsvtrwekekpss.supabase.co';
+const SB_KEY='sb_publishable_hERziVqtGfUc-EYHDCJ8nQ_0TjBvNZq';
+const APP_VERSION='2.2.0';
+const APP_BUILD='2026-05-14';
+const MAINTENANCE_LINKS={
+  github:'https://github.com/TU_USUARIO/hr-manager-pro',
+  pages:'https://TU_USUARIO.github.io/hr-manager-pro/',
+  supabase:'https://supabase.com/dashboard/project/grztncvdsvtrwekekpss'
+};
+let REST_ID=localStorage.getItem('hrm_restaurant_id')||'3f99dc38-0771-4bb6-b307-474ccc80f86e';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+
+// ═══════ LANGS ═══════
+const LANGS={
+  fr:{name:'Français',flag:'🇫🇷',
+    pos:['Chef','Cuisinier/e','Serveur/se','Bartender','Hôte/sse','Caissier/e','Superviseur/e','Gérant/e','Nettoyage'],
+    depts:['Cuisine','Salle','Bar','Administration','Nettoyage'],
+    cons:['CDI','CDD','Apprentissage','Stagiaire'],
+    days:['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],
+    daysFull:['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']},
+  de:{name:'Deutsch',flag:'🇩🇪',
+    pos:['Chef','Koch/Köchin','Kellner/in','Bartender','Host/Hostess','Kassierer/in','Supervisor/in','Manager/in','Reinigung'],
+    depts:['Küche','Saal','Bar','Administration','Reinigung'],
+    cons:['Unbefristet','Befristet','Lehre','Praktikum'],
+    days:['So','Mo','Di','Mi','Do','Fr','Sa'],
+    daysFull:['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag']},
+  es:{name:'Español',flag:'🇪🇸',
+    pos:['Chef','Cocinero/a','Mesero/a','Bartender','Hostess','Cajero/a','Supervisor/a','Gerente','Limpieza'],
+    depts:['Cocina','Sala','Bar','Administración','Limpieza'],
+    cons:['Indefinido','Temporal','Aprendizaje','Practicante'],
+    days:['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
+    daysFull:['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']},
+  en:{name:'English',flag:'🇬🇧',
+    pos:['Chef','Cook','Waiter/Waitress','Bartender','Host/Hostess','Cashier','Supervisor','Manager','Cleaning'],
+    depts:['Kitchen','Hall','Bar','Administration','Cleaning'],
+    cons:['Permanent','Fixed-term','Apprenticeship','Intern'],
+    days:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+    daysFull:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']},
+  it:{name:'Italiano',flag:'🇮🇹',
+    pos:['Chef','Cuoco/a','Cameriere/a','Bartender','Hostess','Cassiere/a','Supervisore/a','Gestore/a','Pulizie'],
+    depts:['Cucina','Sala','Bar','Amministrazione','Pulizie'],
+    cons:['Indeterminato','Determinato','Apprendistato','Stagista'],
+    days:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'],
+    daysFull:['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato']}
+};
+let lang='fr';
+const L=()=>LANGS[lang]||LANGS.fr;
+
+// ═══════ DB ═══════
+let DB={
+  employees:[],history:[],absences:[],shifts:{},
+  settings:{company:'Mon Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed'}
+};
+let MASTER={restaurants:[],profiles:[],stats:{}};
+function loadLocal(){try{const s=localStorage.getItem('hrm_pro');if(s)DB={...DB,...JSON.parse(s)};}catch(e){}}
+function saveLocal(){try{localStorage.setItem('hrm_pro',JSON.stringify(DB));}catch(e){}}
+loadLocal();
+
+function setRestaurantId(id){
+  REST_ID=id;
+  if(id)localStorage.setItem('hrm_restaurant_id',id);
+}
+
+async function loadProfile(user){
+  const {data,error}=await sb.from('profiles').select('*').eq('user_id',user.id).maybeSingle();
+  if(error)throw error;
+  return data;
+}
+
+async function ensureProfile(user,role='restaurant_admin',restaurantId=null){
+  const profile={user_id:user.id,email:user.email,role,restaurant_id:restaurantId,name:user.email?.split('@')[0]||'Admin'};
+  const {error}=await sb.from('profiles').upsert(profile,{onConflict:'user_id'});
+  if(error)throw error;
+  return profile;
+}
+
+async function loadSB(){
+  try{
+    const[e,a,ab,sh,r]=await Promise.all([
+      sb.from('employees').select('*').eq('restaurant_id',REST_ID).order('created_at'),
+      sb.from('attendance').select('*').eq('restaurant_id',REST_ID).order('timestamp',{ascending:false}).limit(500),
+      sb.from('absences').select('*').eq('restaurant_id',REST_ID).order('created_at',{ascending:false}),
+      sb.from('shifts').select('*').eq('restaurant_id',REST_ID),
+      sb.from('restaurants').select('*').eq('id',REST_ID).single()
+    ]);
+    if(e.data)DB.employees=e.data.map(x=>({id:x.id,name:x.name,last:x.last_name||'',num:x.employee_number||'',position:x.position||'',dept:x.department||'',phone:x.phone||'',email:x.email||'',startDate:x.start_date||'',contract:x.contract_type||'CDI',payType:x.pay_type||'hourly',rate:x.hourly_rate||0,salary:x.monthly_salary||0,vacWeeks:x.vacation_weeks||5,avs:x.avs_number||'',emergency:x.emergency_contact||'',notes:x.notes||'',status:x.status||'active',photo:x.photo_url||null,color:x.color||'#4f6ef7',schedules:x.schedules||{},pin:x.pin||'0000'}));
+    if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp}));
+    if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
+    if(sh.data){DB.shifts={};sh.data.forEach(x=>{DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,notes:x.notes||''};});}
+    if(r.data){DB.settings={company:r.data.name||'Mon Restaurant',emoji:r.data.emoji||'🍽️',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed'};lang=DB.settings.lang;}
+    saveLocal();return true;
+  }catch(e){console.warn('SB error:',e);return false;}
+}
+
+async function loadMaster(){
+  if(currentUser?.role!=='super_admin')return false;
+  try{
+    const [r,p,e,a]=await Promise.all([
+      sb.from('restaurants').select('*').order('created_at',{ascending:false}),
+      sb.from('profiles').select('*').order('created_at',{ascending:false}),
+      sb.from('employees').select('id,restaurant_id,status'),
+      sb.from('attendance').select('id,restaurant_id,timestamp').order('timestamp',{ascending:false}).limit(1000)
+    ]);
+    MASTER.restaurants=r.data||[];
+    MASTER.profiles=p.data||[];
+    MASTER.stats={
+      employees:e.data||[],
+      attendance:a.data||[]
+    };
+    return true;
+  }catch(e){console.warn('Master load error:',e);return false;}
+}
+
+async function sbSaveEmp(emp){
+  const{error}=await sb.from('employees').upsert({id:emp.id,restaurant_id:REST_ID,name:emp.name,last_name:emp.last||'',employee_number:emp.num||'',position:emp.position||'',department:emp.dept||'',phone:emp.phone||'',email:emp.email||'',start_date:emp.startDate||null,contract_type:emp.contract||'CDI',pay_type:emp.payType||'hourly',hourly_rate:emp.rate||0,monthly_salary:emp.salary||0,vacation_weeks:emp.vacWeeks||5,avs_number:emp.avs||'',emergency_contact:emp.emergency||'',notes:emp.notes||'',status:emp.status||'active',photo_url:emp.photo||null,color:emp.color||'#4f6ef7',schedules:emp.schedules||{},pin:emp.pin||'0000'});
+  if(error)console.error(error);
+}
+async function sbDelEmp(id){await Promise.all([sb.from('employees').delete().eq('id',id),sb.from('attendance').delete().eq('employee_id',id),sb.from('absences').delete().eq('employee_id',id),sb.from('shifts').delete().eq('employee_id',id)]);}
+async function sbReg(empId,empName,type){await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:new Date().toISOString()});}
+async function sbSaveAbs(a){await sb.from('absences').upsert({id:a.id,restaurant_id:REST_ID,employee_id:a.empId,type:a.type,start_date:a.start,end_date:a.end,approved:a.approved,notes:a.notes||''});}
+async function sbSaveShift(key,sh){const[eId,date]=key.split('_');await sb.from('shifts').upsert({restaurant_id:REST_ID,employee_id:eId,shift_date:date,shift_type:sh.type,start_time:sh.in||null,end_time:sh.out||null,notes:sh.notes||''},{onConflict:'employee_id,shift_date'});}
+async function sbSaveSettings(s){await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2}).eq('id',REST_ID);}
+async function sbUpdateAbsApproved(id,approved){await sb.from('absences').update({approved}).eq('id',id).eq('restaurant_id',REST_ID);}
+async function sbDelAbs(id){await sb.from('absences').delete().eq('id',id).eq('restaurant_id',REST_ID);}
+async function sbDeleteAll(){
+  await Promise.all([
+    sb.from('attendance').delete().eq('restaurant_id',REST_ID),
+    sb.from('absences').delete().eq('restaurant_id',REST_ID),
+    sb.from('shifts').delete().eq('restaurant_id',REST_ID),
+    sb.from('employees').delete().eq('restaurant_id',REST_ID)
+  ]);
+}
+async function sbCreateRestaurant(name,email){
+  const {data,error}=await sb.from('restaurants').insert({name,emoji:'🍽️',currency:'CHF',late_tolerance:10,max_hours_week:45,lang:'fr',brand_color:'#4f6ef7',brand_color2:'#7c3aed'}).select('*').single();
+  if(error)throw error;
+  return data;
+}
+
+// ═══════ UTILS ═══════
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const clean=v=>String(v??'').replace(/[<>]/g,'').trim();
+const csvCell=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+const initials=n=>(n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
+const fmtTime=iso=>new Date(iso).toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'});
+const fmtDate=iso=>new Date(iso).toLocaleDateString('fr-CH');
+const fmtMonth=d=>d.toLocaleDateString('fr-CH',{month:'long',year:'numeric'});
+const sameDay=(a,b)=>{const x=new Date(a),y=new Date(b);return x.getFullYear()===y.getFullYear()&&x.getMonth()===y.getMonth()&&x.getDate()===y.getDate();};
+const todayStart=()=>{const d=new Date();d.setHours(0,0,0,0);return d;};
+const getMonday=d=>{const day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);const m=new Date(d);m.setDate(diff);m.setHours(0,0,0,0);return m;};
+const fullName=e=>e.last?`${e.name} ${e.last}`:e.name;
+const safeEmpName=e=>esc(fullName(e));
+const safeImgSrc=src=>{
+  const s=String(src||'');
+  return /^(data:image\/|https?:\/\/|blob:)/i.test(s)?s:'';
+};
+const EMP_COLORS=['#4f6ef7','#7c3aed','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#8b5cf6','#f97316'];
+const empColor=e=>e.color||EMP_COLORS[Math.abs((e.id||'').charCodeAt(3)||0)%EMP_COLORS.length];
+
+function mkAv(emp,sz='av-44'){
+  const c=empColor(emp);
+  const photo=safeImgSrc(emp.photo);
+  return `<div class="av ${esc(sz)}" style="background:linear-gradient(135deg,${esc(c)},${esc(c)}bb)">${photo?`<img src="${esc(photo)}" alt="">`:esc(initials(fullName(emp)))}</div>`;
+}
+
+let toastT;
+function toast(msg,color='#10b981'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.style.borderColor=color;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),3000);
+}
+const openModal=id=>document.getElementById(id).classList.add('open');
+const closeModal=id=>document.getElementById(id).classList.remove('open');
+const setAT=(tabs,btn)=>{tabs.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');};
+
+function applyBrand(){
+  const c=DB.settings.brandColor||'#4f6ef7',c2=DB.settings.brandColor2||'#7c3aed';
+  document.documentElement.style.setProperty('--brand',c);
+  document.documentElement.style.setProperty('--brand2',c2);
+  document.documentElement.style.setProperty('--brand-light',c+'22');
+  document.getElementById('sb-rl').textContent=DB.settings.emoji||'🍽️';
+  document.getElementById('sb-rn').textContent=DB.settings.company||'Mon Restaurant';
+  document.getElementById('login-logo')?.style&&(document.querySelector('.login-logo').style.background=`linear-gradient(135deg,${c},${c2})`);
+}
+
+function setBrand(c,c2,el){
+  DB.settings.brandColor=c;DB.settings.brandColor2=c2;
+  saveLocal();applyBrand();
+  document.querySelectorAll('.color-opt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');
+  sbSaveSettings(DB.settings).catch(console.error);
+}
+
+function setEmoji(em){
+  DB.settings.emoji=em;saveLocal();
+  document.getElementById('sb-rl').textContent=em;
+  sbSaveSettings(DB.settings).catch(console.error);
+  toast('✅ Emoji mis à jour');
+}
+
+function saveCfg(k,v){
+  if(k==='company')v=clean(v);
+  DB.settings[k]=v;saveLocal();
+  if(k==='company')document.getElementById('sb-rn').textContent=v;
+  sbSaveSettings(DB.settings).catch(console.error);
+}
+
+function renderLangBar(){
+  const bar=document.getElementById('lang-bar');if(!bar)return;
+  bar.innerHTML=Object.entries(LANGS).map(([k,v])=>`<button class="lang-btn ${k===lang?'active':''}" onclick="setLang('${k}')">${v.flag} ${v.name}</button>`).join('');
+}
+function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();sbSaveSettings(DB.settings).catch(console.error);}
+
+// ═══════ AUTH ═══════
+let currentUser=null,pinBuf='',empClockTimer=null;
+
+function setLoginTab(type,btn){
+  document.querySelectorAll('.login-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('login-manager').style.display=type==='manager'?'block':'none';
+  document.getElementById('login-employee').style.display=type==='employee'?'block':'none';
+  document.getElementById('login-register').style.display=type==='register'?'block':'none';
+  pinBuf='';updatePinDisp();
+}
+
+function loginDemo(){currentUser={role:'restaurant_admin',name:'Admin Demo',restaurant_id:REST_ID};showManagerUI();toast('✅ Connexion démo');}
+
+async function loginManager(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-password').value;
+  if(!email||!pass){toast('Entrez vos identifiants','#ef4444');return;}
+  try{
+    const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error)throw error;
+    let profile=await loadProfile(data.user);
+    if(!profile)profile=await ensureProfile(data.user,'restaurant_admin',REST_ID);
+    currentUser={role:profile.role||'restaurant_admin',name:profile.name||data.user.email?.split('@')[0]||email.split('@')[0],email:data.user.email,restaurant_id:profile.restaurant_id,profile};
+    if(currentUser.restaurant_id)setRestaurantId(currentUser.restaurant_id);
+    if(currentUser.role==='super_admin')await loadMaster();
+    else await loadSB();
+    showManagerUI();toast('✅ Connecté');
+  }catch(e){
+    toast('Identifiants invalides. Utilisez le mode démo si besoin.','#ef4444');
+    console.warn('Login error:',e);
+  }
+}
+
+async function registerRestaurant(){
+  const restName=clean(document.getElementById('reg-rest-name').value);
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-password').value;
+  if(!restName||!email||pass.length<6){toast('Restaurant, email et mot de passe requis','#ef4444');return;}
+  try{
+    const {data,error}=await sb.auth.signUp({email,password:pass});
+    if(error)throw error;
+    if(!data.user)throw new Error('Utilisateur non créé');
+    const restaurant=await sbCreateRestaurant(restName,email);
+    await ensureProfile(data.user,'restaurant_admin',restaurant.id);
+    setRestaurantId(restaurant.id);
+    toast('✅ Compte créé. Connectez-vous avec cet email.');
+    setLoginTab('manager',document.querySelector('.login-tab'));
+  }catch(e){
+    console.error(e);
+    toast('Impossible de créer le compte. Vérifiez Supabase/RLS.','#ef4444');
+  }
+}
+
+function pinKey(k){
+  if(k==='del')pinBuf=pinBuf.slice(0,-1);
+  else if(pinBuf.length<4)pinBuf+=k;
+  updatePinDisp();
+  if(pinBuf.length===4)checkPin();
+}
+function updatePinDisp(){for(let i=0;i<4;i++){const d=document.getElementById(`pd${i}`);if(d)d.classList.toggle('filled',i<pinBuf.length);}}
+function checkPin(){
+  const emp=DB.employees.find(e=>e.pin===pinBuf&&e.status==='active');
+  if(emp){currentUser={role:'employee',name:fullName(emp),emp};showEmpUI(emp);document.getElementById('pin-error').textContent='';}
+  else{document.getElementById('pin-error').textContent='Code PIN incorrect';setTimeout(()=>{pinBuf='';updatePinDisp();document.getElementById('pin-error').textContent='';},1500);}
+}
+
+function logout(){
+  if(empClockTimer){clearInterval(empClockTimer);empClockTimer=null;}
+  sb.auth?.signOut?.().catch?.(()=>{});
+  currentUser=null;
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('main').style.display='none';
+  document.getElementById('emp-view').classList.remove('open');
+  document.getElementById('login-screen').style.display='flex';
+  pinBuf='';updatePinDisp();
+}
+
+function showManagerUI(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('main').style.display='block';
+  document.getElementById('sb-uav').textContent=(currentUser.name||'M')[0].toUpperCase();
+  document.getElementById('sb-un').textContent=currentUser.name;
+  document.getElementById('sb-ur').textContent=currentUser.role==='super_admin'?'Super Admin':'Admin restaurant';
+  document.getElementById('master-nav').style.display=currentUser.role==='super_admin'?'block':'none';
+  applyBrand();renderAll();
+  if(currentUser.role==='super_admin')renderMaster();
+}
+
+function showEmpUI(emp){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('emp-view').classList.add('open');
+  renderEmpView(emp);
+}
+
+// ═══════ ATTENDANCE ═══════
+function canReg(empId,type){
+  const t=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,new Date()));
+  if(type==='in')return!t.some(h=>h.type==='in');
+  if(type==='out')return t.some(h=>h.type==='in')&&!t.some(h=>h.type==='out');
+  return true;
+}
+async function register(empId,type){
+  const emp=DB.employees.find(e=>e.id===empId);
+  if(!emp){toast('Employé non trouvé','#ef4444');return;}
+  if(!canReg(empId,type)){toast(type==='in'?'Entrée déjà enregistrée':'Pas d\'entrée enregistrée','#f59e0b');return;}
+  const rec={id:uid(),empId,empName:fullName(emp),type,ts:new Date().toISOString()};
+  DB.history.unshift(rec);saveLocal();
+  toast((type==='in'?'✅ Entrée':'🔴 Sortie')+' — '+emp.name);
+  renderPage(currentPage);
+  sbReg(empId,fullName(emp),type).catch(console.error);
+}
+const lastAction=empId=>DB.history.find(h=>h.empId===empId);
+function workedOn(empId,date){
+  const r=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,date)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  const inn=r.find(h=>h.type==='in'),out=[...r].reverse().find(h=>h.type==='out');
+  if(!inn||!out)return null;
+  return(new Date(out.ts)-new Date(inn.ts))/3600000;
+}
+function getAbs(empId,date){
+  const d=new Date(date);d.setHours(0,0,0,0);
+  return DB.absences.find(a=>{
+    if(a.empId!==empId)return false;
+    const s=new Date(a.start),e=new Date(a.end);s.setHours(0,0,0,0);e.setHours(0,0,0,0);
+    return d>=s&&d<=e;
+  });
+}
+const vacUsed=empId=>DB.absences.filter(a=>a.empId===empId&&a.type==='vacation'&&a.approved).reduce((s,a)=>s+Math.round((new Date(a.end)-new Date(a.start))/86400000)+1,0);
+function dayStatus(emp,date){
+  const d=new Date(date);d.setHours(0,0,0,0);
+  const today=todayStart(),dow=d.getDay(),sch=emp.schedules?.[dow];
+  const abs=getAbs(emp.id,date);
+  if(abs)return{type:'absent',sub:abs.type};
+  const hasRec=DB.history.some(h=>h.empId===emp.id&&sameDay(h.ts,date));
+  if(hasRec)return{type:'worked'};
+  if(d>today)return sch?.enabled?{type:'future'}:{type:'free'};
+  if(sch?.enabled)return{type:'missing'};
+  return{type:'free'};
+}
+function isLate(emp,date){
+  const sch=emp.schedules?.[new Date(date).getDay()];if(!sch?.enabled)return false;
+  const recs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,date));
+  const inn=recs.find(h=>h.type==='in');if(!inn)return false;
+  const[eh,em]=sch.entry.split(':').map(Number);
+  const exp=new Date(date);exp.setHours(eh,em+(DB.settings?.lateTol||10),0,0);
+  return new Date(inn.ts)>exp;
+}
+
+// ═══════ QR ═══════
+function genQR(text,size=180){
+  if(typeof QRCode!=='undefined'){
+    const box=document.createElement('div');
+    new QRCode(box,{text:String(text),width:size,height:size,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+    return box.innerHTML;
+  }
+  return `<div style="width:${size}px;height:${size}px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:10px">QR indisponible</div>`;
+}
+
+// ═══════ SCANNER ═══════
+let scanStream=null,scanInt=null;
+function openScanner(){
+  document.getElementById('scan-wrap').classList.add('open');
+  navigator.mediaDevices?.getUserMedia({video:{facingMode:'environment'}})
+    .then(stream=>{
+      scanStream=stream;
+      const v=document.getElementById('sv');v.srcObject=stream;v.play();
+      const c=document.getElementById('sc');
+      scanInt=setInterval(()=>{
+        if(v.readyState!==v.HAVE_ENOUGH_DATA)return;
+        c.width=v.videoWidth;c.height=v.videoHeight;
+        const ctx=c.getContext('2d');ctx.drawImage(v,0,0);
+        if(typeof jsQR==='undefined')return;
+        const img=ctx.getImageData(0,0,c.width,c.height);
+        const code=jsQR(img.data,img.width,img.height);
+        if(code){clearInterval(scanInt);handleQR(code.data);}
+      },200);
+    }).catch(()=>{closeScanner();toast('Caméra inaccessible','#ef4444');});
+}
+function closeScanner(){
+  clearInterval(scanInt);
+  if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}
+  document.getElementById('scan-wrap').classList.remove('open');
+}
+function handleQR(data){
+  closeScanner();
+  if(!data.startsWith('EMP:')){toast('QR non reconnu','#ef4444');return;}
+  const emp=DB.employees.find(e=>e.id===data.replace('EMP:',''));
+  if(!emp){toast('Employé non trouvé','#ef4444');return;}
+  showQRAction(emp);
+}
+function showQRAction(emp){
+  const last=lastAction(emp.id);
+  const sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
+  document.getElementById('qr-content').innerHTML=`
+    <div class="modal-handle"></div>
+    <div style="text-align:center;padding:10px 0 20px">
+      <div style="position:relative;display:inline-block;margin-bottom:12px">
+        ${mkAv(emp,'av-72')}
+        <div class="av-dot" style="background:${sc};width:14px;height:14px"></div>
+      </div>
+      <div style="font-size:20px;font-weight:800">${safeEmpName(emp)}</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:3px">${esc(emp.position)}</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px">${new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'})}</div>
+      ${last?`<span class="chip ${last.type==='in'?'chip-green':'chip-red'}" style="margin-top:8px">${last.type==='in'?'Entrée':'Sortie'}: ${fmtTime(last.ts)}</span>`:''}
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <button class="btn btn-success" onclick="register('${emp.id}','in');closeModal('qr-modal')">✅ Entrée</button>
+      <button class="btn btn-danger" onclick="register('${emp.id}','out');closeModal('qr-modal')">🔴 Sortie</button>
+    </div>
+    <button class="btn btn-ghost" onclick="closeModal('qr-modal')">Fermer</button>`;
+  openModal('qr-modal');
+}
+
+// ═══════ EMP VIEW ═══════
+function renderEmpView(emp){
+  if(empClockTimer){clearInterval(empClockTimer);empClockTimer=null;}
+  const now=new Date(),dow=now.getDay(),last=lastAction(emp.id),w=workedOn(emp.id,now),sch=emp.schedules?.[dow];
+  const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));
+  const sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
+  const c=empColor(emp);
+  const weekDays=Array.from({length:7},(_,i)=>new Date(getMonday(now).getTime()+i*86400000));
+  let wkHrs=0;weekDays.forEach(d=>{const ww=workedOn(emp.id,d);if(ww)wkHrs+=ww;});
+
+  document.getElementById('evh').style.background=`linear-gradient(160deg,${c}33,transparent)`;
+  document.getElementById('evh').innerHTML=`
+    <div style="position:relative;display:inline-block;margin-bottom:14px">
+      ${mkAv(emp,'av-72')}
+      <div class="av-dot" style="background:${sc};width:14px;height:14px"></div>
+    </div>
+    <div style="font-size:24px;font-weight:800">${safeEmpName(emp)}</div>
+    <div style="font-size:14px;color:var(--text2);margin-top:4px">${esc(emp.position)}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:3px">${esc(DB.settings?.company||'Mon Restaurant')}</div>
+    ${last?`<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border-radius:20px;padding:6px 14px;margin-top:12px;font-size:12px;font-weight:600">
+      <div style="width:7px;height:7px;border-radius:50%;background:${sc}"></div>
+      ${last.type==='in'?'Entrée':'Sortie'} à ${fmtTime(last.ts)}
+    </div>`:''}`;
+
+  document.getElementById('eva').innerHTML=`
+    <div class="emp-clock" id="emp-clock">${now.toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'})}</div>
+    <button class="btn btn-success" onclick="register('${emp.id}','in');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">✅ Pointer l'entrée</button>
+    <button class="btn btn-danger" onclick="register('${emp.id}','out');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">🔴 Pointer la sortie</button>
+    <button class="btn btn-ghost" onclick="logout()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Déconnexion
+    </button>`;
+  empClockTimer=setInterval(()=>{const el=document.getElementById('emp-clock');if(el)el.textContent=new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'});},1000);
+
+  const todayRecs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,now));
+  document.getElementById('evs').innerHTML=`
+    <div class="emp-stat-row">
+      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--brand)">${w?w.toFixed(1)+'h':'-'}</div><div class="emp-stat-lbl">Aujourd'hui</div></div>
+      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--orange)">${wkHrs.toFixed(1)}h</div><div class="emp-stat-lbl">Cette semaine</div></div>
+      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--green)">${vacLeft}j</div><div class="emp-stat-lbl">Vacances</div></div>
+    </div>
+    ${sch?.enabled?`<div class="card" style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Horaire d'aujourd'hui</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:11px;color:var(--text2)">Entrée prévue</div><div style="font-size:22px;font-weight:800;color:var(--green)">${sch.entry}</div></div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text2)">Sortie prévue</div><div style="font-size:22px;font-weight:800;color:var(--red)">${sch.exit}</div></div>
+      </div>
+    </div>`:`<div class="card" style="text-align:center;color:var(--text2);margin-bottom:12px">🌙 Jour non travaillé</div>`}
+    <div style="margin-bottom:20px">
+      <div class="section-lbl">Pointages d'aujourd'hui</div>
+      ${todayRecs.length?todayRecs.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:6px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${r.type==='in'?'var(--green)':'var(--red)'}"></div>
+        <span style="font-weight:600">${r.type==='in'?'Entrée':'Sortie'}</span>
+        <span style="margin-left:auto;color:var(--text2)">${fmtTime(r.ts)}</span>
+      </div>`).join(''):
+      `<div style="color:var(--text2);font-size:13px;text-align:center;padding:12px 0">Aucun pointage aujourd'hui</div>`}
+    </div>
+    <div style="margin-bottom:20px">
+      <div class="section-lbl">Mon badge QR</div>
+      <div style="text-align:center">
+        <div class="qr-wrap" style="margin:0 auto">${genQR('EMP:'+emp.id,150)}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:8px">Présentez ce QR pour pointer</div>
+      </div>
+    </div>`;
+}
+
+// ═══════ NAV ═══════
+let currentPage='dashboard';
+const PAGE_TITLES={dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'};
+
+function toggleSB(){const s=document.getElementById('sidebar'),o=document.getElementById('sb-overlay');const open=s.classList.toggle('open');o.style.display=open?'block':'none';}
+function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').style.display='none';}
+
+function nav(page,el){
+  closeSB();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pg-'+page).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('page-title').textContent=PAGE_TITLES[page];
+  currentPage=page;renderPage(page);
+}
+function renderPage(p){
+  if(p==='dashboard')renderDash();
+  if(p==='attendance')renderAtt();
+  if(p==='employees')renderEmps();
+  if(p==='shifts')renderShifts();
+  if(p==='vacations')renderVacs();
+  if(p==='payroll')renderPayroll();
+  if(p==='reports')renderReports();
+  if(p==='history')renderHistory();
+  if(p==='settings')renderSettings();
+  if(p==='master')renderMaster();
+}
+function renderAll(){renderDash();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();}
+
+// ═══════ DASHBOARD ═══════
+function renderDash(){
+  const now=new Date(),dow=now.getDay();
+  const active=DB.employees.filter(e=>e.status==='active');
+  const present=active.filter(e=>DB.history.some(h=>h.empId===e.id&&sameDay(h.ts,now)));
+  const scheduled=active.filter(e=>e.schedules?.[dow]?.enabled);
+  const missing=scheduled.filter(e=>!present.some(p=>p.id===e.id)&&!getAbs(e.id,now));
+  const onVac=active.filter(e=>getAbs(e.id,now)?.type==='vacation');
+
+  document.getElementById('dash-hero').innerHTML=`
+    <div style="font-size:11px;color:var(--text2);margin-bottom:5px">${now.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+    <div style="font-size:22px;font-weight:800;margin-bottom:4px">${esc(DB.settings?.company||'Mon Restaurant')}</div>
+    <div style="font-size:12px;color:var(--text2)">🇨🇭 Canton de Fribourg · CHF</div>`;
+
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi"><div class="kpi-glow" style="background:var(--brand)"></div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <div class="kpi-val" style="color:var(--brand)">${active.length}</div><div class="kpi-sub">Employés actifs</div></div>
+    <div class="kpi"><div class="kpi-glow" style="background:var(--green)"></div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="kpi-val" style="color:var(--green)">${present.length}<span style="font-size:14px;font-weight:400;color:var(--text2)">/${scheduled.length}</span></div><div class="kpi-sub">Présents / Prévus</div></div>
+    <div class="kpi"><div class="kpi-glow" style="background:var(--red)"></div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div class="kpi-val" style="color:var(--red)">${missing.length}</div><div class="kpi-sub">Absents</div></div>
+    <div class="kpi"><div class="kpi-glow" style="background:var(--orange)"></div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M2 20h20M5 20V8.5L12 3l7 5.5V20"/></svg>
+      <div class="kpi-val" style="color:var(--orange)">${onVac.length}</div><div class="kpi-sub">En vacances</div></div>`;
+
+  let liveHTML='';
+  if(present.length>0){
+    liveHTML=`<div class="card" style="margin-bottom:10px"><div class="card-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Présents en ce moment</div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px">`;
+    present.forEach(emp=>{
+      const w=workedOn(emp.id,now);
+      const out=DB.history.find(h=>h.empId===emp.id&&sameDay(h.ts,now)&&h.type==='out');
+      liveHTML+=`<div style="text-align:center;cursor:pointer" onclick="openDetail('${emp.id}')">
+        <div style="position:relative;margin-bottom:4px">${mkAv(emp,'av-44')}
+          <div class="av-dot" style="background:${out?'#ef4444':'#10b981'}"></div>
+        </div>
+        <div style="font-size:10px;max-width:48px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${emp.name}</div>
+        ${w?`<div style="font-size:9px;color:var(--text2)">${w.toFixed(1)}h</div>`:''}
+      </div>`;
+    });
+    liveHTML+='</div></div>';
+  }
+  document.getElementById('dash-live').innerHTML=liveHTML;
+
+  const alerts=[];
+  active.forEach(emp=>{
+    const ds=dayStatus(emp,now);
+    if(ds.type==='missing')alerts.push({emp,msg:'Entrée non pointée',color:'var(--orange)'});
+    if(isLate(emp,now))alerts.push({emp,msg:'Arrivé en retard',color:'var(--red)'});
+  });
+
+  let aHTML=`<div class="card"><div class="card-header" style="justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Alertes du jour
+    </div>
+    ${alerts.length>0?`<span style="background:rgba(239,68,68,.15);color:var(--red);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700">${alerts.length}</span>`:''}
+  </div>`;
+  if(!alerts.length)aHTML+=`<div style="text-align:center;padding:14px 0;color:var(--green);font-size:13px;font-weight:600">✅ Tout est en ordre</div>`;
+  else alerts.forEach(a=>{aHTML+=`<div class="alert-item">
+    <div class="alert-icon" style="background:${a.color}22;color:${a.color};font-size:16px">⚠️</div>
+    <div><div style="font-weight:700;font-size:13px">${safeEmpName(a.emp)}</div><div style="font-size:11px;color:${a.color}">${esc(a.msg)}</div></div>
+    <div style="margin-left:auto;cursor:pointer" onclick="openDetail('${a.emp.id}')">›</div>
+  </div>`;});
+  aHTML+='</div>';
+  document.getElementById('dash-alerts').innerHTML=aHTML;
+
+  const badge=document.getElementById('sb-badge');
+  if(missing.length>0){badge.textContent=missing.length;badge.style.display='flex';}
+  else badge.style.display='none';
+}
+
+// ═══════ ATTENDANCE ═══════
+function renderAtt(){
+  const now=new Date(),dow=now.getDay();
+  document.getElementById('att-date').textContent=now.toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
+  const active=DB.employees.filter(e=>e.status==='active');
+  const sched=active.filter(e=>e.schedules?.[dow]?.enabled);
+  const present=active.filter(e=>DB.history.some(h=>h.empId===e.id&&sameDay(h.ts,now)));
+  document.getElementById('att-kpi').innerHTML=`
+    <div class="kpi"><div class="kpi-glow" style="background:var(--green)"></div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="kpi-val" style="color:var(--green)">${present.length}</div><div class="kpi-sub">Présents</div></div>
+    <div class="kpi"><div class="kpi-glow" style="background:var(--red)"></div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div class="kpi-val" style="color:var(--red)">${sched.filter(e=>!present.some(p=>p.id===e.id)&&!getAbs(e.id,now)).length}</div><div class="kpi-sub">Absents</div></div>`;
+  if(!sched.length){document.getElementById('att-list').innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><h3>Personne de prévu</h3></div>`;return;}
+  document.getElementById('att-list').innerHTML=sched.map(emp=>{
+    const sch=emp.schedules[dow];
+    const recs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,now)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+    const inn=recs.find(h=>h.type==='in'),out=recs.find(h=>h.type==='out'),w=workedOn(emp.id,now),late=isLate(emp,now),abs=getAbs(emp.id,now);
+    const sc=abs?'#f59e0b':inn?'#10b981':'#ef4444';
+    return`<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:12px">
+      <div style="position:relative">${mkAv(emp,'av-44')}<div class="av-dot" style="background:${sc}"></div></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px">${safeEmpName(emp)}</div>
+        <div style="font-size:11px;color:var(--text2)">${esc(emp.position)} · ${esc(sch.entry)}–${esc(sch.exit)}</div>
+        ${abs?`<div style="font-size:11px;color:var(--orange);margin-top:2px">🌴 ${abs.type}</div>`:''}
+        ${inn?`<div style="font-size:11px;color:var(--green);margin-top:2px">✅ Entrée ${fmtTime(inn.ts)}${late?' ⚠️ retard':''}</div>`:''}
+        ${out?`<div style="font-size:11px;color:var(--red);margin-top:2px">🔴 Sortie ${fmtTime(out.ts)}</div>`:''}
+        ${w?`<div style="font-size:11px;color:var(--brand);margin-top:2px">⏱ ${w.toFixed(2)}h</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px" onclick="event.stopPropagation()">
+        <button class="btn btn-success btn-sm" style="width:36px;height:34px;padding:0" onclick="register('${emp.id}','in')">↗</button>
+        <button class="btn btn-danger btn-sm" style="width:36px;height:34px;padding:0" onclick="register('${emp.id}','out')">↙</button>
+      </div>
+    </div></div>`;
+  }).join('');
+}
+
+// ═══════ EMPLOYEES ═══════
+let empF='all';
+function setEF(f,el){empF=f;setAT(el.closest('.tabs'),el);renderEmps();}
+function renderEmps(){
+  const search=(document.getElementById('emp-search')?.value||'').toLowerCase();
+  const filtered=DB.employees.filter(e=>empF==='all'?true:e.status===empF).filter(e=>!search||fullName(e).toLowerCase().includes(search)||e.position.toLowerCase().includes(search));
+  if(!filtered.length){document.getElementById('emp-list').innerHTML=`<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><h3>${search?'Aucun résultat':'Aucun employé'}</h3><p>Ajoutez votre premier employé</p></div>`;return;}
+  document.getElementById('emp-list').innerHTML=filtered.map(emp=>{
+    const last=lastAction(emp.id),w=workedOn(emp.id,new Date()),sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
+    return`<div class="emp-row" onclick="openDetail('${emp.id}')">
+      <div style="position:relative">${mkAv(emp,'av-44')}<div class="av-dot" style="background:${sc}"></div></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${safeEmpName(emp)}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">${esc(emp.position)} · ${esc(emp.dept)}</div>
+        <div style="font-size:11px;color:${sc};margin-top:3px">${last?`${last.type==='in'?'Entrée':'Sortie'} ${fmtTime(last.ts)}${w?' · '+w.toFixed(1)+'h':''}`:'-'}</div>
+      </div>
+      <div style="display:flex;gap:5px" onclick="event.stopPropagation()">
+        <button class="btn btn-success btn-sm" style="width:34px;height:34px;padding:0" onclick="register('${emp.id}','in')">↗</button>
+        <button class="btn btn-danger btn-sm" style="width:34px;height:34px;padding:0" onclick="register('${emp.id}','out')">↙</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════ EMP FORM ═══════
+let editEmpId=null,photoData=null;
+function openEmpModal(id){
+  editEmpId=id;photoData=null;
+  const emp=id?DB.employees.find(e=>e.id===id):null;
+  document.getElementById('emp-modal-title').textContent=emp?'Modifier — '+emp.name:'Nouvel employé';
+  const fields={name:'name',last:'last',num:'num',start:'startDate',phone:'phone',email:'email',vac:'vacWeeks',avs:'avs',emergency:'emergency',notes:'notes'};
+  Object.entries(fields).forEach(([f,k])=>{const el=document.getElementById('ef-'+f);if(el)el.value=emp?.[k]||'';});
+  document.getElementById('ef-start').value=emp?.startDate||new Date().toISOString().split('T')[0];
+  document.getElementById('ef-vac').value=emp?.vacWeeks||5;
+  document.getElementById('ef-paytype').value=emp?.payType||'hourly';
+  document.getElementById('ef-rate').value=emp?.payType==='hourly'?(emp?.rate||''):(emp?.salary||'');
+  document.getElementById('ef-pin').value=emp?.pin||'';
+  document.getElementById('ef-status').value=emp?.status||'active';
+  updatePL();
+  const pos=L().pos;document.getElementById('ef-pos').innerHTML=pos.map(p=>`<option ${emp?.position===p?'selected':''}>${p}</option>`).join('');
+  const deps=L().depts;document.getElementById('ef-dept').innerHTML=deps.map(d=>`<option ${emp?.dept===d?'selected':''}>${d}</option>`).join('');
+  const cons=L().cons;document.getElementById('ef-contract').innerHTML=cons.map(c=>`<option ${emp?.contract===c?'selected':''}>${c}</option>`).join('');
+  photoData=emp?.photo||null;
+  document.getElementById('photo-ring').innerHTML=emp?.photo?`<img src="${emp.photo}">`:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
+  renderSchedEd(emp?.schedules||defSched());
+  openModal('emp-modal');
+}
+const defSched=()=>{const s={};for(let i=0;i<7;i++)s[i]={enabled:i>=1&&i<=5,entry:'09:00',exit:'17:00'};return s;};
+function updatePL(){document.getElementById('ef-paylbl').textContent=document.getElementById('ef-paytype').value==='hourly'?'Taux/h (CHF)':'Salaire/mois (CHF)';}
+function handlePhoto(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{photoData=e.target.result;document.getElementById('photo-ring').innerHTML=`<img src="${photoData}">`;};r.readAsDataURL(f);}
+function renderSchedEd(sched){
+  document.getElementById('ef-sched').innerHTML=L().daysFull.map((d,i)=>`
+    <div style="background:var(--s3);border-radius:var(--r3);padding:10px 12px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;${sched[i]?.enabled?'margin-bottom:10px':''}">
+        <span style="font-weight:700;font-size:13px">${d}</span>
+        <div class="tgl ${sched[i]?.enabled?'on':''}" id="st-${i}" onclick="toggleSD(${i})"></div>
+      </div>
+      <div id="stimes-${i}" style="display:${sched[i]?.enabled?'grid':'none'};grid-template-columns:1fr 1fr;gap:8px">
+        <div class="fg" style="margin:0"><label>Entrée</label><input type="time" id="se-${i}" value="${sched[i]?.entry||'09:00'}"></div>
+        <div class="fg" style="margin:0"><label>Sortie</label><input type="time" id="sx-${i}" value="${sched[i]?.exit||'17:00'}"></div>
+      </div>
+    </div>`).join('');
+}
+function toggleSD(i){const t=document.getElementById(`st-${i}`),m=document.getElementById(`stimes-${i}`);t.classList.toggle('on');m.style.display=t.classList.contains('on')?'grid':'none';}
+function getSchedEd(){const s={};for(let i=0;i<7;i++){const on=document.getElementById(`st-${i}`)?.classList.contains('on')||false;s[i]={enabled:on,entry:document.getElementById(`se-${i}`)?.value||'09:00',exit:document.getElementById(`sx-${i}`)?.value||'17:00'};}return s;}
+function saveEmp(){
+  const name=clean(document.getElementById('ef-name').value);
+  if(!name){toast('Le prénom est obligatoire','#ef4444');return;}
+  const payType=document.getElementById('ef-paytype').value,rateVal=parseFloat(document.getElementById('ef-rate').value)||0;
+  const data={id:editEmpId||uid(),name,last:clean(document.getElementById('ef-last').value),num:clean(document.getElementById('ef-num').value),position:clean(document.getElementById('ef-pos').value),dept:clean(document.getElementById('ef-dept').value),startDate:document.getElementById('ef-start').value,phone:clean(document.getElementById('ef-phone').value),email:clean(document.getElementById('ef-email').value),contract:clean(document.getElementById('ef-contract').value),status:document.getElementById('ef-status').value,payType,rate:payType==='hourly'?rateVal:0,salary:payType==='monthly'?rateVal:0,vacWeeks:parseInt(document.getElementById('ef-vac').value)||5,avs:clean(document.getElementById('ef-avs').value),emergency:clean(document.getElementById('ef-emergency').value),notes:clean(document.getElementById('ef-notes').value),photo:photoData,schedules:getSchedEd(),pin:(document.getElementById('ef-pin').value||'').replace(/\D/g,'').slice(0,4)||'0000',color:editEmpId?(DB.employees.find(e=>e.id===editEmpId)?.color||EMP_COLORS[DB.employees.length%EMP_COLORS.length]):EMP_COLORS[DB.employees.length%EMP_COLORS.length]};
+  if(editEmpId){const i=DB.employees.findIndex(e=>e.id===editEmpId);if(i>=0)DB.employees[i]={...DB.employees[i],...data};}
+  else DB.employees.push(data);
+  saveLocal();closeModal('emp-modal');renderPage(currentPage);
+  toast(editEmpId?'✅ Employé mis à jour':'✅ Employé ajouté');
+  sbSaveEmp(data).catch(console.error);
+}
+
+// ═══════ DETAIL ═══════
+function openDetail(empId){
+  const emp=DB.employees.find(e=>e.id===empId);if(!emp)return;
+  const now=new Date(),last=lastAction(empId),w=workedOn(empId,now);
+  const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(empId));
+  const startDays=Math.floor((Date.now()-new Date(emp.startDate).getTime())/86400000);
+  const seniority=startDays<30?`${startDays}j`:startDays<365?`${Math.floor(startDays/30)}m`:`${Math.floor(startDays/365)}a`;
+  const sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
+  const c=empColor(emp);
+
+  document.getElementById('detail-content').innerHTML=`
+    <div class="modal-handle"></div>
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="position:relative;display:inline-block;margin-bottom:12px">
+        ${mkAv(emp,'av-72')}<div class="av-dot" style="background:${sc};width:14px;height:14px"></div>
+      </div>
+      <div style="font-size:21px;font-weight:800">${safeEmpName(emp)}</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:4px">${esc(emp.position)} · ${esc(emp.dept)}</div>
+      ${emp.num?`<span class="chip chip-blue" style="margin-top:8px">#${emp.num}</span>`:''}
+      ${emp.pin?`<span class="chip chip-gray" style="margin-top:8px;margin-left:4px">PIN: ${emp.pin}</span>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+      ${[['Ancienneté',seniority,'var(--brand)'],['Vacances',`${vacLeft}j`,'var(--orange)'],["Auj.",w?w.toFixed(1)+'h':'-','var(--green)']].map(([l,v,c])=>`<div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px 8px;text-align:center"><div style="font-size:19px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:3px">${l}</div></div>`).join('')}
+    </div>
+    <div class="tabs" id="dtabs">
+      <button class="tab active" onclick="dtab('dt-pt',this)">⏱ Pointer</button>
+      <button class="tab" onclick="dtab('dt-badge',this)">🪪 Badge QR</button>
+      <button class="tab" onclick="dtab('dt-info',this)">ℹ️ Info</button>
+    </div>
+    <div id="dt-pt">
+      <div class="card mb8">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Dernier pointage</div>
+        ${last?`<div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:${sc}"></div><span style="font-weight:700">${last.type==='in'?'Entrée':'Sortie'}</span><span style="color:var(--text2)">${fmtTime(last.ts)}</span></div>`:
+        `<div style="color:var(--text2);font-size:13px">Aucun pointage</div>`}
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button class="btn btn-success" onclick="register('${empId}','in')">✅ Entrée</button>
+        <button class="btn btn-danger" onclick="register('${empId}','out')">🔴 Sortie</button>
+      </div>
+      <button class="btn btn-ghost" onclick="closeModal('detail-modal');openAbsModal('${empId}')">📋 Nouvelle absence</button>
+    </div>
+    <div id="dt-badge" style="display:none">
+      <div class="badge-card">
+        <div class="badge-header" style="background:linear-gradient(135deg,${c}44,${c}22)">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;margin-bottom:10px">${esc((DB.settings?.company||'MON RESTAURANT').toUpperCase())}</div>
+          ${mkAv(emp,'av-72')}
+          <div class="badge-emp-name">${safeEmpName(emp)}</div>
+          <div class="badge-emp-role">${esc(emp.position)} · ${esc(emp.dept)}</div>
+          <div class="badge-status-pill">
+            <div style="width:7px;height:7px;border-radius:50%;background:${sc}"></div>
+            ${last?`${last.type==='in'?'En service':'Hors service'} · ${fmtTime(last.ts)}`:'Pas de pointage'}
+          </div>
+        </div>
+        <div class="badge-body" style="text-align:center">
+          <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Scanner pour pointer</div>
+          <div class="qr-wrap" style="margin:0 auto;display:inline-block">${genQR('EMP:'+empId,160)}</div>
+          <div style="font-size:9px;color:var(--text3);margin-top:10px;font-family:monospace">${empId.toUpperCase().slice(0,16)}...</div>
+          ${emp.num?`<div style="font-size:10px;color:var(--text2);margin-top:3px">Employé #${emp.num}</div>`:''}
+        </div>
+      </div>
+      <div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px;font-size:11px;color:var(--text2);text-align:center">🔮 Compatible NFC — badge physique prévu</div>
+    </div>
+    <div id="dt-info" style="display:none">
+      <div class="card">
+        ${[['Téléphone',emp.phone],['Email',emp.email],['Contrat',emp.contract],['Salaire',`${emp.payType==='hourly'?'Horaire':'Mensuel'} · CHF ${emp.payType==='hourly'?emp.rate+'/h':emp.salary+'/mois'}`],['Vacances',`${emp.vacWeeks} sem. · ${vacLeft}j restants`],['Urgence',emp.emergency],['AVS',emp.avs]].filter(r=>r[1]).map(([l,v])=>`<div class="rrow"><span class="muted">${esc(l)}</span><span style="font-weight:500;text-align:right;max-width:55%">${esc(v)}</span></div>`).join('')}
+        ${emp.notes?`<div style="background:var(--s3);border-radius:var(--r3);padding:10px;margin-top:8px;font-size:12px;color:var(--text2)">${esc(emp.notes)}</div>`:''}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn btn-ghost" onclick="closeModal('detail-modal');openEmpModal('${empId}')">✏️ Modifier</button>
+        <button class="btn btn-ghost" style="color:var(--red)" onclick="deleteEmp('${empId}')">🗑 Supprimer</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost mt12" onclick="closeModal('detail-modal')">Fermer</button>`;
+  openModal('detail-modal');
+}
+function dtab(id,btn){['dt-pt','dt-badge','dt-info'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});document.getElementById('dtabs')?.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const el=document.getElementById(id);if(el)el.style.display='block';}
+function deleteEmp(id){if(!confirm('Supprimer cet employé?'))return;DB.employees=DB.employees.filter(e=>e.id!==id);DB.history=DB.history.filter(h=>h.empId!==id);DB.absences=DB.absences.filter(a=>a.empId!==id);saveLocal();closeModal('detail-modal');renderPage(currentPage);toast('Employé supprimé');sbDelEmp(id).catch(console.error);}
+
+// ═══════ SHIFTS ═══════
+let shiftWS=getMonday(new Date()),shiftKey=null,shiftType='morning';
+function shiftWN(dir){shiftWS=new Date(shiftWS.getTime()+dir*7*86400000);renderShifts();}
+function renderShifts(){
+  const dates=Array.from({length:7},(_,i)=>new Date(shiftWS.getTime()+i*86400000));
+  document.getElementById('shift-wlbl').textContent=`${fmtDate(dates[0])} — ${fmtDate(dates[6])}`;
+  const active=DB.employees.filter(e=>e.status==='active'),days=L().days,cols=`88px repeat(7,1fr)`;
+  document.getElementById('shift-hdr').style.gridTemplateColumns=cols;
+  document.getElementById('shift-hdr').innerHTML=`<div></div>`+dates.map((d,i)=>`<div style="text-align:center"><div style="font-size:10px;font-weight:700;color:var(--text3)">${days[d.getDay()]}</div><div style="font-size:12px;font-weight:${sameDay(d,new Date())?'800':'400'};color:${sameDay(d,new Date())?'var(--orange)':'var(--text)'}">${d.getDate()}</div></div>`).join('');
+  if(!active.length){document.getElementById('shift-grid').innerHTML=`<div class="empty-state" style="padding:24px"><h3>Aucun employé actif</h3></div>`;return;}
+  document.getElementById('shift-grid').innerHTML=active.map(emp=>{
+    let row=`<div class="shift-row" style="grid-template-columns:${cols}"><div style="display:flex;align-items:center;gap:6px;min-width:0">${mkAv(emp,'av-28')}<span style="font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${emp.name}</span></div>`;
+    dates.forEach(d=>{const key=`${emp.id}_${d.toISOString().split('T')[0]}`,sh=DB.shifts[key],abs=getAbs(emp.id,d);let type='off',lbl='—';if(abs){type='abs';lbl='ABS';}else if(sh){type=sh.type;const m={morning:'AM',afternoon:'PM',evening:'SOI',night:'NOC',rest:'DSC',off:'—'};lbl=m[sh.type]||'?';}else if(emp.schedules?.[d.getDay()]?.enabled){type='morning';lbl='?';}row+=`<div class="s-cell ${type}" onclick="openShiftModal('${emp.id}','${d.toISOString().split('T')[0]}')">${lbl}</div>`;});
+    row+='</div>';return row;
+  }).join('');
+}
+function openShiftModal(empId,dateStr){
+  const emp=DB.employees.find(e=>e.id===empId);
+  shiftKey=`${empId}_${dateStr}`;const sh=DB.shifts[shiftKey];
+  document.getElementById('shift-mtitle').textContent=`${emp?.name||'?'} · ${new Date(dateStr).toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'})}`;
+  shiftType=sh?.type||'morning';
+  document.getElementById('sh-in').value=sh?.in||emp?.schedules?.[new Date(dateStr).getDay()]?.entry||'09:00';
+  document.getElementById('sh-out').value=sh?.out||emp?.schedules?.[new Date(dateStr).getDay()]?.exit||'17:00';
+  document.getElementById('sh-notes').value=sh?.notes||'';
+  const opts=[{v:'morning',l:'🌅 Matin',c:'#06b6d4'},{v:'afternoon',l:'☀️ Après-midi',c:'#f59e0b'},{v:'evening',l:'🌆 Soir',c:'#7c3aed'},{v:'night',l:'🌙 Nuit',c:'#4f6ef7'},{v:'rest',l:'✅ Repos',c:'#10b981'},{v:'off',l:'❌ Libre',c:'#5a5e78'}];
+  document.getElementById('shift-type-grid').innerHTML=opts.map(o=>`<button id="stype-${o.v}" onclick="selST('${o.v}')" style="padding:10px 12px;border-radius:10px;border:2px solid ${shiftType===o.v?o.c:'var(--border)'};background:${shiftType===o.v?o.c+'22':'var(--s3)'};color:${shiftType===o.v?o.c:'var(--text2)'};font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;text-align:left">${o.l}</button>`).join('');
+  document.getElementById('shift-times').style.display=['rest','off'].includes(shiftType)?'none':'grid';
+  openModal('shift-modal');
+}
+function selST(type){
+  shiftType=type;
+  const colors={morning:'#06b6d4',afternoon:'#f59e0b',evening:'#7c3aed',night:'#4f6ef7',rest:'#10b981',off:'#5a5e78'};
+  document.querySelectorAll('[id^="stype-"]').forEach(btn=>{const t=btn.id.replace('stype-',''),c=colors[t];btn.style.borderColor=t===type?c:'var(--border)';btn.style.background=t===type?c+'22':'var(--s3)';btn.style.color=t===type?c:'var(--text2)';});
+  document.getElementById('shift-times').style.display=['rest','off'].includes(type)?'none':'grid';
+}
+function saveShift(){if(!shiftKey)return;DB.shifts[shiftKey]={type:shiftType,in:document.getElementById('sh-in').value,out:document.getElementById('sh-out').value,notes:document.getElementById('sh-notes').value};saveLocal();closeModal('shift-modal');renderShifts();toast('✅ Horaire enregistré');sbSaveShift(shiftKey,DB.shifts[shiftKey]).catch(console.error);}
+
+// ═══════ VACATIONS ═══════
+let vacT='pending';
+function setVT(f,el){vacT=f;setAT(el.closest('.tabs'),el);renderVacs();}
+function renderVacs(){
+  const c=document.getElementById('vac-content');
+  if(vacT==='balance'){
+    const active=DB.employees.filter(e=>e.status==='active');
+    if(!active.length){c.innerHTML=`<div class="empty-state"><h3>Aucun employé</h3></div>`;return;}
+    c.innerHTML=active.map(emp=>{const total=(emp.vacWeeks||4)*5,used=vacUsed(emp.id),left=Math.max(0,total-used),pct=Math.min(100,(used/total)*100);return`<div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">${mkAv(emp,'av-36')}<div style="flex:1"><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--orange);font-size:18px">${left}j</div><div style="font-size:10px;color:var(--text2)">restants</div></div></div><div class="prog"><div class="prog-fill" style="width:${pct}%;background:var(--orange)"></div></div><div style="font-size:10px;color:var(--text2);margin-top:5px">${used}/${total} jours utilisés</div></div>`;}).join('');return;
+  }
+  const isAppr=vacT==='approved',filtered=DB.absences.filter(a=>a.approved===isAppr);
+  if(!filtered.length){c.innerHTML=`<div class="empty-state"><h3>Aucune demande</h3><p>${isAppr?'Aucun congé approuvé':'Aucune demande en attente'}</p></div>`;return;}
+  const icons={vacation:'🌴',medical:'🏥',personal:'👤',dayOff:'💤',training:'📚',maternity:'🤱',holiday:'⭐'};
+  c.innerHTML=filtered.map(a=>{const emp=DB.employees.find(e=>e.id===a.empId),days=Math.round((new Date(a.end)-new Date(a.start))/86400000)+1;
+    return`<div class="card"><div style="display:flex;align-items:center;gap:10px">${emp?mkAv(emp,'av-36'):''}<div style="flex:1"><div style="font-weight:700;font-size:13px">${emp?safeEmpName(emp):'?'}</div><div style="font-size:11px;color:var(--text2)">${icons[a.type]||'📋'} ${esc(a.type)} · ${days}j</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${fmtDate(a.start)} — ${fmtDate(a.end)}</div></div><div style="display:flex;flex-direction:column;gap:6px">${!isAppr?`<button class="btn btn-success btn-sm" style="width:34px;height:32px;padding:0" onclick="apprAbs('${esc(a.id)}')">✓</button>`:''}<button class="btn btn-ghost btn-sm" style="width:34px;height:32px;padding:0;color:var(--red)" onclick="delAbs('${esc(a.id)}')">🗑</button></div></div>${a.notes?`<div style="font-size:11px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${esc(a.notes)}</div>`:''}</div>`;}).join('');
+}
+async function apprAbs(id){
+  DB.absences=DB.absences.map(a=>a.id===id?{...a,approved:true}:a);saveLocal();renderVacs();toast('✅ Approuvé');
+  sbUpdateAbsApproved(id,true).catch(console.error);
+}
+async function delAbs(id){
+  DB.absences=DB.absences.filter(a=>a.id!==id);saveLocal();renderVacs();toast('🗑 Supprimé');
+  sbDelAbs(id).catch(console.error);
+}
+function openAbsModal(empId){
+  document.getElementById('abs-emp').innerHTML=DB.employees.map(e=>`<option value="${e.id}" ${e.id===empId?'selected':''}>${fullName(e)}</option>`).join('');
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('abs-start').value=today;document.getElementById('abs-end').value=today;
+  document.getElementById('abs-notes').value='';document.getElementById('abs-appr').classList.add('on');
+  openModal('abs-modal');
+}
+function saveAbs(){
+  const empId=document.getElementById('abs-emp').value,start=document.getElementById('abs-start').value,end=document.getElementById('abs-end').value;
+  if(!start||!end){toast('Sélectionnez les dates','#ef4444');return;}
+  const newAbs={id:uid(),empId,type:document.getElementById('abs-type').value,start,end,approved:document.getElementById('abs-appr').classList.contains('on'),notes:document.getElementById('abs-notes').value.trim()};
+  DB.absences.unshift(newAbs);saveLocal();closeModal('abs-modal');renderPage(currentPage);toast('✅ Absence enregistrée');
+  sbSaveAbs(newAbs).catch(console.error);
+}
+
+// ═══════ PAYROLL ═══════
+let payMD=new Date();
+function payMN(dir){payMD=new Date(payMD.getFullYear(),payMD.getMonth()+dir,1);renderPayroll();}
+function calcPay(emp,y,m){
+  const recs=DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===y&&d.getMonth()===m;});
+  const days=new Set(recs.map(h=>new Date(h.ts).toDateString()));
+  const weekHours={};let hrs=0;
+  for(const ds of days){
+    const date=new Date(ds),w=workedOn(emp.id,date);
+    if(!w)continue;
+    hrs+=w;
+    const wk=getMonday(date).toISOString().split('T')[0];
+    weekHours[wk]=(weekHours[wk]||0)+w;
+  }
+  const maxW=DB.settings?.maxHours||45;
+  const ot=Object.values(weekHours).reduce((sum,h)=>sum+Math.max(0,h-maxW),0);
+  const regular=Math.max(0,hrs-ot);
+  const pay=emp.payType==='hourly'?regular*(emp.rate||0)+ot*(emp.rate||0)*1.25:(emp.salary||0);
+  return{hrs,ot,pay,days:days.size};
+}
+function renderPayroll(){
+  const y=payMD.getFullYear(),m=payMD.getMonth();
+  document.getElementById('pay-mlbl').textContent=fmtMonth(payMD);
+  document.getElementById('pay-msub').textContent=fmtMonth(payMD);
+  let total=0;
+  const rows=DB.employees.map(emp=>{const r=calcPay(emp,y,m);total+=r.pay;return{emp,...r};});
+  document.getElementById('pay-total').textContent=`CHF ${total.toFixed(2)}`;
+  document.getElementById('pay-list').innerHTML=rows.map(({emp,hrs,ot,pay,days})=>`<div class="card"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">${mkAv(emp,'av-36')}<div style="flex:1"><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div><div style="text-align:right"><div style="font-weight:800;color:var(--green);font-size:17px">CHF ${pay.toFixed(2)}</div><div style="font-size:10px;color:var(--text2)">estimé</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">${[['Travaillées',hrs.toFixed(1)+'h','var(--brand)'],['Jours',days+'j','var(--green)'],['Supp.',ot>0?'+'+ot.toFixed(1)+'h':'0h',ot>0?'var(--red)':'var(--text3)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:8px;text-align:center"><div style="font-size:15px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2)">${l}</div></div>`).join('')}</div></div>`).join('');
+}
+
+// ═══════ REPORTS ═══════
+let repMD=new Date();
+function repMN(dir){repMD=new Date(repMD.getFullYear(),repMD.getMonth()+dir,1);renderReports();}
+function renderReports(){
+  const y=repMD.getFullYear(),m=repMD.getMonth();
+  document.getElementById('rep-mlbl').textContent=fmtMonth(repMD);
+  const tol=DB.settings?.lateTol||10;
+  if(!DB.employees.length){document.getElementById('rep-content').innerHTML=`<div class="empty-state"><h3>Aucune donnée</h3><p>Ajoutez des employés pour générer des rapports</p></div>`;return;}
+  document.getElementById('rep-content').innerHTML=DB.employees.map(emp=>{
+    const recs=DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===y&&d.getMonth()===m;});
+    const days=new Set(recs.map(h=>new Date(h.ts).toDateString()));
+    let hrs=0;for(const ds of days){const w=workedOn(emp.id,new Date(ds));if(w)hrs+=w;}
+    const dim=new Date(y,m+1,0).getDate();let late=0,abs=0;
+    for(let d=1;d<=dim;d++){const date=new Date(y,m,d);if(date>new Date())continue;const dow=date.getDay(),sch=emp.schedules?.[dow];if(!sch?.enabled)continue;const dr=recs.filter(h=>sameDay(h.ts,date));if(!dr.length&&!getAbs(emp.id,date)){abs++;continue;}const inn=dr.find(h=>h.type==='in');if(inn){const[eh,em]=sch.entry.split(':').map(Number);const exp=new Date(date);exp.setHours(eh,em+tol,0,0);if(new Date(inn.ts)>exp)late++;}}
+    const att=days.size+abs>0?((days.size/(days.size+abs))*100).toFixed(0):0;
+    const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));
+    const payInfo=calcPay(emp,y,m),ot=payInfo.ot,pay=payInfo.pay;
+    const ac=Number(att)>=80?'var(--green)':Number(att)>=60?'var(--orange)':'var(--red)';
+    return`<div class="card mb8"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">${mkAv(emp,'av-36')}<div><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">${[['Jours travaillés',days.size,'var(--green)'],['Heures',hrs.toFixed(1)+'h','var(--brand)'],['Retards',late,'var(--orange)'],['Absences',abs,'var(--red)'],['H. supp.',ot>0?'+'+ot.toFixed(1)+'h':'0h',ot>0?'var(--red)':'var(--text3)'],['Vacances rest.',vacLeft+'j','var(--orange)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div></div>`).join('')}</div>${pay>0?`<div class="flex-b fs12 mb8"><span class="muted">Salaire estimé</span><span style="font-weight:800;color:var(--green)">CHF ${pay.toFixed(2)}</span></div>`:''}<div class="flex-b fs11 mb4"><span class="muted">Taux de présence</span><span style="font-weight:700;color:${ac}">${att}%</span></div><div class="prog"><div class="prog-fill" style="width:${att}%;background:${ac}"></div></div></div>`;
+  }).join('');
+}
+
+// ═══════ HISTORY ═══════
+function renderHistory(){
+  const search=(document.getElementById('hist-search')?.value||'').toLowerCase();
+  const src=search?DB.history.filter(h=>h.empName.toLowerCase().includes(search)):DB.history;
+  if(!src.length){document.getElementById('hist-list').innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><h3>Aucun enregistrement</h3></div>`;return;}
+  const groups={};src.forEach(h=>{const k=new Date(h.ts).toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});if(!groups[k])groups[k]=[];groups[k].push(h);});
+  document.getElementById('hist-list').innerHTML=Object.entries(groups).map(([day,recs])=>`<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">${esc(day)}</div>${recs.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:5px"><div style="width:32px;height:32px;border-radius:50%;background:${r.type==='in'?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px">${r.type==='in'?'✅':'🔴'}</div><div><div style="font-weight:700;font-size:13px">${r.type==='in'?'Entrée':'Sortie'}</div><div style="font-size:11px;color:var(--text2)">${esc(r.empName)}</div></div><span style="margin-left:auto;color:var(--text2);font-size:12px;font-family:monospace;font-weight:600">${fmtTime(r.ts)}</span></div>`).join('')}</div>`).join('');
+}
+function clearHist(){if(confirm("Effacer l'historique?")){DB.history=[];saveLocal();renderHistory();toast('🗑 Historique effacé');}}
+
+// ═══════ SETTINGS ═══════
+function renderSettings(){
+  document.getElementById('cfg-company').value=DB.settings?.company||'Mon Restaurant';
+  document.getElementById('cfg-late').value=DB.settings?.lateTol||10;
+  document.getElementById('cfg-maxh').value=DB.settings?.maxHours||45;
+  renderLangBar();
+}
+
+async function renderMaster(){
+  if(currentUser?.role!=='super_admin')return;
+  await loadMaster();
+  const restaurants=MASTER.restaurants||[],profiles=MASTER.profiles||[];
+  const emps=MASTER.stats?.employees||[],atts=MASTER.stats?.attendance||[];
+  const today=todayStart();
+  document.getElementById('master-version').textContent=`Versión ${APP_VERSION} · Build ${APP_BUILD} · Restaurante activo: ${REST_ID}`;
+  document.getElementById('master-kpi').innerHTML=`
+    <div class="kpi"><div class="kpi-val" style="color:var(--brand)">${restaurants.length}</div><div class="kpi-sub">Restaurantes</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--green)">${profiles.length}</div><div class="kpi-sub">Usuarios</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${emps.length}</div><div class="kpi-sub">Empleados</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--cyan)">${atts.filter(a=>sameDay(a.timestamp,today)).length}</div><div class="kpi-sub">Pointages hoy</div></div>`;
+  document.getElementById('master-restaurants').innerHTML=restaurants.length?restaurants.map(r=>{
+    const count=emps.filter(e=>e.restaurant_id===r.id).length;
+    const admins=profiles.filter(p=>p.restaurant_id===r.id).length;
+    return `<div class="emp-row" onclick="switchRestaurant('${esc(r.id)}')">
+      <div class="sb-resto-logo">${esc(r.emoji||'🍽️')}</div>
+      <div style="flex:1;min-width:0">
+        <div class="fw7 fs14">${esc(r.name||'Restaurant')}</div>
+        <div class="fs11 muted">${count} empleados · ${admins} usuarios · ${esc(r.id)}</div>
+      </div>
+      <span class="chip ${r.id===REST_ID?'chip-green':'chip-blue'}">${r.id===REST_ID?'Activo':'Abrir'}</span>
+    </div>`;
+  }).join(''):`<div class="empty-state"><h3>No hay restaurantes</h3><p>Crea el primero desde registro o Supabase.</p></div>`;
+}
+
+async function switchRestaurant(id){
+  setRestaurantId(id);
+  await loadSB();
+  applyBrand();
+  renderAll();
+  toast('Restaurante activo cambiado');
+  nav('dashboard',document.querySelector('.sb-item'));
+}
+
+function openMaintenance(kind){
+  const url=MAINTENANCE_LINKS[kind];
+  if(url&&url.includes('TU_USUARIO'))toast('Actualiza el enlace de GitHub en MAINTENANCE_LINKS','#f59e0b');
+  if(url)window.open(url,'_blank','noopener');
+}
+async function deleteAllConfirm(){
+  if(!confirm('⚠️ Supprimer TOUTES les données?'))return;
+  const old={employees:DB.employees,history:DB.history,absences:DB.absences,shifts:DB.shifts};
+  DB={employees:[],history:[],absences:[],shifts:{},settings:DB.settings};saveLocal();renderPage(currentPage);
+  try{await sbDeleteAll();toast('🗑 Données supprimées','#ef4444');}
+  catch(e){DB={...DB,...old};saveLocal();renderPage(currentPage);toast('Erreur Supabase: suppression annulée','#ef4444');console.error(e);}
+}
+
+// ═══════ EXPORT ═══════
+const dl=(content,name,type)=>{const b=new Blob([content],{type}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);};
+function exportPayCSV(){const y=payMD.getFullYear(),m=payMD.getMonth();let csv=`Employé,Poste,Type,Taux,Heures,H.Supp,Salaire\n`;DB.employees.forEach(emp=>{const{hrs,ot,pay}=calcPay(emp,y,m);csv+=[csvCell(fullName(emp)),csvCell(emp.position),csvCell(emp.payType==='hourly'?'Horaire':'Mensuel'),csvCell(`CHF ${emp.payType==='hourly'?emp.rate:emp.salary}`),hrs.toFixed(2),ot.toFixed(2),csvCell(`CHF ${pay.toFixed(2)}`)].join(',')+'\n';});dl(csv,`salaires_${fmtMonth(payMD).replace(' ','_')}.csv`,'text/csv');}
+function exportRepCSV(){const y=repMD.getFullYear(),m=repMD.getMonth();let csv=`Employé,Poste,Jours,Heures,Retards,Absences,Vac.rest.\n`;DB.employees.forEach(emp=>{const recs=DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===y&&d.getMonth()===m;});const days=new Set(recs.map(h=>new Date(h.ts).toDateString()));let hrs=0;for(const ds of days){const w=workedOn(emp.id,new Date(ds));if(w)hrs+=w;}const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));csv+=[csvCell(fullName(emp)),csvCell(emp.position),days.size,hrs.toFixed(2),0,0,vacLeft].join(',')+'\n';});dl(csv,`rapport_${fmtMonth(repMD).replace(' ','_')}.csv`,'text/csv');}
+function exportAllJSON(){dl(JSON.stringify(DB,null,2),'hrmanagerpro_backup.json','application/json');}
+async function exportMasterJSON(){
+  if(currentUser?.role!=='super_admin'){toast('Réservé au super admin','#ef4444');return;}
+  await loadMaster();
+  const payload={version:APP_VERSION,build:APP_BUILD,exportedAt:new Date().toISOString(),master:MASTER};
+  dl(JSON.stringify(payload,null,2),`hrmanagerpro_master_backup_${APP_BUILD}.json`,'application/json');
+}
+
+// ═══════ INIT ═══════
+async function init(){
+  document.getElementById('loading-msg').textContent='Connexion à la base de données...';
+  try{
+    const ok=await loadSB();
+    if(ok){document.getElementById('loading-msg').textContent='Données chargées ✅';await new Promise(r=>setTimeout(r,400));}
+  }catch(e){console.warn('Local mode');}
+  const lo=document.getElementById('loading-overlay');
+  lo.style.opacity='0';lo.style.transition='opacity .3s';
+  setTimeout(()=>lo.style.display='none',300);
+  applyBrand();
+  document.getElementById('login-screen').style.display='flex';
+}
+init();
+</script>
+</body>
+</html>
