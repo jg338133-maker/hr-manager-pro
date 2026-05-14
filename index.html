@@ -306,7 +306,7 @@ input[type=date],input[type=time]{color-scheme:dark}
     </div>
     <!-- Employee PIN -->
     <div id="login-employee" style="display:none">
-      <div class="fg"><label>Restaurant</label><select id="pin-restaurant" onchange="selectPinRestaurant(this.value)"></select></div>
+      <div class="fg"><label>Email personnel</label><input type="email" id="pin-email" placeholder="employe@email.com"></div>
       <div style="text-align:center;margin-bottom:14px;font-size:13px;color:var(--text2)">Entrez votre code PIN à 4 chiffres</div>
       <div class="pin-display">
         <div class="pin-dot" id="pd0"></div>
@@ -869,8 +869,8 @@ const LANGS={
 let lang='fr';
 const L=()=>LANGS[lang]||LANGS.fr;
 const UI={
-  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',password:'Mot de passe',confirmPassword:'Répéter le mot de passe',passwordMismatch:'Les mots de passe ne correspondent pas',restaurantSelect:'Restaurant',pinPrompt:'Entrez votre code PIN à 4 chiffres',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin',sub:'Gestion du personnel · Fribourg CH'},dash:{active:'Employés actifs',present:'Présents / Prévus',absent:'Absents',vacation:'En vacances',live:'Présents en ce moment',alerts:'Alertes du jour',allGood:'Tout est en ordre',missing:'Entrée non pointée',late:'Arrivé en retard',scan:'Scanner QR',addEmp:'+ Employé'},emp:{search:'Rechercher un employé...',all:'Tous',active:'Actifs',inactive:'Inactifs',new:'Nouvel employé',edit:'Modifier',none:'Aucun employé',noResult:'Aucun résultat',addFirst:'Ajoutez votre premier employé',in:'Entrée',out:'Sortie'},att:{today:'Pointages du jour',scheduled:'Programmés aujourd’hui',manual:'Manuel',present:'Présents',absent:'Absents',none:'Personne de prévu',manualTitle:'Pointage manuel',employee:'Employé',date:'Date',reason:'Motif',save:'Enregistrer',cancel:'Annuler'},shift:{title:'Planification',morning:'Matin',afternoon:'Après-midi',evening:'Soir',night:'Nuit',rest:'Repos',off:'Libre',none:'Aucun employé actif',scheduleSaved:'Horaire enregistré'},vac:{pending:'En attente',approved:'Approuvés',balance:'Soldes',new:'+ Nouvelle absence',title:'Nouvelle absence',none:'Aucune demande',noneApproved:'Aucun congé approuvé',nonePending:'Aucune demande en attente',remaining:'restants',used:'jours utilisés'}},
-  es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Restaurante',email:'Email',password:'Contraseña',confirmPassword:'Repetir contraseña',passwordMismatch:'Las contraseñas no coinciden',restaurantSelect:'Restaurante',pinPrompt:'Ingresa tu PIN de 4 cifras',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del restaurante',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin',sub:'Gestión de personal · Friburgo CH'},dash:{active:'Empleados activos',present:'Presentes / Previstos',absent:'Ausentes',vacation:'De vacaciones',live:'Presentes ahora',alerts:'Alertas del día',allGood:'Todo está en orden',missing:'Entrada no registrada',late:'Llegó tarde',scan:'Escanear QR',addEmp:'+ Empleado'},emp:{search:'Buscar empleado...',all:'Todos',active:'Activos',inactive:'Inactivos',new:'Nuevo empleado',edit:'Modificar',none:'Sin empleados',noResult:'Sin resultados',addFirst:'Agrega tu primer empleado',in:'Entrada',out:'Salida'}},
+  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',employeeEmail:'Email personnel',password:'Mot de passe',confirmPassword:'Répéter le mot de passe',passwordMismatch:'Les mots de passe ne correspondent pas',pinPrompt:'Entrez votre code PIN à 4 chiffres',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin',sub:'Gestion du personnel · Fribourg CH'},dash:{active:'Employés actifs',present:'Présents / Prévus',absent:'Absents',vacation:'En vacances',live:'Présents en ce moment',alerts:'Alertes du jour',allGood:'Tout est en ordre',missing:'Entrée non pointée',late:'Arrivé en retard',scan:'Scanner QR',addEmp:'+ Employé'},emp:{search:'Rechercher un employé...',all:'Tous',active:'Actifs',inactive:'Inactifs',new:'Nouvel employé',edit:'Modifier',none:'Aucun employé',noResult:'Aucun résultat',addFirst:'Ajoutez votre premier employé',in:'Entrée',out:'Sortie'},att:{today:'Pointages du jour',scheduled:'Programmés aujourd’hui',manual:'Manuel',present:'Présents',absent:'Absents',none:'Personne de prévu',manualTitle:'Pointage manuel',employee:'Employé',date:'Date',reason:'Motif',save:'Enregistrer',cancel:'Annuler'},shift:{title:'Planification',morning:'Matin',afternoon:'Après-midi',evening:'Soir',night:'Nuit',rest:'Repos',off:'Libre',none:'Aucun employé actif',scheduleSaved:'Horaire enregistré'},vac:{pending:'En attente',approved:'Approuvés',balance:'Soldes',new:'+ Nouvelle absence',title:'Nouvelle absence',none:'Aucune demande',noneApproved:'Aucun congé approuvé',nonePending:'Aucune demande en attente',remaining:'restants',used:'jours utilisés'}},
+  es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Restaurante',email:'Email',employeeEmail:'Email personal',password:'Contraseña',confirmPassword:'Repetir contraseña',passwordMismatch:'Las contraseñas no coinciden',pinPrompt:'Ingresa tu PIN de 4 cifras',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del restaurante',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin',sub:'Gestión de personal · Friburgo CH'},dash:{active:'Empleados activos',present:'Presentes / Previstos',absent:'Ausentes',vacation:'De vacaciones',live:'Presentes ahora',alerts:'Alertas del día',allGood:'Todo está en orden',missing:'Entrada no registrada',late:'Llegó tarde',scan:'Escanear QR',addEmp:'+ Empleado'},emp:{search:'Buscar empleado...',all:'Todos',active:'Activos',inactive:'Inactivos',new:'Nuevo empleado',edit:'Modificar',none:'Sin empleados',noResult:'Sin resultados',addFirst:'Agrega tu primer empleado',in:'Entrada',out:'Salida'}},
   en:{pages:{dashboard:'Dashboard',attendance:'Attendance',employees:'Employees',shifts:'Shifts',vacations:'Leave',payroll:'Payroll',reports:'Reports',history:'History',settings:'Settings',master:'Master Admin'},nav:{principal:'Main',planning:'Planning',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employee',restaurant:'Restaurant',email:'Email',password:'Password',signin:'Sign in',forgot:'Forgot password?',demo:'Demo access (no account)',restName:'Restaurant name',adminEmail:'Admin email',createAdmin:'Create admin account',sub:'Staff management · Fribourg CH'},dash:{active:'Active employees',present:'Present / Scheduled',absent:'Absent',vacation:'On vacation',live:'Present now',alerts:'Daily alerts',allGood:'Everything is fine',missing:'Clock-in missing',late:'Arrived late',scan:'Scan QR',addEmp:'+ Employee'},emp:{search:'Search employee...',all:'All',active:'Active',inactive:'Inactive',new:'New employee',edit:'Edit',none:'No employees',noResult:'No results',addFirst:'Add your first employee',in:'Clock in',out:'Clock out'}},
   de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Personalverwaltung · Freiburg CH'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
   it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione personale · Friburgo CH'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
@@ -982,6 +982,15 @@ async function sbCreateRestaurant(name,email){
   if(error)throw error;
   return data;
 }
+async function sbEmployeeLogin(email,pin){
+  const {data,error}=await sb.rpc('employee_login',{p_email:email,p_pin:pin});
+  if(error)throw error;
+  return Array.isArray(data)?data[0]:data;
+}
+async function sbEmployeeRegister(emp,type){
+  const {error}=await sb.rpc('employee_register_attendance',{p_email:emp.email,p_pin:emp.pin,p_type:type});
+  if(error)throw error;
+}
 
 // ═══════ UTILS ═══════
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
@@ -1071,7 +1080,7 @@ function applyUITexts(){
   const forgot=document.querySelector('[onclick="recoverPassword()"]');if(forgot)forgot.textContent=t.login.forgot;
   const signin=document.querySelector('[onclick="loginManager()"]');if(signin)signin.lastChild.textContent=' '+t.login.signin;
   const demo=document.querySelector('[onclick="loginDemo()"]');if(demo)demo.textContent='🎯 '+t.login.demo;
-  const pinRestLabel=document.querySelector('#login-employee .fg label');if(pinRestLabel)pinRestLabel.textContent=lt.restaurantSelect;
+  const pinRestLabel=document.querySelector('#login-employee .fg label');if(pinRestLabel)pinRestLabel.textContent=lt.employeeEmail||lt.email;
   const pinPrompt=document.querySelector('#login-employee > div[style*="text-align:center"]');if(pinPrompt)pinPrompt.textContent=lt.pinPrompt;
   const regLabels=document.querySelectorAll('#login-register .fg label');if(regLabels[0])regLabels[0].textContent=lt.restName;if(regLabels[1])regLabels[1].textContent=lt.adminEmail;if(regLabels[2])regLabels[2].textContent=lt.password;if(regLabels[3])regLabels[3].textContent=lt.confirmPassword;
   const create=document.querySelector('[onclick="registerRestaurant()"]');if(create)create.textContent=lt.createAdmin;
@@ -1136,7 +1145,6 @@ function setLoginTab(type,btn){
   document.getElementById('login-manager').style.display=type==='manager'?'block':'none';
   document.getElementById('login-employee').style.display=type==='employee'?'block':'none';
   document.getElementById('login-register').style.display=type==='register'?'block':'none';
-  if(type==='employee')loadLoginRestaurants();
   pinBuf='';updatePinDisp();
 }
 
@@ -1239,10 +1247,26 @@ function pinKey(k){
   if(pinBuf.length===4)checkPin();
 }
 function updatePinDisp(){for(let i=0;i<4;i++){const d=document.getElementById(`pd${i}`);if(d)d.classList.toggle('filled',i<pinBuf.length);}}
-function checkPin(){
-  const emp=DB.employees.find(e=>e.pin===pinBuf&&e.status==='active');
-  if(emp){currentUser={role:'employee',name:fullName(emp),emp};showEmpUI(emp);document.getElementById('pin-error').textContent='';}
-  else{document.getElementById('pin-error').textContent='Code PIN incorrect';setTimeout(()=>{pinBuf='';updatePinDisp();document.getElementById('pin-error').textContent='';},1500);}
+async function checkPin(){
+  const email=document.getElementById('pin-email')?.value.trim().toLowerCase();
+  const err=document.getElementById('pin-error');
+  if(!email){err.textContent='Email requis';setTimeout(()=>{pinBuf='';updatePinDisp();err.textContent='';},1200);return;}
+  try{
+    const row=await sbEmployeeLogin(email,pinBuf);
+    if(!row)throw new Error('not found');
+    const emp={id:row.id,name:row.name,last:row.last_name||'',num:row.employee_number||'',position:row.position||'',dept:row.department||'',phone:row.phone||'',email:row.email||email,startDate:row.start_date||'',contract:row.contract_type||'CDI',payType:row.pay_type||'hourly',rate:row.hourly_rate||0,salary:row.monthly_salary||0,vacWeeks:row.vacation_weeks||5,avs:row.avs_number||'',emergency:row.emergency_contact||'',notes:row.notes||'',status:row.status||'active',photo:row.photo_url||null,color:row.color||'#4f6ef7',schedules:row.schedules||{},pin:pinBuf};
+    setRestaurantId(row.restaurant_id);
+    DB.employees=[emp];DB.history=[];DB.absences=[];DB.shifts={};
+    DB.settings={...DB.settings,company:row.restaurant_name||DB.settings.company,emoji:row.restaurant_emoji||DB.settings.emoji,currency:row.currency||'CHF',lateTol:row.late_tolerance||10,maxHours:row.max_hours_week||45,lang:row.lang||lang,brandColor:row.brand_color||DB.settings.brandColor,brandColor2:row.brand_color2||DB.settings.brandColor2};
+    lang=DB.settings.lang||lang;applyBrand();applyUITexts();
+    currentUser={role:'employee',name:fullName(emp),emp};
+    showEmpUI(emp);err.textContent='';
+  }catch(e){
+    const emp=DB.employees.find(e=>e.email?.toLowerCase()===email&&e.pin===pinBuf&&e.status==='active');
+    if(emp){currentUser={role:'employee',name:fullName(emp),emp};showEmpUI(emp);err.textContent='';return;}
+    err.textContent='Email ou PIN incorrect';
+    setTimeout(()=>{pinBuf='';updatePinDisp();err.textContent='';},1500);
+  }
 }
 
 function logout(){
@@ -1289,7 +1313,8 @@ async function register(empId,type){
   DB.history.unshift(rec);saveLocal();
   toast((type==='in'?'✅ Entrée':'🔴 Sortie')+' — '+emp.name);
   renderPage(currentPage);
-  sbReg(empId,fullName(emp),type).catch(console.error);
+  if(currentUser?.role==='employee'&&emp.email&&emp.pin)sbEmployeeRegister(emp,type).catch(console.error);
+  else sbReg(empId,fullName(emp),type).catch(console.error);
 }
 function localDateTimeISO(dateStr,timeStr){
   const [y,m,d]=dateStr.split('-').map(Number),[hh,mm]=timeStr.split(':').map(Number);
@@ -1719,11 +1744,14 @@ function saveEmp(){
   const name=clean(document.getElementById('ef-name').value);
   if(!name){toast('Le prénom est obligatoire','#ef4444');return;}
   const payType=document.getElementById('ef-paytype').value,rateVal=parseFloat(document.getElementById('ef-rate').value)||0;
-  const data={id:editEmpId||uid(),name,last:clean(document.getElementById('ef-last').value),num:clean(document.getElementById('ef-num').value),position:clean(document.getElementById('ef-pos').value),dept:clean(document.getElementById('ef-dept').value),startDate:document.getElementById('ef-start').value,phone:clean(document.getElementById('ef-phone').value),email:clean(document.getElementById('ef-email').value),contract:clean(document.getElementById('ef-contract').value),status:document.getElementById('ef-status').value,payType,rate:payType==='hourly'?rateVal:0,salary:payType==='monthly'?rateVal:0,vacWeeks:parseInt(document.getElementById('ef-vac').value)||5,avs:clean(document.getElementById('ef-avs').value),emergency:clean(document.getElementById('ef-emergency').value),notes:clean(document.getElementById('ef-notes').value),photo:photoData,schedules:getSchedEd(),pin:(document.getElementById('ef-pin').value||'').replace(/\D/g,'').slice(0,4)||'0000',color:editEmpId?(DB.employees.find(e=>e.id===editEmpId)?.color||EMP_COLORS[DB.employees.length%EMP_COLORS.length]):EMP_COLORS[DB.employees.length%EMP_COLORS.length]};
+  const existing=editEmpId?DB.employees.find(e=>e.id===editEmpId):null;
+  const typedPin=(document.getElementById('ef-pin').value||'').replace(/\D/g,'').slice(0,4);
+  const generatedPin=typedPin||existing?.pin||String(Math.floor(1000+Math.random()*9000));
+  const data={id:editEmpId||uid(),name,last:clean(document.getElementById('ef-last').value),num:clean(document.getElementById('ef-num').value),position:clean(document.getElementById('ef-pos').value),dept:clean(document.getElementById('ef-dept').value),startDate:document.getElementById('ef-start').value,phone:clean(document.getElementById('ef-phone').value),email:clean(document.getElementById('ef-email').value).toLowerCase(),contract:clean(document.getElementById('ef-contract').value),status:document.getElementById('ef-status').value,payType,rate:payType==='hourly'?rateVal:0,salary:payType==='monthly'?rateVal:0,vacWeeks:parseInt(document.getElementById('ef-vac').value)||5,avs:clean(document.getElementById('ef-avs').value),emergency:clean(document.getElementById('ef-emergency').value),notes:clean(document.getElementById('ef-notes').value),photo:photoData,schedules:getSchedEd(),pin:generatedPin,color:editEmpId?(existing?.color||EMP_COLORS[DB.employees.length%EMP_COLORS.length]):EMP_COLORS[DB.employees.length%EMP_COLORS.length]};
   if(editEmpId){const i=DB.employees.findIndex(e=>e.id===editEmpId);if(i>=0)DB.employees[i]={...DB.employees[i],...data};}
   else DB.employees.push(data);
   saveLocal();closeModal('emp-modal');renderPage(currentPage);
-  toast(editEmpId?'✅ Employé mis à jour':'✅ Employé ajouté');
+  toast((editEmpId?'✅ Employé mis à jour':'✅ Employé ajouté')+(!typedPin&&!existing?.pin?` · PIN ${generatedPin}`:''));
   sbSaveEmp(data).catch(console.error);
 }
 

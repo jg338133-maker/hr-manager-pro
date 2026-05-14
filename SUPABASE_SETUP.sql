@@ -109,3 +109,120 @@ from auth.users
 where email = 'jg338133@gmail.com'
 on conflict (user_id) do update set role='super_admin', restaurant_id=null;
 
+-- Employee self-service login by email + PIN.
+-- This lets employees access only their own badge screen without knowing the restaurant id.
+create or replace function public.employee_login(p_email text, p_pin text)
+returns table (
+  id text,
+  restaurant_id text,
+  name text,
+  last_name text,
+  employee_number text,
+  position text,
+  department text,
+  phone text,
+  email text,
+  start_date date,
+  contract_type text,
+  pay_type text,
+  hourly_rate numeric,
+  monthly_salary numeric,
+  vacation_weeks integer,
+  avs_number text,
+  emergency_contact text,
+  notes text,
+  status text,
+  photo_url text,
+  color text,
+  schedules jsonb,
+  restaurant_name text,
+  restaurant_emoji text,
+  currency text,
+  late_tolerance integer,
+  max_hours_week integer,
+  lang text,
+  brand_color text,
+  brand_color2 text
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select
+    e.id::text,
+    e.restaurant_id::text,
+    e.name,
+    e.last_name,
+    e.employee_number,
+    e.position,
+    e.department,
+    e.phone,
+    e.email,
+    e.start_date,
+    e.contract_type,
+    e.pay_type,
+    e.hourly_rate,
+    e.monthly_salary,
+    e.vacation_weeks,
+    e.avs_number,
+    e.emergency_contact,
+    e.notes,
+    e.status,
+    e.photo_url,
+    e.color,
+    e.schedules,
+    r.name as restaurant_name,
+    r.emoji as restaurant_emoji,
+    r.currency,
+    r.late_tolerance,
+    r.max_hours_week,
+    r.lang,
+    r.brand_color,
+    r.brand_color2
+  from public.employees e
+  join public.restaurants r on r.id = e.restaurant_id
+  where lower(e.email) = lower(trim(p_email))
+    and e.pin = p_pin
+    and e.status = 'active'
+  limit 1;
+$$;
+
+create or replace function public.employee_register_attendance(p_email text, p_pin text, p_type text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_emp record;
+begin
+  if p_type not in ('in','out') then
+    raise exception 'Invalid attendance type';
+  end if;
+
+  select e.id, e.restaurant_id, e.name, e.last_name
+  into v_emp
+  from public.employees e
+  where lower(e.email) = lower(trim(p_email))
+    and e.pin = p_pin
+    and e.status = 'active'
+  limit 1;
+
+  if v_emp.id is null then
+    raise exception 'Employee not found';
+  end if;
+
+  insert into public.attendance (restaurant_id, employee_id, employee_name, type, timestamp)
+  values (
+    v_emp.restaurant_id,
+    v_emp.id,
+    trim(concat(v_emp.name, ' ', coalesce(v_emp.last_name,''))),
+    p_type,
+    now()
+  );
+end;
+$$;
+
+grant execute on function public.employee_login(text,text) to anon, authenticated;
+grant execute on function public.employee_register_attendance(text,text,text) to anon, authenticated;
+
