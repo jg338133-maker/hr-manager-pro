@@ -1312,12 +1312,22 @@ function isLate(emp,date){
 
 // ═══════ QR ═══════
 function genQR(text,size=180){
-  if(typeof QRCode!=='undefined'){
-    const box=document.createElement('div');
-    new QRCode(box,{text:String(text),width:size,height:size,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
-    return box.innerHTML;
-  }
-  return `<div style="width:${size}px;height:${size}px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:10px">QR indisponible</div>`;
+  const s=parseInt(size,10)||180;
+  return `<div class="qr-target" data-qr="${esc(text)}" data-size="${s}" style="width:${s}px;height:${s}px"></div>`;
+}
+function renderQRCodes(root=document){
+  root.querySelectorAll('.qr-target').forEach(el=>{
+    if(el.dataset.ready==='1')return;
+    const text=el.dataset.qr||'',size=parseInt(el.dataset.size,10)||180;
+    el.dataset.ready='1';
+    if(typeof QRCode==='undefined'){
+      el.innerHTML=`<div style="width:${size}px;height:${size}px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:10px">QR indisponible</div>`;
+      return;
+    }
+    el.innerHTML='';
+    new QRCode(el,{text,width:size,height:size,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+    el.querySelectorAll('canvas,img').forEach(node=>{node.style.display='block';node.style.width=size+'px';node.style.height=size+'px';});
+  });
 }
 
 // ═══════ SCANNER ═══════
@@ -1440,6 +1450,7 @@ function renderEmpView(emp){
         <div style="font-size:11px;color:var(--text2);margin-top:8px">Présentez ce QR pour pointer</div>
       </div>
     </div>`;
+  renderQRCodes(document.getElementById('evs'));
 }
 
 // ═══════ NAV ═══════
@@ -1740,6 +1751,7 @@ function openDetail(empId){
       </div>
     </div>
     <button class="btn btn-ghost mt12" onclick="closeModal('detail-modal')">Fermer</button>`;
+  renderQRCodes(document.getElementById('detail-content'));
   openModal('detail-modal');
 }
 function dtab(id,btn){['dt-pt','dt-badge','dt-info'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});document.getElementById('dtabs')?.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const el=document.getElementById(id);if(el)el.style.display='block';}
