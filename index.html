@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#07080f">
-<title>HR Manager Pro</title>
+<title>Mananger Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
@@ -285,7 +285,7 @@ input[type=date],input[type=time]{color-scheme:dark}
 <!-- LOADING -->
 <div id="loading-overlay">
   <div style="width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 8px 32px rgba(79,110,247,.4)">🍽️</div>
-  <div style="font-size:19px;font-weight:800;margin-top:8px">HR Manager Pro</div>
+  <div style="font-size:19px;font-weight:800;margin-top:8px">Mananger Pro</div>
   <div class="spinner" style="margin-top:12px"></div>
   <div id="loading-msg" style="font-size:13px;color:var(--text2);margin-top:12px">Connexion...</div>
 </div>
@@ -293,7 +293,7 @@ input[type=date],input[type=time]{color-scheme:dark}
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-logo">🍽️</div>
-  <div class="login-title">HR Manager Pro</div>
+  <div class="login-title">Mananger Pro</div>
   <div class="login-sub">Gestion du personnel · Fribourg 🇨🇭</div>
   <div class="login-card">
     <div class="login-tabs">
@@ -378,7 +378,7 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div class="sb-head">
     <div class="sb-brand">
       <div class="sb-logo">🍽️</div>
-      <div><div class="sb-app">HR Manager Pro</div><div class="sb-ver">v2.0 · Fribourg 🇨🇭</div></div>
+      <div><div class="sb-app">Mananger Pro</div><div class="sb-ver">v2.0 · Fribourg 🇨🇭</div></div>
     </div>
     <div class="sb-resto">
       <div class="sb-resto-logo" id="sb-rl">🍽️</div>
@@ -1464,7 +1464,7 @@ function downloadBadge(emp){
     if(qrUrl)ctx.drawImage(qrImg,170,400,300,300);
     ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='500 20px DM Sans, Arial';ctx.fillText('Scanner pour pointer',320,770);
     ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,880,640,80);
-    ctx.fillStyle='#ffffff';ctx.font='700 22px DM Sans, Arial';ctx.fillText('HR Manager Pro',320,928);
+    ctx.fillStyle='#ffffff';ctx.font='700 22px DM Sans, Arial';ctx.fillText('Mananger Pro',320,928);
     const a=document.createElement('a');
     a.href=canvas.toDataURL('image/png');
     a.download=`carnet_${clean(fullName(emp)).replace(/\s+/g,'_')}.png`;
@@ -1479,11 +1479,11 @@ function roundRect(ctx,x,y,w,h,r,fill){
 function sendBadgeEmail(emp){
   if(!emp?.email){toast('Ajoutez un email à cet employé','#f59e0b');return;}
   const restaurant=DB.settings?.company||'Mon Restaurant';
-  const subject=`Carnet HR Manager Pro - ${fullName(emp)}`;
+  const subject=`Carnet Mananger Pro - ${fullName(emp)}`;
   const body=[
     `Bonjour ${fullName(emp)},`,
     '',
-    `Voici votre carnet HR Manager Pro.`,
+    `Voici votre carnet Mananger Pro.`,
     '',
     `Restaurant: ${restaurant}`,
     `N° employé: ${emp.num||emp.id}`,
