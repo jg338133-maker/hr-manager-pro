@@ -295,7 +295,7 @@ input[type=date],input[type=time]{color-scheme:dark}
     <!-- Manager -->
     <div id="login-manager">
       <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="manager@restaurant.ch"></div>
-      <div class="fg"><label>Mot de passe</label><input type="password" id="login-password" placeholder="••••••••"></div>
+      <div class="fg"><label>Mot de passe</label><div style="display:flex;gap:8px"><input type="password" id="login-password" placeholder="••••••••"><button type="button" class="btn btn-ghost btn-sm" onclick="togglePassword('login-password',this)" style="width:46px;padding:0">👁</button></div></div>
       <button class="btn btn-ghost" onclick="recoverPassword()" style="margin-bottom:12px;padding:9px 12px;font-size:12px">Mot de passe oublié ?</button>
       <button class="btn btn-primary" onclick="loginManager()" style="margin-bottom:12px">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
@@ -306,6 +306,7 @@ input[type=date],input[type=time]{color-scheme:dark}
     </div>
     <!-- Employee PIN -->
     <div id="login-employee" style="display:none">
+      <div class="fg"><label>Restaurant</label><select id="pin-restaurant" onchange="selectPinRestaurant(this.value)"></select></div>
       <div style="text-align:center;margin-bottom:14px;font-size:13px;color:var(--text2)">Entrez votre code PIN à 4 chiffres</div>
       <div class="pin-display">
         <div class="pin-dot" id="pd0"></div>
@@ -333,7 +334,8 @@ input[type=date],input[type=time]{color-scheme:dark}
     <div id="login-register" style="display:none">
       <div class="fg"><label>Nom du restaurant</label><input id="reg-rest-name" placeholder="Restaurant Bellevue"></div>
       <div class="fg"><label>Email administrateur</label><input type="email" id="reg-email" placeholder="admin@restaurant.ch"></div>
-      <div class="fg"><label>Mot de passe</label><input type="password" id="reg-password" placeholder="Minimum 6 caractères"></div>
+      <div class="fg"><label>Mot de passe</label><div style="display:flex;gap:8px"><input type="password" id="reg-password" placeholder="Minimum 6 caractères"><button type="button" class="btn btn-ghost btn-sm" onclick="togglePassword('reg-password',this)" style="width:46px;padding:0">👁</button></div></div>
+      <div class="fg"><label>Répéter le mot de passe</label><div style="display:flex;gap:8px"><input type="password" id="reg-password2" placeholder="Répéter le mot de passe"><button type="button" class="btn btn-ghost btn-sm" onclick="togglePassword('reg-password2',this)" style="width:46px;padding:0">👁</button></div></div>
       <button class="btn btn-primary" onclick="registerRestaurant()" style="margin-bottom:10px">Créer compte admin</button>
       <div style="font-size:11px;color:var(--text2);line-height:1.5">Crée le restaurant et lie cet utilisateur comme administrateur. Si Supabase demande confirmation email, confirmez avant de vous connecter.</div>
     </div>
@@ -867,8 +869,8 @@ const LANGS={
 let lang='fr';
 const L=()=>LANGS[lang]||LANGS.fr;
 const UI={
-  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',password:'Mot de passe',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin',sub:'Gestion du personnel · Fribourg CH'},dash:{active:'Employés actifs',present:'Présents / Prévus',absent:'Absents',vacation:'En vacances',live:'Présents en ce moment',alerts:'Alertes du jour',allGood:'Tout est en ordre',missing:'Entrée non pointée',late:'Arrivé en retard',scan:'Scanner QR',addEmp:'+ Employé'},emp:{search:'Rechercher un employé...',all:'Tous',active:'Actifs',inactive:'Inactifs',new:'Nouvel employé',edit:'Modifier',none:'Aucun employé',noResult:'Aucun résultat',addFirst:'Ajoutez votre premier employé',in:'Entrée',out:'Sortie'},att:{today:'Pointages du jour',scheduled:'Programmés aujourd’hui',manual:'Manuel',present:'Présents',absent:'Absents',none:'Personne de prévu',manualTitle:'Pointage manuel',employee:'Employé',date:'Date',reason:'Motif',save:'Enregistrer',cancel:'Annuler'},shift:{title:'Planification',morning:'Matin',afternoon:'Après-midi',evening:'Soir',night:'Nuit',rest:'Repos',off:'Libre',none:'Aucun employé actif',scheduleSaved:'Horaire enregistré'},vac:{pending:'En attente',approved:'Approuvés',balance:'Soldes',new:'+ Nouvelle absence',title:'Nouvelle absence',none:'Aucune demande',noneApproved:'Aucun congé approuvé',nonePending:'Aucune demande en attente',remaining:'restants',used:'jours utilisés'}},
-  es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Restaurante',email:'Email',password:'Contraseña',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del restaurante',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin',sub:'Gestión de personal · Friburgo CH'},dash:{active:'Empleados activos',present:'Presentes / Previstos',absent:'Ausentes',vacation:'De vacaciones',live:'Presentes ahora',alerts:'Alertas del día',allGood:'Todo está en orden',missing:'Entrada no registrada',late:'Llegó tarde',scan:'Escanear QR',addEmp:'+ Empleado'},emp:{search:'Buscar empleado...',all:'Todos',active:'Activos',inactive:'Inactivos',new:'Nuevo empleado',edit:'Modificar',none:'Sin empleados',noResult:'Sin resultados',addFirst:'Agrega tu primer empleado',in:'Entrada',out:'Salida'}},
+  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',password:'Mot de passe',confirmPassword:'Répéter le mot de passe',passwordMismatch:'Les mots de passe ne correspondent pas',restaurantSelect:'Restaurant',pinPrompt:'Entrez votre code PIN à 4 chiffres',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin',sub:'Gestion du personnel · Fribourg CH'},dash:{active:'Employés actifs',present:'Présents / Prévus',absent:'Absents',vacation:'En vacances',live:'Présents en ce moment',alerts:'Alertes du jour',allGood:'Tout est en ordre',missing:'Entrée non pointée',late:'Arrivé en retard',scan:'Scanner QR',addEmp:'+ Employé'},emp:{search:'Rechercher un employé...',all:'Tous',active:'Actifs',inactive:'Inactifs',new:'Nouvel employé',edit:'Modifier',none:'Aucun employé',noResult:'Aucun résultat',addFirst:'Ajoutez votre premier employé',in:'Entrée',out:'Sortie'},att:{today:'Pointages du jour',scheduled:'Programmés aujourd’hui',manual:'Manuel',present:'Présents',absent:'Absents',none:'Personne de prévu',manualTitle:'Pointage manuel',employee:'Employé',date:'Date',reason:'Motif',save:'Enregistrer',cancel:'Annuler'},shift:{title:'Planification',morning:'Matin',afternoon:'Après-midi',evening:'Soir',night:'Nuit',rest:'Repos',off:'Libre',none:'Aucun employé actif',scheduleSaved:'Horaire enregistré'},vac:{pending:'En attente',approved:'Approuvés',balance:'Soldes',new:'+ Nouvelle absence',title:'Nouvelle absence',none:'Aucune demande',noneApproved:'Aucun congé approuvé',nonePending:'Aucune demande en attente',remaining:'restants',used:'jours utilisés'}},
+  es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Restaurante',email:'Email',password:'Contraseña',confirmPassword:'Repetir contraseña',passwordMismatch:'Las contraseñas no coinciden',restaurantSelect:'Restaurante',pinPrompt:'Ingresa tu PIN de 4 cifras',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del restaurante',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin',sub:'Gestión de personal · Friburgo CH'},dash:{active:'Empleados activos',present:'Presentes / Previstos',absent:'Ausentes',vacation:'De vacaciones',live:'Presentes ahora',alerts:'Alertas del día',allGood:'Todo está en orden',missing:'Entrada no registrada',late:'Llegó tarde',scan:'Escanear QR',addEmp:'+ Empleado'},emp:{search:'Buscar empleado...',all:'Todos',active:'Activos',inactive:'Inactivos',new:'Nuevo empleado',edit:'Modificar',none:'Sin empleados',noResult:'Sin resultados',addFirst:'Agrega tu primer empleado',in:'Entrada',out:'Salida'}},
   en:{pages:{dashboard:'Dashboard',attendance:'Attendance',employees:'Employees',shifts:'Shifts',vacations:'Leave',payroll:'Payroll',reports:'Reports',history:'History',settings:'Settings',master:'Master Admin'},nav:{principal:'Main',planning:'Planning',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employee',restaurant:'Restaurant',email:'Email',password:'Password',signin:'Sign in',forgot:'Forgot password?',demo:'Demo access (no account)',restName:'Restaurant name',adminEmail:'Admin email',createAdmin:'Create admin account',sub:'Staff management · Fribourg CH'},dash:{active:'Active employees',present:'Present / Scheduled',absent:'Absent',vacation:'On vacation',live:'Present now',alerts:'Daily alerts',allGood:'Everything is fine',missing:'Clock-in missing',late:'Arrived late',scan:'Scan QR',addEmp:'+ Employee'},emp:{search:'Search employee...',all:'All',active:'Active',inactive:'Inactive',new:'New employee',edit:'Edit',none:'No employees',noResult:'No results',addFirst:'Add your first employee',in:'Clock in',out:'Clock out'}},
   de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Personalverwaltung · Freiburg CH'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
   it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione personale · Friburgo CH'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
@@ -946,6 +948,7 @@ async function loadMaster(){
       employees:e.data||[],
       attendance:a.data||[]
     };
+    localStorage.setItem('hrm_restaurant_directory',JSON.stringify(MASTER.restaurants.map(x=>({id:x.id,name:x.name,emoji:x.emoji}))));
     return true;
   }catch(e){console.warn('Master load error:',e);return false;}
 }
@@ -1063,13 +1066,16 @@ function applyUITexts(){
   const mt=document.querySelector('[onclick="nav(\'master\',this)"] span');if(mt)mt.textContent=t.pages.master;
   document.getElementById('page-title').textContent=t.pages[currentPage]||currentPage;
   const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].innerHTML='👔 '+t.login.manager;if(tabs[1])tabs[1].innerHTML='👤 '+t.login.employee;if(tabs[2])tabs[2].innerHTML='➕ '+t.login.restaurant;
-  const labels=document.querySelectorAll('#login-manager .fg label');if(labels[0])labels[0].textContent=t.login.email;if(labels[1])labels[1].textContent=t.login.password;
+  const lt={...UI.fr.login,...t.login};
+  const labels=document.querySelectorAll('#login-manager .fg label');if(labels[0])labels[0].textContent=lt.email;if(labels[1])labels[1].textContent=lt.password;
   const forgot=document.querySelector('[onclick="recoverPassword()"]');if(forgot)forgot.textContent=t.login.forgot;
   const signin=document.querySelector('[onclick="loginManager()"]');if(signin)signin.lastChild.textContent=' '+t.login.signin;
   const demo=document.querySelector('[onclick="loginDemo()"]');if(demo)demo.textContent='🎯 '+t.login.demo;
-  const regLabels=document.querySelectorAll('#login-register .fg label');if(regLabels[0])regLabels[0].textContent=t.login.restName;if(regLabels[1])regLabels[1].textContent=t.login.adminEmail;if(regLabels[2])regLabels[2].textContent=t.login.password;
-  const create=document.querySelector('[onclick="registerRestaurant()"]');if(create)create.textContent=t.login.createAdmin;
-  const sub=document.querySelector('.login-sub');if(sub)sub.textContent=t.login.sub;
+  const pinRestLabel=document.querySelector('#login-employee .fg label');if(pinRestLabel)pinRestLabel.textContent=lt.restaurantSelect;
+  const pinPrompt=document.querySelector('#login-employee > div[style*="text-align:center"]');if(pinPrompt)pinPrompt.textContent=lt.pinPrompt;
+  const regLabels=document.querySelectorAll('#login-register .fg label');if(regLabels[0])regLabels[0].textContent=lt.restName;if(regLabels[1])regLabels[1].textContent=lt.adminEmail;if(regLabels[2])regLabels[2].textContent=lt.password;if(regLabels[3])regLabels[3].textContent=lt.confirmPassword;
+  const create=document.querySelector('[onclick="registerRestaurant()"]');if(create)create.textContent=lt.createAdmin;
+  const sub=document.querySelector('.login-sub');if(sub)sub.textContent=lt.sub;
   const empSearch=document.getElementById('emp-search');if(empSearch)empSearch.placeholder=t.emp.search;
   const topNew=document.querySelector('.top-btn.primary');if(topNew)topNew.lastChild.textContent=' '+t.emp.new.split(' ')[0];
   const dashBtns=document.querySelectorAll('#pg-dashboard .btn');if(dashBtns[0])dashBtns[0].textContent='📷 '+t.dash.scan;if(dashBtns[1])dashBtns[1].textContent=t.dash.addEmp;
@@ -1123,13 +1129,48 @@ function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();applyU
 
 // ═══════ AUTH ═══════
 let currentUser=null,pinBuf='',empClockTimer=null;
+let LOGIN_RESTAURANTS=[];
 
 function setLoginTab(type,btn){
   document.querySelectorAll('.login-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   document.getElementById('login-manager').style.display=type==='manager'?'block':'none';
   document.getElementById('login-employee').style.display=type==='employee'?'block':'none';
   document.getElementById('login-register').style.display=type==='register'?'block':'none';
+  if(type==='employee')loadLoginRestaurants();
   pinBuf='';updatePinDisp();
+}
+
+function togglePassword(id,btn){
+  const input=document.getElementById(id);
+  if(!input)return;
+  const show=input.type==='password';
+  input.type=show?'text':'password';
+  if(btn)btn.textContent=show?'🙈':'👁';
+}
+
+async function loadLoginRestaurants(){
+  const sel=document.getElementById('pin-restaurant');if(!sel)return;
+  const fallback={id:REST_ID,name:DB.settings?.company||'Mon Restaurant',emoji:DB.settings?.emoji||'🍽️'};
+  const saved=(()=>{try{return JSON.parse(localStorage.getItem('hrm_restaurant_directory')||'[]');}catch(e){return[];}})();
+  try{
+    const {data,error}=await sb.from('restaurants').select('id,name,emoji').order('name');
+    if(error)throw error;
+    LOGIN_RESTAURANTS=(data&&data.length)?data:(saved.length?saved:[fallback]);
+  }catch(e){
+    LOGIN_RESTAURANTS=saved.length?saved:[fallback];
+  }
+  if(!LOGIN_RESTAURANTS.some(r=>r.id===REST_ID))LOGIN_RESTAURANTS.unshift(fallback);
+  sel.innerHTML=LOGIN_RESTAURANTS.map(r=>`<option value="${esc(r.id)}" ${r.id===REST_ID?'selected':''}>${esc(r.emoji||'🍽️')} ${esc(r.name||'Restaurant')}</option>`).join('');
+}
+
+async function selectPinRestaurant(id){
+  if(!id||id===REST_ID)return;
+  setRestaurantId(id);
+  pinBuf='';updatePinDisp();
+  document.getElementById('pin-error').textContent='';
+  const ok=await loadSB();
+  applyBrand();
+  if(!ok)toast('Impossible de charger ce restaurant','#ef4444');
 }
 
 function loginDemo(){currentUser={role:'restaurant_admin',name:'Admin Demo',restaurant_id:REST_ID};showManagerUI();toast('✅ Connexion démo');}
@@ -1171,7 +1212,9 @@ async function registerRestaurant(){
   const restName=clean(document.getElementById('reg-rest-name').value);
   const email=document.getElementById('reg-email').value.trim();
   const pass=document.getElementById('reg-password').value;
+  const pass2=document.getElementById('reg-password2').value;
   if(!restName||!email||pass.length<6){toast('Restaurant, email et mot de passe requis','#ef4444');return;}
+  if(pass!==pass2){toast((T().login?.passwordMismatch)||UI.fr.login.passwordMismatch,'#ef4444');return;}
   try{
     const {data,error}=await sb.auth.signUp({email,password:pass});
     if(error)throw error;
@@ -1179,6 +1222,8 @@ async function registerRestaurant(){
     const restaurant=await sbCreateRestaurant(restName,email);
     await ensureProfile(data.user,'restaurant_admin',restaurant.id);
     setRestaurantId(restaurant.id);
+    LOGIN_RESTAURANTS=[...LOGIN_RESTAURANTS.filter(r=>r.id!==restaurant.id),{id:restaurant.id,name:restaurant.name,emoji:restaurant.emoji}];
+    localStorage.setItem('hrm_restaurant_directory',JSON.stringify(LOGIN_RESTAURANTS));
     toast('✅ Compte créé. Connectez-vous avec cet email.');
     setLoginTab('manager',document.querySelector('.login-tab'));
   }catch(e){
