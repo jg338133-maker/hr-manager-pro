@@ -831,6 +831,14 @@ const LANGS={
 };
 let lang='fr';
 const L=()=>LANGS[lang]||LANGS.fr;
+const UI={
+  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',password:'Mot de passe',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin'}},
+  es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Restaurante',email:'Email',password:'Contraseña',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del restaurante',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin'}},
+  en:{pages:{dashboard:'Dashboard',attendance:'Attendance',employees:'Employees',shifts:'Shifts',vacations:'Leave',payroll:'Payroll',reports:'Reports',history:'History',settings:'Settings',master:'Master Admin'},nav:{principal:'Main',planning:'Planning',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employee',restaurant:'Restaurant',email:'Email',password:'Password',signin:'Sign in',forgot:'Forgot password?',demo:'Demo access (no account)',restName:'Restaurant name',adminEmail:'Admin email',createAdmin:'Create admin account'}},
+  de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen'}},
+  it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin'}}
+};
+const T=()=>UI[lang]||UI.fr;
 
 // ═══════ DB ═══════
 let DB={
@@ -995,7 +1003,22 @@ function renderLangBar(){
   const bar=document.getElementById('lang-bar');if(!bar)return;
   bar.innerHTML=Object.entries(LANGS).map(([k,v])=>`<button class="lang-btn ${k===lang?'active':''}" onclick="setLang('${k}')">${v.flag} ${v.name}</button>`).join('');
 }
-function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();sbSaveSettings(DB.settings).catch(console.error);}
+function applyUITexts(){
+  const t=T();
+  document.querySelectorAll('.sb-section').forEach((el,i)=>{const vals=[t.nav.principal,t.nav.planning,t.nav.finance,t.nav.config,t.nav.master];if(vals[i])el.textContent=vals[i];});
+  const setNav=(page,text)=>{const el=document.querySelector(`[onclick="nav('${page}',this)"] span`);if(el)el.textContent=text;};
+  setNav('dashboard',t.pages.dashboard);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
+  const mt=document.querySelector('[onclick="nav(\'master\',this)"] span');if(mt)mt.textContent=t.pages.master;
+  document.getElementById('page-title').textContent=t.pages[currentPage]||currentPage;
+  const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].innerHTML='👔 '+t.login.manager;if(tabs[1])tabs[1].innerHTML='👤 '+t.login.employee;if(tabs[2])tabs[2].innerHTML='➕ '+t.login.restaurant;
+  const labels=document.querySelectorAll('#login-manager .fg label');if(labels[0])labels[0].textContent=t.login.email;if(labels[1])labels[1].textContent=t.login.password;
+  const forgot=document.querySelector('[onclick="recoverPassword()"]');if(forgot)forgot.textContent=t.login.forgot;
+  const signin=document.querySelector('[onclick="loginManager()"]');if(signin)signin.lastChild.textContent=' '+t.login.signin;
+  const demo=document.querySelector('[onclick="loginDemo()"]');if(demo)demo.textContent='🎯 '+t.login.demo;
+  const regLabels=document.querySelectorAll('#login-register .fg label');if(regLabels[0])regLabels[0].textContent=t.login.restName;if(regLabels[1])regLabels[1].textContent=t.login.adminEmail;if(regLabels[2])regLabels[2].textContent=t.login.password;
+  const create=document.querySelector('[onclick="registerRestaurant()"]');if(create)create.textContent=t.login.createAdmin;
+}
+function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();applyUITexts();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);}
 
 // ═══════ AUTH ═══════
 let currentUser=null,pinBuf='',empClockTimer=null;
@@ -1095,7 +1118,7 @@ function showManagerUI(){
   document.getElementById('sb-un').textContent=currentUser.name;
   document.getElementById('sb-ur').textContent=currentUser.role==='super_admin'?'Super Admin':'Admin restaurant';
   document.getElementById('master-nav').style.display=currentUser.role==='super_admin'?'block':'none';
-  applyBrand();renderAll();
+  applyBrand();applyUITexts();renderAll();
   if(currentUser.role==='super_admin')renderMaster();
 }
 
@@ -1292,7 +1315,6 @@ function renderEmpView(emp){
 
 // ═══════ NAV ═══════
 let currentPage='dashboard';
-const PAGE_TITLES={dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'};
 
 function toggleSB(){const s=document.getElementById('sidebar'),o=document.getElementById('sb-overlay');const open=s.classList.toggle('open');o.style.display=open?'block':'none';}
 function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').style.display='none';}
@@ -1303,7 +1325,7 @@ function nav(page,el){
   document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('pg-'+page).classList.add('active');
   el.classList.add('active');
-  document.getElementById('page-title').textContent=PAGE_TITLES[page];
+  document.getElementById('page-title').textContent=T().pages[page]||page;
   currentPage=page;renderPage(page);
 }
 function renderPage(p){
@@ -1734,6 +1756,7 @@ function renderSettings(){
   document.getElementById('cfg-late').value=DB.settings?.lateTol||10;
   document.getElementById('cfg-maxh').value=DB.settings?.maxHours||45;
   renderLangBar();
+  applyUITexts();
 }
 
 async function renderMaster(){
