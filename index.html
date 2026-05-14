@@ -787,8 +787,8 @@ const SB_KEY='sb_publishable_hERziVqtGfUc-EYHDCJ8nQ_0TjBvNZq';
 const APP_VERSION='2.2.0';
 const APP_BUILD='2026-05-14';
 const MAINTENANCE_LINKS={
-  github:'https://github.com/TU_USUARIO/hr-manager-pro',
-  pages:'https://TU_USUARIO.github.io/hr-manager-pro/',
+  github:'https://github.com/jg338133-maker/hr-manager-pro',
+  pages:'https://jg338133-maker.github.io/hr-manager-pro/',
   supabase:'https://supabase.com/dashboard/project/grztncvdsvtrwekekpss'
 };
 let REST_ID=localStorage.getItem('hrm_restaurant_id')||'3f99dc38-0771-4bb6-b307-474ccc80f86e';
@@ -1758,7 +1758,7 @@ async function switchRestaurant(id){
 
 function openMaintenance(kind){
   const url=MAINTENANCE_LINKS[kind];
-  if(url&&url.includes('TU_USUARIO'))toast('Actualiza el enlace de GitHub en MAINTENANCE_LINKS','#f59e0b');
+  if(url&&url.includes('jg338133-maker'))toast('Actualiza el enlace de GitHub en MAINTENANCE_LINKS','#f59e0b');
   if(url)window.open(url,'_blank','noopener');
 }
 async function deleteAllConfirm(){
@@ -1798,3 +1798,4 @@ init();
 </script>
 </body>
 </html>
+

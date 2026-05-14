@@ -1,4 +1,4 @@
-HR Manager Pro - GitHub Pages commands
+﻿HR Manager Pro - GitHub Pages commands
 
 1) Open PowerShell in the project folder:
 
@@ -14,10 +14,10 @@ git commit -m "Initial HR Manager Pro app"
 
 hr-manager-pro
 
-4) Connect and push. Replace TU_USUARIO with your GitHub username:
+4) Connect and push. Replace jg338133-maker with your GitHub username:
 
 git branch -M main
-git remote add origin https://github.com/TU_USUARIO/hr-manager-pro.git
+git remote add origin https://github.com/jg338133-maker/hr-manager-pro.git
 git push -u origin main
 
 5) Enable GitHub Pages:
@@ -30,7 +30,7 @@ Save
 
 6) Your public URL will be:
 
-https://TU_USUARIO.github.io/hr-manager-pro/
+https://jg338133-maker.github.io/hr-manager-pro/
 
 7) Every future update:
 
@@ -41,9 +41,10 @@ git push
 8) Supabase Auth URLs to add:
 
 Site URL:
-https://TU_USUARIO.github.io/hr-manager-pro/
+https://jg338133-maker.github.io/hr-manager-pro/
 
 Redirect URLs:
-https://TU_USUARIO.github.io/hr-manager-pro/
+https://jg338133-maker.github.io/hr-manager-pro/
 http://localhost:3000/
 http://127.0.0.1:3000/
+
