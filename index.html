@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 <style>
 :root {
   --bg:#07080f; --s1:#0d0f1c; --s2:#12152a; --s3:#181b32; --s4:#1e2238;
@@ -1320,8 +1320,17 @@ function renderQRCodes(root=document){
     if(el.dataset.ready==='1')return;
     const text=el.dataset.qr||'',size=parseInt(el.dataset.size,10)||180;
     el.dataset.ready='1';
-    const src=`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&margin=0&data=${encodeURIComponent(text)}`;
-    el.innerHTML=`<img src="${src}" alt="QR" referrerpolicy="no-referrer" style="display:block;width:${size}px;height:${size}px;image-rendering:pixelated" onerror="this.parentNode.innerHTML='<div style=&quot;width:${size}px;height:${size}px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:10px&quot;>QR indisponible</div>'">`;
+    if(typeof QRCode==='undefined'||typeof QRCode.toDataURL!=='function'){
+      el.innerHTML=`<div style="width:${size}px;height:${size}px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:10px">QR indisponible</div>`;
+      return;
+    }
+    QRCode.toDataURL(text,{width:size,margin:0,errorCorrectionLevel:'M',color:{dark:'#000000',light:'#ffffff'}},(err,url)=>{
+      if(err){
+        el.innerHTML=`<div style="width:${size}px;height:${size}px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;padding:10px">QR indisponible</div>`;
+        return;
+      }
+      el.innerHTML=`<img src="${url}" alt="QR" style="display:block;width:${size}px;height:${size}px;image-rendering:pixelated">`;
+    });
   });
 }
 
