@@ -1467,8 +1467,8 @@ function employeeAccessUrl(emp){
 function badgeQRUrl(emp){
   return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(employeeAccessUrl(emp))}`;
 }
-function downloadBadge(emp){
-  if(!emp){toast('Employé non trouvé','#ef4444');return;}
+function buildBadgeCanvas(emp){
+  return new Promise((resolve,reject)=>{
   const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
   canvas.width=640;canvas.height=960;
   const restaurant=DB.settings?.company||'Mon Restaurant',accessUrl=employeeAccessUrl(emp),qrUrl=makeQRDataURL(accessUrl,300);
@@ -1489,15 +1489,54 @@ function downloadBadge(emp){
     if(qrUrl)ctx.drawImage(qrImg,170,400,300,300);
     ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='500 20px DM Sans, Arial';ctx.fillText('Scanner pour ouvrir le portail',320,770);
     ctx.font='500 17px DM Sans, Arial';ctx.fillText('Email + PIN requis',320,800);
+    ctx.font='500 15px DM Sans, Arial';ctx.fillText('Lien cliquable dans le PDF',320,830);
     ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,880,640,80);
     ctx.fillStyle='#ffffff';ctx.font='700 22px DM Sans, Arial';ctx.fillText('Mananger Pro',320,928);
+    resolve(canvas);
+  };
+  qrImg.onerror=()=>reject(new Error('QR indisponible'));
+  qrImg.src=qrUrl||badgeQRUrl(emp);
+  });
+}
+async function downloadBadge(emp){
+  if(!emp){toast('Employé non trouvé','#ef4444');return;}
+  try{
+    const canvas=await buildBadgeCanvas(emp);
     const a=document.createElement('a');
     a.href=canvas.toDataURL('image/png');
     a.download=`carnet_${clean(fullName(emp)).replace(/\s+/g,'_')}.png`;
     a.click();
-  };
-  qrImg.onerror=()=>toast('QR indisponible pour le téléchargement','#ef4444');
-  qrImg.src=qrUrl||badgeQRUrl(emp);
+  }catch(e){toast('QR indisponible pour le téléchargement','#ef4444');}
+}
+const pdfEsc=s=>String(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+function binaryStringToBytes(s){const a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i)&255;return a;}
+function makeBadgePDF(jpegDataUrl,accessUrl){
+  const img=atob(jpegDataUrl.split(',')[1]),w=640,h=960;
+  const objs=[
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${w} ${h}] /Resources << /XObject << /Im0 5 0 R >> >> /Contents 4 0 R /Annots [6 0 R] >>`,
+    `<< /Length 35 >>\nstream\nq ${w} 0 0 ${h} 0 0 cm /Im0 Do Q\nendstream`,
+    `<< /Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.length} >>\nstream\n${img}\nendstream`,
+    `<< /Type /Annot /Subtype /Link /Rect [120 130 520 610] /Border [0 0 0] /A << /S /URI /URI (${pdfEsc(accessUrl)}) >> >>`
+  ];
+  let pdf='%PDF-1.4\n%\xE2\xE3\xCF\xD3\n',offsets=[0];
+  objs.forEach((o,i)=>{offsets.push(pdf.length);pdf+=`${i+1} 0 obj\n${o}\nendobj\n`;});
+  const xref=pdf.length;
+  pdf+=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`;
+  for(let i=1;i<offsets.length;i++)pdf+=String(offsets[i]).padStart(10,'0')+' 00000 n \n';
+  pdf+=`trailer\n<< /Size ${objs.length+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return new Blob([binaryStringToBytes(pdf)],{type:'application/pdf'});
+}
+async function downloadBadgePDF(emp){
+  if(!emp){toast('Employé non trouvé','#ef4444');return;}
+  try{
+    const canvas=await buildBadgeCanvas(emp),accessUrl=employeeAccessUrl(emp);
+    const blob=makeBadgePDF(canvas.toDataURL('image/jpeg',0.92),accessUrl);
+    const a=document.createElement('a'),u=URL.createObjectURL(blob);
+    a.href=u;a.download=`carnet_${clean(fullName(emp)).replace(/\s+/g,'_')}.pdf`;a.click();
+    setTimeout(()=>URL.revokeObjectURL(u),1000);
+  }catch(e){console.error(e);toast('PDF indisponible','#ef4444');}
 }
 function roundRect(ctx,x,y,w,h,r,fill){
   ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();ctx.fillStyle=fill;ctx.fill();
@@ -1846,6 +1885,7 @@ function renderEmpView(emp){
         <div class="qr-wrap" style="margin:0 auto">${genQR(employeeAccessUrl(emp),150)}</div>
         <div style="font-size:11px;color:var(--text2);margin-top:8px">Scannez pour ouvrir votre portail</div>
         <a class="btn btn-ghost mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Ouvrir mon accès</a>
+        <button class="btn btn-primary mt12" onclick="downloadBadgePDF(currentUser.emp)">⬇️ Télécharger PDF</button>
         <button class="btn btn-ghost mt12" onclick="downloadBadge(currentUser.emp)">⬇️ Télécharger mon carnet</button>
       </div>
     </div>`;
@@ -2144,6 +2184,7 @@ function openDetail(empId){
         </div>
       </div>
       <div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px;font-size:11px;color:var(--text2);text-align:center">🔮 Compatible NFC — badge physique prévu</div>
+      <button class="btn btn-primary mt12" onclick="downloadBadgePDF(DB.employees.find(e=>e.id==='${empId}'))">⬇️ Télécharger PDF</button>
       <button class="btn btn-ghost mt12" onclick="downloadBadge(DB.employees.find(e=>e.id==='${empId}'))">⬇️ Télécharger carnet</button>
     </div>
     <div id="dt-info" style="display:none">
