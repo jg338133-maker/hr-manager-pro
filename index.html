@@ -1305,6 +1305,19 @@ function logout(){
   pinBuf='';updatePinDisp();
 }
 
+function applyEmployeeAccessLink(){
+  const params=new URLSearchParams(location.search);
+  const email=params.get('email')||params.get('employee_email');
+  const hasEmployeeLink=params.has('employee')||params.has('emp')||params.has('employee_id')||email;
+  if(!hasEmployeeLink)return;
+  const btn=[...document.querySelectorAll('.login-tab')].find(b=>b.getAttribute('onclick')?.includes("'employee'"));
+  if(btn)setLoginTab('employee',btn);
+  const input=document.getElementById('pin-email');
+  if(input&&email)input.value=email;
+  const err=document.getElementById('pin-error');
+  if(err)err.textContent=email?'Entrez votre PIN pour ouvrir votre badge':'Entrez votre email et votre PIN';
+}
+
 function showManagerUI(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('topbar').style.display='flex';
@@ -1445,14 +1458,20 @@ function makeQRDataURL(text,size=240){
   const cell=Math.max(2,Math.floor(size/qr.getModuleCount()));
   return qr.createDataURL(cell,0);
 }
+function employeeAccessUrl(emp){
+  const u=new URL(APP_PUBLIC_URL);
+  u.searchParams.set('employee',emp.id);
+  if(emp.email)u.searchParams.set('email',emp.email);
+  return u.toString();
+}
 function badgeQRUrl(emp){
-  return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent('EMP:'+emp.id)}`;
+  return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(employeeAccessUrl(emp))}`;
 }
 function downloadBadge(emp){
   if(!emp){toast('Employé non trouvé','#ef4444');return;}
   const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
   canvas.width=640;canvas.height=960;
-  const restaurant=DB.settings?.company||'Mon Restaurant',qrUrl=makeQRDataURL('EMP:'+emp.id,300);
+  const restaurant=DB.settings?.company||'Mon Restaurant',accessUrl=employeeAccessUrl(emp),qrUrl=makeQRDataURL(accessUrl,300);
   const qrImg=new Image();
   qrImg.onload=()=>{
     const grad=ctx.createLinearGradient(0,0,640,960);
@@ -1468,7 +1487,8 @@ function downloadBadge(emp){
     ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='500 22px DM Sans, Arial';ctx.fillText(`N° ${emp.num||emp.id}`,320,315);
     roundRect(ctx,150,380,340,340,28,'#ffffff');
     if(qrUrl)ctx.drawImage(qrImg,170,400,300,300);
-    ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='500 20px DM Sans, Arial';ctx.fillText('Scanner pour pointer',320,770);
+    ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='500 20px DM Sans, Arial';ctx.fillText('Scanner pour ouvrir le portail',320,770);
+    ctx.font='500 17px DM Sans, Arial';ctx.fillText('Email + PIN requis',320,800);
     ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,880,640,80);
     ctx.fillStyle='#ffffff';ctx.font='700 22px DM Sans, Arial';ctx.fillText('Mananger Pro',320,928);
     const a=document.createElement('a');
@@ -1497,11 +1517,12 @@ function sendBadgeEmail(emp){
     `Email d'accès: ${emp.email}`,
     `PIN: ${emp.pin}`,
     '',
+    `Lien d'accès employé: ${employeeAccessUrl(emp)}`,
     `QR du carnet: ${badgeQRUrl(emp)}`,
     '',
     `Lien application: ${APP_PUBLIC_URL}`,
     '',
-    `Utilisez votre email personnel et votre PIN pour accéder à votre badge.`
+    `Ouvrez le lien ou scannez le QR, puis entrez votre PIN pour accéder à votre badge.`
   ].join('\n');
   window.location.href=`mailto:${encodeURIComponent(emp.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
@@ -1822,8 +1843,9 @@ function renderEmpView(emp){
     <div style="margin-bottom:20px">
       <div class="section-lbl">Mon badge QR</div>
       <div style="text-align:center">
-        <div class="qr-wrap" style="margin:0 auto">${genQR('EMP:'+emp.id,150)}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:8px">Présentez ce QR pour pointer</div>
+        <div class="qr-wrap" style="margin:0 auto">${genQR(employeeAccessUrl(emp),150)}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:8px">Scannez pour ouvrir votre portail</div>
+        <a class="btn btn-ghost mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Ouvrir mon accès</a>
         <button class="btn btn-ghost mt12" onclick="downloadBadge(currentUser.emp)">⬇️ Télécharger mon carnet</button>
       </div>
     </div>`;
@@ -2114,10 +2136,11 @@ function openDetail(empId){
           </div>
         </div>
         <div class="badge-body" style="text-align:center">
-          <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Scanner pour pointer</div>
-          <div class="qr-wrap" style="margin:0 auto;display:inline-block">${genQR('EMP:'+empId,160)}</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Scanner pour ouvrir le portail employé</div>
+          <div class="qr-wrap" style="margin:0 auto;display:inline-block">${genQR(employeeAccessUrl(emp),160)}</div>
           <div style="font-size:9px;color:var(--text3);margin-top:10px;font-family:monospace">${empId.toUpperCase().slice(0,16)}...</div>
           ${emp.num?`<div style="font-size:10px;color:var(--text2);margin-top:3px">Employé #${emp.num}</div>`:''}
+          <a class="btn btn-ghost mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Ouvrir accès employé</a>
         </div>
       </div>
       <div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px;font-size:11px;color:var(--text2);text-align:center">🔮 Compatible NFC — badge physique prévu</div>
@@ -2378,6 +2401,7 @@ async function init(){
   setTimeout(()=>lo.style.display='none',300);
   applyBrand();
   document.getElementById('login-screen').style.display='flex';
+  applyEmployeeAccessLink();
 }
 init();
 </script>
