@@ -365,7 +365,12 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div class="scan-ui">
     <div class="scan-frame"><div class="sf-bl"></div><div class="sf-br"></div><div class="scan-line"></div></div>
     <p id="scan-status" style="color:#fff;font-size:14px;margin-top:24px;opacity:.85;font-weight:500;text-align:center;padding:0 24px">Pointez vers le badge QR</p>
-    <button style="pointer-events:all;margin-top:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:700" onclick="openQRManual()">Entrer le code</button>
+    <div style="pointer-events:all;margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+      <button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:700" onclick="openQRPhoto()">Photo QR</button>
+      <button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:700" onclick="switchCamera()">Changer caméra</button>
+      <button style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:700" onclick="openQRManual()">Entrer le code</button>
+    </div>
+    <input type="file" id="qr-photo-input" accept="image/*" capture="environment" style="display:none" onchange="scanQRImageFile(event)">
   </div>
   <button class="scan-close-btn" onclick="closeScanner()">✕</button>
 </div>
@@ -1502,8 +1507,37 @@ function sendBadgeEmail(emp){
 }
 
 // ═══════ SCANNER ═══════
-let scanStream=null,scanLoopId=null,scanBusy=false,scanDetector=null;
+let scanStream=null,scanLoopId=null,scanBusy=false,scanDetector=null,scanDevices=[],scanDeviceIndex=-1;
 function setScanStatus(msg){const el=document.getElementById('scan-status');if(el)el.textContent=msg;}
+async function getVideoDevices(){
+  try{
+    const devices=await navigator.mediaDevices.enumerateDevices();
+    scanDevices=devices.filter(d=>d.kind==='videoinput');
+    return scanDevices;
+  }catch(e){scanDevices=[];return[];}
+}
+async function getCameraStream(){
+  await getVideoDevices();
+  const rear=scanDevices.findIndex(d=>/back|rear|environment|arrière|trasera|rück/i.test(d.label||''));
+  if(scanDeviceIndex<0&&rear>=0)scanDeviceIndex=rear;
+  if(scanDeviceIndex>=0&&scanDevices[scanDeviceIndex]){
+    return navigator.mediaDevices.getUserMedia({
+      video:{deviceId:{exact:scanDevices[scanDeviceIndex].deviceId},width:{ideal:1280},height:{ideal:720}},
+      audio:false
+    });
+  }
+  try{
+    return await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:720}},
+      audio:false
+    });
+  }catch(e){
+    return navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},
+      audio:false
+    });
+  }
+}
 async function openScanner(){
   const wrap=document.getElementById('scan-wrap');
   wrap.classList.add('open');
@@ -1514,10 +1548,7 @@ async function openScanner(){
   try{
     let stream;
     try{
-      stream=await navigator.mediaDevices.getUserMedia({
-        video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},
-        audio:false
-      });
+      stream=await getCameraStream();
     }catch(e){
       stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
     }
@@ -1525,6 +1556,7 @@ async function openScanner(){
     const v=document.getElementById('sv');
     v.srcObject=stream;
     await v.play();
+    await getVideoDevices();
     scanDetector='BarcodeDetector' in window?new BarcodeDetector({formats:['qr_code']}):null;
     setScanStatus('Approchez le QR et gardez-le bien éclairé');
     scanLoop();
@@ -1561,6 +1593,49 @@ async function scanLoop(){
 function openQRManual(){
   const raw=prompt('Code QR, ID employé, N° employé ou email');
   if(raw)handleQR(raw);
+}
+async function switchCamera(){
+  if(!navigator.mediaDevices?.getUserMedia)return;
+  await getVideoDevices();
+  if(scanDevices.length<2){toast('Aucune autre caméra détectée','#f59e0b');return;}
+  scanDeviceIndex=(scanDeviceIndex+1)%scanDevices.length;
+  closeScanner();
+  setTimeout(openScanner,120);
+}
+function openQRPhoto(){
+  const input=document.getElementById('qr-photo-input');
+  if(input){input.value='';input.click();}
+}
+function scanQRImageFile(ev){
+  const file=ev.target.files?.[0];
+  if(!file)return;
+  if(typeof jsQR==='undefined'){
+    toast('Lecteur QR indisponible','#ef4444');
+    return;
+  }
+  setScanStatus('Lecture de la photo...');
+  const img=new Image();
+  img.onload=()=>{
+    try{
+      const c=document.getElementById('sc'),ctx=c.getContext('2d',{willReadFrequently:true});
+      const max=1400,scale=Math.min(1,max/Math.max(img.width,img.height));
+      c.width=Math.max(1,Math.round(img.width*scale));
+      c.height=Math.max(1,Math.round(img.height*scale));
+      ctx.drawImage(img,0,0,c.width,c.height);
+      const data=ctx.getImageData(0,0,c.width,c.height);
+      const code=jsQR(data.data,data.width,data.height,{inversionAttempts:'attemptBoth'});
+      URL.revokeObjectURL(img.src);
+      if(code?.data){handleQR(code.data);return;}
+      setScanStatus('QR non lu. Essayez plus près, bien net et lumineux.');
+      toast('QR non lu depuis la photo','#ef4444');
+    }catch(e){
+      console.warn('QR photo error',e);
+      setScanStatus('Impossible de lire cette photo');
+      toast('Impossible de lire cette photo','#ef4444');
+    }
+  };
+  img.onerror=()=>{setScanStatus('Photo invalide');toast('Photo invalide','#ef4444');};
+  img.src=URL.createObjectURL(file);
 }
 function closeScanner(){
   if(scanLoopId)cancelAnimationFrame(scanLoopId);
