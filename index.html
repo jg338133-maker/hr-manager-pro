@@ -364,7 +364,8 @@ input[type=date],input[type=time]{color-scheme:dark}
   <canvas id="sc"></canvas>
   <div class="scan-ui">
     <div class="scan-frame"><div class="sf-bl"></div><div class="sf-br"></div><div class="scan-line"></div></div>
-    <p style="color:#fff;font-size:14px;margin-top:24px;opacity:.8;font-weight:500">Pointez vers le badge QR</p>
+    <p id="scan-status" style="color:#fff;font-size:14px;margin-top:24px;opacity:.85;font-weight:500;text-align:center;padding:0 24px">Pointez vers le badge QR</p>
+    <button style="pointer-events:all;margin-top:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:12px;padding:10px 14px;font-family:inherit;font-weight:700" onclick="openQRManual()">Entrer le code</button>
   </div>
   <button class="scan-close-btn" onclick="closeScanner()">✕</button>
 </div>
@@ -1502,22 +1503,30 @@ function sendBadgeEmail(emp){
 
 // ═══════ SCANNER ═══════
 let scanStream=null,scanLoopId=null,scanBusy=false,scanDetector=null;
+function setScanStatus(msg){const el=document.getElementById('scan-status');if(el)el.textContent=msg;}
 async function openScanner(){
   const wrap=document.getElementById('scan-wrap');
   wrap.classList.add('open');
+  setScanStatus('Ouverture de la caméra...');
   if(!navigator.mediaDevices?.getUserMedia){
     closeScanner();toast('Scanner non disponible sur ce navigateur','#ef4444');return;
   }
   try{
-    const stream=await navigator.mediaDevices.getUserMedia({
-      video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},
-      audio:false
-    });
+    let stream;
+    try{
+      stream=await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},
+        audio:false
+      });
+    }catch(e){
+      stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+    }
     scanStream=stream;
     const v=document.getElementById('sv');
     v.srcObject=stream;
     await v.play();
     scanDetector='BarcodeDetector' in window?new BarcodeDetector({formats:['qr_code']}):null;
+    setScanStatus('Approchez le QR et gardez-le bien éclairé');
     scanLoop();
   }catch(e){
     console.error('Camera error',e);
@@ -1536,6 +1545,7 @@ async function scanLoop(){
       if(scanDetector){
         const codes=await scanDetector.detect(c);
         const raw=codes?.[0]?.rawValue||codes?.[0]?.rawValueText;
+        if(codes?.length&&!raw)setScanStatus('QR détecté, lecture en cours...');
         if(raw){await handleQR(raw);return;}
       }
       if(typeof jsQR!=='undefined'){
@@ -1548,6 +1558,10 @@ async function scanLoop(){
   }
   scanLoopId=requestAnimationFrame(scanLoop);
 }
+function openQRManual(){
+  const raw=prompt('Code QR, ID employé, N° employé ou email');
+  if(raw)handleQR(raw);
+}
 function closeScanner(){
   if(scanLoopId)cancelAnimationFrame(scanLoopId);
   scanLoopId=null;scanBusy=false;scanDetector=null;
@@ -1558,6 +1572,7 @@ function parseEmpQR(data){
   const raw=String(data||'').trim();
   const direct=raw.match(/^EMP:(.+)$/i);
   if(direct)return direct[1].trim();
+  if(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(raw))return raw;
   try{
     const url=new URL(raw);
     const fromQuery=url.searchParams.get('emp')||url.searchParams.get('employee')||url.searchParams.get('employee_id');
@@ -1572,18 +1587,24 @@ function empFromSBRow(x){
 }
 async function handleQR(data){
   closeScanner();
-  const empId=parseEmpQR(data);
-  if(!empId){toast('QR non reconnu','#ef4444');return;}
-  let emp=DB.employees.find(e=>String(e.id)===String(empId));
+  const raw=String(data||'').trim();
+  const empId=parseEmpQR(raw);
+  let emp=empId?DB.employees.find(e=>String(e.id)===String(empId)):null;
+  if(!emp&&!empId){
+    const key=raw.toLowerCase();
+    emp=DB.employees.find(e=>String(e.num||'').toLowerCase()===key||String(e.email||'').toLowerCase()===key);
+  }
   if(!emp){
     try{
-      const r=await sb.from('employees').select('*').eq('id',empId).maybeSingle();
+      const q=empId?sb.from('employees').select('*').eq('id',empId):sb.from('employees').select('*').or(`employee_number.eq.${raw},email.eq.${raw}`);
+      const r=await q.maybeSingle();
       if(!r.error&&r.data){
         emp=empFromSBRow(r.data);
         DB.employees.push(emp);saveLocal();
       }
     }catch(e){console.warn('Employee QR lookup error',e);}
   }
+  if(!empId&&!emp){toast('QR non reconnu','#ef4444');return;}
   if(!emp){toast('Employé non trouvé dans ce restaurant','#ef4444');return;}
   showQRAction(emp);
 }
