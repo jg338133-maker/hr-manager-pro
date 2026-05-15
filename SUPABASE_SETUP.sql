@@ -109,6 +109,17 @@ from auth.users
 where email = 'jg338133@gmail.com'
 on conflict (user_id) do update set role='super_admin', restaurant_id=null;
 
+-- Columns required by the current app version.
+alter table public.employees add column if not exists pin text default '0000';
+alter table public.restaurants add column if not exists emoji text default '🍽️';
+alter table public.restaurants add column if not exists brand_color text default '#4f6ef7';
+alter table public.restaurants add column if not exists brand_color2 text default '#7c3aed';
+update public.employees set pin = '0000' where pin is null or pin = '';
+update public.restaurants set emoji = '🍽️' where emoji is null or emoji = '';
+update public.restaurants set brand_color = '#4f6ef7' where brand_color is null or brand_color = '';
+update public.restaurants set brand_color2 = '#7c3aed' where brand_color2 is null or brand_color2 = '';
+create unique index if not exists shifts_employee_date_unique on public.shifts(employee_id, shift_date);
+
 -- Employee self-service login by email + PIN.
 -- This lets employees access only their own badge screen without knowing the restaurant id.
 create or replace function public.employee_login(p_email text, p_pin text)
@@ -118,7 +129,7 @@ returns table (
   name text,
   last_name text,
   employee_number text,
-  position text,
+  "position" text,
   department text,
   phone text,
   email text,

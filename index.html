@@ -1011,7 +1011,7 @@ async function sbEmployeeRequestAbsence(emp,type,start,end,notes){
 }
 
 // ═══════ UTILS ═══════
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
+const uid=()=>crypto?.randomUUID?.()||'10000000-1000-4000-8000-'+Math.random().toString(16).slice(2,14).padEnd(12,'0');
 const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const clean=v=>String(v??'').replace(/[<>]/g,'').trim();
 const csvCell=v=>`"${String(v??'').replace(/"/g,'""')}"`;
