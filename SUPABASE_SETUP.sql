@@ -207,7 +207,7 @@ as $$
 declare
   v_emp record;
 begin
-  if p_type not in ('in','out') then
+  if p_type not in ('in','out','break_start','break_end') then
     raise exception 'Invalid attendance type';
   end if;
 
@@ -231,6 +231,40 @@ begin
     p_type,
     now()
   );
+end;
+$$;
+
+create or replace function public.employee_register_break(p_email text, p_pin text, p_minutes integer)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_emp record;
+  v_minutes integer;
+begin
+  v_minutes := case when p_minutes in (15,30) then p_minutes else null end;
+  if v_minutes is null then
+    raise exception 'Invalid break length';
+  end if;
+
+  select e.id, e.restaurant_id, e.name, e.last_name
+  into v_emp
+  from public.employees e
+  where lower(e.email) = lower(trim(p_email))
+    and e.pin = p_pin
+    and e.status = 'active'
+  limit 1;
+
+  if v_emp.id is null then
+    raise exception 'Employee not found';
+  end if;
+
+  insert into public.attendance (restaurant_id, employee_id, employee_name, type, timestamp)
+  values
+    (v_emp.restaurant_id, v_emp.id, trim(concat(v_emp.name, ' ', coalesce(v_emp.last_name,''))), 'break_start', now()),
+    (v_emp.restaurant_id, v_emp.id, trim(concat(v_emp.name, ' ', coalesce(v_emp.last_name,''))), 'break_end', now() + make_interval(mins => v_minutes));
 end;
 $$;
 
@@ -337,6 +371,7 @@ $$;
 
 grant execute on function public.employee_login(text,text) to anon, authenticated;
 grant execute on function public.employee_register_attendance(text,text,text) to anon, authenticated;
+grant execute on function public.employee_register_break(text,text,integer) to anon, authenticated;
 grant execute on function public.employee_portal_data(text,text) to anon, authenticated;
 grant execute on function public.employee_request_absence(text,text,text,date,date,text) to anon, authenticated;
 
