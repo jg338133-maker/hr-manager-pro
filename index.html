@@ -951,7 +951,7 @@ async function loadSB(){
       sb.from('restaurants').select('*').eq('id',REST_ID).single()
     ]);
     if(e.data)DB.employees=e.data.map(x=>({id:x.id,name:x.name,last:x.last_name||'',num:x.employee_number||'',position:x.position||'',dept:x.department||'',phone:x.phone||'',email:x.email||'',startDate:x.start_date||'',contract:x.contract_type||'CDI',payType:x.pay_type||'hourly',rate:x.hourly_rate||0,salary:x.monthly_salary||0,vacWeeks:x.vacation_weeks||5,avs:x.avs_number||'',emergency:x.emergency_contact||'',notes:x.notes||'',status:x.status||'active',photo:x.photo_url||null,color:x.color||'#4f6ef7',schedules:x.schedules||{},pin:x.pin||'0000'}));
-    if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp}));
+    if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp,note:x.note||''}));
     if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     if(sh.data){DB.shifts={};sh.data.forEach(x=>{DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,notes:x.notes||''};});}
     if(r.data){DB.settings={company:r.data.name||'Mon Restaurant',emoji:r.data.emoji||'🍽️',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed'};lang=DB.settings.lang;}
@@ -984,8 +984,8 @@ async function sbSaveEmp(emp){
   if(error)console.error(error);
 }
 async function sbDelEmp(id){await Promise.all([sb.from('employees').delete().eq('id',id),sb.from('attendance').delete().eq('employee_id',id),sb.from('absences').delete().eq('employee_id',id),sb.from('shifts').delete().eq('employee_id',id)]);}
-async function sbReg(empId,empName,type){await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:new Date().toISOString()});}
-async function sbRegAt(empId,empName,type,ts){await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:ts});}
+async function sbReg(empId,empName,type,note=''){await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:new Date().toISOString(),note});}
+async function sbRegAt(empId,empName,type,ts,note=''){await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:ts,note});}
 async function sbDelAttendanceDay(empId,dateStr){
   const start=localDateTimeISO(dateStr,'00:00'),end=localDateTimeISO(dateStr,'23:59');
   await sb.from('attendance').delete().eq('restaurant_id',REST_ID).eq('employee_id',empId).gte('timestamp',start).lte('timestamp',end);
@@ -1013,8 +1013,8 @@ async function sbEmployeeLogin(email,pin){
   if(error)throw error;
   return Array.isArray(data)?data[0]:data;
 }
-async function sbEmployeeRegister(emp,type){
-  const {error}=await sb.rpc('employee_register_attendance',{p_email:emp.email,p_pin:emp.pin,p_type:type});
+async function sbEmployeeRegister(emp,type,note=''){
+  const {error}=await sb.rpc('employee_register_attendance',{p_email:emp.email,p_pin:emp.pin,p_type:type,p_note:note});
   if(error)throw error;
 }
 async function sbEmployeeBreak(emp,minutes){
@@ -1354,7 +1354,7 @@ function showEmpUI(emp){
 async function loadEmployeePortal(emp){
   try{
     const data=await sbEmployeePortalData(emp);
-    DB.history=(data.attendance||[]).map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||fullName(emp),type:x.type,ts:x.timestamp}));
+    DB.history=(data.attendance||[]).map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||fullName(emp),type:x.type,ts:x.timestamp,note:x.note||''}));
     DB.absences=(data.absences||[]).map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     DB.shifts={};
     (data.shifts||[]).forEach(x=>{DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,notes:x.notes||''};});
@@ -1375,12 +1375,16 @@ async function register(empId,type){
   const emp=DB.employees.find(e=>e.id===empId);
   if(!emp){toast('Employé non trouvé','#ef4444');return;}
   if(!canReg(empId,type)){toast(type==='in'?'Entrée déjà enregistrée':'Pas d\'entrée enregistrée','#f59e0b');return;}
-  const rec={id:uid(),empId,empName:fullName(emp),type,ts:new Date().toISOString()};
+  let note='';
+  if(type==='in'&&wouldBeLate(emp,new Date())){
+    note=clean(prompt('Llegaste tarde. Puedes escribir el motivo:')||'');
+  }
+  const rec={id:uid(),empId,empName:fullName(emp),type,ts:new Date().toISOString(),note};
   DB.history.unshift(rec);saveLocal();
   toast((type==='in'?'✅ ':type==='out'?'🔴 ':'☕ ')+attLabel(type)+' — '+emp.name);
   renderPage(currentPage);
-  if(currentUser?.role==='employee'&&emp.email&&emp.pin)sbEmployeeRegister(emp,type).catch(console.error);
-  else sbReg(empId,fullName(emp),type).catch(console.error);
+  if(currentUser?.role==='employee'&&emp.email&&emp.pin)sbEmployeeRegister(emp,type,note).catch(console.error);
+  else sbReg(empId,fullName(emp),type,note).catch(console.error);
 }
 async function registerBreak(empId,minutes){
   const emp=DB.employees.find(e=>e.id===empId),mins=parseInt(minutes,10)||0;
@@ -1470,6 +1474,12 @@ function isLate(emp,date){
   const[eh,em]=sch.entry.split(':').map(Number);
   const exp=new Date(date);exp.setHours(eh,em+(DB.settings?.lateTol||10),0,0);
   return new Date(inn.ts)>exp;
+}
+function wouldBeLate(emp,date=new Date()){
+  const sch=emp.schedules?.[date.getDay()];if(!sch?.enabled||!sch.entry)return false;
+  const[eh,em]=sch.entry.split(':').map(Number);
+  const exp=new Date(date);exp.setHours(eh,em+(DB.settings?.lateTol||10),0,0);
+  return date>exp;
 }
 
 // ═══════ QR ═══════
@@ -2102,6 +2112,7 @@ function renderAtt(){
         <div style="font-size:11px;color:var(--text2)">${esc(emp.position)} · ${esc(sch.entry)}–${esc(sch.exit)}</div>
         ${abs?`<div style="font-size:11px;color:var(--orange);margin-top:2px">🌴 ${abs.type}</div>`:''}
         ${inn?`<div style="font-size:11px;color:var(--green);margin-top:2px">✅ ${ex.in} ${fmtTime(inn.ts)}${late?' ⚠️ retard':''}</div>`:''}
+        ${inn?.note?`<div style="font-size:11px;color:var(--orange);margin-top:2px">Motivo: ${esc(inn.note)}</div>`:''}
         ${out?`<div style="font-size:11px;color:var(--red);margin-top:2px">🔴 ${ex.out} ${fmtTime(out.ts)}</div>`:''}
         ${w?`<div style="font-size:11px;color:var(--brand);margin-top:2px">⏱ ${w.toFixed(2)}h</div>`:''}
       </div>
@@ -2423,12 +2434,14 @@ function renderReports(){
     const days=new Set(recs.map(h=>new Date(h.ts).toDateString()));
     let hrs=0,breaks=0;for(const ds of days){const dt=new Date(ds),w=workedOn(emp.id,dt);if(w)hrs+=w;breaks+=breakMinutesOn(emp.id,dt)/60;}
     const dim=new Date(y,m+1,0).getDate();let late=0,abs=0;
+    const lateNotes=[];
     for(let d=1;d<=dim;d++){const date=new Date(y,m,d);if(date>new Date())continue;const dow=date.getDay(),sch=emp.schedules?.[dow];if(!sch?.enabled)continue;const dr=recs.filter(h=>sameDay(h.ts,date));if(!dr.length&&!getAbs(emp.id,date)){abs++;continue;}const inn=dr.find(h=>h.type==='in');if(inn){const[eh,em]=sch.entry.split(':').map(Number);const exp=new Date(date);exp.setHours(eh,em+tol,0,0);if(new Date(inn.ts)>exp)late++;}}
+    recs.filter(r=>r.type==='in'&&r.note).forEach(r=>lateNotes.push(`${fmtDate(r.ts)}: ${r.note}`));
     const att=days.size+abs>0?((days.size/(days.size+abs))*100).toFixed(0):0;
     const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));
     const payInfo=calcPay(emp,y,m),ot=payInfo.ot,pay=payInfo.pay;
     const ac=Number(att)>=80?'var(--green)':Number(att)>=60?'var(--orange)':'var(--red)';
-    return`<div class="card mb8"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">${mkAv(emp,'av-36')}<div><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">${[[tx.workedDays,days.size,'var(--green)'],[tx.hours,hrs.toFixed(1)+'h','var(--brand)'],['Pausas',breaks.toFixed(1)+'h','var(--orange)'],[tx.late,late,'var(--orange)'],[tx.absences,abs,'var(--red)'],[tx.overtime,ot>0?'+'+ot.toFixed(1)+'h':'0h',ot>0?'var(--red)':'var(--text3)'],[tx.vacLeft,vacLeft+'j','var(--orange)'],['Extra anual',annualExtraHours(emp,year).toFixed(1)+'h','var(--cyan)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div></div>`).join('')}</div>${pay>0?`<div class="flex-b fs12 mb8"><span class="muted">${tx.salary}</span><span style="font-weight:800;color:var(--green)">CHF ${pay.toFixed(2)}</span></div>`:''}<div class="flex-b fs11 mb4"><span class="muted">${tx.attendance}</span><span style="font-weight:700;color:${ac}">${att}%</span></div><div class="prog"><div class="prog-fill" style="width:${att}%;background:${ac}"></div></div></div>`;
+    return`<div class="card mb8"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">${mkAv(emp,'av-36')}<div><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">${[[tx.workedDays,days.size,'var(--green)'],[tx.hours,hrs.toFixed(1)+'h','var(--brand)'],['Pausas',breaks.toFixed(1)+'h','var(--orange)'],[tx.late,late,'var(--orange)'],[tx.absences,abs,'var(--red)'],[tx.overtime,ot>0?'+'+ot.toFixed(1)+'h':'0h',ot>0?'var(--red)':'var(--text3)'],[tx.vacLeft,vacLeft+'j','var(--orange)'],['Extra anual',annualExtraHours(emp,year).toFixed(1)+'h','var(--cyan)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div></div>`).join('')}</div>${lateNotes.length?`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:9px 10px;margin-bottom:10px">${lateNotes.map(n=>`<div class="fs11" style="color:var(--orange)">${esc(n)}</div>`).join('')}</div>`:''}${pay>0?`<div class="flex-b fs12 mb8"><span class="muted">${tx.salary}</span><span style="font-weight:800;color:var(--green)">CHF ${pay.toFixed(2)}</span></div>`:''}<div class="flex-b fs11 mb4"><span class="muted">${tx.attendance}</span><span style="font-weight:700;color:${ac}">${att}%</span></div><div class="prog"><div class="prog-fill" style="width:${att}%;background:${ac}"></div></div></div>`;
   }).join('');
 }
 

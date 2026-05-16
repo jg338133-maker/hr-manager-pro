@@ -111,6 +111,7 @@ on conflict (user_id) do update set role='super_admin', restaurant_id=null;
 
 -- Columns required by the current app version.
 alter table public.employees add column if not exists pin text default '0000';
+alter table public.attendance add column if not exists note text default '';
 alter table public.restaurants add column if not exists emoji text default '🍽️';
 alter table public.restaurants add column if not exists brand_color text default '#4f6ef7';
 alter table public.restaurants add column if not exists brand_color2 text default '#7c3aed';
@@ -198,7 +199,7 @@ as $$
   limit 1;
 $$;
 
-create or replace function public.employee_register_attendance(p_email text, p_pin text, p_type text)
+create or replace function public.employee_register_attendance(p_email text, p_pin text, p_type text, p_note text default '')
 returns void
 language plpgsql
 security definer
@@ -223,13 +224,14 @@ begin
     raise exception 'Employee not found';
   end if;
 
-  insert into public.attendance (restaurant_id, employee_id, employee_name, type, timestamp)
+  insert into public.attendance (restaurant_id, employee_id, employee_name, type, timestamp, note)
   values (
     v_emp.restaurant_id,
     v_emp.id,
     trim(concat(v_emp.name, ' ', coalesce(v_emp.last_name,''))),
     p_type,
-    now()
+    now(),
+    coalesce(p_note,'')
   );
 end;
 $$;
@@ -297,7 +299,8 @@ begin
         'employee_id', a.employee_id::text,
         'employee_name', a.employee_name,
         'type', a.type,
-        'timestamp', a.timestamp
+        'timestamp', a.timestamp,
+        'note', a.note
       ) order by a.timestamp desc)
       from public.attendance a
       where a.employee_id = v_emp.id
@@ -371,6 +374,7 @@ $$;
 
 grant execute on function public.employee_login(text,text) to anon, authenticated;
 grant execute on function public.employee_register_attendance(text,text,text) to anon, authenticated;
+grant execute on function public.employee_register_attendance(text,text,text,text) to anon, authenticated;
 grant execute on function public.employee_register_break(text,text,integer) to anon, authenticated;
 grant execute on function public.employee_portal_data(text,text) to anon, authenticated;
 grant execute on function public.employee_request_absence(text,text,text,date,date,text) to anon, authenticated;
