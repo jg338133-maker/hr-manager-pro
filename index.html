@@ -282,6 +282,21 @@ input[type=date],input[type=time]{color-scheme:dark}
 .color-opt.sel{border-color:#fff;transform:scale(1.1)}
 .lang-btn{padding:8px 14px;border-radius:20px;border:1px solid var(--border);background:var(--s2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
 .lang-btn.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.emp-lang-bar{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:0 auto 14px}
+.emp-lang-bar .lang-btn{padding:6px 9px;font-size:11px}
+.tour-overlay{position:fixed;inset:0;z-index:850;display:none;pointer-events:none}
+.tour-overlay.open{display:block}
+.tour-dim{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(3px)}
+.tour-spot{position:fixed;border:2px solid var(--brand);border-radius:18px;box-shadow:0 0 0 9999px rgba(0,0,0,.72),0 0 36px rgba(79,110,247,.38);transition:all .22s ease;display:none}
+.tour-card{position:fixed;left:16px;right:16px;bottom:22px;background:var(--s1);border:1px solid var(--border2);border-radius:18px;padding:16px;box-shadow:0 18px 70px rgba(0,0,0,.55);pointer-events:auto;max-width:420px;margin:auto}
+.tour-kicker{font-size:10px;color:var(--brand);font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.tour-title{font-size:18px;font-weight:800;margin-bottom:6px}
+.tour-text{font-size:13px;line-height:1.45;color:var(--text2)}
+.tour-actions{display:flex;gap:8px;margin-top:14px}
+.tour-actions .btn{padding:10px 12px;font-size:13px}
+.tour-progress{display:flex;gap:5px;margin-top:12px}
+.tour-dot{height:4px;flex:1;border-radius:8px;background:var(--border2)}
+.tour-dot.active{background:var(--brand)}
 </style>
 </head>
 <body>
@@ -360,6 +375,13 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div class="emp-view-header" id="evh"></div>
   <div class="emp-view-actions" id="eva"></div>
   <div class="emp-view-section" id="evs"></div>
+</div>
+
+<!-- TOUR -->
+<div class="tour-overlay" id="tour-overlay">
+  <div class="tour-dim"></div>
+  <div class="tour-spot" id="tour-spot"></div>
+  <div class="tour-card" id="tour-card"></div>
 </div>
 
 <!-- SCANNER -->
@@ -463,6 +485,9 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div class="top-actions">
     <button class="top-btn" id="refresh-btn" onclick="manualRefresh()" title="Actualizar datos">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a9 9 0 0 1 14.8-3.4L23 10"/><path d="M20.5 15a9 9 0 0 1-14.8 3.4L1 14"/></svg>
+    </button>
+    <button class="top-btn" onclick="startTour('manager',true)" title="Tour">
+      ?
     </button>
     <button class="top-btn" onclick="openScanner()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -927,6 +952,14 @@ Object.assign(UI.es.pay,{export:'Exportar Excel'});Object.assign(UI.es.rep,{expo
 Object.assign(UI.en.pay,{export:'Export Excel'});Object.assign(UI.en.rep,{export:'Export Excel'});
 Object.assign(UI.de.pay,{export:'Excel exportieren'});Object.assign(UI.de.rep,{export:'Excel exportieren'});
 Object.assign(UI.it.pay,{export:'Esporta Excel'});Object.assign(UI.it.rep,{export:'Esporta Excel'});
+const EMP_UI={
+  fr:{clockIn:"Pointer l'entrée",clockOut:'Pointer la sortie',logout:'Déconnexion',tour:'Voir le tour',today:"Aujourd'hui",week:'Cette semaine',vac:'Vacances',medical:'Incapacité / maladie',personal:'Personnel',monthHours:'Heures du mois',calendar:'Calendrier',absence:'Demander une absence',type:'Type',start:'Début',end:'Fin',note:'Note',send:'Envoyer la demande',todaySchedule:"Horaire d'aujourd'hui",expectedIn:'Entrée prévue',expectedOut:'Sortie prévue',off:'Jour non travaillé',todayPunches:"Pointages d'aujourd'hui",noneToday:"Aucun pointage aujourd'hui",in:'Entrée',out:'Sortie',badge:'Mon carnet',badgeOpen:'Cliquez pour ouvrir votre portail',badgeLink:'Cliquez ici pour ouvrir',pdf:'Télécharger PDF',card:'Télécharger mon carnet'},
+  es:{clockIn:'Fichar entrada',clockOut:'Fichar salida',logout:'Cerrar sesión',tour:'Ver tour',today:'Hoy',week:'Esta semana',vac:'Vacaciones',medical:'Incapacidad / enfermedad',personal:'Personal',monthHours:'Horas del mes',calendar:'Calendario',absence:'Solicitar ausencia',type:'Tipo',start:'Inicio',end:'Fin',note:'Nota',send:'Enviar solicitud',todaySchedule:'Horario de hoy',expectedIn:'Entrada prevista',expectedOut:'Salida prevista',off:'Día no trabajado',todayPunches:'Fichajes de hoy',noneToday:'Sin fichajes hoy',in:'Entrada',out:'Salida',badge:'Mi carnet',badgeOpen:'Haz click para abrir tu portal',badgeLink:'Haz click aquí para abrir',pdf:'Descargar PDF',card:'Descargar mi carnet'},
+  en:{clockIn:'Clock in',clockOut:'Clock out',logout:'Sign out',tour:'View tour',today:'Today',week:'This week',vac:'Vacation',medical:'Sick leave',personal:'Personal',monthHours:'Month hours',calendar:'Calendar',absence:'Request absence',type:'Type',start:'Start',end:'End',note:'Note',send:'Send request',todaySchedule:"Today's schedule",expectedIn:'Expected in',expectedOut:'Expected out',off:'Day off',todayPunches:"Today's punches",noneToday:'No punches today',in:'In',out:'Out',badge:'My card',badgeOpen:'Click to open your portal',badgeLink:'Click here to open',pdf:'Download PDF',card:'Download my card'},
+  de:{clockIn:'Einstempeln',clockOut:'Ausstempeln',logout:'Abmelden',tour:'Tour ansehen',today:'Heute',week:'Diese Woche',vac:'Ferien',medical:'Krankheit',personal:'Persönlich',monthHours:'Monatsstunden',calendar:'Kalender',absence:'Abwesenheit beantragen',type:'Typ',start:'Beginn',end:'Ende',note:'Notiz',send:'Anfrage senden',todaySchedule:'Heutiger Dienstplan',expectedIn:'Geplanter Beginn',expectedOut:'Geplantes Ende',off:'Freier Tag',todayPunches:'Heutige Buchungen',noneToday:'Keine Buchungen heute',in:'Eingang',out:'Ausgang',badge:'Mein Ausweis',badgeOpen:'Klicken, um das Portal zu öffnen',badgeLink:'Hier klicken zum Öffnen',pdf:'PDF herunterladen',card:'Meinen Ausweis herunterladen'},
+  it:{clockIn:'Timbrata entrata',clockOut:'Timbrata uscita',logout:'Esci',tour:'Vedi tour',today:'Oggi',week:'Questa settimana',vac:'Vacanze',medical:'Malattia',personal:'Personale',monthHours:'Ore del mese',calendar:'Calendario',absence:'Richiedere assenza',type:'Tipo',start:'Inizio',end:'Fine',note:'Nota',send:'Invia richiesta',todaySchedule:'Orario di oggi',expectedIn:'Entrata prevista',expectedOut:'Uscita prevista',off:'Giorno libero',todayPunches:'Timbrature di oggi',noneToday:'Nessuna timbratura oggi',in:'Entrata',out:'Uscita',badge:'Il mio badge',badgeOpen:'Clicca per aprire il tuo portale',badgeLink:'Clicca qui per aprire',pdf:'Scarica PDF',card:'Scarica il mio badge'}
+};
+const ETT=()=>EMP_UI[lang]||EMP_UI.fr;
 
 // ═══════ DB ═══════
 let DB={
@@ -1153,6 +1186,9 @@ function renderLangBar(){
   const bar=document.getElementById('lang-bar');if(!bar)return;
   bar.innerHTML=Object.entries(LANGS).map(([k,v])=>`<button class="lang-btn ${k===lang?'active':''}" onclick="setLang('${k}')">${v.flag} ${v.name}</button>`).join('');
 }
+function renderEmployeeLangBar(){
+  return `<div class="emp-lang-bar" id="emp-lang-bar">${Object.entries(LANGS).map(([k,v])=>`<button class="lang-btn ${k===lang?'active':''}" onclick="setEmployeeLang('${k}')">${v.flag} ${k.toUpperCase()}</button>`).join('')}</div>`;
+}
 function applyUITexts(){
   const t=T();
   document.querySelectorAll('.sb-section').forEach((el,i)=>{const vals=[t.nav.principal,t.nav.planning,t.nav.finance,t.nav.config,t.nav.master];if(vals[i])el.textContent=vals[i];});
@@ -1222,6 +1258,11 @@ function applyUITexts(){
   const maintBtns=document.querySelectorAll('#pg-master > .card:last-child .btn');if(maintBtns[0])maintBtns[0].textContent=master.github;if(maintBtns[1])maintBtns[1].textContent=master.site;if(maintBtns[2])maintBtns[2].textContent=master.supabase;if(maintBtns[3])maintBtns[3].textContent=master.backupJson;
 }
 function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();applyUITexts();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);}
+function setEmployeeLang(l){
+  lang=l;localStorage.setItem('hrm_employee_lang',l);
+  if(currentUser?.role==='employee'&&currentUser.emp)renderEmpView(currentUser.emp);
+  else{applyUITexts();renderPage(currentPage);}
+}
 
 // ═══════ AUTH ═══════
 let currentUser=null,pinBuf='',empClockTimer=null;
@@ -1350,7 +1391,7 @@ async function checkPin(){
     DB.employees=[emp];DB.history=[];DB.absences=[];DB.shifts={};
     DB.settings={...DB.settings,company:row.restaurant_name||DB.settings.company,emoji:row.restaurant_emoji||DB.settings.emoji,currency:row.currency||'CHF',lateTol:row.late_tolerance||10,maxHours:row.max_hours_week||45,lang:row.lang||lang,brandColor:row.brand_color||DB.settings.brandColor,brandColor2:row.brand_color2||DB.settings.brandColor2};
     await loadEmployeePortal(emp);
-    lang=DB.settings.lang||lang;applyBrand();applyUITexts();
+    lang=localStorage.getItem('hrm_employee_lang')||DB.settings.lang||lang;applyBrand();applyUITexts();
     currentUser={role:'employee',name:fullName(emp),emp};
     showEmpUI(emp);err.textContent='';
   }catch(e){
@@ -1397,6 +1438,7 @@ function showManagerUI(){
   applyBrand();applyUITexts();renderAll();
   if(currentUser.role==='super_admin')renderMaster();
   startAutoRefresh();
+  maybeStartTour('manager');
 }
 
 function showEmpUI(emp){
@@ -1404,6 +1446,7 @@ function showEmpUI(emp){
   document.getElementById('emp-view').classList.add('open');
   renderEmpView(emp);
   startAutoRefresh();
+  maybeStartTour('employee');
 }
 
 async function loadEmployeePortal(emp){
@@ -1904,13 +1947,14 @@ function monthHours(emp,date=new Date()){
   return hrs;
 }
 function empCalendarHTML(emp,date=new Date()){
+  const et=ETT();
   const y=date.getFullYear(),m=date.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0);
   const start=(first.getDay()+6)%7,days=[];
   for(let i=0;i<start;i++)days.push(null);
   for(let d=1;d<=last.getDate();d++)days.push(new Date(y,m,d));
   const names=L().days;
   return `<div class="card">
-    <div class="flex-b mb12"><div class="section-lbl" style="margin:0">Calendrier · ${fmtMonth(date)}</div><div class="chip chip-blue">${monthHours(emp,date).toFixed(1)}h mois</div></div>
+    <div class="flex-b mb12"><div class="section-lbl" style="margin:0">${et.calendar} · ${fmtMonth(date)}</div><div class="chip chip-blue">${monthHours(emp,date).toFixed(1)}h</div></div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:6px">${[1,2,3,4,5,6,0].map(i=>`<div class="fs11 muted tc fw7">${names[i]}</div>`).join('')}</div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">${days.map(d=>{
       if(!d)return`<div style="min-height:46px"></div>`;
@@ -1941,6 +1985,7 @@ async function requestEmpAbsence(){
 // ═══════ EMP VIEW ═══════
 function renderEmpView(emp){
   if(empClockTimer){clearInterval(empClockTimer);empClockTimer=null;}
+  const et=ETT();
   const now=new Date(),dow=now.getDay(),last=lastAction(emp.id),w=workedOn(emp.id,now),sch=emp.schedules?.[dow];
   const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));
   const monthHrs=monthHours(emp,now);
@@ -1951,6 +1996,7 @@ function renderEmpView(emp){
 
   document.getElementById('evh').style.background=`linear-gradient(160deg,${c}33,transparent)`;
   document.getElementById('evh').innerHTML=`
+    ${renderEmployeeLangBar()}
     <div style="position:relative;display:inline-block;margin-bottom:14px">
       ${mkAv(emp,'av-72')}
       <div class="av-dot" style="background:${sc};width:14px;height:14px"></div>
@@ -1960,62 +2006,63 @@ function renderEmpView(emp){
     <div style="font-size:12px;color:var(--text2);margin-top:3px">${esc(DB.settings?.company||'Mon Restaurant')}</div>
     ${last?`<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border-radius:20px;padding:6px 14px;margin-top:12px;font-size:12px;font-weight:600">
       <div style="width:7px;height:7px;border-radius:50%;background:${sc}"></div>
-      ${last.type==='in'?'Entrée':'Sortie'} à ${fmtTime(last.ts)}
+      ${last.type==='in'?et.in:et.out} · ${fmtTime(last.ts)}
     </div>`:''}`;
 
   document.getElementById('eva').innerHTML=`
     <div class="emp-clock" id="emp-clock">${now.toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'})}</div>
-    <button class="btn btn-success" onclick="register('${emp.id}','in');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">✅ Pointer l'entrée</button>
+    <button class="btn btn-success" onclick="register('${emp.id}','in');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">✅ ${et.clockIn}</button>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <button class="btn btn-ghost" onclick="registerBreak('${emp.id}',15)">☕ Pause 15</button>
       <button class="btn btn-ghost" onclick="registerBreak('${emp.id}',30)">☕ Pause 30</button>
     </div>
-    <button class="btn btn-danger" onclick="register('${emp.id}','out');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">🔴 Pointer la sortie</button>
+    <button class="btn btn-danger" onclick="register('${emp.id}','out');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">🔴 ${et.clockOut}</button>
+    <button class="btn btn-ghost" onclick="startTour('employee',true)">${et.tour}</button>
     <button class="btn btn-ghost" onclick="logout()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Déconnexion
+      ${et.logout}
     </button>`;
   empClockTimer=setInterval(()=>{const el=document.getElementById('emp-clock');if(el)el.textContent=new Date().toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'});},1000);
 
   const todayRecs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,now));
   document.getElementById('evs').innerHTML=`
-    <div class="emp-stat-row">
-      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--brand)">${w?w.toFixed(1)+'h':'-'}</div><div class="emp-stat-lbl">Aujourd'hui</div></div>
-      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--orange)">${wkHrs.toFixed(1)}h</div><div class="emp-stat-lbl">Cette semaine</div></div>
-      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--green)">${vacLeft}j</div><div class="emp-stat-lbl">Vacances</div></div>
+    <div class="emp-stat-row" id="emp-tour-stats">
+      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--brand)">${w?w.toFixed(1)+'h':'-'}</div><div class="emp-stat-lbl">${et.today}</div></div>
+      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--orange)">${wkHrs.toFixed(1)}h</div><div class="emp-stat-lbl">${et.week}</div></div>
+      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--green)">${vacLeft}j</div><div class="emp-stat-lbl">${et.vac}</div></div>
     </div>
-    <div class="card" style="margin-bottom:12px;text-align:center">
-      <div class="section-lbl" style="margin-top:0">Heures du mois</div>
+    <div class="card" id="emp-tour-month" style="margin-bottom:12px;text-align:center">
+      <div class="section-lbl" style="margin-top:0">${et.monthHours}</div>
       <div style="font-size:34px;font-weight:800;color:var(--brand)">${monthHrs.toFixed(1)}h</div>
       <div class="fs12 muted">${fmtMonth(now)}</div>
     </div>
     ${empCalendarHTML(emp,now)}
-    <div class="card">
-      <div class="section-lbl" style="margin-top:0">Demander une absence</div>
-      <div class="fg"><label>Type</label><select id="emp-abs-type"><option value="vacation">🌴 Vacances</option><option value="medical">🏥 Incapacité / maladie</option><option value="personal">👤 Personnel</option></select></div>
-      <div class="frow"><div class="fg"><label>Début</label><input type="date" id="emp-abs-start"></div><div class="fg"><label>Fin</label><input type="date" id="emp-abs-end"></div></div>
-      <div class="fg"><label>Note</label><input id="emp-abs-notes" placeholder="Facultatif"></div>
-      <button class="btn btn-primary" onclick="requestEmpAbsence()">Envoyer la demande</button>
+    <div class="card" id="emp-tour-absence">
+      <div class="section-lbl" style="margin-top:0">${et.absence}</div>
+      <div class="fg"><label>${et.type}</label><select id="emp-abs-type"><option value="vacation">🌴 ${et.vac}</option><option value="medical">🏥 ${et.medical}</option><option value="personal">👤 ${et.personal}</option></select></div>
+      <div class="frow"><div class="fg"><label>${et.start}</label><input type="date" id="emp-abs-start"></div><div class="fg"><label>${et.end}</label><input type="date" id="emp-abs-end"></div></div>
+      <div class="fg"><label>${et.note}</label><input id="emp-abs-notes" placeholder="-"></div>
+      <button class="btn btn-primary" onclick="requestEmpAbsence()">${et.send}</button>
     </div>
     ${sch?.enabled?`<div class="card" style="margin-bottom:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Horaire d'aujourd'hui</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">${et.todaySchedule}</div>
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-size:11px;color:var(--text2)">Entrée prévue</div><div style="font-size:22px;font-weight:800;color:var(--green)">${sch.entry}</div></div>
+        <div><div style="font-size:11px;color:var(--text2)">${et.expectedIn}</div><div style="font-size:22px;font-weight:800;color:var(--green)">${sch.entry}</div></div>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        <div style="text-align:right"><div style="font-size:11px;color:var(--text2)">Sortie prévue</div><div style="font-size:22px;font-weight:800;color:var(--red)">${sch.exit}</div></div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text2)">${et.expectedOut}</div><div style="font-size:22px;font-weight:800;color:var(--red)">${sch.exit}</div></div>
       </div>
-    </div>`:`<div class="card" style="text-align:center;color:var(--text2);margin-bottom:12px">🌙 Jour non travaillé</div>`}
+    </div>`:`<div class="card" style="text-align:center;color:var(--text2);margin-bottom:12px">🌙 ${et.off}</div>`}
     <div style="margin-bottom:20px">
-      <div class="section-lbl">Pointages d'aujourd'hui</div>
+      <div class="section-lbl">${et.todayPunches}</div>
       ${todayRecs.length?todayRecs.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:6px">
         <div style="width:8px;height:8px;border-radius:50%;background:${r.type==='in'?'var(--green)':'var(--red)'}"></div>
-        <span style="font-weight:600">${r.type==='in'?'Entrée':'Sortie'}</span>
+        <span style="font-weight:600">${r.type==='in'?et.in:et.out}</span>
         <span style="margin-left:auto;color:var(--text2)">${fmtTime(r.ts)}</span>
       </div>`).join(''):
-      `<div style="color:var(--text2);font-size:13px;text-align:center;padding:12px 0">Aucun pointage aujourd'hui</div>`}
+      `<div style="color:var(--text2);font-size:13px;text-align:center;padding:12px 0">${et.noneToday}</div>`}
     </div>
     <div style="margin-bottom:20px">
-      <div class="section-lbl">Mon carnet</div>
+      <div class="section-lbl">${et.badge}</div>
       <div class="badge-card">
         <div class="badge-header" style="min-height:250px;background:radial-gradient(circle at 18% 5%,${c}55,transparent 34%),linear-gradient(180deg,${c}33,transparent)">
           <div class="badge-kicker">${esc((DB.settings?.company||'MON RESTAURANT').toUpperCase())}</div>
@@ -2025,10 +2072,10 @@ function renderEmpView(emp){
         </div>
         <div class="badge-body">
         <div class="qr-wrap" style="margin:0 auto">${genQR(employeeAccessUrl(emp),150)}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:8px">Cliquez pour ouvrir votre portail</div>
-        <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Cliquez ici pour ouvrir</a>
-        <button class="btn btn-primary mt12" onclick="downloadBadgePDF(currentUser.emp)">⬇️ Télécharger PDF</button>
-        <button class="btn btn-ghost mt12" onclick="downloadBadge(currentUser.emp)">⬇️ Télécharger mon carnet</button>
+        <div style="font-size:11px;color:var(--text2);margin-top:8px">${et.badgeOpen}</div>
+        <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">${et.badgeLink}</a>
+        <button class="btn btn-primary mt12" onclick="downloadBadgePDF(currentUser.emp)">⬇️ ${et.pdf}</button>
+        <button class="btn btn-ghost mt12" onclick="downloadBadge(currentUser.emp)">⬇️ ${et.card}</button>
         </div>
       </div>
     </div>`;
@@ -2133,6 +2180,77 @@ function stopAutoRefresh(){
 document.addEventListener('input',e=>{if(e.target?.matches?.('input,textarea,select,[contenteditable="true"]'))markEditing();});
 document.addEventListener('focusin',e=>{if(e.target?.matches?.('input,textarea,select,[contenteditable="true"]'))markEditing();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshNow(false);});
+
+// ═══════ ONBOARDING TOUR ═══════
+let tourRole=null,tourStep=0;
+const TOUR={
+  manager:[
+    {sel:'#kpi-grid',title:'Panel diario',text:'Aquí ves rápidamente quién está activo, presente, ausente o de vacaciones.'},
+    {sel:'#dash-alerts',title:'Alertas del día',text:'La app te avisa si alguien esperado no ha fichado o si hubo retrasos.'},
+    {sel:'button[onclick="openScanner()"]',title:'QR y fichajes',text:'Desde aquí puedes escanear carnets o abrir acciones rápidas de asistencia.'},
+    {sel:'#refresh-btn',title:'Datos actualizados',text:'La app actualiza sola, pero este botón fuerza una actualización cuando quieras.'},
+    {sel:null,title:'Menú principal',text:'En el menú lateral están planificación, empleados, ausencias, salarios, reportes y ajustes.'}
+  ],
+  employee:[
+    {sel:'#emp-lang-bar',title:'Idioma',text:'El trabajador puede escoger su idioma desde aquí. Esto no cambia el idioma del restaurante.'},
+    {sel:'#eva',title:'Fichar y pausas',text:'Aquí registra entrada, salida y pausas obligatorias de 15 o 30 minutos.'},
+    {sel:'#emp-tour-stats',title:'Resumen personal',text:'El empleado ve sus horas del día, semana y vacaciones disponibles.'},
+    {sel:'#emp-tour-month',title:'Horas del mes',text:'Esta tarjeta ayuda a seguir el acumulado mensual sin preguntar al manager.'},
+    {sel:'#emp-tour-absence',title:'Ausencias',text:'Desde aquí puede pedir vacaciones, incapacidad o ausencias personales.'}
+  ]
+};
+function tourKey(role){
+  const id=role==='employee'?(currentUser?.emp?.id||'employee'):(REST_ID||'restaurant');
+  return `hrm_tour_seen_${role}_${id}`;
+}
+function maybeStartTour(role){
+  if(localStorage.getItem(tourKey(role)))return;
+  setTimeout(()=>startTour(role,false),500);
+}
+function startTour(role,manual=false){
+  if(!TOUR[role])return;
+  tourRole=role;tourStep=0;
+  if(manual)localStorage.removeItem(tourKey(role));
+  document.getElementById('tour-overlay').classList.add('open');
+  renderTour();
+}
+function closeTour(done=true){
+  if(done&&tourRole)localStorage.setItem(tourKey(tourRole),'1');
+  document.getElementById('tour-overlay')?.classList.remove('open');
+  const spot=document.getElementById('tour-spot');if(spot)spot.style.display='none';
+  tourRole=null;tourStep=0;
+}
+function nextTour(){
+  const steps=TOUR[tourRole]||[];
+  if(tourStep>=steps.length-1){closeTour(true);return;}
+  tourStep++;renderTour();
+}
+function prevTour(){if(tourStep>0){tourStep--;renderTour();}}
+function renderTour(){
+  const steps=TOUR[tourRole]||[],s=steps[tourStep];if(!s)return closeTour(false);
+  const card=document.getElementById('tour-card'),spot=document.getElementById('tour-spot');
+  const el=s.sel?document.querySelector(s.sel):null;
+  if(el){
+    el.scrollIntoView({block:'center',inline:'nearest'});
+    const r=el.getBoundingClientRect(),pad=8;
+    spot.style.display='block';
+    spot.style.left=Math.max(8,r.left-pad)+'px';
+    spot.style.top=Math.max(8,r.top-pad)+'px';
+    spot.style.width=Math.min(innerWidth-16,r.width+pad*2)+'px';
+    spot.style.height=Math.min(innerHeight-16,r.height+pad*2)+'px';
+  }else spot.style.display='none';
+  card.innerHTML=`
+    <div class="tour-kicker">${tourStep+1} / ${steps.length}</div>
+    <div class="tour-title">${esc(s.title)}</div>
+    <div class="tour-text">${esc(s.text)}</div>
+    <div class="tour-progress">${steps.map((_,i)=>`<div class="tour-dot ${i===tourStep?'active':''}"></div>`).join('')}</div>
+    <div class="tour-actions">
+      <button class="btn btn-ghost" onclick="closeTour(true)">Saltar</button>
+      ${tourStep>0?`<button class="btn btn-ghost" onclick="prevTour()">Atrás</button>`:''}
+      <button class="btn btn-primary" onclick="nextTour()">${tourStep>=steps.length-1?'Terminar':'Siguiente'}</button>
+    </div>`;
+}
+window.addEventListener('resize',()=>{if(tourRole)renderTour();});
 
 // ═══════ DASHBOARD ═══════
 function renderDash(){
