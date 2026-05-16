@@ -76,6 +76,11 @@ create policy "restaurants update scoped"
 on public.restaurants for update
 using (id = public.current_restaurant_id() or public.is_super_admin());
 
+drop policy if exists "restaurants delete super" on public.restaurants;
+create policy "restaurants delete super"
+on public.restaurants for delete
+using (public.is_super_admin());
+
 -- Scoped policies for app data tables.
 drop policy if exists "employees scoped all" on public.employees;
 create policy "employees scoped all"
@@ -115,10 +120,12 @@ alter table public.attendance add column if not exists note text default '';
 alter table public.restaurants add column if not exists emoji text default '🍽️';
 alter table public.restaurants add column if not exists brand_color text default '#4f6ef7';
 alter table public.restaurants add column if not exists brand_color2 text default '#7c3aed';
+alter table public.restaurants add column if not exists status text default 'active';
 update public.employees set pin = '0000' where pin is null or pin = '';
 update public.restaurants set emoji = '🍽️' where emoji is null or emoji = '';
 update public.restaurants set brand_color = '#4f6ef7' where brand_color is null or brand_color = '';
 update public.restaurants set brand_color2 = '#7c3aed' where brand_color2 is null or brand_color2 = '';
+update public.restaurants set status = 'active' where status is null or status = '';
 create unique index if not exists shifts_employee_date_unique on public.shifts(employee_id, shift_date);
 
 -- Employee self-service login by email + PIN.
@@ -196,6 +203,7 @@ as $$
   where lower(e.email) = lower(trim(p_email))
     and e.pin = p_pin
     and e.status = 'active'
+    and coalesce(r.status,'active') = 'active'
   limit 1;
 $$;
 
@@ -215,9 +223,11 @@ begin
   select e.id, e.restaurant_id, e.name, e.last_name
   into v_emp
   from public.employees e
+  join public.restaurants r on r.id = e.restaurant_id
   where lower(e.email) = lower(trim(p_email))
     and e.pin = p_pin
     and e.status = 'active'
+    and coalesce(r.status,'active') = 'active'
   limit 1;
 
   if v_emp.id is null then
@@ -254,9 +264,11 @@ begin
   select e.id, e.restaurant_id, e.name, e.last_name
   into v_emp
   from public.employees e
+  join public.restaurants r on r.id = e.restaurant_id
   where lower(e.email) = lower(trim(p_email))
     and e.pin = p_pin
     and e.status = 'active'
+    and coalesce(r.status,'active') = 'active'
   limit 1;
 
   if v_emp.id is null then
@@ -283,9 +295,11 @@ begin
   select e.id, e.restaurant_id
   into v_emp
   from public.employees e
+  join public.restaurants r on r.id = e.restaurant_id
   where lower(e.email) = lower(trim(p_email))
     and e.pin = p_pin
     and e.status = 'active'
+    and coalesce(r.status,'active') = 'active'
   limit 1;
 
   if v_emp.id is null then
@@ -358,9 +372,11 @@ begin
   select e.id, e.restaurant_id
   into v_emp
   from public.employees e
+  join public.restaurants r on r.id = e.restaurant_id
   where lower(e.email) = lower(trim(p_email))
     and e.pin = p_pin
     and e.status = 'active'
+    and coalesce(r.status,'active') = 'active'
   limit 1;
 
   if v_emp.id is null then
@@ -378,4 +394,59 @@ grant execute on function public.employee_register_attendance(text,text,text,tex
 grant execute on function public.employee_register_break(text,text,integer) to anon, authenticated;
 grant execute on function public.employee_portal_data(text,text) to anon, authenticated;
 grant execute on function public.employee_request_absence(text,text,text,date,date,text) to anon, authenticated;
+
+-- Master admin: delete a restaurant and all app data linked to it.
+create or replace function public.master_delete_restaurant(p_restaurant_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.is_super_admin() then
+    raise exception 'Only super admin can delete restaurants';
+  end if;
+
+  if p_restaurant_id is null then
+    raise exception 'Restaurant id is required';
+  end if;
+
+  delete from public.attendance where restaurant_id = p_restaurant_id;
+  delete from public.absences where restaurant_id = p_restaurant_id;
+  delete from public.shifts where restaurant_id = p_restaurant_id;
+  delete from public.employees where restaurant_id = p_restaurant_id;
+  update public.profiles set restaurant_id = null where restaurant_id = p_restaurant_id;
+  delete from public.restaurants where id = p_restaurant_id;
+end;
+$$;
+
+grant execute on function public.master_delete_restaurant(uuid) to authenticated;
+
+-- Master admin: freeze/reactivate a restaurant without deleting its data.
+create or replace function public.master_set_restaurant_status(p_restaurant_id uuid, p_status text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.is_super_admin() then
+    raise exception 'Only super admin can change restaurant status';
+  end if;
+
+  if p_restaurant_id is null then
+    raise exception 'Restaurant id is required';
+  end if;
+
+  if p_status not in ('active','frozen') then
+    raise exception 'Invalid restaurant status';
+  end if;
+
+  update public.restaurants
+  set status = p_status
+  where id = p_restaurant_id;
+end;
+$$;
+
+grant execute on function public.master_set_restaurant_status(uuid,text) to authenticated;
 

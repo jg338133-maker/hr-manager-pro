@@ -959,7 +959,7 @@ async function loadSB(){
     if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp,note:x.note||''}));
     if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     if(sh.data){DB.shifts={};sh.data.forEach(x=>{DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,notes:x.notes||''};});}
-    if(r.data){DB.settings={company:r.data.name||'Mon Restaurant',emoji:r.data.emoji||'🍽️',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed'};lang=DB.settings.lang;}
+    if(r.data){DB.settings={company:r.data.name||'Mon Restaurant',emoji:r.data.emoji||'🍽️',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active'};lang=DB.settings.lang;}
     saveLocal();return true;
   }catch(e){console.warn('SB error:',e);return false;}
 }
@@ -1008,6 +1008,14 @@ async function sbDeleteAll(){
     sb.from('employees').delete().eq('restaurant_id',REST_ID)
   ]);
 }
+async function sbDeleteRestaurant(id){
+  const {error}=await sb.rpc('master_delete_restaurant',{p_restaurant_id:id});
+  if(error)throw error;
+}
+async function sbSetRestaurantStatus(id,status){
+  const {error}=await sb.rpc('master_set_restaurant_status',{p_restaurant_id:id,p_status:status});
+  if(error)throw error;
+}
 async function sbCreateRestaurant(name,email){
   const {data,error}=await sb.from('restaurants').insert({name,emoji:'🍽️',currency:'CHF',late_tolerance:10,max_hours_week:45,lang:'fr',brand_color:'#4f6ef7',brand_color2:'#7c3aed'}).select('*').single();
   if(error)throw error;
@@ -1039,6 +1047,7 @@ async function sbEmployeeRequestAbsence(emp,type,start,end,notes){
 // ═══════ UTILS ═══════
 const uid=()=>crypto?.randomUUID?.()||'10000000-1000-4000-8000-'+Math.random().toString(16).slice(2,14).padEnd(12,'0');
 const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const jsArg=v=>esc(JSON.stringify(String(v??'')));
 const clean=v=>String(v??'').replace(/[<>]/g,'').trim();
 const csvCell=v=>`"${String(v??'').replace(/"/g,'""')}"`;
 const initials=n=>(n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
@@ -1223,6 +1232,7 @@ async function selectPinRestaurant(id){
   const ok=await loadSB();
   applyBrand();
   if(!ok)toast('Impossible de charger ce restaurant','#ef4444');
+  if(DB.settings?.status==='frozen')toast('Restaurante congelado','#ef4444');
 }
 
 function loginDemo(){currentUser={role:'restaurant_admin',name:'Admin Demo',restaurant_id:REST_ID};showManagerUI();toast('✅ Connexion démo');}
@@ -1239,7 +1249,10 @@ async function loginManager(){
     currentUser={role:profile.role||'restaurant_admin',name:profile.name||data.user.email?.split('@')[0]||email.split('@')[0],email:data.user.email,restaurant_id:profile.restaurant_id,profile};
     if(currentUser.restaurant_id)setRestaurantId(currentUser.restaurant_id);
     if(currentUser.role==='super_admin')await loadMaster();
-    else await loadSB();
+    else{
+      await loadSB();
+      if(DB.settings?.status==='frozen'){await sb.auth.signOut();currentUser=null;toast('Acceso congelado. Contacta a HR Manager Pro.','#ef4444');return;}
+    }
     showManagerUI();toast('✅ Connecté');
   }catch(e){
     toast('Identifiants invalides. Utilisez le mode démo si besoin.','#ef4444');
@@ -1308,7 +1321,7 @@ async function checkPin(){
     showEmpUI(emp);err.textContent='';
   }catch(e){
     const emp=DB.employees.find(e=>e.email?.toLowerCase()===email&&e.pin===pinBuf&&e.status==='active');
-    if(emp){currentUser={role:'employee',name:fullName(emp),emp};showEmpUI(emp);err.textContent='';return;}
+    if(emp&&DB.settings?.status!=='frozen'){currentUser={role:'employee',name:fullName(emp),emp};showEmpUI(emp);err.textContent='';return;}
     err.textContent='Email ou PIN incorrect';
     setTimeout(()=>{pinBuf='';updatePinDisp();err.textContent='';},1500);
   }
@@ -2516,18 +2529,23 @@ async function renderMaster(){
     const count=emps.filter(e=>e.restaurant_id===r.id).length;
     const admins=profiles.filter(p=>p.restaurant_id===r.id).length;
     const todayAtt=atts.filter(a=>a.restaurant_id===r.id&&sameDay(a.timestamp,today)).length;
+    const frozen=(r.status||'active')==='frozen';
     return `<div class="emp-row" onclick="switchRestaurant('${esc(r.id)}')" style="align-items:flex-start">
       <div class="sb-resto-logo" style="margin-top:2px">${esc(r.emoji||'🍽️')}</div>
       <div style="flex:1;min-width:0;display:grid;grid-template-columns:minmax(150px,1.2fr) repeat(3,minmax(70px,.5fr));gap:8px;align-items:center">
         <div style="min-width:0">
-          <div class="fw7 fs14" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name||'Restaurant')}</div>
+          <div class="fw7 fs14" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name||'Restaurant')} ${frozen?'<span class="chip chip-red" style="margin-left:6px">Congelado</span>':''}</div>
           <div class="fs11 muted" style="font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.id)}</div>
         </div>
         <div><div class="fs11 muted">${tx.employees}</div><div class="fw8">${count}</div></div>
         <div><div class="fs11 muted">${tx.users}</div><div class="fw8">${admins}</div></div>
         <div><div class="fs11 muted">${tx.today}</div><div class="fw8 col-cyan">${todayAtt}</div></div>
       </div>
-      <span class="chip ${r.id===REST_ID?'chip-green':'chip-blue'}">${r.id===REST_ID?tx.active:tx.open}</span>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+        <span class="chip ${r.id===REST_ID?'chip-green':'chip-blue'}">${r.id===REST_ID?tx.active:tx.open}</span>
+        <button class="btn btn-ghost btn-sm" onclick="toggleRestaurantStatusMaster(event,${jsArg(r.id)},${jsArg(r.name||'Restaurant')},${jsArg(frozen?'active':'frozen')})">${frozen?'Reactivar':'Congelar'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRestaurantMaster(event,${jsArg(r.id)},${jsArg(r.name||'Restaurant')})">Eliminar</button>
+      </div>
     </div>`;
   }).join(''):`<div class="empty-state"><h3>${tx.noneTitle}</h3><p>${tx.noneText}</p></div>`;
   applyUITexts();
@@ -2540,6 +2558,43 @@ async function switchRestaurant(id){
   renderAll();
   toast(TL('master').changed);
   nav('dashboard',document.querySelector('.sb-item'));
+}
+async function deleteRestaurantMaster(ev,id,name){
+  ev?.stopPropagation?.();
+  if(currentUser?.role!=='super_admin'){toast('Solo master admin','#ef4444');return;}
+  const label=name||id;
+  const typed=prompt(`Eliminar restaurante: ${label}\n\nEsto borra empleados, fichajes, ausencias, turnos y desvincula usuarios admin.\n\nEscribe el nombre exacto del restaurante para confirmar:`);
+  if(typed!==label){toast('Eliminación cancelada','#f59e0b');return;}
+  try{
+    await sbDeleteRestaurant(id);
+    if(id===REST_ID){
+      const next=(MASTER.restaurants||[]).find(r=>r.id!==id);
+      if(next)setRestaurantId(next.id);
+    }
+    await loadMaster();
+    if(id===REST_ID&&MASTER.restaurants?.length)await loadSB();
+    renderAll();
+    toast('Restaurante eliminado','#ef4444');
+  }catch(e){
+    console.error(e);
+    toast('No se pudo eliminar. Ejecuta el SQL nuevo en Supabase.','#ef4444');
+  }
+}
+async function toggleRestaurantStatusMaster(ev,id,name,nextStatus){
+  ev?.stopPropagation?.();
+  if(currentUser?.role!=='super_admin'){toast('Solo master admin','#ef4444');return;}
+  const action=nextStatus==='frozen'?'congelar':'reactivar';
+  if(!confirm(`¿Quieres ${action} el restaurante "${name}"?${nextStatus==='frozen'?' Los managers y empleados no podrán entrar, pero los datos se conservan.':''}`))return;
+  try{
+    await sbSetRestaurantStatus(id,nextStatus);
+    await loadMaster();
+    if(id===REST_ID)await loadSB();
+    renderAll();
+    toast(nextStatus==='frozen'?'Restaurante congelado':'Restaurante reactivado',nextStatus==='frozen'?'#ef4444':'#10b981');
+  }catch(e){
+    console.error(e);
+    toast('No se pudo cambiar el estado. Ejecuta el SQL nuevo en Supabase.','#ef4444');
+  }
 }
 
 function openMaintenance(kind){
