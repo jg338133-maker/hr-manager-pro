@@ -2185,27 +2185,36 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshNow
 let tourRole=null,tourStep=0;
 const TOUR={
   manager:[
-    {kind:'language',sel:null,title:'Elige idioma',text:'Antes de empezar, escoge el idioma en el que quieres ver la app y este recorrido.'},
-    {sel:'#kpi-grid',title:'Panel diario',text:'Aquí ves rápidamente quién está activo, presente, ausente o de vacaciones.'},
-    {sel:'#dash-alerts',title:'Alertas del día',text:'La app te avisa si alguien esperado no ha fichado o si hubo retrasos.'},
-    {sel:'#dash-scan-btn',title:'QR y fichajes',text:'Desde aquí puedes escanear carnets o abrir acciones rápidas de asistencia.'},
-    {page:'employees',sel:'#pg-employees',title:'Empleados',text:'Aquí creas empleados, agregas foto, contrato, salario, PIN y horario semanal base.'},
-    {page:'shifts',sel:'#pg-shifts',title:'Planificación',text:'Aquí revisas los turnos por semana y corriges horarios puntuales sin cambiar el horario permanente.'},
-    {page:'vacations',sel:'#pg-vacations',title:'Ausencias',text:'Aquí apruebas vacaciones, incapacidades o ausencias personales y ves el saldo disponible.'},
-    {page:'payroll',sel:'#pg-payroll',title:'Salarios',text:'Esta sección estima pagos según horas trabajadas, tipo de contrato, pausas y horas extra.'},
-    {page:'reports',sel:'#pg-reports',title:'Reportes',text:'Aquí generas el reporte mensual con horas, ausencias, retrasos, salarios estimados y alertas.'},
-    {page:'settings',sel:'#pg-settings',title:'Configuración',text:'Aquí ajustas idioma, tolerancia de retraso, colores, horarios de apertura y datos del restaurante.'},
-    {sel:'#refresh-btn',title:'Datos actualizados',text:'La app actualiza sola, pero este botón fuerza una actualización cuando quieras.'},
-    {page:'dashboard',sel:'#tour-menu-btn',title:'Menú principal',text:'El menú lateral te permite moverte entre panel, presencias, empleados, planificación, finanzas y ajustes.'}
+    {key:'language',kind:'language',sel:null},
+    {key:'daily',sel:'#kpi-grid'},
+    {key:'alerts',sel:'#dash-alerts'},
+    {key:'qr',sel:'#dash-scan-btn'},
+    {key:'employees',page:'employees',sel:'#pg-employees'},
+    {key:'planning',page:'shifts',sel:'#pg-shifts'},
+    {key:'leave',page:'vacations',sel:'#pg-vacations'},
+    {key:'payroll',page:'payroll',sel:'#pg-payroll'},
+    {key:'reports',page:'reports',sel:'#pg-reports'},
+    {key:'settings',page:'settings',sel:'#pg-settings'},
+    {key:'refresh',sel:'#refresh-btn'},
+    {key:'menu',page:'dashboard',sel:'#tour-menu-btn'}
   ],
   employee:[
-    {kind:'language',sel:'#emp-lang-bar',title:'Elige idioma',text:'El trabajador puede escoger su idioma. Esto no cambia el idioma del restaurante.'},
-    {sel:'#eva',title:'Fichar y pausas',text:'Aquí registra entrada, salida y pausas obligatorias de 15 o 30 minutos.'},
-    {sel:'#emp-tour-stats',title:'Resumen personal',text:'El empleado ve sus horas del día, semana y vacaciones disponibles.'},
-    {sel:'#emp-tour-month',title:'Horas del mes',text:'Esta tarjeta ayuda a seguir el acumulado mensual sin preguntar al manager.'},
-    {sel:'#emp-tour-absence',title:'Ausencias',text:'Desde aquí puede pedir vacaciones, incapacidad o ausencias personales.'}
+    {key:'languageEmployee',kind:'language',sel:'#emp-lang-bar'},
+    {key:'clock',sel:'#eva'},
+    {key:'summary',sel:'#emp-tour-stats'},
+    {key:'month',sel:'#emp-tour-month'},
+    {key:'absence',sel:'#emp-tour-absence'}
   ]
 };
+const TOUR_TX={
+  es:{buttons:{skip:'Saltar',back:'Atrás',next:'Siguiente',done:'Terminar'},manager:{language:['Elige idioma','Antes de empezar, escoge el idioma en el que quieres ver la app y este recorrido.'],daily:['Panel diario','Aquí ves rápidamente quién está activo, presente, ausente o de vacaciones.'],alerts:['Alertas del día','La app te avisa si alguien esperado no ha fichado o si hubo retrasos.'],qr:['QR y fichajes','Desde aquí puedes escanear carnets o abrir acciones rápidas de asistencia.'],employees:['Empleados','Aquí creas empleados, agregas foto, contrato, salario, PIN y horario semanal base.'],planning:['Planificación','Aquí revisas los turnos por semana y corriges horarios puntuales sin cambiar el horario permanente.'],leave:['Ausencias','Aquí apruebas vacaciones, incapacidades o ausencias personales y ves el saldo disponible.'],payroll:['Salarios','Esta sección estima pagos según horas trabajadas, tipo de contrato, pausas y horas extra.'],reports:['Reportes','Aquí generas el reporte mensual con horas, ausencias, retrasos, salarios estimados y alertas.'],settings:['Configuración','Aquí ajustas idioma, tolerancia de retraso, colores, horarios de apertura y datos del restaurante.'],refresh:['Datos actualizados','La app actualiza sola, pero este botón fuerza una actualización cuando quieras.'],menu:['Menú principal','El menú lateral te permite moverte entre panel, presencias, empleados, planificación, finanzas y ajustes.']},employee:{languageEmployee:['Elige idioma','El trabajador puede escoger su idioma. Esto no cambia el idioma del restaurante.'],clock:['Fichar y pausas','Aquí registra entrada, salida y pausas obligatorias de 15 o 30 minutos.'],summary:['Resumen personal','El empleado ve sus horas del día, semana y vacaciones disponibles.'],month:['Horas del mes','Esta tarjeta ayuda a seguir el acumulado mensual sin preguntar al manager.'],absence:['Ausencias','Desde aquí puede pedir vacaciones, incapacidad o ausencias personales.']}},
+  fr:{buttons:{skip:'Passer',back:'Retour',next:'Suivant',done:'Terminer'},manager:{language:['Choisir la langue','Avant de commencer, choisissez la langue de l’app et de ce tour.'],daily:['Tableau du jour','Vous voyez rapidement qui est actif, présent, absent ou en vacances.'],alerts:['Alertes du jour','L’app vous signale les personnes prévues qui n’ont pas pointé ou les retards.'],qr:['QR et pointages','Vous pouvez scanner les badges ou ouvrir les actions rapides de présence.'],employees:['Employés','Créez les employés, ajoutez photo, contrat, salaire, PIN et horaire hebdomadaire.'],planning:['Planification','Consultez les horaires de la semaine et corrigez un jour ponctuel sans changer l’horaire permanent.'],leave:['Absences','Approuvez vacances, incapacités ou absences personnelles et suivez les soldes.'],payroll:['Salaires','Estimez les paiements selon heures, contrat, pauses et heures supplémentaires.'],reports:['Rapports','Générez le rapport mensuel avec heures, absences, retards, salaires estimés et alertes.'],settings:['Paramètres','Réglez langue, tolérance de retard, couleurs, heures d’ouverture et données du restaurant.'],refresh:['Données à jour','L’app se met à jour seule, mais ce bouton force une actualisation.'],menu:['Menu principal','Le menu latéral permet de naviguer entre tableau, présences, employés, planning, finance et paramètres.']},employee:{languageEmployee:['Choisir la langue','L’employé peut choisir sa langue. Cela ne change pas la langue du restaurant.'],clock:['Pointage et pauses','L’employé enregistre entrée, sortie et pauses obligatoires de 15 ou 30 minutes.'],summary:['Résumé personnel','L’employé voit ses heures du jour, de la semaine et ses vacances disponibles.'],month:['Heures du mois','Cette carte permet de suivre le cumul mensuel sans demander au manager.'],absence:['Absences','Depuis ici, il peut demander vacances, incapacité ou absence personnelle.']}},
+  en:{buttons:{skip:'Skip',back:'Back',next:'Next',done:'Finish'},manager:{language:['Choose language','Before starting, choose the language for the app and this tour.'],daily:['Daily dashboard','Quickly see who is active, present, absent, or on vacation.'],alerts:['Daily alerts','The app flags scheduled people who have not clocked in or arrived late.'],qr:['QR and punches','Scan employee cards or open quick attendance actions.'],employees:['Employees','Create employees, add photo, contract, salary, PIN, and base weekly schedule.'],planning:['Planning','Review weekly shifts and correct specific days without changing the permanent schedule.'],leave:['Absences','Approve vacation, sick leave, or personal absences and track balances.'],payroll:['Payroll','Estimate payments based on worked hours, contract type, breaks, and overtime.'],reports:['Reports','Generate the monthly report with hours, absences, lateness, estimated salaries, and alerts.'],settings:['Settings','Adjust language, late tolerance, colors, opening hours, and restaurant data.'],refresh:['Updated data','The app refreshes automatically, but this button forces an update.'],menu:['Main menu','Use the side menu to move between dashboard, attendance, employees, planning, finance, and settings.']},employee:{languageEmployee:['Choose language','The employee can choose their language. This does not change the restaurant language.'],clock:['Clocking and breaks','Clock in, clock out, and register mandatory 15 or 30 minute breaks.'],summary:['Personal summary','The employee sees today’s hours, weekly hours, and available vacation.'],month:['Month hours','This card tracks the monthly total without asking the manager.'],absence:['Absences','From here they can request vacation, sick leave, or personal absence.']}},
+  de:{buttons:{skip:'Überspringen',back:'Zurück',next:'Weiter',done:'Fertig'},manager:{language:['Sprache wählen','Wählen Sie zuerst die Sprache für die App und diese Einführung.'],daily:['Tagesübersicht','Sie sehen schnell, wer aktiv, anwesend, abwesend oder in den Ferien ist.'],alerts:['Tageswarnungen','Die App zeigt geplante Personen ohne Buchung oder mit Verspätung.'],qr:['QR und Buchungen','Scannen Sie Ausweise oder öffnen Sie schnelle Anwesenheitsaktionen.'],employees:['Mitarbeiter','Mitarbeiter erstellen, Foto, Vertrag, Lohn, PIN und Wochenplan hinzufügen.'],planning:['Planung','Wochenpläne prüfen und einzelne Tage korrigieren, ohne den Dauerplan zu ändern.'],leave:['Abwesenheiten','Ferien, Krankheit oder persönliche Abwesenheiten genehmigen und Salden verfolgen.'],payroll:['Löhne','Zahlungen nach Stunden, Vertrag, Pausen und Überstunden schätzen.'],reports:['Berichte','Monatsbericht mit Stunden, Abwesenheiten, Verspätungen, geschätzten Löhnen und Warnungen erstellen.'],settings:['Einstellungen','Sprache, Verspätungstoleranz, Farben, Öffnungszeiten und Restaurantdaten anpassen.'],refresh:['Aktuelle Daten','Die App aktualisiert sich automatisch, dieser Button erzwingt eine Aktualisierung.'],menu:['Hauptmenü','Über das Seitenmenü wechseln Sie zwischen Übersicht, Anwesenheit, Mitarbeitern, Planung, Finanzen und Einstellungen.']},employee:{languageEmployee:['Sprache wählen','Der Mitarbeiter kann seine Sprache wählen. Die Restaurantsprache bleibt unverändert.'],clock:['Buchungen und Pausen','Ein- und Ausstempeln sowie obligatorische Pausen von 15 oder 30 Minuten erfassen.'],summary:['Persönliche Übersicht','Der Mitarbeiter sieht Tagesstunden, Wochenstunden und verfügbare Ferien.'],month:['Monatsstunden','Diese Karte zeigt den Monatssaldo, ohne den Manager fragen zu müssen.'],absence:['Abwesenheiten','Hier kann Urlaub, Krankheit oder persönliche Abwesenheit beantragt werden.']}},
+  it:{buttons:{skip:'Salta',back:'Indietro',next:'Avanti',done:'Fine'},manager:{language:['Scegli lingua','Prima di iniziare, scegli la lingua dell’app e di questo tour.'],daily:['Dashboard giornaliera','Vedi subito chi è attivo, presente, assente o in vacanza.'],alerts:['Avvisi del giorno','L’app segnala chi era previsto ma non ha timbrato o è arrivato in ritardo.'],qr:['QR e timbrature','Puoi scannerizzare i badge o aprire azioni rapide di presenza.'],employees:['Dipendenti','Crea dipendenti, aggiungi foto, contratto, salario, PIN e orario settimanale base.'],planning:['Pianificazione','Controlli i turni settimanali e correggi singoli giorni senza cambiare l’orario permanente.'],leave:['Assenze','Approvi vacanze, malattie o assenze personali e controlli i saldi.'],payroll:['Stipendi','Stima i pagamenti in base a ore lavorate, contratto, pause e straordinari.'],reports:['Report','Generi il report mensile con ore, assenze, ritardi, stipendi stimati e avvisi.'],settings:['Impostazioni','Regoli lingua, tolleranza ritardo, colori, orari di apertura e dati del ristorante.'],refresh:['Dati aggiornati','L’app si aggiorna da sola, ma questo pulsante forza l’aggiornamento.'],menu:['Menu principale','Dal menu laterale navighi tra dashboard, presenze, dipendenti, pianificazione, finanza e impostazioni.']},employee:{languageEmployee:['Scegli lingua','Il dipendente può scegliere la sua lingua. Questo non cambia la lingua del ristorante.'],clock:['Timbrature e pause','Registra entrata, uscita e pause obbligatorie da 15 o 30 minuti.'],summary:['Riepilogo personale','Il dipendente vede ore del giorno, della settimana e vacanze disponibili.'],month:['Ore del mese','Questa scheda aiuta a seguire il totale mensile senza chiedere al manager.'],absence:['Assenze','Da qui può richiedere vacanze, malattia o assenze personali.']}}
+};
+const tourTxt=(role,key)=>((TOUR_TX[lang]||TOUR_TX.es)[role]||{})[key]||TOUR_TX.es[role][key]||['',''];
+const tourButtons=()=>((TOUR_TX[lang]||TOUR_TX.es).buttons||TOUR_TX.es.buttons);
 function tourKey(role){
   const id=role==='employee'?(currentUser?.emp?.id||'employee'):(REST_ID||'restaurant');
   return `hrm_tour_seen_${role}_${id}`;
@@ -2254,6 +2263,7 @@ function renderTour(){
   const steps=TOUR[tourRole]||[],s=steps[tourStep];if(!s)return closeTour(false);
   if(s.page)activateTourPage(s.page);
   const card=document.getElementById('tour-card'),spot=document.getElementById('tour-spot');
+  const [title,text]=tourTxt(tourRole,s.key),btn=tourButtons();
   const el=s.sel?document.querySelector(s.sel):null;
   if(el){
     el.scrollIntoView({block:'center',inline:'nearest'});
@@ -2266,14 +2276,14 @@ function renderTour(){
   }else spot.style.display='none';
   card.innerHTML=`
     <div class="tour-kicker">${tourStep+1} / ${steps.length}</div>
-    <div class="tour-title">${esc(s.title)}</div>
-    <div class="tour-text">${esc(s.text)}</div>
+    <div class="tour-title">${esc(title)}</div>
+    <div class="tour-text">${esc(text)}</div>
     ${s.kind==='language'?`<div class="emp-lang-bar mt12">${Object.entries(LANGS).map(([k,v])=>`<button class="lang-btn ${k===lang?'active':''}" onclick="setTourLang('${k}')">${v.flag} ${v.name}</button>`).join('')}</div>`:''}
     <div class="tour-progress">${steps.map((_,i)=>`<div class="tour-dot ${i===tourStep?'active':''}"></div>`).join('')}</div>
     <div class="tour-actions">
-      <button class="btn btn-ghost" onclick="closeTour(true)">Saltar</button>
-      ${tourStep>0?`<button class="btn btn-ghost" onclick="prevTour()">Atrás</button>`:''}
-      <button class="btn btn-primary" onclick="nextTour()">${tourStep>=steps.length-1?'Terminar':'Siguiente'}</button>
+      <button class="btn btn-ghost" onclick="closeTour(true)">${esc(btn.skip)}</button>
+      ${tourStep>0?`<button class="btn btn-ghost" onclick="prevTour()">${esc(btn.back)}</button>`:''}
+      <button class="btn btn-primary" onclick="nextTour()">${esc(tourStep>=steps.length-1?btn.done:btn.next)}</button>
     </div>`;
 }
 window.addEventListener('resize',()=>{if(tourRole)renderTour();});
