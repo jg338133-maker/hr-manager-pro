@@ -779,7 +779,7 @@ input[type=date],input[type=time]{color-scheme:dark}
   </div>
   <div class="frow">
     <div class="fg"><label>Semaines vacances</label><input type="number" id="ef-vac" value="5" min="4" max="8"></div>
-    <div class="fg"><label>PIN (4 chiffres)</label><input type="number" id="ef-pin" placeholder="1234" maxlength="4"></div>
+    <div class="fg"><label>PIN (4 chiffres)</label><div style="display:flex;gap:8px"><input type="text" id="ef-pin" inputmode="numeric" pattern="[0-9]*" placeholder="1234" maxlength="4"><button type="button" class="btn btn-ghost btn-sm" onclick="generateEmpPin()" style="width:92px;padding:0">Générer</button></div></div>
   </div>
   <div class="fg"><label>N° AVS</label><input id="ef-avs" placeholder="756.xxxx.xxxx.xx"></div>
   <div class="fg"><label>Contact urgence</label><input id="ef-emergency"></div>
@@ -967,9 +967,33 @@ let DB={
   settings:{company:'Mon Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],stats:{}};
+const isDemo=()=>currentUser?.demo===true;
 function loadLocal(){try{const s=localStorage.getItem('hrm_pro');if(s)DB={...DB,...JSON.parse(s)};}catch(e){}}
-function saveLocal(){try{localStorage.setItem('hrm_pro',JSON.stringify(DB));}catch(e){}}
+function saveLocal(){try{if(isDemo())return;localStorage.setItem('hrm_pro',JSON.stringify(DB));}catch(e){}}
 loadLocal();
+
+function demoDB(){
+  const today=new Date(),fmt=d=>d.toISOString().split('T')[0],day=n=>fmt(new Date(today.getTime()-n*86400000));
+  const sched={};for(let i=0;i<7;i++)sched[i]={enabled:i>=1&&i<=5,entry:'09:00',exit:'17:00'};
+  const split={...sched,1:{enabled:true,entry:'10:00',exit:'15:00'},3:{enabled:true,entry:'18:00',exit:'23:00'}};
+  const employees=[
+    {id:'demo-emp-1',name:'Sofia',last:'Martin',num:'D-001',position:'Serveur',dept:'Salle',phone:'+41 79 111 22 33',email:'sofia.demo@hrmanagerpro.local',startDate:day(120),contract:'CDI',payType:'hourly',rate:25,salary:0,vacWeeks:5,avs:'756.0000.0000.01',emergency:'Marco +41 79 444 55 66',notes:'Disponible soirs et week-end',status:'active',photo:null,color:'#4f6ef7',schedules:sched,pin:'1234'},
+    {id:'demo-emp-2',name:'Luca',last:'Rossi',num:'D-002',position:'Chef',dept:'Cuisine',phone:'+41 79 222 33 44',email:'luca.demo@hrmanagerpro.local',startDate:day(240),contract:'CDI',payType:'monthly',rate:0,salary:4800,vacWeeks:5,avs:'756.0000.0000.02',emergency:'Anna +41 79 555 66 77',notes:'Responsable cuisine',status:'active',photo:null,color:'#10b981',schedules:sched,pin:'2345'},
+    {id:'demo-emp-3',name:'Mia',last:'Keller',num:'D-003',position:'Aide cuisine',dept:'Cuisine',phone:'+41 79 333 44 55',email:'mia.demo@hrmanagerpro.local',startDate:day(45),contract:'CDD',payType:'hourly',rate:22,salary:0,vacWeeks:4,avs:'756.0000.0000.03',emergency:'Tom +41 79 666 77 88',notes:'Temps partiel',status:'active',photo:null,color:'#f59e0b',schedules:split,pin:'3456'}
+  ];
+  const history=[
+    {id:'demo-h1',empId:'demo-emp-1',empName:'Sofia Martin',type:'in',ts:localDateTimeISO(day(0),'09:05'),note:''},
+    {id:'demo-h2',empId:'demo-emp-1',empName:'Sofia Martin',type:'break_start',ts:localDateTimeISO(day(0),'12:30'),note:''},
+    {id:'demo-h3',empId:'demo-emp-1',empName:'Sofia Martin',type:'break_end',ts:localDateTimeISO(day(0),'13:00'),note:''},
+    {id:'demo-h4',empId:'demo-emp-2',empName:'Luca Rossi',type:'in',ts:localDateTimeISO(day(1),'08:55'),note:''},
+    {id:'demo-h5',empId:'demo-emp-2',empName:'Luca Rossi',type:'out',ts:localDateTimeISO(day(1),'17:35'),note:''},
+    {id:'demo-h6',empId:'demo-emp-1',empName:'Sofia Martin',type:'in',ts:localDateTimeISO(day(1),'09:18'),note:'Train en retard'},
+    {id:'demo-h7',empId:'demo-emp-1',empName:'Sofia Martin',type:'out',ts:localDateTimeISO(day(1),'17:05'),note:''}
+  ];
+  const shifts={};
+  employees.forEach(emp=>{for(let i=0;i<5;i++){const d=new Date(getMonday(today).getTime()+i*86400000),ds=fmt(d),sch=emp.schedules[d.getDay()];shifts[`${emp.id}_${ds}`]=sch?.enabled?{type:'morning',in:sch.entry,out:sch.exit,notes:'Demo'}:{type:'off',in:null,out:null,notes:'Demo'};}});
+  return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,settings:{company:'Demo Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
+}
 
 function setRestaurantId(id){
   REST_ID=id;
@@ -1028,22 +1052,25 @@ async function loadMaster(){
 }
 
 async function sbSaveEmp(emp){
+  if(isDemo())return;
   const{error}=await sb.from('employees').upsert({id:emp.id,restaurant_id:REST_ID,name:emp.name,last_name:emp.last||'',employee_number:emp.num||'',position:emp.position||'',department:emp.dept||'',phone:emp.phone||'',email:emp.email||'',start_date:emp.startDate||null,contract_type:emp.contract||'CDI',pay_type:emp.payType||'hourly',hourly_rate:emp.rate||0,monthly_salary:emp.salary||0,vacation_weeks:emp.vacWeeks||5,avs_number:emp.avs||'',emergency_contact:emp.emergency||'',notes:emp.notes||'',status:emp.status||'active',photo_url:emp.photo||null,color:emp.color||'#4f6ef7',schedules:emp.schedules||{},pin:emp.pin||'0000'});
   if(error)console.error(error);
 }
-async function sbDelEmp(id){await Promise.all([sb.from('employees').delete().eq('id',id),sb.from('attendance').delete().eq('employee_id',id),sb.from('absences').delete().eq('employee_id',id),sb.from('shifts').delete().eq('employee_id',id)]);}
-async function sbReg(empId,empName,type,note=''){await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:new Date().toISOString(),note});}
-async function sbRegAt(empId,empName,type,ts,note=''){await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:ts,note});}
+async function sbDelEmp(id){if(isDemo())return;await Promise.all([sb.from('employees').delete().eq('id',id),sb.from('attendance').delete().eq('employee_id',id),sb.from('absences').delete().eq('employee_id',id),sb.from('shifts').delete().eq('employee_id',id)]);}
+async function sbReg(empId,empName,type,note=''){if(isDemo())return;await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:new Date().toISOString(),note});}
+async function sbRegAt(empId,empName,type,ts,note=''){if(isDemo())return;await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:ts,note});}
 async function sbDelAttendanceDay(empId,dateStr){
+  if(isDemo())return;
   const start=localDateTimeISO(dateStr,'00:00'),end=localDateTimeISO(dateStr,'23:59');
   await sb.from('attendance').delete().eq('restaurant_id',REST_ID).eq('employee_id',empId).gte('timestamp',start).lte('timestamp',end);
 }
-async function sbSaveAbs(a){await sb.from('absences').upsert({id:a.id,restaurant_id:REST_ID,employee_id:a.empId,type:a.type,start_date:a.start,end_date:a.end,approved:a.approved,notes:a.notes||''});}
-async function sbSaveShift(key,sh){const[eId,date]=key.split('_');await sb.from('shifts').upsert({restaurant_id:REST_ID,employee_id:eId,shift_date:date,shift_type:sh.type,start_time:sh.in||null,end_time:sh.out||null,notes:sh.notes||''},{onConflict:'employee_id,shift_date'});}
-async function sbSaveSettings(s){await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours()}).eq('id',REST_ID);}
-async function sbUpdateAbsApproved(id,approved){await sb.from('absences').update({approved}).eq('id',id).eq('restaurant_id',REST_ID);}
-async function sbDelAbs(id){await sb.from('absences').delete().eq('id',id).eq('restaurant_id',REST_ID);}
+async function sbSaveAbs(a){if(isDemo())return;await sb.from('absences').upsert({id:a.id,restaurant_id:REST_ID,employee_id:a.empId,type:a.type,start_date:a.start,end_date:a.end,approved:a.approved,notes:a.notes||''});}
+async function sbSaveShift(key,sh){if(isDemo())return;const[eId,date]=key.split('_');await sb.from('shifts').upsert({restaurant_id:REST_ID,employee_id:eId,shift_date:date,shift_type:sh.type,start_time:sh.in||null,end_time:sh.out||null,notes:sh.notes||''},{onConflict:'employee_id,shift_date'});}
+async function sbSaveSettings(s){if(isDemo())return;await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours()}).eq('id',REST_ID);}
+async function sbUpdateAbsApproved(id,approved){if(isDemo())return;await sb.from('absences').update({approved}).eq('id',id).eq('restaurant_id',REST_ID);}
+async function sbDelAbs(id){if(isDemo())return;await sb.from('absences').delete().eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDeleteAll(){
+  if(isDemo())return;
   await Promise.all([
     sb.from('attendance').delete().eq('restaurant_id',REST_ID),
     sb.from('absences').delete().eq('restaurant_id',REST_ID),
@@ -1310,7 +1337,13 @@ async function selectPinRestaurant(id){
   if(DB.settings?.status==='frozen')toast('Restaurante congelado','#ef4444');
 }
 
-function loginDemo(){currentUser={role:'restaurant_admin',name:'Admin Demo',restaurant_id:REST_ID};showManagerUI();toast('✅ Connexion démo');}
+function loginDemo(){
+  DB=demoDB();lang=DB.settings.lang||'es';
+  currentUser={role:'restaurant_admin',name:'Admin Demo',restaurant_id:'demo-restaurant',demo:true};
+  currentPage='dashboard';
+  showManagerUI();
+  toast('✅ Demo aislado: no toca tus datos reales');
+}
 
 async function loginManager(){
   const email=document.getElementById('login-email').value.trim();
@@ -1538,6 +1571,31 @@ function breakMinutesOn(empId,date){
   let total=0,start=null;
   r.forEach(h=>{if(h.type==='break_start')start=new Date(h.ts);else if(h.type==='break_end'&&start){const end=new Date(h.ts);if(end>start)total+=(end-start)/60000;start=null;}});
   return total;
+}
+function breakInfoOn(empId,date){
+  const r=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,date)&&['break_start','break_end'].includes(h.type)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  if(!r.length)return null;
+  const ranges=[];let start=null;
+  r.forEach(h=>{
+    if(h.type==='break_start')start=h;
+    if(h.type==='break_end'&&start){
+      const mins=Math.max(0,Math.round((new Date(h.ts)-new Date(start.ts))/60000));
+      ranges.push({start:start.ts,end:h.ts,mins});
+      start=null;
+    }
+  });
+  return {ranges,open:start};
+}
+function breakStatusHTML(emp,date,hasClockIn){
+  const info=breakInfoOn(emp.id,date);
+  const planned=scheduledHoursOn(emp,date);
+  if(info?.ranges?.length){
+    return info.ranges.map(b=>`<div style="font-size:11px;color:var(--orange);margin-top:2px">☕ Pausa ${fmtTime(b.start)}–${fmtTime(b.end)} · ${b.mins} min</div>`).join('');
+  }
+  if(info?.open)return `<div style="font-size:11px;color:var(--orange);margin-top:2px">☕ Pausa iniciada ${fmtTime(info.open.ts)} · sin cierre</div>`;
+  if(hasClockIn&&planned>=5.5)return `<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ Sin pausa registrada</div>`;
+  if(hasClockIn)return `<div style="font-size:11px;color:var(--text2);margin-top:2px">☕ Sin pausa registrada</div>`;
+  return '';
 }
 function workedOn(empId,date){
   const r=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,date)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
@@ -2144,7 +2202,9 @@ async function refreshNow(force=false){
   refreshing=true;setRefreshState('loading');
   try{
     let ok=true;
-    if(currentUser.role==='employee'){
+    if(isDemo()){
+      renderPage(currentPage);
+    }else if(currentUser.role==='employee'){
       const emp=currentUser.emp;
       if(emp?.email&&emp?.pin)await loadEmployeePortal(emp);
       const fresh=DB.employees.find(e=>e.id===emp?.id)||emp;
@@ -2395,6 +2455,7 @@ function renderAtt(){
         ${abs?`<div style="font-size:11px;color:var(--orange);margin-top:2px">🌴 ${abs.type}</div>`:''}
         ${inn?`<div style="font-size:11px;color:var(--green);margin-top:2px">✅ ${ex.in} ${fmtTime(inn.ts)}${late?' ⚠️ retard':''}</div>`:''}
         ${inn?.note?`<div style="font-size:11px;color:var(--orange);margin-top:2px">Motivo: ${esc(inn.note)}</div>`:''}
+        ${breakStatusHTML(emp,now,!!inn)}
         ${out?`<div style="font-size:11px;color:var(--red);margin-top:2px">🔴 ${ex.out} ${fmtTime(out.ts)}</div>`:''}
         ${w?`<div style="font-size:11px;color:var(--brand);margin-top:2px">⏱ ${w.toFixed(2)}h</div>`:''}
       </div>
@@ -2456,6 +2517,16 @@ function openEmpModal(id){
   renderSchedEd(emp?.schedules||defSched());
   openModal('emp-modal');
 }
+const newPin=()=>String(Math.floor(1000+Math.random()*9000));
+function generateEmpPin(){
+  const pin=newPin(),el=document.getElementById('ef-pin');
+  if(el)el.value=pin;
+  toast(`PIN généré: ${pin}`);
+}
+async function copyText(text,msg='Copié'){
+  try{await navigator.clipboard.writeText(text);toast(msg);}
+  catch(e){toast(text,'#4f6ef7');}
+}
 const defSched=()=>{const s={};for(let i=0;i<7;i++)s[i]={enabled:i>=1&&i<=5,entry:'09:00',exit:'17:00'};return s;};
 function updatePL(){document.getElementById('ef-paylbl').textContent=document.getElementById('ef-paytype').value==='hourly'?'Taux/h (CHF)':'Salaire/mois (CHF)';}
 function handlePhoto(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{photoData=e.target.result;document.getElementById('photo-ring').innerHTML=`<img src="${photoData}">`;};r.readAsDataURL(f);}
@@ -2497,7 +2568,7 @@ function saveEmp(){
   const payType=document.getElementById('ef-paytype').value,rateVal=parseFloat(document.getElementById('ef-rate').value)||0;
   const existing=editEmpId?DB.employees.find(e=>e.id===editEmpId):null;
   const typedPin=(document.getElementById('ef-pin').value||'').replace(/\D/g,'').slice(0,4);
-  const generatedPin=typedPin||existing?.pin||String(Math.floor(1000+Math.random()*9000));
+  const generatedPin=typedPin||existing?.pin||newPin();
   const data={id:editEmpId||uid(),name,last:clean(document.getElementById('ef-last').value),num:clean(document.getElementById('ef-num').value),position:clean(document.getElementById('ef-pos').value),dept:clean(document.getElementById('ef-dept').value),startDate:document.getElementById('ef-start').value,phone:clean(document.getElementById('ef-phone').value),email:empEmail,contract:clean(document.getElementById('ef-contract').value),status:document.getElementById('ef-status').value,payType,rate:payType==='hourly'?rateVal:0,salary:payType==='monthly'?rateVal:0,vacWeeks:parseInt(document.getElementById('ef-vac').value)||5,avs:clean(document.getElementById('ef-avs').value),emergency:clean(document.getElementById('ef-emergency').value),notes:clean(document.getElementById('ef-notes').value),photo:photoData,schedules:getSchedEd(),pin:generatedPin,color:editEmpId?(existing?.color||EMP_COLORS[DB.employees.length%EMP_COLORS.length]):EMP_COLORS[DB.employees.length%EMP_COLORS.length]};
   if(editEmpId){const i=DB.employees.findIndex(e=>e.id===editEmpId);if(i>=0)DB.employees[i]={...DB.employees[i],...data};}
   else DB.employees.push(data);
@@ -2527,7 +2598,7 @@ function openDetail(empId){
       <div style="font-size:21px;font-weight:800">${safeEmpName(emp)}</div>
       <div style="font-size:13px;color:var(--text2);margin-top:4px">${esc(emp.position)} · ${esc(emp.dept)}</div>
       ${emp.num?`<span class="chip chip-blue" style="margin-top:8px">#${emp.num}</span>`:''}
-      ${emp.pin?`<span class="chip chip-gray" style="margin-top:8px;margin-left:4px">PIN: ${emp.pin}</span>`:''}
+      ${emp.pin?`<button class="chip chip-gray" style="margin-top:8px;margin-left:4px;border:none;cursor:pointer" onclick="copyText('${esc(emp.pin)}','PIN copié')">PIN: ${emp.pin}</button>`:''}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
       ${[['Ancienneté',seniority,'var(--brand)'],['Vacances',`${vacLeft}j`,'var(--orange)'],["Auj.",w?w.toFixed(1)+'h':'-','var(--green)']].map(([l,v,c])=>`<div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px 8px;text-align:center"><div style="font-size:19px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:3px">${l}</div></div>`).join('')}
@@ -2576,6 +2647,11 @@ function openDetail(empId){
     <div id="dt-info" style="display:none">
       <div class="card">
         ${[['Téléphone',emp.phone],['Email',emp.email],['Contrat',emp.contract],['Salaire',`${emp.payType==='hourly'?'Horaire':'Mensuel'} · CHF ${emp.payType==='hourly'?emp.rate+'/h':emp.salary+'/mois'}`],['Vacances',`${emp.vacWeeks} sem. · ${vacLeft}j restants`],['Urgence',emp.emergency],['AVS',emp.avs]].filter(r=>r[1]).map(([l,v])=>`<div class="rrow"><span class="muted">${esc(l)}</span><span style="font-weight:500;text-align:right;max-width:55%">${esc(v)}</span></div>`).join('')}
+        <div class="rrow"><span class="muted">PIN</span><span style="font-weight:800">${esc(emp.pin||'0000')}</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+          <button class="btn btn-ghost" onclick="copyText('${esc(emp.pin||'0000')}','PIN copié')">Copier PIN</button>
+          <button class="btn btn-primary" onclick="resetEmpPin('${empId}')">Restablecer PIN</button>
+        </div>
         ${emp.notes?`<div style="background:var(--s3);border-radius:var(--r3);padding:10px;margin-top:8px;font-size:12px;color:var(--text2)">${esc(emp.notes)}</div>`:''}
       </div>
       <div class="card">
@@ -2591,6 +2667,13 @@ function openDetail(empId){
     <button class="btn btn-ghost mt12" onclick="closeModal('detail-modal')">Fermer</button>`;
   renderQRCodes(document.getElementById('detail-content'));
   openModal('detail-modal');
+}
+function resetEmpPin(empId){
+  const emp=DB.employees.find(e=>e.id===empId);if(!emp)return;
+  const pin=newPin();
+  emp.pin=pin;saveLocal();sbSaveEmp(emp).catch(console.error);
+  openDetail(empId);
+  copyText(pin,`Nouveau PIN: ${pin}`);
 }
 function dtab(id,btn){['dt-pt','dt-badge','dt-info'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});document.getElementById('dtabs')?.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const el=document.getElementById(id);if(el)el.style.display='block';}
 function deleteEmp(id){if(!confirm('Supprimer cet employé?'))return;DB.employees=DB.employees.filter(e=>e.id!==id);DB.history=DB.history.filter(h=>h.empId!==id);DB.absences=DB.absences.filter(a=>a.empId!==id);saveLocal();closeModal('detail-modal');renderPage(currentPage);toast('Employé supprimé');sbDelEmp(id).catch(console.error);}
