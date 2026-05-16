@@ -1559,8 +1559,8 @@ function buildBadgeCanvas(emp){
       ctx.fillStyle='rgba(255,255,255,.88)';ctx.font='700 18px DM Sans, Arial';ctx.fillText(emp.num?`#${emp.num}`:'Badge employé',320,419);
       roundRect(ctx,166,486,308,308,26,'#ffffff');
       if(qrImg)ctx.drawImage(qrImg,184,504,272,272);
-      ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='600 20px DM Sans, Arial';ctx.fillText('Scanner pour ouvrir le portail',320,835);
-      ctx.fillStyle='rgba(255,255,255,.52)';ctx.font='500 16px DM Sans, Arial';ctx.fillText('Email + PIN requis · Lien cliquable dans le PDF',320,862);
+      ctx.fillStyle='rgba(255,255,255,.76)';ctx.font='700 20px DM Sans, Arial';ctx.fillText('Cliquez ici pour ouvrir le portail',320,835);
+      ctx.fillStyle='rgba(255,255,255,.52)';ctx.font='500 16px DM Sans, Arial';ctx.fillText('Ou scannez le QR · Email + PIN requis',320,862);
       ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(0,900,640,60);
       ctx.fillStyle='#ffffff';ctx.font='800 22px DM Sans, Arial';ctx.fillText('Mananger Pro',320,938);
       resolve(canvas);
@@ -1967,8 +1967,8 @@ function renderEmpView(emp){
         </div>
         <div class="badge-body">
         <div class="qr-wrap" style="margin:0 auto">${genQR(employeeAccessUrl(emp),150)}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:8px">Scannez pour ouvrir votre portail</div>
-        <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Ouvrir mon accès</a>
+        <div style="font-size:11px;color:var(--text2);margin-top:8px">Cliquez pour ouvrir votre portail</div>
+        <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Cliquez ici pour ouvrir</a>
         <button class="btn btn-primary mt12" onclick="downloadBadgePDF(currentUser.emp)">⬇️ Télécharger PDF</button>
         <button class="btn btn-ghost mt12" onclick="downloadBadge(currentUser.emp)">⬇️ Télécharger mon carnet</button>
         </div>
@@ -2263,11 +2263,11 @@ function openDetail(empId){
           </div>
         </div>
         <div class="badge-body" style="text-align:center">
-          <div style="font-size:11px;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;font-weight:800">Accès autonome employé</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;font-weight:800">Cliquez pour ouvrir · QR en respaldo</div>
           <div class="qr-wrap" style="margin:0 auto;display:inline-block">${genQR(employeeAccessUrl(emp),160)}</div>
           <div style="font-size:9px;color:var(--text3);margin-top:10px;font-family:monospace">${empId.toUpperCase().slice(0,16)}...</div>
           ${emp.num?`<div style="font-size:10px;color:var(--text2);margin-top:3px">Employé #${emp.num}</div>`:''}
-          <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Ouvrir accès employé</a>
+          <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Cliquez ici pour ouvrir</a>
         </div>
       </div>
       <div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px;font-size:11px;color:var(--text2);text-align:center">PDF recommandé: conserva el link clicable y el QR</div>
