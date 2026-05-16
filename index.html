@@ -2392,6 +2392,8 @@ function calcPay(emp,y,m){
   const pay=emp.payType==='hourly'?regular*(emp.rate||0)+ot*(emp.rate||0)*1.25:(emp.salary||0);
   return{hrs,ot,pay,days:days.size};
 }
+function payModeLabel(emp){return emp.payType==='monthly'?'Mensuel fixe':'Horaire';}
+function payBaseLabel(emp){return emp.payType==='monthly'?`CHF ${(emp.salary||0).toFixed(2)}/mois`:`CHF ${(emp.rate||0).toFixed(2)}/h`;}
 function scheduledHoursOn(emp,date){
   const sch=emp.schedules?.[date.getDay()];
   if(!sch?.enabled||!sch.entry||!sch.exit)return 0;
@@ -2420,28 +2422,52 @@ function renderPayroll(){
 // ═══════ REPORTS ═══════
 let repMD=new Date();
 function repMN(dir){repMD=new Date(repMD.getFullYear(),repMD.getMonth()+dir,1);renderReports();}
+function monthlyEmployeeReport(emp,y,m){
+  const tol=DB.settings?.lateTol||10;
+  const recs=DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===y&&d.getMonth()===m;});
+  const days=new Set(recs.map(h=>new Date(h.ts).toDateString()));
+  let hrs=0,breaks=0;
+  for(const ds of days){
+    const dt=new Date(ds),w=workedOn(emp.id,dt);
+    if(w)hrs+=w;
+    breaks+=breakMinutesOn(emp.id,dt)/60;
+  }
+  const dim=new Date(y,m+1,0).getDate();let late=0,abs=0;
+  for(let d=1;d<=dim;d++){
+    const date=new Date(y,m,d);
+    if(date>new Date())continue;
+    const sch=emp.schedules?.[date.getDay()];
+    if(!sch?.enabled)continue;
+    const dr=recs.filter(h=>sameDay(h.ts,date));
+    if(!dr.length&&!getAbs(emp.id,date)){abs++;continue;}
+    const inn=dr.find(h=>h.type==='in');
+    if(inn){
+      const[eh,em]=sch.entry.split(':').map(Number);
+      const exp=new Date(date);exp.setHours(eh,em+tol,0,0);
+      if(new Date(inn.ts)>exp)late++;
+    }
+  }
+  const lateNotes=recs.filter(r=>r.type==='in'&&r.note).map(r=>`${fmtDate(r.ts)}: ${r.note}`);
+  const att=days.size+abs>0?((days.size/(days.size+abs))*100):0;
+  const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));
+  const payInfo=calcPay(emp,y,m),annual=annualExtraHours(emp,y);
+  return{emp,recs,days:days.size,hrs,breaks,late,abs,lateNotes,att,vacLeft,annual,...payInfo};
+}
 function renderReports(){
   const tx=TL('rep');
   const y=repMD.getFullYear(),m=repMD.getMonth();
   document.getElementById('rep-mlbl').textContent=fmtMonth(repMD);
-  const tol=DB.settings?.lateTol||10;
   if(!DB.employees.length){document.getElementById('rep-content').innerHTML=`<div class="empty-state"><h3>${tx.emptyTitle}</h3><p>${tx.emptyText}</p></div>`;return;}
-  const year=new Date().getFullYear();
-  const annual=DB.employees.map(emp=>({emp,extra:annualExtraHours(emp,year)}));
-  const annualHTML=`<div class="card" style="border-color:rgba(245,158,11,.35)"><div class="card-header">Banco anual horas extra ${year}</div>${annual.map(({emp,extra})=>`<div class="rrow"><span>${safeEmpName(emp)}</span><span class="fw8" style="color:${extra>0?'var(--orange)':'var(--text3)'}">${extra.toFixed(1)}h · ${(extra/8.4).toFixed(1)}j</span></div>`).join('')}<div class="fs11 muted mt12">Referencia: 1 día = 8.4h. Las pausas no remuneradas ya se descuentan.</div></div>`;
-  document.getElementById('rep-content').innerHTML=annualHTML+DB.employees.map(emp=>{
-    const recs=DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===y&&d.getMonth()===m;});
-    const days=new Set(recs.map(h=>new Date(h.ts).toDateString()));
-    let hrs=0,breaks=0;for(const ds of days){const dt=new Date(ds),w=workedOn(emp.id,dt);if(w)hrs+=w;breaks+=breakMinutesOn(emp.id,dt)/60;}
-    const dim=new Date(y,m+1,0).getDate();let late=0,abs=0;
-    const lateNotes=[];
-    for(let d=1;d<=dim;d++){const date=new Date(y,m,d);if(date>new Date())continue;const dow=date.getDay(),sch=emp.schedules?.[dow];if(!sch?.enabled)continue;const dr=recs.filter(h=>sameDay(h.ts,date));if(!dr.length&&!getAbs(emp.id,date)){abs++;continue;}const inn=dr.find(h=>h.type==='in');if(inn){const[eh,em]=sch.entry.split(':').map(Number);const exp=new Date(date);exp.setHours(eh,em+tol,0,0);if(new Date(inn.ts)>exp)late++;}}
-    recs.filter(r=>r.type==='in'&&r.note).forEach(r=>lateNotes.push(`${fmtDate(r.ts)}: ${r.note}`));
-    const att=days.size+abs>0?((days.size/(days.size+abs))*100).toFixed(0):0;
-    const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));
-    const payInfo=calcPay(emp,y,m),ot=payInfo.ot,pay=payInfo.pay;
-    const ac=Number(att)>=80?'var(--green)':Number(att)>=60?'var(--orange)':'var(--red)';
-    return`<div class="card mb8"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">${mkAv(emp,'av-36')}<div><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">${[[tx.workedDays,days.size,'var(--green)'],[tx.hours,hrs.toFixed(1)+'h','var(--brand)'],['Pausas',breaks.toFixed(1)+'h','var(--orange)'],[tx.late,late,'var(--orange)'],[tx.absences,abs,'var(--red)'],[tx.overtime,ot>0?'+'+ot.toFixed(1)+'h':'0h',ot>0?'var(--red)':'var(--text3)'],[tx.vacLeft,vacLeft+'j','var(--orange)'],['Extra anual',annualExtraHours(emp,year).toFixed(1)+'h','var(--cyan)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div></div>`).join('')}</div>${lateNotes.length?`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:9px 10px;margin-bottom:10px">${lateNotes.map(n=>`<div class="fs11" style="color:var(--orange)">${esc(n)}</div>`).join('')}</div>`:''}${pay>0?`<div class="flex-b fs12 mb8"><span class="muted">${tx.salary}</span><span style="font-weight:800;color:var(--green)">CHF ${pay.toFixed(2)}</span></div>`:''}<div class="flex-b fs11 mb4"><span class="muted">${tx.attendance}</span><span style="font-weight:700;color:${ac}">${att}%</span></div><div class="prog"><div class="prog-fill" style="width:${att}%;background:${ac}"></div></div></div>`;
+  const rows=DB.employees.map(emp=>monthlyEmployeeReport(emp,y,m));
+  const totalPay=rows.reduce((s,r)=>s+r.pay,0),totalHrs=rows.reduce((s,r)=>s+r.hrs,0),totalBreaks=rows.reduce((s,r)=>s+r.breaks,0);
+  const totalLate=rows.reduce((s,r)=>s+r.late,0),totalAbs=rows.reduce((s,r)=>s+r.abs,0),totalOt=rows.reduce((s,r)=>s+r.ot,0);
+  const avgAtt=rows.length?rows.reduce((s,r)=>s+r.att,0)/rows.length:0;
+  const summaryHTML=`<div class="card" style="border-color:rgba(79,109,245,.35)"><div class="card-header">Paquete mensual · ${fmtMonth(repMD)}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${[['Salarios','CHF '+totalPay.toFixed(2),'var(--green)'],['Horas netas',totalHrs.toFixed(1)+'h','var(--brand)'],['Pausas descontadas',totalBreaks.toFixed(1)+'h','var(--orange)'],['H. extra mes',totalOt.toFixed(1)+'h',totalOt>0?'var(--red)':'var(--text3)'],['Retardos',totalLate,'var(--orange)'],['Ausencias',totalAbs,'var(--red)'],['Presencia promedio',avgAtt.toFixed(0)+'%',avgAtt>=80?'var(--green)':avgAtt>=60?'var(--orange)':'var(--red)'],['Empleados',rows.length,'var(--cyan)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div></div>`).join('')}</div><div class="fs11 muted mt12">Incluye salarios estimados, asistencia, pausas no remuneradas, retardos, ausencias y banco de horas.</div></div>`;
+  const annualHTML=`<div class="card" style="border-color:rgba(245,158,11,.35)"><div class="card-header">Banco anual horas extra ${y}</div>${rows.map(({emp,annual})=>`<div class="rrow"><span>${safeEmpName(emp)}</span><span class="fw8" style="color:${annual>0?'var(--orange)':'var(--text3)'}">${annual.toFixed(1)}h · ${(annual/8.4).toFixed(1)}j</span></div>`).join('')}<div class="fs11 muted mt12">Referencia: 1 día = 8.4h. Las pausas no remuneradas ya se descuentan.</div></div>`;
+  document.getElementById('rep-content').innerHTML=summaryHTML+annualHTML+rows.map(r=>{
+    const {emp,days,hrs,breaks,late,abs,lateNotes,att,vacLeft,annual,ot,pay}=r;
+    const ac=att>=80?'var(--green)':att>=60?'var(--orange)':'var(--red)';
+    return`<div class="card mb8"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">${mkAv(emp,'av-36')}<div><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">${[[tx.workedDays,days,'var(--green)'],[tx.hours,hrs.toFixed(1)+'h','var(--brand)'],['Pausas',breaks.toFixed(1)+'h','var(--orange)'],[tx.late,late,'var(--orange)'],[tx.absences,abs,'var(--red)'],[tx.overtime,ot>0?'+'+ot.toFixed(1)+'h':'0h',ot>0?'var(--red)':'var(--text3)'],[tx.vacLeft,vacLeft+'j','var(--orange)'],['Extra anual',annual.toFixed(1)+'h','var(--cyan)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div></div>`).join('')}</div>${lateNotes.length?`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:9px 10px;margin-bottom:10px">${lateNotes.map(n=>`<div class="fs11" style="color:var(--orange)">${esc(n)}</div>`).join('')}</div>`:''}<div class="flex-b fs12 mb8"><span class="muted">${payModeLabel(emp)} · ${payBaseLabel(emp)}</span><span style="font-weight:800;color:var(--green)">CHF ${pay.toFixed(2)}</span></div><div class="flex-b fs11 mb4"><span class="muted">${tx.attendance}</span><span style="font-weight:700;color:${ac}">${att.toFixed(0)}%</span></div><div class="prog"><div class="prog-fill" style="width:${att.toFixed(0)}%;background:${ac}"></div></div></div>`;
   }).join('');
 }
 
@@ -2526,8 +2552,8 @@ async function deleteAllConfirm(){
 
 // ═══════ EXPORT ═══════
 const dl=(content,name,type)=>{const b=new Blob([content],{type}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);};
-function exportPayCSV(){const y=payMD.getFullYear(),m=payMD.getMonth();let csv=`Employé,Poste,Type,Taux,Heures,H.Supp,Salaire\n`;DB.employees.forEach(emp=>{const{hrs,ot,pay}=calcPay(emp,y,m);csv+=[csvCell(fullName(emp)),csvCell(emp.position),csvCell(emp.payType==='hourly'?'Horaire':'Mensuel'),csvCell(`CHF ${emp.payType==='hourly'?emp.rate:emp.salary}`),hrs.toFixed(2),ot.toFixed(2),csvCell(`CHF ${pay.toFixed(2)}`)].join(',')+'\n';});dl(csv,`salaires_${fmtMonth(payMD).replace(' ','_')}.csv`,'text/csv');}
-function exportRepCSV(){const y=repMD.getFullYear(),m=repMD.getMonth(),year=new Date().getFullYear();let csv=`Employé,Poste,Jours,Heures nettes,Pauses,Retards,Absences,Vac.rest.,Extra annuel,Repos équiv. jours\n`;DB.employees.forEach(emp=>{const recs=DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===y&&d.getMonth()===m;});const days=new Set(recs.map(h=>new Date(h.ts).toDateString()));let hrs=0,breaks=0;for(const ds of days){const dt=new Date(ds),w=workedOn(emp.id,dt);if(w)hrs+=w;breaks+=breakMinutesOn(emp.id,dt)/60;}const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id)),annual=annualExtraHours(emp,year);csv+=[csvCell(fullName(emp)),csvCell(emp.position),days.size,hrs.toFixed(2),breaks.toFixed(2),0,0,vacLeft,annual.toFixed(2),(annual/8.4).toFixed(2)].join(',')+'\n';});dl(csv,`rapport_${fmtMonth(repMD).replace(' ','_')}.csv`,'text/csv');}
+function exportPayCSV(){const y=payMD.getFullYear(),m=payMD.getMonth();let csv=`Employé,Poste,Contrat,Type salaire,Base salaire,Heures,H.Supp,Salaire estimé\n`;DB.employees.forEach(emp=>{const{hrs,ot,pay}=calcPay(emp,y,m);csv+=[csvCell(fullName(emp)),csvCell(emp.position),csvCell(emp.contract),csvCell(payModeLabel(emp)),csvCell(payBaseLabel(emp)),hrs.toFixed(2),ot.toFixed(2),csvCell(`CHF ${pay.toFixed(2)}`)].join(',')+'\n';});dl(csv,`salaires_${fmtMonth(payMD).replace(' ','_')}.csv`,'text/csv');}
+function exportRepCSV(){const y=repMD.getFullYear(),m=repMD.getMonth();let csv=`Employé,Poste,Contrat,Type salaire,Base salaire,Jours,Heures nettes,Pauses,Retards,Absences,Présence %,H.Supp mois,Salaire estimé,Vac.rest.,Extra annuel,Repos équiv. jours,Commentaires retard\n`;DB.employees.map(emp=>monthlyEmployeeReport(emp,y,m)).forEach(r=>{csv+=[csvCell(fullName(r.emp)),csvCell(r.emp.position),csvCell(r.emp.contract),csvCell(payModeLabel(r.emp)),csvCell(payBaseLabel(r.emp)),r.days,r.hrs.toFixed(2),r.breaks.toFixed(2),r.late,r.abs,r.att.toFixed(0),r.ot.toFixed(2),csvCell(`CHF ${r.pay.toFixed(2)}`),r.vacLeft,r.annual.toFixed(2),(r.annual/8.4).toFixed(2),csvCell(r.lateNotes.join(' | '))].join(',')+'\n';});dl(csv,`paquete_mensual_${fmtMonth(repMD).replace(' ','_')}.csv`,'text/csv');}
 function exportAllJSON(){dl(JSON.stringify(DB,null,2),'hrmanagerpro_backup.json','application/json');}
 async function exportMasterJSON(){
   if(currentUser?.role!=='super_admin'){toast('Réservé au super admin','#ef4444');return;}
