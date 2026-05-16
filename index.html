@@ -461,6 +461,9 @@ input[type=date],input[type=time]{color-scheme:dark}
   </button>
   <div class="top-title" id="page-title">Dashboard</div>
   <div class="top-actions">
+    <button class="top-btn" id="refresh-btn" onclick="manualRefresh()" title="Actualizar datos">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a9 9 0 0 1 14.8-3.4L23 10"/><path d="M20.5 15a9 9 0 0 1-14.8 3.4L1 14"/></svg>
+    </button>
     <button class="top-btn" onclick="openScanner()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       QR
@@ -1360,6 +1363,7 @@ async function checkPin(){
 
 function logout(){
   if(empClockTimer){clearInterval(empClockTimer);empClockTimer=null;}
+  stopAutoRefresh();
   sb.auth?.signOut?.().catch?.(()=>{});
   currentUser=null;
   document.getElementById('topbar').style.display='none';
@@ -1392,12 +1396,14 @@ function showManagerUI(){
   document.getElementById('master-nav').style.display=currentUser.role==='super_admin'?'block':'none';
   applyBrand();applyUITexts();renderAll();
   if(currentUser.role==='super_admin')renderMaster();
+  startAutoRefresh();
 }
 
 function showEmpUI(emp){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('emp-view').classList.add('open');
   renderEmpView(emp);
+  startAutoRefresh();
 }
 
 async function loadEmployeePortal(emp){
@@ -2057,6 +2063,76 @@ function renderPage(p){
   if(p==='master')renderMaster();
 }
 function renderAll(){renderDash();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();}
+
+// ═══════ REFRESH ═══════
+let autoRefreshTimer=null,refreshing=false,lastAutoRefreshAt=0,lastEditAt=0;
+const AUTO_REFRESH_TICK=15000;
+function markEditing(){lastEditAt=Date.now();}
+function isEditingForm(){
+  const a=document.activeElement;
+  return !!(a&&a.matches?.('input,textarea,select,[contenteditable="true"]'));
+}
+function hasOpenModal(){return !!document.querySelector('.ov.open');}
+function refreshDelay(){
+  if(currentUser?.role==='employee')return 45000;
+  if(['dashboard','attendance'].includes(currentPage))return 30000;
+  if(['employees','shifts','vacations'].includes(currentPage))return 60000;
+  return 120000;
+}
+function canAutoRefresh(){
+  if(!currentUser||document.hidden||refreshing)return false;
+  if(hasOpenModal()||isEditingForm())return false;
+  if(Date.now()-lastEditAt<5000)return false;
+  return Date.now()-lastAutoRefreshAt>=refreshDelay();
+}
+function setRefreshState(state){
+  const btn=document.getElementById('refresh-btn');if(!btn)return;
+  btn.style.opacity=state==='loading'?'.55':'';
+  btn.style.pointerEvents=state==='loading'?'none':'';
+  btn.title=state==='loading'?'Actualizando datos':'Actualizar datos';
+}
+async function refreshNow(force=false){
+  if(!currentUser||refreshing)return false;
+  if(!force&&!canAutoRefresh())return false;
+  refreshing=true;setRefreshState('loading');
+  try{
+    let ok=true;
+    if(currentUser.role==='employee'){
+      const emp=currentUser.emp;
+      if(emp?.email&&emp?.pin)await loadEmployeePortal(emp);
+      const fresh=DB.employees.find(e=>e.id===emp?.id)||emp;
+      currentUser.emp=fresh;
+      renderEmpView(fresh);
+    }else{
+      ok=await loadSB();
+      if(ok&&DB.settings?.status==='frozen'){toast('Acceso congelado. Contacta a HR Manager Pro.','#ef4444');logout();return false;}
+      if(currentUser.role==='super_admin'&&currentPage==='master')await loadMaster();
+      applyBrand();applyUITexts();renderPage(currentPage);
+    }
+    lastAutoRefreshAt=Date.now();
+    if(force)toast(ok?'Datos actualizados':'No se pudo actualizar',ok?'#10b981':'#ef4444');
+    return ok;
+  }catch(e){
+    console.warn('Refresh error:',e);
+    if(force)toast('No se pudo actualizar','#ef4444');
+    return false;
+  }finally{
+    refreshing=false;setRefreshState('idle');
+  }
+}
+function manualRefresh(){refreshNow(true);}
+function startAutoRefresh(){
+  stopAutoRefresh();
+  lastAutoRefreshAt=Date.now();
+  autoRefreshTimer=setInterval(()=>refreshNow(false),AUTO_REFRESH_TICK);
+}
+function stopAutoRefresh(){
+  if(autoRefreshTimer){clearInterval(autoRefreshTimer);autoRefreshTimer=null;}
+  refreshing=false;setRefreshState('idle');
+}
+document.addEventListener('input',e=>{if(e.target?.matches?.('input,textarea,select,[contenteditable="true"]'))markEditing();});
+document.addEventListener('focusin',e=>{if(e.target?.matches?.('input,textarea,select,[contenteditable="true"]'))markEditing();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshNow(false);});
 
 // ═══════ DASHBOARD ═══════
 function renderDash(){
