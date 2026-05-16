@@ -121,11 +121,13 @@ alter table public.restaurants add column if not exists emoji text default '🍽
 alter table public.restaurants add column if not exists brand_color text default '#4f6ef7';
 alter table public.restaurants add column if not exists brand_color2 text default '#7c3aed';
 alter table public.restaurants add column if not exists status text default 'active';
+alter table public.restaurants add column if not exists opening_hours jsonb default '{}'::jsonb;
 update public.employees set pin = '0000' where pin is null or pin = '';
 update public.restaurants set emoji = '🍽️' where emoji is null or emoji = '';
 update public.restaurants set brand_color = '#4f6ef7' where brand_color is null or brand_color = '';
 update public.restaurants set brand_color2 = '#7c3aed' where brand_color2 is null or brand_color2 = '';
 update public.restaurants set status = 'active' where status is null or status = '';
+update public.restaurants set opening_hours = '{}'::jsonb where opening_hours is null;
 create unique index if not exists shifts_employee_date_unique on public.shifts(employee_id, shift_date);
 
 -- Employee self-service login by email + PIN.

@@ -633,6 +633,13 @@ input[type=date],input[type=time]{color-scheme:dark}
   </div>
   <div class="card">
     <div class="card-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Días de apertura
+    </div>
+    <div id="opening-hours-box"></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       Langue
     </div>
@@ -921,7 +928,7 @@ Object.assign(UI.it.pay,{export:'Esporta Excel'});Object.assign(UI.it.rep,{expor
 // ═══════ DB ═══════
 let DB={
   employees:[],history:[],absences:[],shifts:{},
-  settings:{company:'Mon Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed'}
+  settings:{company:'Mon Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],stats:{}};
 function loadLocal(){try{const s=localStorage.getItem('hrm_pro');if(s)DB={...DB,...JSON.parse(s)};}catch(e){}}
@@ -959,7 +966,7 @@ async function loadSB(){
     if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp,note:x.note||''}));
     if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     if(sh.data){DB.shifts={};sh.data.forEach(x=>{DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,notes:x.notes||''};});}
-    if(r.data){DB.settings={company:r.data.name||'Mon Restaurant',emoji:r.data.emoji||'🍽️',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active'};lang=DB.settings.lang;}
+    if(r.data){DB.settings={company:r.data.name||'Mon Restaurant',emoji:r.data.emoji||'🍽️',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active',openingHours:r.data.opening_hours||defOpeningHours()};lang=DB.settings.lang;}
     saveLocal();return true;
   }catch(e){console.warn('SB error:',e);return false;}
 }
@@ -997,7 +1004,7 @@ async function sbDelAttendanceDay(empId,dateStr){
 }
 async function sbSaveAbs(a){await sb.from('absences').upsert({id:a.id,restaurant_id:REST_ID,employee_id:a.empId,type:a.type,start_date:a.start,end_date:a.end,approved:a.approved,notes:a.notes||''});}
 async function sbSaveShift(key,sh){const[eId,date]=key.split('_');await sb.from('shifts').upsert({restaurant_id:REST_ID,employee_id:eId,shift_date:date,shift_type:sh.type,start_time:sh.in||null,end_time:sh.out||null,notes:sh.notes||''},{onConflict:'employee_id,shift_date'});}
-async function sbSaveSettings(s){await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2}).eq('id',REST_ID);}
+async function sbSaveSettings(s){await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours()}).eq('id',REST_ID);}
 async function sbUpdateAbsApproved(id,approved){await sb.from('absences').update({approved}).eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDelAbs(id){await sb.from('absences').delete().eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDeleteAll(){
@@ -1017,7 +1024,7 @@ async function sbSetRestaurantStatus(id,status){
   if(error)throw error;
 }
 async function sbCreateRestaurant(name,email){
-  const {data,error}=await sb.from('restaurants').insert({name,emoji:'🍽️',currency:'CHF',late_tolerance:10,max_hours_week:45,lang:'fr',brand_color:'#4f6ef7',brand_color2:'#7c3aed'}).select('*').single();
+  const {data,error}=await sb.from('restaurants').insert({name,emoji:'🍽️',currency:'CHF',late_tolerance:10,max_hours_week:45,lang:'fr',brand_color:'#4f6ef7',brand_color2:'#7c3aed',opening_hours:defOpeningHours()}).select('*').single();
   if(error)throw error;
   return data;
 }
@@ -1115,6 +1122,29 @@ function saveCfg(k,v){
   if(k==='company')document.getElementById('sb-rn').textContent=v;
   sbSaveSettings(DB.settings).catch(console.error);
 }
+function defOpeningHours(){const h={};for(let i=0;i<7;i++)h[i]={open:i>=1&&i<=6,start:'09:00',end:'23:00'};return h;}
+function restaurantDay(date){const h=DB.settings.openingHours||defOpeningHours();return h[new Date(date).getDay()]||{open:true,start:'09:00',end:'23:00'};}
+function isRestaurantOpen(date){return restaurantDay(date).open!==false;}
+function saveOpeningDay(i){
+  const h=DB.settings.openingHours||defOpeningHours();
+  h[i]={open:document.getElementById(`ro-${i}`)?.classList.contains('on')||false,start:document.getElementById(`rs-${i}`)?.value||'09:00',end:document.getElementById(`re-${i}`)?.value||'23:00'};
+  DB.settings.openingHours=h;saveLocal();renderOpeningHours();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);
+}
+function renderOpeningHours(){
+  const box=document.getElementById('opening-hours-box');if(!box)return;
+  const h=DB.settings.openingHours||defOpeningHours();
+  box.innerHTML=L().daysFull.map((d,i)=>{const v=h[i]||{open:true,start:'09:00',end:'23:00'};return`
+    <div style="background:var(--s3);border-radius:var(--r3);padding:10px 12px;margin-bottom:6px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:${v.open!==false?'10px':'0'}">
+        <span style="font-weight:700;font-size:13px">${esc(d)}</span>
+        <div class="tgl ${v.open!==false?'on':''}" id="ro-${i}" onclick="this.classList.toggle('on');saveOpeningDay(${i})"></div>
+      </div>
+      <div style="display:${v.open!==false?'grid':'none'};grid-template-columns:1fr 1fr;gap:8px">
+        <div class="fg" style="margin:0"><label>Apertura</label><input type="time" id="rs-${i}" value="${esc(v.start||'09:00')}" onchange="saveOpeningDay(${i})"></div>
+        <div class="fg" style="margin:0"><label>Cierre</label><input type="time" id="re-${i}" value="${esc(v.end||'23:00')}" onchange="saveOpeningDay(${i})"></div>
+      </div>
+    </div>`;}).join('');
+}
 
 function renderLangBar(){
   const bar=document.getElementById('lang-bar');if(!bar)return;
@@ -1168,17 +1198,18 @@ function applyUITexts(){
   const settingsHeaders=document.querySelectorAll('#pg-settings .card-header');
   if(settingsHeaders[0])settingsHeaders[0].lastChild.textContent=' '+set.restaurant;
   if(settingsHeaders[1])settingsHeaders[1].lastChild.textContent=' '+set.configuration;
-  if(settingsHeaders[2])settingsHeaders[2].lastChild.textContent=' '+set.language;
-  if(settingsHeaders[3])settingsHeaders[3].lastChild.textContent=' '+set.law;
-  if(settingsHeaders[4])settingsHeaders[4].lastChild.textContent=' '+set.data;
+  if(settingsHeaders[2])settingsHeaders[2].lastChild.textContent=' Días de apertura';
+  if(settingsHeaders[3])settingsHeaders[3].lastChild.textContent=' '+set.language;
+  if(settingsHeaders[4])settingsHeaders[4].lastChild.textContent=' '+set.law;
+  if(settingsHeaders[5])settingsHeaders[5].lastChild.textContent=' '+set.data;
   const cfgCompany=document.querySelector('#cfg-company')?.closest('.fg')?.querySelector('label');if(cfgCompany)cfgCompany.textContent=set.companyName;
   const cfgEmoji=document.querySelector('#pg-settings > .card:first-child .fg:nth-of-type(2) label');if(cfgEmoji)cfgEmoji.textContent=set.emoji;
   const cfgBrand=document.querySelector('#color-picker')?.closest('.fg')?.querySelector('label');if(cfgBrand)cfgBrand.textContent=set.brand;
   const cfgLate=document.getElementById('cfg-late')?.closest('.fg')?.querySelector('label');if(cfgLate)cfgLate.textContent=set.lateTol;
   const cfgMax=document.getElementById('cfg-maxh')?.closest('.fg')?.querySelector('label');if(cfgMax)cfgMax.textContent=set.maxHours;
-  const lawRows=document.querySelectorAll('#pg-settings .card:nth-of-type(4) .rrow .muted');
+  const lawRows=document.querySelectorAll('#pg-settings .card:nth-of-type(5) .rrow .muted');
   [set.legalMax,set.legalOvertime,set.legalNight,set.legalSunday,set.legalRest,set.legalVac].forEach((v,i)=>{if(lawRows[i])lawRows[i].textContent=v;});
-  const dataBtns=document.querySelectorAll('#pg-settings .card:nth-of-type(5) .btn');if(dataBtns[0])dataBtns[0].textContent='⬇️ '+set.exportAll;if(dataBtns[1])dataBtns[1].textContent='🗑 '+set.deleteAll;
+  const dataBtns=document.querySelectorAll('#pg-settings .card:nth-of-type(6) .btn');if(dataBtns[0])dataBtns[0].textContent='⬇️ '+set.exportAll;if(dataBtns[1])dataBtns[1].textContent='🗑 '+set.deleteAll;
   const masterHeader=document.querySelector('#pg-master .card-header');if(masterHeader)masterHeader.lastChild.textContent=' '+master.console;
   const masterTitle=document.querySelector('#pg-master .fw8');if(masterTitle)masterTitle.textContent=master.title;
   const masterBtns=document.querySelectorAll('#pg-master > .card:first-child .btn');if(masterBtns[0])masterBtns[0].textContent=master.backup;if(masterBtns[1])masterBtns[1].textContent=master.refresh;
@@ -1478,6 +1509,7 @@ function dayStatus(emp,date){
   const d=new Date(date);d.setHours(0,0,0,0);
   const today=todayStart(),dow=d.getDay(),sch=emp.schedules?.[dow];
   const abs=getAbs(emp.id,date);
+  if(!isRestaurantOpen(date))return{type:'free',sub:'closed'};
   if(abs)return{type:'absent',sub:abs.type};
   const hasRec=DB.history.some(h=>h.empId===emp.id&&sameDay(h.ts,date));
   if(hasRec)return{type:'worked'};
@@ -1486,6 +1518,7 @@ function dayStatus(emp,date){
   return{type:'free'};
 }
 function isLate(emp,date){
+  if(!isRestaurantOpen(date))return false;
   const sch=emp.schedules?.[new Date(date).getDay()];if(!sch?.enabled)return false;
   const recs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,date));
   const inn=recs.find(h=>h.type==='in');if(!inn)return false;
@@ -1494,6 +1527,7 @@ function isLate(emp,date){
   return new Date(inn.ts)>exp;
 }
 function wouldBeLate(emp,date=new Date()){
+  if(!isRestaurantOpen(date))return false;
   const sch=emp.schedules?.[date.getDay()];if(!sch?.enabled||!sch.entry)return false;
   const[eh,em]=sch.entry.split(':').map(Number);
   const exp=new Date(date);exp.setHours(eh,em+(DB.settings?.lateTol||10),0,0);
@@ -2030,7 +2064,7 @@ function renderDash(){
   const now=new Date(),dow=now.getDay();
   const active=DB.employees.filter(e=>e.status==='active');
   const present=active.filter(e=>DB.history.some(h=>h.empId===e.id&&sameDay(h.ts,now)));
-  const scheduled=active.filter(e=>e.schedules?.[dow]?.enabled);
+  const scheduled=isRestaurantOpen(now)?active.filter(e=>e.schedules?.[dow]?.enabled):[];
   const missing=scheduled.filter(e=>!present.some(p=>p.id===e.id)&&!getAbs(e.id,now));
   const onVac=active.filter(e=>getAbs(e.id,now)?.type==='vacation');
 
@@ -2108,7 +2142,7 @@ function renderAtt(){
   const now=new Date(),dow=now.getDay();
   document.getElementById('att-date').textContent=now.toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'});
   const active=DB.employees.filter(e=>e.status==='active');
-  const sched=active.filter(e=>e.schedules?.[dow]?.enabled);
+  const sched=isRestaurantOpen(now)?active.filter(e=>e.schedules?.[dow]?.enabled):[];
   const present=active.filter(e=>DB.history.some(h=>h.empId===e.id&&sameDay(h.ts,now)));
   document.getElementById('att-kpi').innerHTML=`
     <div class="kpi"><div class="kpi-glow" style="background:var(--green)"></div>
@@ -2210,6 +2244,21 @@ function renderSchedEd(sched){
 }
 function toggleSD(i){const t=document.getElementById(`st-${i}`),m=document.getElementById(`stimes-${i}`);t.classList.toggle('on');m.style.display=t.classList.contains('on')?'grid':'none';}
 function getSchedEd(){const s={};for(let i=0;i<7;i++){const on=document.getElementById(`st-${i}`)?.classList.contains('on')||false;s[i]={enabled:on,entry:document.getElementById(`se-${i}`)?.value||'09:00',exit:document.getElementById(`sx-${i}`)?.value||'17:00'};}return s;}
+function seedVisibleWeekFromSchedule(emp){
+  if(!emp?.id||!emp.schedules)return;
+  for(let i=0;i<7;i++){
+    const d=new Date(shiftWS.getTime()+i*86400000),ds=d.toISOString().split('T')[0],key=`${emp.id}_${ds}`;
+    if(DB.shifts[key]&&DB.shifts[key].notes!=='Horaire de base')continue;
+    const sch=emp.schedules[d.getDay()];
+    if(sch?.enabled){
+      DB.shifts[key]={type:'morning',in:sch.entry||'09:00',out:sch.exit||'17:00',notes:'Horaire de base'};
+      sbSaveShift(key,DB.shifts[key]).catch(console.error);
+    }else if(DB.shifts[key]?.notes==='Horaire de base'){
+      DB.shifts[key]={type:'off',in:null,out:null,notes:'Horaire de base'};
+      sbSaveShift(key,DB.shifts[key]).catch(console.error);
+    }
+  }
+}
 function saveEmp(){
   const name=clean(document.getElementById('ef-name').value);
   if(!name){toast('Le prénom est obligatoire','#ef4444');return;}
@@ -2222,6 +2271,7 @@ function saveEmp(){
   const data={id:editEmpId||uid(),name,last:clean(document.getElementById('ef-last').value),num:clean(document.getElementById('ef-num').value),position:clean(document.getElementById('ef-pos').value),dept:clean(document.getElementById('ef-dept').value),startDate:document.getElementById('ef-start').value,phone:clean(document.getElementById('ef-phone').value),email:empEmail,contract:clean(document.getElementById('ef-contract').value),status:document.getElementById('ef-status').value,payType,rate:payType==='hourly'?rateVal:0,salary:payType==='monthly'?rateVal:0,vacWeeks:parseInt(document.getElementById('ef-vac').value)||5,avs:clean(document.getElementById('ef-avs').value),emergency:clean(document.getElementById('ef-emergency').value),notes:clean(document.getElementById('ef-notes').value),photo:photoData,schedules:getSchedEd(),pin:generatedPin,color:editEmpId?(existing?.color||EMP_COLORS[DB.employees.length%EMP_COLORS.length]):EMP_COLORS[DB.employees.length%EMP_COLORS.length]};
   if(editEmpId){const i=DB.employees.findIndex(e=>e.id===editEmpId);if(i>=0)DB.employees[i]={...DB.employees[i],...data};}
   else DB.employees.push(data);
+  seedVisibleWeekFromSchedule(data);
   saveLocal();closeModal('emp-modal');renderPage(currentPage);
   toast((editEmpId?'✅ Employé mis à jour':'✅ Employé ajouté')+(!typedPin&&!existing?.pin?` · PIN ${generatedPin}`:''));
   sbSaveEmp(data).catch(console.error);
@@ -2236,6 +2286,7 @@ function openDetail(empId){
   const seniority=startDays<30?`${startDays}j`:startDays<365?`${Math.floor(startDays/30)}m`:`${Math.floor(startDays/365)}a`;
   const sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
   const c=empColor(emp);
+  const schedHTML=L().daysFull.map((d,i)=>{const sch=emp.schedules?.[i];return`<div class="rrow"><span class="muted">${esc(d)}</span><span style="font-weight:700;text-align:right;color:${sch?.enabled?'var(--text)':'var(--text3)'}">${sch?.enabled?`${esc(sch.entry||'09:00')} - ${esc(sch.exit||'17:00')}`:'Libre'}</span></div>`;}).join('');
 
   document.getElementById('detail-content').innerHTML=`
     <div class="modal-handle"></div>
@@ -2297,6 +2348,11 @@ function openDetail(empId){
         ${[['Téléphone',emp.phone],['Email',emp.email],['Contrat',emp.contract],['Salaire',`${emp.payType==='hourly'?'Horaire':'Mensuel'} · CHF ${emp.payType==='hourly'?emp.rate+'/h':emp.salary+'/mois'}`],['Vacances',`${emp.vacWeeks} sem. · ${vacLeft}j restants`],['Urgence',emp.emergency],['AVS',emp.avs]].filter(r=>r[1]).map(([l,v])=>`<div class="rrow"><span class="muted">${esc(l)}</span><span style="font-weight:500;text-align:right;max-width:55%">${esc(v)}</span></div>`).join('')}
         ${emp.notes?`<div style="background:var(--s3);border-radius:var(--r3);padding:10px;margin-top:8px;font-size:12px;color:var(--text2)">${esc(emp.notes)}</div>`:''}
       </div>
+      <div class="card">
+        <div class="card-header">Horario semanal base</div>
+        ${schedHTML}
+        <button class="btn btn-primary mt12" onclick="closeModal('detail-modal');openEmpModal('${empId}')">Editar horario permanente</button>
+      </div>
       <div style="display:flex;gap:8px;margin-top:10px">
         <button class="btn btn-ghost" onclick="closeModal('detail-modal');openEmpModal('${empId}')">✏️ Modifier</button>
         <button class="btn btn-ghost" style="color:var(--red)" onclick="deleteEmp('${empId}')">🗑 Supprimer</button>
@@ -2312,6 +2368,14 @@ function deleteEmp(id){if(!confirm('Supprimer cet employé?'))return;DB.employee
 // ═══════ SHIFTS ═══════
 let shiftWS=getMonday(new Date()),shiftKey=null,shiftType='morning';
 function shiftWN(dir){shiftWS=new Date(shiftWS.getTime()+dir*7*86400000);renderShifts();}
+function shiftLabel(sh){
+  if(!sh)return '—';
+  if(sh.type==='closed')return 'Cerrado';
+  if(sh.type==='rest')return 'Repos';
+  if(sh.type==='off')return 'Libre';
+  if(sh.type==='abs')return 'ABS';
+  return `${sh.in||'09:00'}-${sh.out||'17:00'}`;
+}
 function renderShifts(){
   const tx=TL('shift');
   const dates=Array.from({length:7},(_,i)=>new Date(shiftWS.getTime()+i*86400000));
@@ -2322,7 +2386,15 @@ function renderShifts(){
   if(!active.length){document.getElementById('shift-grid').innerHTML=`<div class="empty-state" style="padding:24px"><h3>${tx.none}</h3></div>`;return;}
   document.getElementById('shift-grid').innerHTML=active.map(emp=>{
     let row=`<div class="shift-row" style="grid-template-columns:${cols}"><div style="display:flex;align-items:center;gap:6px;min-width:0">${mkAv(emp,'av-28')}<span style="font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${emp.name}</span></div>`;
-    dates.forEach(d=>{const key=`${emp.id}_${d.toISOString().split('T')[0]}`,sh=DB.shifts[key],abs=getAbs(emp.id,d);let type='off',lbl='—';if(abs){type='abs';lbl='ABS';}else if(sh){type=sh.type;const m={morning:'AM',afternoon:'PM',evening:'SOI',night:'NOC',rest:'DSC',off:'—'};lbl=m[sh.type]||'?';}else if(emp.schedules?.[d.getDay()]?.enabled){type='morning';lbl='?';}row+=`<div class="s-cell ${type}" onclick="openShiftModal('${emp.id}','${d.toISOString().split('T')[0]}')">${lbl}</div>`;});
+    dates.forEach(d=>{
+      const ds=d.toISOString().split('T')[0],key=`${emp.id}_${ds}`,manual=DB.shifts[key],sch=emp.schedules?.[d.getDay()],abs=getAbs(emp.id,d);
+      let sh=null,type='off';
+      if(!isRestaurantOpen(d)){sh={type:'closed'};type='off';}
+      else if(abs){sh={type:'abs'};type='abs';}
+      else if(manual){sh=manual;type=manual.type;}
+      else if(sch?.enabled){sh={type:'morning',in:sch.entry||'09:00',out:sch.exit||'17:00'};type='morning';}
+      row+=`<div class="s-cell ${type}" ${sh?.type==='closed'?'':`onclick="openShiftModal(${jsArg(emp.id)},${jsArg(ds)})"`} style="font-size:10px;line-height:1.2">${shiftLabel(sh)}</div>`;
+    });
     row+='</div>';return row;
   }).join('');
 }
@@ -2413,6 +2485,7 @@ function calcPay(emp,y,m){
 function payModeLabel(emp){return emp.payType==='monthly'?'Mensuel fixe':'Horaire';}
 function payBaseLabel(emp){return emp.payType==='monthly'?`CHF ${(emp.salary||0).toFixed(2)}/mois`:`CHF ${(emp.rate||0).toFixed(2)}/h`;}
 function scheduledHoursOn(emp,date){
+  if(!isRestaurantOpen(date))return 0;
   const sch=emp.schedules?.[date.getDay()];
   if(!sch?.enabled||!sch.entry||!sch.exit)return 0;
   const [ih,im]=sch.entry.split(':').map(Number),[oh,om]=sch.exit.split(':').map(Number);
@@ -2455,6 +2528,7 @@ function monthlyEmployeeReport(emp,y,m){
   for(let d=1;d<=dim;d++){
     const date=new Date(y,m,d);
     if(date>new Date())continue;
+    if(!isRestaurantOpen(date))continue;
     const sch=emp.schedules?.[date.getDay()];
     if(!sch?.enabled)continue;
     const dr=recs.filter(h=>sameDay(h.ts,date));
@@ -2506,6 +2580,8 @@ function renderSettings(){
   document.getElementById('cfg-company').value=DB.settings?.company||'Mon Restaurant';
   document.getElementById('cfg-late').value=DB.settings?.lateTol||10;
   document.getElementById('cfg-maxh').value=DB.settings?.maxHours||45;
+  DB.settings.openingHours=DB.settings.openingHours||defOpeningHours();
+  renderOpeningHours();
   renderLangBar();
   applyUITexts();
 }
