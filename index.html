@@ -233,12 +233,16 @@ input[type=date],input[type=time]{color-scheme:dark}
 .emp-stat-lbl{font-size:10px;color:var(--text2);margin-top:3px}
 
 /* BADGE */
-.badge-card{background:var(--s1);border:1px solid var(--border);border-radius:22px;overflow:hidden;margin-bottom:16px;box-shadow:0 4px 24px rgba(0,0,0,.4)}
-.badge-header{padding:28px 24px 22px;text-align:center;position:relative}
-.badge-emp-name{font-size:22px;font-weight:800;margin-top:14px}
-.badge-emp-role{font-size:13px;opacity:.8;margin-top:4px}
+.badge-card{background:linear-gradient(180deg,#1d2755 0%,#111426 48%,#0b0d18 100%);border:1px solid rgba(92,108,180,.35);border-radius:22px;overflow:hidden;margin-bottom:16px;box-shadow:0 10px 34px rgba(0,0,0,.46)}
+.badge-header{padding:28px 24px 24px;text-align:center;position:relative;min-height:292px}
+.badge-photo{width:112px;height:112px;border-radius:28px;margin:14px auto 18px;overflow:hidden;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:34px;font-weight:900;box-shadow:0 14px 28px rgba(0,0,0,.32),0 0 0 1px rgba(255,255,255,.16)}
+.badge-photo img{width:100%;height:100%;object-fit:cover}
+.badge-kicker{font-size:10px;font-weight:800;color:rgba(255,255,255,.38);letter-spacing:2px;text-transform:uppercase}
+.badge-emp-name{font-size:23px;font-weight:850;margin-top:8px}
+.badge-emp-role{font-size:13px;opacity:.78;margin-top:5px}
 .badge-status-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border-radius:20px;padding:6px 14px;margin-top:12px;font-size:12px;font-weight:600;backdrop-filter:blur(10px)}
-.badge-body{padding:20px 24px 24px}
+.badge-body{padding:22px 24px 24px;text-align:center}
+.badge-link-pill{display:block;background:rgba(79,110,247,.13);border:1px solid rgba(79,110,247,.28);border-radius:14px;padding:12px 14px;color:#fff;font-weight:800;text-decoration:underline;text-underline-offset:3px}
 .qr-wrap{background:#fff;border-radius:16px;padding:14px;display:inline-block;box-shadow:0 2px 12px rgba(0,0,0,.3)}
 
 /* ALERT */
@@ -1507,35 +1511,50 @@ function employeeAccessUrl(emp){
 function badgeQRUrl(emp){
   return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(employeeAccessUrl(emp))}`;
 }
+function loadCanvasImage(src){
+  return new Promise(resolve=>{
+    if(!src){resolve(null);return;}
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>resolve(null);
+    img.src=src;
+  });
+}
+function drawCoverImage(ctx,img,x,y,w,h,r=0){
+  const s=Math.max(w/img.width,h/img.height),sw=w/s,sh=h/s,sx=(img.width-sw)/2,sy=(img.height-sh)/2;
+  ctx.save();
+  if(r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();ctx.clip();}
+  ctx.drawImage(img,sx,sy,sw,sh,x,y,w,h);
+  ctx.restore();
+}
 function buildBadgeCanvas(emp){
   return new Promise((resolve,reject)=>{
-  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
-  canvas.width=640;canvas.height=960;
-  const restaurant=DB.settings?.company||'Mon Restaurant',accessUrl=employeeAccessUrl(emp),qrUrl=makeQRDataURL(accessUrl,300);
-  const qrImg=new Image();
-  qrImg.onload=()=>{
-    const grad=ctx.createLinearGradient(0,0,640,960);
-    grad.addColorStop(0,DB.settings?.brandColor||'#4f6ef7');
-    grad.addColorStop(1,DB.settings?.brandColor2||'#7c3aed');
-    ctx.fillStyle=grad;ctx.fillRect(0,0,640,960);
-    ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(560,80,140,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='#ffffff';ctx.textAlign='center';
-    ctx.font='700 28px DM Sans, Arial';ctx.fillText(restaurant.toUpperCase(),320,88);
-    ctx.font='500 22px DM Sans, Arial';ctx.fillText(APP_PUBLIC_URL.replace(/^https?:\/\//,''),320,126);
-    ctx.fillStyle='rgba(255,255,255,.92)';ctx.font='800 44px DM Sans, Arial';ctx.fillText(fullName(emp),320,230);
-    ctx.fillStyle='rgba(255,255,255,.78)';ctx.font='600 28px DM Sans, Arial';ctx.fillText(emp.position||'-',320,274);
-    ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='500 22px DM Sans, Arial';ctx.fillText(`N° ${emp.num||emp.id}`,320,315);
-    roundRect(ctx,150,380,340,340,28,'#ffffff');
-    if(qrUrl)ctx.drawImage(qrImg,170,400,300,300);
-    ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='500 20px DM Sans, Arial';ctx.fillText('Scanner pour ouvrir le portail',320,770);
-    ctx.font='500 17px DM Sans, Arial';ctx.fillText('Email + PIN requis',320,800);
-    ctx.font='500 15px DM Sans, Arial';ctx.fillText('Lien cliquable dans le PDF',320,830);
-    ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,880,640,80);
-    ctx.fillStyle='#ffffff';ctx.font='700 22px DM Sans, Arial';ctx.fillText('Mananger Pro',320,928);
-    resolve(canvas);
-  };
-  qrImg.onerror=()=>reject(new Error('QR indisponible'));
-  qrImg.src=qrUrl||badgeQRUrl(emp);
+    const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+    canvas.width=640;canvas.height=960;
+    const restaurant=DB.settings?.company||'Mon Restaurant',accessUrl=employeeAccessUrl(emp),qrUrl=makeQRDataURL(accessUrl,270),brand=DB.settings?.brandColor||'#4f6ef7',brand2=DB.settings?.brandColor2||'#7c3aed';
+    Promise.all([loadCanvasImage(qrUrl),loadCanvasImage(emp.photo)]).then(([qrImg,photoImg])=>{
+      const bg=ctx.createLinearGradient(0,0,0,960);
+      bg.addColorStop(0,'#202a5a');bg.addColorStop(.45,'#111426');bg.addColorStop(1,'#07080f');
+      ctx.fillStyle=bg;ctx.fillRect(0,0,640,960);
+      ctx.fillStyle=brand;ctx.globalAlpha=.26;ctx.beginPath();ctx.arc(60,80,160,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+      ctx.fillStyle=brand2;ctx.globalAlpha=.18;ctx.beginPath();ctx.arc(610,210,210,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+      ctx.textAlign='center';
+      ctx.fillStyle='rgba(255,255,255,.42)';ctx.font='800 16px DM Sans, Arial';ctx.fillText(restaurant.toUpperCase(),320,58);
+      roundRect(ctx,238,98,164,164,36,brand);
+      if(photoImg)drawCoverImage(ctx,photoImg,238,98,164,164,36);
+      else{ctx.fillStyle='#ffffff';ctx.font='900 54px DM Sans, Arial';ctx.fillText(initials(fullName(emp)),320,195);}
+      ctx.fillStyle='#ffffff';ctx.font='800 40px DM Sans, Arial';ctx.fillText(fullName(emp),320,326);
+      ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='600 23px DM Sans, Arial';ctx.fillText(`${emp.position||'-'}${emp.dept?' · '+emp.dept:''}`,320,363);
+      roundRect(ctx,220,392,200,42,21,'rgba(255,255,255,.12)');
+      ctx.fillStyle='rgba(255,255,255,.88)';ctx.font='700 18px DM Sans, Arial';ctx.fillText(emp.num?`#${emp.num}`:'Badge employé',320,419);
+      roundRect(ctx,166,486,308,308,26,'#ffffff');
+      if(qrImg)ctx.drawImage(qrImg,184,504,272,272);
+      ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='600 20px DM Sans, Arial';ctx.fillText('Scanner pour ouvrir le portail',320,835);
+      ctx.fillStyle='rgba(255,255,255,.52)';ctx.font='500 16px DM Sans, Arial';ctx.fillText('Email + PIN requis · Lien cliquable dans le PDF',320,862);
+      ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(0,900,640,60);
+      ctx.fillStyle='#ffffff';ctx.font='800 22px DM Sans, Arial';ctx.fillText('Mananger Pro',320,938);
+      resolve(canvas);
+    }).catch(()=>reject(new Error('QR indisponible')));
   });
 }
 async function downloadBadge(emp){
@@ -1928,13 +1947,21 @@ function renderEmpView(emp){
       `<div style="color:var(--text2);font-size:13px;text-align:center;padding:12px 0">Aucun pointage aujourd'hui</div>`}
     </div>
     <div style="margin-bottom:20px">
-      <div class="section-lbl">Mon badge QR</div>
-      <div style="text-align:center">
+      <div class="section-lbl">Mon carnet</div>
+      <div class="badge-card">
+        <div class="badge-header" style="min-height:250px;background:radial-gradient(circle at 18% 5%,${c}55,transparent 34%),linear-gradient(180deg,${c}33,transparent)">
+          <div class="badge-kicker">${esc((DB.settings?.company||'MON RESTAURANT').toUpperCase())}</div>
+          <div class="badge-photo">${safeImgSrc(emp.photo)?`<img src="${esc(safeImgSrc(emp.photo))}" alt="">`:esc(initials(fullName(emp)))}</div>
+          <div class="badge-emp-name">${safeEmpName(emp)}</div>
+          <div class="badge-emp-role">${esc(emp.position)} · ${esc(emp.dept)}</div>
+        </div>
+        <div class="badge-body">
         <div class="qr-wrap" style="margin:0 auto">${genQR(employeeAccessUrl(emp),150)}</div>
         <div style="font-size:11px;color:var(--text2);margin-top:8px">Scannez pour ouvrir votre portail</div>
-        <a class="btn btn-ghost mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Ouvrir mon accès</a>
+        <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Ouvrir mon accès</a>
         <button class="btn btn-primary mt12" onclick="downloadBadgePDF(currentUser.emp)">⬇️ Télécharger PDF</button>
         <button class="btn btn-ghost mt12" onclick="downloadBadge(currentUser.emp)">⬇️ Télécharger mon carnet</button>
+        </div>
       </div>
     </div>`;
   renderQRCodes(document.getElementById('evs'));
@@ -2214,9 +2241,9 @@ function openDetail(empId){
     </div>
     <div id="dt-badge" style="display:none">
       <div class="badge-card">
-        <div class="badge-header" style="background:linear-gradient(135deg,${c}44,${c}22)">
-          <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1.5px;margin-bottom:10px">${esc((DB.settings?.company||'MON RESTAURANT').toUpperCase())}</div>
-          ${mkAv(emp,'av-72')}
+        <div class="badge-header" style="background:radial-gradient(circle at 18% 5%,${c}55,transparent 34%),linear-gradient(180deg,${c}33,transparent)">
+          <div class="badge-kicker">${esc((DB.settings?.company||'MON RESTAURANT').toUpperCase())}</div>
+          <div class="badge-photo">${safeImgSrc(emp.photo)?`<img src="${esc(safeImgSrc(emp.photo))}" alt="">`:esc(initials(fullName(emp)))}</div>
           <div class="badge-emp-name">${safeEmpName(emp)}</div>
           <div class="badge-emp-role">${esc(emp.position)} · ${esc(emp.dept)}</div>
           <div class="badge-status-pill">
@@ -2225,14 +2252,14 @@ function openDetail(empId){
           </div>
         </div>
         <div class="badge-body" style="text-align:center">
-          <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Scanner pour ouvrir le portail employé</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;font-weight:800">Accès autonome employé</div>
           <div class="qr-wrap" style="margin:0 auto;display:inline-block">${genQR(employeeAccessUrl(emp),160)}</div>
           <div style="font-size:9px;color:var(--text3);margin-top:10px;font-family:monospace">${empId.toUpperCase().slice(0,16)}...</div>
           ${emp.num?`<div style="font-size:10px;color:var(--text2);margin-top:3px">Employé #${emp.num}</div>`:''}
-          <a class="btn btn-ghost mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Ouvrir accès employé</a>
+          <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">Ouvrir accès employé</a>
         </div>
       </div>
-      <div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px;font-size:11px;color:var(--text2);text-align:center">🔮 Compatible NFC — badge physique prévu</div>
+      <div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px;font-size:11px;color:var(--text2);text-align:center">PDF recommandé: conserva el link clicable y el QR</div>
       <button class="btn btn-primary mt12" onclick="downloadBadgePDF(DB.employees.find(e=>e.id==='${empId}'))">⬇️ Télécharger PDF</button>
       <button class="btn btn-ghost mt12" onclick="downloadBadge(DB.employees.find(e=>e.id==='${empId}'))">⬇️ Télécharger carnet</button>
     </div>
