@@ -478,7 +478,7 @@ input[type=date],input[type=time]{color-scheme:dark}
 
 <!-- TOPBAR -->
 <div id="topbar" style="display:none">
-  <button class="menu-btn" onclick="toggleSB()">
+  <button class="menu-btn" id="tour-menu-btn" onclick="toggleSB()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
   </button>
   <div class="top-title" id="page-title">Dashboard</div>
@@ -489,11 +489,11 @@ input[type=date],input[type=time]{color-scheme:dark}
     <button class="top-btn" onclick="startTour('manager',true)" title="Tour">
       ?
     </button>
-    <button class="top-btn" onclick="openScanner()">
+    <button class="top-btn" id="top-qr-btn" onclick="openScanner()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       QR
     </button>
-    <button class="top-btn primary" onclick="openEmpModal(null)">
+    <button class="top-btn primary" id="top-new-emp-btn" onclick="openEmpModal(null)">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Nouveau
     </button>
@@ -509,8 +509,8 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div id="dash-live"></div>
   <div id="dash-alerts"></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-    <button class="btn btn-primary" onclick="openScanner()">📷 Scanner QR</button>
-    <button class="btn btn-ghost" onclick="openEmpModal(null)">+ Employé</button>
+    <button class="btn btn-primary" id="dash-scan-btn" onclick="openScanner()">📷 Scanner QR</button>
+    <button class="btn btn-ghost" id="dash-add-emp-btn" onclick="openEmpModal(null)">+ Employé</button>
   </div>
 </div>
 
@@ -2185,14 +2185,21 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshNow
 let tourRole=null,tourStep=0;
 const TOUR={
   manager:[
+    {kind:'language',sel:null,title:'Elige idioma',text:'Antes de empezar, escoge el idioma en el que quieres ver la app y este recorrido.'},
     {sel:'#kpi-grid',title:'Panel diario',text:'Aquí ves rápidamente quién está activo, presente, ausente o de vacaciones.'},
     {sel:'#dash-alerts',title:'Alertas del día',text:'La app te avisa si alguien esperado no ha fichado o si hubo retrasos.'},
-    {sel:'button[onclick="openScanner()"]',title:'QR y fichajes',text:'Desde aquí puedes escanear carnets o abrir acciones rápidas de asistencia.'},
+    {sel:'#dash-scan-btn',title:'QR y fichajes',text:'Desde aquí puedes escanear carnets o abrir acciones rápidas de asistencia.'},
+    {page:'employees',sel:'#pg-employees',title:'Empleados',text:'Aquí creas empleados, agregas foto, contrato, salario, PIN y horario semanal base.'},
+    {page:'shifts',sel:'#pg-shifts',title:'Planificación',text:'Aquí revisas los turnos por semana y corriges horarios puntuales sin cambiar el horario permanente.'},
+    {page:'vacations',sel:'#pg-vacations',title:'Ausencias',text:'Aquí apruebas vacaciones, incapacidades o ausencias personales y ves el saldo disponible.'},
+    {page:'payroll',sel:'#pg-payroll',title:'Salarios',text:'Esta sección estima pagos según horas trabajadas, tipo de contrato, pausas y horas extra.'},
+    {page:'reports',sel:'#pg-reports',title:'Reportes',text:'Aquí generas el reporte mensual con horas, ausencias, retrasos, salarios estimados y alertas.'},
+    {page:'settings',sel:'#pg-settings',title:'Configuración',text:'Aquí ajustas idioma, tolerancia de retraso, colores, horarios de apertura y datos del restaurante.'},
     {sel:'#refresh-btn',title:'Datos actualizados',text:'La app actualiza sola, pero este botón fuerza una actualización cuando quieras.'},
-    {sel:null,title:'Menú principal',text:'En el menú lateral están planificación, empleados, ausencias, salarios, reportes y ajustes.'}
+    {page:'dashboard',sel:'#tour-menu-btn',title:'Menú principal',text:'El menú lateral te permite moverte entre panel, presencias, empleados, planificación, finanzas y ajustes.'}
   ],
   employee:[
-    {sel:'#emp-lang-bar',title:'Idioma',text:'El trabajador puede escoger su idioma desde aquí. Esto no cambia el idioma del restaurante.'},
+    {kind:'language',sel:'#emp-lang-bar',title:'Elige idioma',text:'El trabajador puede escoger su idioma. Esto no cambia el idioma del restaurante.'},
     {sel:'#eva',title:'Fichar y pausas',text:'Aquí registra entrada, salida y pausas obligatorias de 15 o 30 minutos.'},
     {sel:'#emp-tour-stats',title:'Resumen personal',text:'El empleado ve sus horas del día, semana y vacaciones disponibles.'},
     {sel:'#emp-tour-month',title:'Horas del mes',text:'Esta tarjeta ayuda a seguir el acumulado mensual sin preguntar al manager.'},
@@ -2214,6 +2221,18 @@ function startTour(role,manual=false){
   document.getElementById('tour-overlay').classList.add('open');
   renderTour();
 }
+function activateTourPage(page){
+  if(!page||currentUser?.role==='employee')return;
+  closeSB();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pg-'+page)?.classList.add('active');
+  const item=[...document.querySelectorAll('.sb-item')].find(n=>n.getAttribute('onclick')?.includes(`'${page}'`));
+  item?.classList.add('active');
+  currentPage=page;
+  document.getElementById('page-title').textContent=T().pages[page]||page;
+  renderPage(page);
+}
 function closeTour(done=true){
   if(done&&tourRole)localStorage.setItem(tourKey(tourRole),'1');
   document.getElementById('tour-overlay')?.classList.remove('open');
@@ -2226,8 +2245,14 @@ function nextTour(){
   tourStep++;renderTour();
 }
 function prevTour(){if(tourStep>0){tourStep--;renderTour();}}
+function setTourLang(l){
+  if(tourRole==='employee')setEmployeeLang(l);
+  else setLang(l);
+  setTimeout(renderTour,0);
+}
 function renderTour(){
   const steps=TOUR[tourRole]||[],s=steps[tourStep];if(!s)return closeTour(false);
+  if(s.page)activateTourPage(s.page);
   const card=document.getElementById('tour-card'),spot=document.getElementById('tour-spot');
   const el=s.sel?document.querySelector(s.sel):null;
   if(el){
@@ -2243,6 +2268,7 @@ function renderTour(){
     <div class="tour-kicker">${tourStep+1} / ${steps.length}</div>
     <div class="tour-title">${esc(s.title)}</div>
     <div class="tour-text">${esc(s.text)}</div>
+    ${s.kind==='language'?`<div class="emp-lang-bar mt12">${Object.entries(LANGS).map(([k,v])=>`<button class="lang-btn ${k===lang?'active':''}" onclick="setTourLang('${k}')">${v.flag} ${v.name}</button>`).join('')}</div>`:''}
     <div class="tour-progress">${steps.map((_,i)=>`<div class="tour-dot ${i===tourStep?'active':''}"></div>`).join('')}</div>
     <div class="tour-actions">
       <button class="btn btn-ghost" onclick="closeTour(true)">Saltar</button>
