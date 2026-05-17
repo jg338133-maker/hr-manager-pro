@@ -817,9 +817,10 @@ input[type=date],input[type=time]{color-scheme:dark}
     </select>
   </div>
   <div class="frow">
-    <div class="fg"><label>Début</label><input type="date" id="abs-start"></div>
-    <div class="fg"><label>Fin</label><input type="date" id="abs-end"></div>
+    <div class="fg"><label>Début</label><input type="date" id="abs-start" onchange="updateAbsConflictWarning()"></div>
+    <div class="fg"><label>Fin</label><input type="date" id="abs-end" onchange="updateAbsConflictWarning()"></div>
   </div>
+  <div id="abs-conflict" style="display:none"></div>
   <div class="tgl-row">
     <span class="fs13">Approuvé</span>
     <div class="tgl on" id="abs-appr" onclick="this.classList.toggle('on')"></div>
@@ -1112,6 +1113,12 @@ async function sbEmployeePortalData(emp){
 async function sbEmployeeRequestAbsence(emp,type,start,end,notes){
   const {error}=await sb.rpc('employee_request_absence',{p_email:emp.email,p_pin:emp.pin,p_type:type,p_start:start,p_end:end,p_notes:notes||''});
   if(error)throw error;
+}
+async function sbEmployeeAbsenceConflicts(emp,start,end,type='vacation'){
+  if(isDemo()||type!=='vacation')return [];
+  const {data,error}=await sb.rpc('employee_absence_conflicts',{p_email:emp.email,p_pin:emp.pin,p_start:start,p_end:end});
+  if(error)throw error;
+  return Array.isArray(data)?data:(Array.isArray(data?.conflicts)?data.conflicts:[]);
 }
 
 // ═══════ UTILS ═══════
@@ -1647,6 +1654,25 @@ function getAbs(empId,date){
     return d>=s&&d<=e;
   });
 }
+function rangeOverlaps(aStart,aEnd,bStart,bEnd){
+  const as=new Date(aStart),ae=new Date(aEnd),bs=new Date(bStart),be=new Date(bEnd);
+  as.setHours(0,0,0,0);ae.setHours(0,0,0,0);bs.setHours(0,0,0,0);be.setHours(0,0,0,0);
+  return as<=be&&bs<=ae;
+}
+function vacationConflicts(empId,start,end,excludeId=''){
+  if(!start||!end)return [];
+  return DB.absences.filter(a=>a.id!==excludeId&&a.empId!==empId&&a.type==='vacation'&&rangeOverlaps(start,end,a.start,a.end))
+    .map(a=>({...a,emp:DB.employees.find(e=>e.id===a.empId)}));
+}
+function conflictNoticeHTML(conflicts,scope='manager'){
+  if(!conflicts.length)return '';
+  const names=conflicts.map(c=>c.emp?safeEmpName(c.emp):'Otro empleado').filter(Boolean);
+  const details=conflicts.slice(0,3).map(c=>`${c.emp?safeEmpName(c.emp):'Empleado'} · ${fmtDate(c.start)}–${fmtDate(c.end)} · ${c.approved?'aprobado':'pendiente'}`).join('<br>');
+  const msg=scope==='employee'
+    ? `Ya hay otra persona con vacaciones en esas fechas. Tu solicitud puede no ser aprobada.`
+    : `Cruce de vacaciones: ${esc(names.slice(0,3).join(', '))}. Revisa cobertura antes de aprobar.`;
+  return `<div style="margin:10px 0;padding:10px 12px;border-radius:var(--r2);border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.12);color:var(--orange);font-size:12px;line-height:1.35"><div style="font-weight:800;margin-bottom:4px">⚠️ ${msg}</div>${scope==='manager'?`<div style="color:var(--text2)">${details}</div>`:''}</div>`;
+}
 const vacUsed=empId=>DB.absences.filter(a=>a.empId===empId&&a.type==='vacation'&&a.approved).reduce((s,a)=>s+Math.round((new Date(a.end)-new Date(a.start))/86400000)+1,0);
 function dayStatus(emp,date){
   const d=new Date(date);d.setHours(0,0,0,0);
@@ -2068,12 +2094,26 @@ async function requestEmpAbsence(){
   const type=document.getElementById('emp-abs-type').value,start=document.getElementById('emp-abs-start').value,end=document.getElementById('emp-abs-end').value,notes=clean(document.getElementById('emp-abs-notes').value);
   if(!start||!end){toast('Sélectionnez les dates','#ef4444');return;}
   try{
+    let conflicts=type==='vacation'?vacationConflicts(emp.id,start,end):[];
+    if(type==='vacation'){
+      try{conflicts=await sbEmployeeAbsenceConflicts(emp,start,end,type);}catch(e){console.warn('absence conflict check failed',e);}
+      if(conflicts.length&&!confirm('Ya hay otra persona con vacaciones en esas fechas. Tu solicitud puede no ser aprobada. ¿Enviar de todas formas?'))return;
+    }
     await sbEmployeeRequestAbsence(emp,type,start,end,notes);
     const a={id:uid(),empId:emp.id,type,start,end,approved:false,notes};
     DB.absences.unshift(a);
     renderEmpView(emp);
     toast('Demande envoyée');
   }catch(e){console.error(e);toast('Impossible d’envoyer la demande','#ef4444');}
+}
+async function updateEmpAbsConflictWarning(){
+  const emp=currentUser?.emp,box=document.getElementById('emp-abs-conflict');if(!emp||!box)return;
+  const type=document.getElementById('emp-abs-type')?.value,start=document.getElementById('emp-abs-start')?.value,end=document.getElementById('emp-abs-end')?.value;
+  if(type!=='vacation'||!start||!end){box.style.display='none';box.innerHTML='';return;}
+  let conflicts=vacationConflicts(emp.id,start,end);
+  try{conflicts=await sbEmployeeAbsenceConflicts(emp,start,end,type);}catch(e){console.warn('absence conflict check failed',e);}
+  box.innerHTML=conflicts.length?conflictNoticeHTML(conflicts,'employee'):'';
+  box.style.display=conflicts.length?'block':'none';
 }
 
 // ═══════ EMP VIEW ═══════
@@ -2145,8 +2185,9 @@ function renderEmpView(emp){
     ${empCalendarHTML(emp,now)}
     <div class="card" id="emp-tour-absence">
       <div class="section-lbl" style="margin-top:0">${et.absence}</div>
-      <div class="fg"><label>${et.type}</label><select id="emp-abs-type"><option value="vacation">🌴 ${et.vac}</option><option value="medical">🏥 ${et.medical}</option><option value="personal">👤 ${et.personal}</option></select></div>
-      <div class="frow"><div class="fg"><label>${et.start}</label><input type="date" id="emp-abs-start"></div><div class="fg"><label>${et.end}</label><input type="date" id="emp-abs-end"></div></div>
+      <div class="fg"><label>${et.type}</label><select id="emp-abs-type" onchange="updateEmpAbsConflictWarning()"><option value="vacation">🌴 ${et.vac}</option><option value="medical">🏥 ${et.medical}</option><option value="personal">👤 ${et.personal}</option></select></div>
+      <div class="frow"><div class="fg"><label>${et.start}</label><input type="date" id="emp-abs-start" onchange="updateEmpAbsConflictWarning()"></div><div class="fg"><label>${et.end}</label><input type="date" id="emp-abs-end" onchange="updateEmpAbsConflictWarning()"></div></div>
+      <div id="emp-abs-conflict" style="display:none"></div>
       <div class="fg"><label>${et.note}</label><input id="emp-abs-notes" placeholder="-"></div>
       <button class="btn btn-primary" onclick="requestEmpAbsence()">${et.send}</button>
     </div>
@@ -2807,9 +2848,13 @@ function renderVacs(){
   if(!filtered.length){c.innerHTML=`<div class="empty-state"><h3>${tx.none}</h3><p>${isAppr?tx.noneApproved:tx.nonePending}</p></div>`;return;}
   const icons={vacation:'🌴',medical:'🏥',personal:'👤',dayOff:'💤',training:'📚',maternity:'🤱',holiday:'⭐'};
   c.innerHTML=filtered.map(a=>{const emp=DB.employees.find(e=>e.id===a.empId),days=Math.round((new Date(a.end)-new Date(a.start))/86400000)+1;
-    return`<div class="card"><div style="display:flex;align-items:center;gap:10px">${emp?mkAv(emp,'av-36'):''}<div style="flex:1"><div style="font-weight:700;font-size:13px">${emp?safeEmpName(emp):'?'}</div><div style="font-size:11px;color:var(--text2)">${icons[a.type]||'📋'} ${esc(a.type)} · ${days}j</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${fmtDate(a.start)} — ${fmtDate(a.end)}</div></div><div style="display:flex;flex-direction:column;gap:6px">${!isAppr?`<button class="btn btn-success btn-sm" style="width:34px;height:32px;padding:0" onclick="apprAbs('${esc(a.id)}')">✓</button>`:''}<button class="btn btn-ghost btn-sm" style="width:34px;height:32px;padding:0;color:var(--red)" onclick="delAbs('${esc(a.id)}')">🗑</button></div></div>${a.notes?`<div style="font-size:11px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${esc(a.notes)}</div>`:''}</div>`;}).join('');
+    const conflicts=a.type==='vacation'?vacationConflicts(a.empId,a.start,a.end,a.id):[];
+    return`<div class="card"><div style="display:flex;align-items:center;gap:10px">${emp?mkAv(emp,'av-36'):''}<div style="flex:1"><div style="font-weight:700;font-size:13px">${emp?safeEmpName(emp):'?'}</div><div style="font-size:11px;color:var(--text2)">${icons[a.type]||'📋'} ${esc(a.type)} · ${days}j</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${fmtDate(a.start)} — ${fmtDate(a.end)}</div></div><div style="display:flex;flex-direction:column;gap:6px">${!isAppr?`<button class="btn btn-success btn-sm" style="width:34px;height:32px;padding:0" onclick="apprAbs('${esc(a.id)}')">✓</button>`:''}<button class="btn btn-ghost btn-sm" style="width:34px;height:32px;padding:0;color:var(--red)" onclick="delAbs('${esc(a.id)}')">🗑</button></div></div>${conflicts.length?conflictNoticeHTML(conflicts,'manager'):''}${a.notes?`<div style="font-size:11px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${esc(a.notes)}</div>`:''}</div>`;}).join('');
 }
 async function apprAbs(id){
+  const abs=DB.absences.find(a=>a.id===id);
+  const conflicts=abs?.type==='vacation'?vacationConflicts(abs.empId,abs.start,abs.end,abs.id):[];
+  if(conflicts.length&&!confirm('Hay vacaciones cruzadas con otro empleado. ¿Aprobar de todas formas?'))return;
   DB.absences=DB.absences.map(a=>a.id===id?{...a,approved:true}:a);saveLocal();renderVacs();toast('✅ Approuvé');
   sbUpdateAbsApproved(id,true).catch(console.error);
 }
@@ -2822,13 +2867,24 @@ function openAbsModal(empId){
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('abs-start').value=today;document.getElementById('abs-end').value=today;
   document.getElementById('abs-notes').value='';document.getElementById('abs-appr').classList.add('on');
+  ['abs-emp','abs-type'].forEach(id=>document.getElementById(id).onchange=updateAbsConflictWarning);
+  updateAbsConflictWarning();
   applyUITexts();
   openModal('abs-modal');
+}
+function updateAbsConflictWarning(){
+  const box=document.getElementById('abs-conflict');if(!box)return;
+  const empId=document.getElementById('abs-emp')?.value,type=document.getElementById('abs-type')?.value,start=document.getElementById('abs-start')?.value,end=document.getElementById('abs-end')?.value;
+  const conflicts=type==='vacation'?vacationConflicts(empId,start,end):[];
+  box.innerHTML=conflicts.length?conflictNoticeHTML(conflicts,'manager'):'';
+  box.style.display=conflicts.length?'block':'none';
 }
 function saveAbs(){
   const empId=document.getElementById('abs-emp').value,start=document.getElementById('abs-start').value,end=document.getElementById('abs-end').value;
   if(!start||!end){toast('Sélectionnez les dates','#ef4444');return;}
   const newAbs={id:uid(),empId,type:document.getElementById('abs-type').value,start,end,approved:document.getElementById('abs-appr').classList.contains('on'),notes:document.getElementById('abs-notes').value.trim()};
+  const conflicts=vacationConflicts(empId,start,end);
+  if(newAbs.type==='vacation'&&newAbs.approved&&conflicts.length&&!confirm('Hay vacaciones cruzadas con otro empleado. ¿Guardar aprobada de todas formas?'))return;
   DB.absences.unshift(newAbs);saveLocal();closeModal('abs-modal');renderPage(currentPage);toast('✅ Absence enregistrée');
   sbSaveAbs(newAbs).catch(console.error);
 }

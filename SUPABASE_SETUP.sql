@@ -397,6 +397,57 @@ grant execute on function public.employee_register_break(text,text,integer) to a
 grant execute on function public.employee_portal_data(text,text) to anon, authenticated;
 grant execute on function public.employee_request_absence(text,text,text,date,date,text) to anon, authenticated;
 
+-- Employee self-service: warn when requested vacation overlaps another employee.
+create or replace function public.employee_absence_conflicts
+  (p_email text, p_pin text, p_start date, p_end date)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_emp record;
+  v_payload jsonb;
+begin
+  if p_start is null or p_end is null or p_end < p_start then
+    raise exception 'Invalid absence dates';
+  end if;
+
+  select e.id, e.restaurant_id
+  into v_emp
+  from public.employees e
+  join public.restaurants r on r.id = e.restaurant_id
+  where lower(e.email) = lower(trim(p_email))
+    and e.pin = p_pin
+    and e.status = 'active'
+    and coalesce(r.status,'active') = 'active'
+  limit 1;
+
+  if v_emp.id is null then
+    raise exception 'Employee not found';
+  end if;
+
+  select coalesce(jsonb_agg(jsonb_build_object(
+    'id', ab.id::text,
+    'employee_id', ab.employee_id::text,
+    'start', ab.start_date,
+    'end', ab.end_date,
+    'approved', ab.approved
+  ) order by ab.start_date), '[]'::jsonb)
+  into v_payload
+  from public.absences ab
+  where ab.restaurant_id = v_emp.restaurant_id
+    and ab.employee_id <> v_emp.id
+    and ab.type = 'vacation'
+    and ab.start_date <= p_end
+    and ab.end_date >= p_start;
+
+  return v_payload;
+end;
+$$;
+
+grant execute on function public.employee_absence_conflicts(text,text,date,date) to anon, authenticated;
+
 -- Master admin: delete a restaurant and all app data linked to it.
 create or replace function public.master_delete_restaurant(p_restaurant_id uuid)
 returns void
