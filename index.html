@@ -570,10 +570,7 @@ input[type=date],input[type=time]{color-scheme:dark}
     </div>
   </div>
   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">
-    <span class="chip chip-cyan">🌅 Matin</span>
-    <span class="chip chip-orange">☀️ Après-midi</span>
-    <span class="chip chip-purple">🌆 Soir</span>
-    <span class="chip chip-blue">🌙 Nuit</span>
+    <span class="chip chip-cyan">Travaille</span>
     <span class="chip chip-green">✅ Repos</span>
     <span class="chip chip-gray">❌ Libre</span>
   </div>
@@ -881,10 +878,16 @@ input[type=date],input[type=time]{color-scheme:dark}
 <div class="modal">
   <div class="modal-handle"></div>
   <div class="modal-title" id="shift-mtitle">Horaire</div>
-  <div id="shift-type-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px"></div>
-  <div class="frow" id="shift-times">
-    <div class="fg"><label>Entrée</label><input type="time" id="sh-in" value="08:00"></div>
-    <div class="fg"><label>Sortie</label><input type="time" id="sh-out" value="17:00"></div>
+  <div id="shift-type-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px"></div>
+  <div id="shift-times" style="display:grid;gap:8px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="fg"><label id="sh-in-lbl">Entrée</label><input type="time" id="sh-in" value="08:00"></div>
+      <div class="fg"><label id="sh-out-lbl">Sortie</label><input type="time" id="sh-out" value="17:00"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="fg"><label id="sh-in2-lbl">Entrée 2</label><input type="time" id="sh-in-2"></div>
+      <div class="fg"><label id="sh-out2-lbl">Sortie 2</label><input type="time" id="sh-out-2"></div>
+    </div>
   </div>
   <div class="fg"><label>Notes</label><input id="sh-notes"></div>
   <div class="modal-actions">
@@ -986,6 +989,14 @@ const EMP_PORTAL={
 };
 const ETT=()=>EMP_UI[lang]||EMP_UI.fr;
 const EPT=()=>EMP_PORTAL[lang]||EMP_PORTAL.fr;
+const SCHED_UI={
+  fr:{open1:'Ouverture',close1:'Fermeture',open2:'Ouverture 2',close2:'Fermeture 2',splitHelp:'Utilisez le deuxième bloc pour un service coupé, par exemple 10:00–14:00 et 17:30–22:00.',entry1:'Entrée',exit1:'Sortie',entry2:'Entrée 2',exit2:'Sortie 2',splitEmpHelp:'Deuxième bloc optionnel pour les horaires coupés.',work:'Travaille'},
+  es:{open1:'Apertura',close1:'Cierre',open2:'Apertura 2',close2:'Cierre 2',splitHelp:'Usa el segundo bloque para servicio partido, por ejemplo 10:00–14:00 y 17:30–22:00.',entry1:'Entrada',exit1:'Salida',entry2:'Entrada 2',exit2:'Salida 2',splitEmpHelp:'Segundo bloque opcional para turnos partidos.',work:'Trabaja'},
+  en:{open1:'Opening',close1:'Closing',open2:'Opening 2',close2:'Closing 2',splitHelp:'Use the second block for split service, for example 10:00–14:00 and 17:30–22:00.',entry1:'Clock-in',exit1:'Clock-out',entry2:'Clock-in 2',exit2:'Clock-out 2',splitEmpHelp:'Optional second block for split shifts.',work:'Works'},
+  de:{open1:'Öffnung',close1:'Schließung',open2:'Öffnung 2',close2:'Schließung 2',splitHelp:'Nutzen Sie den zweiten Block für geteilte Dienste, z. B. 10:00–14:00 und 17:30–22:00.',entry1:'Beginn',exit1:'Ende',entry2:'Beginn 2',exit2:'Ende 2',splitEmpHelp:'Optionaler zweiter Block für geteilte Dienste.',work:'Arbeitet'},
+  it:{open1:'Apertura',close1:'Chiusura',open2:'Apertura 2',close2:'Chiusura 2',splitHelp:'Usa il secondo blocco per il servizio spezzato, per esempio 10:00–14:00 e 17:30–22:00.',entry1:'Entrata',exit1:'Uscita',entry2:'Entrata 2',exit2:'Uscita 2',splitEmpHelp:'Secondo blocco opzionale per turni spezzati.',work:'Lavora'}
+};
+const STT=()=>SCHED_UI[lang]||SCHED_UI.fr;
 const ATT_WORDS={
   fr:{late:'retard',reason:'Motif',breakOpen:'Pause commencée',noClose:'sans fermeture'},
   es:{late:'retardo',reason:'Motivo',breakOpen:'Pausa iniciada',noClose:'sin cierre'},
@@ -1059,7 +1070,7 @@ async function loadSB(){
     if(e.data)DB.employees=e.data.map(x=>({id:x.id,name:x.name,last:x.last_name||'',num:x.employee_number||'',position:x.position||'',dept:x.department||'',phone:x.phone||'',email:x.email||'',startDate:x.start_date||'',contract:x.contract_type||'CDI',payType:x.pay_type||'hourly',rate:x.hourly_rate||0,salary:x.monthly_salary||0,vacWeeks:x.vacation_weeks||5,avs:x.avs_number||'',emergency:x.emergency_contact||'',notes:x.notes||'',status:x.status||'active',photo:x.photo_url||null,color:x.color||'#4f6ef7',schedules:x.schedules||{},pin:x.pin||'0000'}));
     if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp,note:x.note||''}));
     if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
-    if(sh.data){DB.shifts={};sh.data.forEach(x=>{DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,notes:x.notes||''};});}
+    if(sh.data){DB.shifts={};sh.data.forEach(x=>{const blocks=normalizeBlocks({blocks:x.blocks,start:x.start_time,end:x.end_time},'restaurant');DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,blocks,notes:x.notes||''};});}
     if(r.data){DB.settings={company:r.data.name||'Mon Restaurant',emoji:r.data.emoji||'🍽️',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active',openingHours:r.data.opening_hours||defOpeningHours()};lang=DB.settings.lang;}
     saveLocal();return true;
   }catch(e){console.warn('SB error:',e);return false;}
@@ -1099,7 +1110,17 @@ async function sbDelAttendanceDay(empId,dateStr){
   await sb.from('attendance').delete().eq('restaurant_id',REST_ID).eq('employee_id',empId).gte('timestamp',start).lte('timestamp',end);
 }
 async function sbSaveAbs(a){if(isDemo())return;await sb.from('absences').upsert({id:a.id,restaurant_id:REST_ID,employee_id:a.empId,type:a.type,start_date:a.start,end_date:a.end,approved:a.approved,notes:a.notes||''});}
-async function sbSaveShift(key,sh){if(isDemo())return;const[eId,date]=key.split('_');await sb.from('shifts').upsert({restaurant_id:REST_ID,employee_id:eId,shift_date:date,shift_type:sh.type,start_time:sh.in||null,end_time:sh.out||null,notes:sh.notes||''},{onConflict:'employee_id,shift_date'});}
+async function sbSaveShift(key,sh){
+  if(isDemo())return;
+  const[eId,date]=key.split('_'),payload={restaurant_id:REST_ID,employee_id:eId,shift_date:date,shift_type:sh.type,start_time:sh.in||null,end_time:sh.out||null,blocks:sh.blocks||[],notes:sh.notes||''};
+  const res=await sb.from('shifts').upsert(payload,{onConflict:'employee_id,shift_date'});
+  if(res.error&&String(res.error.message||'').includes('blocks')){
+    const fallback={...payload};delete fallback.blocks;
+    await sb.from('shifts').upsert(fallback,{onConflict:'employee_id,shift_date'});
+    return;
+  }
+  if(res.error)throw res.error;
+}
 async function sbSaveSettings(s){if(isDemo())return;await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours()}).eq('id',REST_ID);}
 async function sbUpdateAbsApproved(id,approved){if(isDemo())return;await sb.from('absences').update({approved}).eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDelAbs(id){if(isDemo())return;await sb.from('absences').delete().eq('id',id).eq('restaurant_id',REST_ID);}
@@ -1262,7 +1283,7 @@ function saveOpeningDay(i){
 }
 function renderOpeningHours(){
   const box=document.getElementById('opening-hours-box');if(!box)return;
-  const h=DB.settings.openingHours||defOpeningHours();
+  const h=DB.settings.openingHours||defOpeningHours(),st=STT();
   box.innerHTML=L().daysFull.map((d,i)=>{const v={...(h[i]||{open:true}),blocks:normalizeBlocks(h[i]||{start:'09:00',end:'23:00'},'restaurant')};const blocks=[v.blocks[0]||{start:'09:00',end:'23:00'},v.blocks[1]||{start:'',end:''}];return`
     <div style="background:var(--s3);border-radius:var(--r3);padding:10px 12px;margin-bottom:6px">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:${v.open!==false?'10px':'0'}">
@@ -1271,10 +1292,10 @@ function renderOpeningHours(){
       </div>
       <div style="display:${v.open!==false?'grid':'none'};gap:8px">
         ${blocks.map((b,n)=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="fg" style="margin:0"><label>${n?'Apertura 2':'Apertura'}</label><input type="time" id="rs-${i}-${n}" value="${esc(b.start||'')}" onchange="saveOpeningDay(${i})"></div>
-          <div class="fg" style="margin:0"><label>${n?'Cierre 2':'Cierre'}</label><input type="time" id="re-${i}-${n}" value="${esc(b.end||'')}" onchange="saveOpeningDay(${i})"></div>
+          <div class="fg" style="margin:0"><label>${n?st.open2:st.open1}</label><input type="time" id="rs-${i}-${n}" value="${esc(b.start||'')}" onchange="saveOpeningDay(${i})"></div>
+          <div class="fg" style="margin:0"><label>${n?st.close2:st.close1}</label><input type="time" id="re-${i}-${n}" value="${esc(b.end||'')}" onchange="saveOpeningDay(${i})"></div>
         </div>`).join('')}
-        <div style="font-size:10px;color:var(--text2)">Usa el segundo bloque para servicio partido, por ejemplo 10:00–14:00 y 17:30–22:00.</div>
+        <div style="font-size:10px;color:var(--text2)">${st.splitHelp}</div>
       </div>
     </div>`;}).join('');
 }
@@ -1314,7 +1335,7 @@ function applyUITexts(){
   const attManual=document.querySelector('[onclick="openManualModal()"]');if(attManual)attManual.textContent=at.manual;
   const attLbl=document.querySelector('#pg-attendance .section-lbl');if(attLbl)attLbl.textContent=at.scheduled;
   const shiftTitle=document.querySelector('#pg-shifts .fw7.fs14');if(shiftTitle)shiftTitle.textContent=sh.title;
-  const chips=document.querySelectorAll('#pg-shifts .chip');if(chips[0])chips[0].textContent='🌅 '+sh.morning;if(chips[1])chips[1].textContent='☀️ '+sh.afternoon;if(chips[2])chips[2].textContent='🌆 '+sh.evening;if(chips[3])chips[3].textContent='🌙 '+sh.night;if(chips[4])chips[4].textContent='✅ '+sh.rest;if(chips[5])chips[5].textContent='❌ '+sh.off;
+  const chips=document.querySelectorAll('#pg-shifts .chip'),st=STT();if(chips[0])chips[0].textContent=st.work;if(chips[1])chips[1].textContent='✅ '+sh.rest;if(chips[2])chips[2].textContent='❌ '+sh.off;
   const vacTabs=document.querySelectorAll('#pg-vacations .tab');if(vacTabs[0])vacTabs[0].textContent=vc.pending;if(vacTabs[1])vacTabs[1].textContent=vc.approved;if(vacTabs[2])vacTabs[2].textContent=vc.balance;
   const vacBtn=document.querySelector('#pg-vacations .btn-ghost.mt12');if(vacBtn)vacBtn.textContent=vc.new;
   const manTitle=document.querySelector('#manual-modal .modal-title');if(manTitle)manTitle.textContent=at.manualTitle;
@@ -1558,7 +1579,7 @@ async function loadEmployeePortal(emp){
     DB.history=(data.attendance||[]).map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||fullName(emp),type:x.type,ts:x.timestamp,note:x.note||''}));
     DB.absences=(data.absences||[]).map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     DB.shifts={};
-    (data.shifts||[]).forEach(x=>{DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,notes:x.notes||''};});
+    (data.shifts||[]).forEach(x=>{const blocks=normalizeBlocks({blocks:x.blocks,start:x.start_time,end:x.end_time},'restaurant');DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,blocks,notes:x.notes||''};});
   }catch(e){console.warn('Employee portal data error:',e);}
 }
 
@@ -2782,6 +2803,7 @@ const defSched=()=>{const s={};for(let i=0;i<7;i++)s[i]={enabled:i>=1&&i<=5,bloc
 function updatePL(){document.getElementById('ef-paylbl').textContent=document.getElementById('ef-paytype').value==='hourly'?'Taux/h (CHF)':'Salaire/mois (CHF)';}
 function handlePhoto(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{photoData=e.target.result;document.getElementById('photo-ring').innerHTML=`<img src="${photoData}">`;};r.readAsDataURL(f);}
 function renderSchedEd(sched){
+  const st=STT();
   document.getElementById('ef-sched').innerHTML=L().daysFull.map((d,i)=>{
     const day={...(sched[i]||{}),blocks:normalizeBlocks(sched[i],'employee')},blocks=[day.blocks[0]||{start:'09:00',end:'17:00'},day.blocks[1]||{start:'',end:''}];
     return`
@@ -2792,10 +2814,10 @@ function renderSchedEd(sched){
       </div>
       <div id="stimes-${i}" style="display:${day.enabled?'grid':'none'};gap:8px">
         ${blocks.map((b,n)=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="fg" style="margin:0"><label>${n?'Entrée 2':'Entrée'}</label><input type="time" id="se-${i}-${n}" value="${esc(b.start||'')}"></div>
-          <div class="fg" style="margin:0"><label>${n?'Sortie 2':'Sortie'}</label><input type="time" id="sx-${i}-${n}" value="${esc(b.end||'')}"></div>
+          <div class="fg" style="margin:0"><label>${n?st.entry2:st.entry1}</label><input type="time" id="se-${i}-${n}" value="${esc(b.start||'')}"></div>
+          <div class="fg" style="margin:0"><label>${n?st.exit2:st.exit1}</label><input type="time" id="sx-${i}-${n}" value="${esc(b.end||'')}"></div>
         </div>`).join('')}
-        <div style="font-size:10px;color:var(--text2)">Segundo bloque opcional para turnos partidos.</div>
+        <div style="font-size:10px;color:var(--text2)">${st.splitEmpHelp}</div>
       </div>
     </div>`;}).join('');
 }
@@ -2972,14 +2994,18 @@ function renderShifts(){
 function openShiftModal(empId,dateStr){
   const emp=DB.employees.find(e=>e.id===empId);
   shiftKey=`${empId}_${dateStr}`;const sh=DB.shifts[shiftKey];
-  const base=empDaySchedule(emp,new Date(dateStr)),first=base.blocks[0]||{};
+  const base=empDaySchedule(emp,new Date(dateStr)),blocks=(sh?.blocks?.length?sh.blocks:base.blocks)||[],first=blocks[0]||{},second=blocks[1]||{};
   document.getElementById('shift-mtitle').textContent=`${emp?.name||'?'} · ${new Date(dateStr).toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'})}`;
-  shiftType=sh?.type||'morning';
+  shiftType=['rest','off'].includes(sh?.type)?sh.type:'morning';
   document.getElementById('sh-in').value=sh?.in||first.start||'09:00';
   document.getElementById('sh-out').value=sh?.out||first.end||'17:00';
+  document.getElementById('sh-in-2').value=second.start||'';
+  document.getElementById('sh-out-2').value=second.end||'';
   document.getElementById('sh-notes').value=sh?.notes||'';
-  const tx=TL('shift');
-  const opts=[{v:'morning',l:'🌅 '+tx.morning,c:'#06b6d4'},{v:'afternoon',l:'☀️ '+tx.afternoon,c:'#f59e0b'},{v:'evening',l:'🌆 '+tx.evening,c:'#7c3aed'},{v:'night',l:'🌙 '+tx.night,c:'#4f6ef7'},{v:'rest',l:'✅ '+tx.rest,c:'#10b981'},{v:'off',l:'❌ '+tx.off,c:'#5a5e78'}];
+  const tx=TL('shift'),st=STT();
+  const labels={in1:document.getElementById('sh-in-lbl'),out1:document.getElementById('sh-out-lbl'),in2:document.getElementById('sh-in2-lbl'),out2:document.getElementById('sh-out2-lbl')};
+  if(labels.in1)labels.in1.textContent=st.entry1;if(labels.out1)labels.out1.textContent=st.exit1;if(labels.in2)labels.in2.textContent=st.entry2;if(labels.out2)labels.out2.textContent=st.exit2;
+  const opts=[{v:'morning',l:st.work,c:'#06b6d4'},{v:'rest',l:tx.rest,c:'#10b981'},{v:'off',l:tx.off,c:'#5a5e78'}];
   document.getElementById('shift-type-grid').innerHTML=opts.map(o=>`<button id="stype-${o.v}" onclick="selST('${o.v}')" style="padding:10px 12px;border-radius:10px;border:2px solid ${shiftType===o.v?o.c:'var(--border)'};background:${shiftType===o.v?o.c+'22':'var(--s3)'};color:${shiftType===o.v?o.c:'var(--text2)'};font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;text-align:left">${o.l}</button>`).join('');
   document.getElementById('shift-times').style.display=['rest','off'].includes(shiftType)?'none':'grid';
   applyUITexts();
@@ -2987,11 +3013,20 @@ function openShiftModal(empId,dateStr){
 }
 function selST(type){
   shiftType=type;
-  const colors={morning:'#06b6d4',afternoon:'#f59e0b',evening:'#7c3aed',night:'#4f6ef7',rest:'#10b981',off:'#5a5e78'};
+  const colors={morning:'#06b6d4',rest:'#10b981',off:'#5a5e78'};
   document.querySelectorAll('[id^="stype-"]').forEach(btn=>{const t=btn.id.replace('stype-',''),c=colors[t];btn.style.borderColor=t===type?c:'var(--border)';btn.style.background=t===type?c+'22':'var(--s3)';btn.style.color=t===type?c:'var(--text2)';});
   document.getElementById('shift-times').style.display=['rest','off'].includes(type)?'none':'grid';
 }
-function saveShift(){if(!shiftKey)return;DB.shifts[shiftKey]={type:shiftType,in:document.getElementById('sh-in').value,out:document.getElementById('sh-out').value,notes:document.getElementById('sh-notes').value};saveLocal();closeModal('shift-modal');renderShifts();toast('✅ '+TL('shift').scheduleSaved);sbSaveShift(shiftKey,DB.shifts[shiftKey]).catch(console.error);}
+function getShiftBlocks(){
+  if(['rest','off'].includes(shiftType))return[];
+  return [0,1].map(n=>({start:document.getElementById(n?`sh-in-2`:'sh-in')?.value,end:document.getElementById(n?`sh-out-2`:'sh-out')?.value})).filter(b=>b.start&&b.end);
+}
+function saveShift(){
+  if(!shiftKey)return;
+  const blocks=getShiftBlocks(),first=blocks[0]||{};
+  DB.shifts[shiftKey]={type:shiftType,in:first.start||null,out:first.end||null,blocks,notes:document.getElementById('sh-notes').value};
+  saveLocal();closeModal('shift-modal');renderShifts();toast('✅ '+TL('shift').scheduleSaved);sbSaveShift(shiftKey,DB.shifts[shiftKey]).catch(console.error);
+}
 
 // ═══════ VACATIONS ═══════
 let vacT='pending';

@@ -122,6 +122,7 @@ alter table public.restaurants add column if not exists brand_color text default
 alter table public.restaurants add column if not exists brand_color2 text default '#7c3aed';
 alter table public.restaurants add column if not exists status text default 'active';
 alter table public.restaurants add column if not exists opening_hours jsonb default '{}'::jsonb;
+alter table public.shifts add column if not exists blocks jsonb default '[]'::jsonb;
 update public.employees set pin = '0000' where pin is null or pin = '';
 update public.restaurants set emoji = '🍽️' where emoji is null or emoji = '';
 update public.restaurants set brand_color = '#4f6ef7' where brand_color is null or brand_color = '';
@@ -345,6 +346,7 @@ begin
         'shift_type', s.shift_type,
         'start_time', s.start_time,
         'end_time', s.end_time,
+        'blocks', coalesce(s.blocks, '[]'::jsonb),
         'notes', s.notes
       ) order by s.shift_date)
       from public.shifts s
