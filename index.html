@@ -954,13 +954,21 @@ Object.assign(UI.en.pay,{export:'Export Excel'});Object.assign(UI.en.rep,{export
 Object.assign(UI.de.pay,{export:'Excel exportieren'});Object.assign(UI.de.rep,{export:'Excel exportieren'});
 Object.assign(UI.it.pay,{export:'Esporta Excel'});Object.assign(UI.it.rep,{export:'Esporta Excel'});
 const EMP_UI={
-  fr:{clockIn:"Pointer l'entrée",clockOut:'Pointer la sortie',breakStart:'Début pause',breakEnd:'Terminer pause',breakChoose:'Choisir la durée',breakActive:'En pause depuis',logout:'Déconnexion',tour:'Voir le tour',today:"Aujourd'hui",week:'Cette semaine',vac:'Vacances',medical:'Incapacité / maladie',personal:'Personnel',monthHours:'Heures du mois',calendar:'Calendrier',absence:'Demander une absence',type:'Type',start:'Début',end:'Fin',note:'Note',send:'Envoyer la demande',todaySchedule:"Horaire d'aujourd'hui",expectedIn:'Entrée prévue',expectedOut:'Sortie prévue',off:'Jour non travaillé',todayPunches:"Pointages d'aujourd'hui",noneToday:"Aucun pointage aujourd'hui",in:'Entrée',out:'Sortie',badge:'Mon carnet',badgeOpen:'Cliquez pour ouvrir votre portail',badgeLink:'Cliquez ici pour ouvrir',pdf:'Télécharger PDF',card:'Télécharger mon carnet'},
-  es:{clockIn:'Fichar entrada',clockOut:'Fichar salida',breakStart:'Iniciar pausa',breakEnd:'Terminar pausa',breakChoose:'Elegir duración',breakActive:'En pausa desde',logout:'Cerrar sesión',tour:'Ver tour',today:'Hoy',week:'Esta semana',vac:'Vacaciones',medical:'Incapacidad / enfermedad',personal:'Personal',monthHours:'Horas del mes',calendar:'Calendario',absence:'Solicitar ausencia',type:'Tipo',start:'Inicio',end:'Fin',note:'Nota',send:'Enviar solicitud',todaySchedule:'Horario de hoy',expectedIn:'Entrada prevista',expectedOut:'Salida prevista',off:'Día no trabajado',todayPunches:'Fichajes de hoy',noneToday:'Sin fichajes hoy',in:'Entrada',out:'Salida',badge:'Mi carnet',badgeOpen:'Haz click para abrir tu portal',badgeLink:'Haz click aquí para abrir',pdf:'Descargar PDF',card:'Descargar mi carnet'},
-  en:{clockIn:'Clock in',clockOut:'Clock out',breakStart:'Start break',breakEnd:'End break',breakChoose:'Choose duration',breakActive:'On break since',logout:'Sign out',tour:'View tour',today:'Today',week:'This week',vac:'Vacation',medical:'Sick leave',personal:'Personal',monthHours:'Month hours',calendar:'Calendar',absence:'Request absence',type:'Type',start:'Start',end:'End',note:'Note',send:'Send request',todaySchedule:"Today's schedule",expectedIn:'Expected in',expectedOut:'Expected out',off:'Day off',todayPunches:"Today's punches",noneToday:'No punches today',in:'In',out:'Out',badge:'My card',badgeOpen:'Click to open your portal',badgeLink:'Click here to open',pdf:'Download PDF',card:'Download my card'},
-  de:{clockIn:'Einstempeln',clockOut:'Ausstempeln',breakStart:'Pause starten',breakEnd:'Pause beenden',breakChoose:'Dauer wählen',breakActive:'In Pause seit',logout:'Abmelden',tour:'Tour ansehen',today:'Heute',week:'Diese Woche',vac:'Ferien',medical:'Krankheit',personal:'Persönlich',monthHours:'Monatsstunden',calendar:'Kalender',absence:'Abwesenheit beantragen',type:'Typ',start:'Beginn',end:'Ende',note:'Notiz',send:'Anfrage senden',todaySchedule:'Heutiger Dienstplan',expectedIn:'Geplanter Beginn',expectedOut:'Geplantes Ende',off:'Freier Tag',todayPunches:'Heutige Buchungen',noneToday:'Keine Buchungen heute',in:'Eingang',out:'Ausgang',badge:'Mein Ausweis',badgeOpen:'Klicken, um das Portal zu öffnen',badgeLink:'Hier klicken zum Öffnen',pdf:'PDF herunterladen',card:'Meinen Ausweis herunterladen'},
-  it:{clockIn:'Timbrata entrata',clockOut:'Timbrata uscita',breakStart:'Inizia pausa',breakEnd:'Termina pausa',breakChoose:'Scegli durata',breakActive:'In pausa dalle',logout:'Esci',tour:'Vedi tour',today:'Oggi',week:'Questa settimana',vac:'Vacanze',medical:'Malattia',personal:'Personale',monthHours:'Ore del mese',calendar:'Calendario',absence:'Richiedere assenza',type:'Tipo',start:'Inizio',end:'Fine',note:'Nota',send:'Invia richiesta',todaySchedule:'Orario di oggi',expectedIn:'Entrata prevista',expectedOut:'Uscita prevista',off:'Giorno libero',todayPunches:'Timbrature di oggi',noneToday:'Nessuna timbratura oggi',in:'Entrata',out:'Uscita',badge:'Il mio badge',badgeOpen:'Clicca per aprire il tuo portale',badgeLink:'Clicca qui per aprire',pdf:'Scarica PDF',card:'Scarica il mio badge'}
+  fr:{clockIn:"Pointer l'entrée",clockOut:'Pointer la sortie',breakStart:'Début pause',breakEnd:'Terminer pause',breakChoose:'Choisir la durée',breakActive:'En pause depuis',breakRemaining:'Temps restant',breakOver:'Temps de pause terminé',latePrompt:'Vous êtes arrivé en retard. Vous pouvez écrire le motif:',outOpenBreak:'Vous avez une pause ouverte. Si vous pointez la sortie maintenant, elle restera sans fermeture. Continuer?',outNoBreak:'Aucune pause enregistrée. Si vous pointez la sortie, le manager sera averti. Continuer?',clockInFirst:"Enregistrez d'abord l'entrée",breakAlready:'Pause déjà en cours',breakDone:'Pause terminée',logout:'Déconnexion',tour:'Voir le tour',today:"Aujourd'hui",week:'Cette semaine',vac:'Vacances',medical:'Incapacité / maladie',personal:'Personnel',monthHours:'Heures du mois',calendar:'Calendrier',absence:'Demander une absence',type:'Type',start:'Début',end:'Fin',note:'Note',send:'Envoyer la demande',todaySchedule:"Horaire d'aujourd'hui",expectedIn:'Entrée prévue',expectedOut:'Sortie prévue',off:'Jour non travaillé',todayPunches:"Pointages d'aujourd'hui",noneToday:"Aucun pointage aujourd'hui",in:'Entrée',out:'Sortie',badge:'Mon carnet',badgeOpen:'Cliquez pour ouvrir votre portail',badgeLink:'Cliquez ici pour ouvrir',pdf:'Télécharger PDF',card:'Télécharger mon carnet'},
+  es:{clockIn:'Fichar entrada',clockOut:'Fichar salida',breakStart:'Iniciar pausa',breakEnd:'Terminar pausa',breakChoose:'Elegir duración',breakActive:'En pausa desde',breakRemaining:'Tiempo restante',breakOver:'Tiempo de pausa terminado',latePrompt:'Llegaste tarde. Puedes escribir el motivo:',outOpenBreak:'Tienes una pausa abierta. Si fichas salida ahora, la pausa quedará sin cierre. ¿Continuar?',outNoBreak:'No tienes una pausa registrada. Si fichas salida, se avisará al manager. ¿Continuar?',clockInFirst:'Primero registra entrada',breakAlready:'Pausa ya en curso',breakDone:'Pausa terminada',logout:'Cerrar sesión',tour:'Ver tour',today:'Hoy',week:'Esta semana',vac:'Vacaciones',medical:'Incapacidad / enfermedad',personal:'Personal',monthHours:'Horas del mes',calendar:'Calendario',absence:'Solicitar ausencia',type:'Tipo',start:'Inicio',end:'Fin',note:'Nota',send:'Enviar solicitud',todaySchedule:'Horario de hoy',expectedIn:'Entrada prevista',expectedOut:'Salida prevista',off:'Día no trabajado',todayPunches:'Fichajes de hoy',noneToday:'Sin fichajes hoy',in:'Entrada',out:'Salida',badge:'Mi carnet',badgeOpen:'Haz click para abrir tu portal',badgeLink:'Haz click aquí para abrir',pdf:'Descargar PDF',card:'Descargar mi carnet'},
+  en:{clockIn:'Clock in',clockOut:'Clock out',breakStart:'Start break',breakEnd:'End break',breakChoose:'Choose duration',breakActive:'On break since',breakRemaining:'Time left',breakOver:'Break time is over',latePrompt:'You arrived late. You can write the reason:',outOpenBreak:'You have an open break. If you clock out now, the break will remain open. Continue?',outNoBreak:'No break has been registered. If you clock out, the manager will be notified. Continue?',clockInFirst:'Clock in first',breakAlready:'Break already in progress',breakDone:'Break finished',logout:'Sign out',tour:'View tour',today:'Today',week:'This week',vac:'Vacation',medical:'Sick leave',personal:'Personal',monthHours:'Month hours',calendar:'Calendar',absence:'Request absence',type:'Type',start:'Start',end:'End',note:'Note',send:'Send request',todaySchedule:"Today's schedule",expectedIn:'Expected in',expectedOut:'Expected out',off:'Day off',todayPunches:"Today's punches",noneToday:'No punches today',in:'In',out:'Out',badge:'My card',badgeOpen:'Click to open your portal',badgeLink:'Click here to open',pdf:'Download PDF',card:'Download my card'},
+  de:{clockIn:'Einstempeln',clockOut:'Ausstempeln',breakStart:'Pause starten',breakEnd:'Pause beenden',breakChoose:'Dauer wählen',breakActive:'In Pause seit',breakRemaining:'Verbleibende Zeit',breakOver:'Pausenzeit beendet',latePrompt:'Sie sind zu spät angekommen. Sie können den Grund eingeben:',outOpenBreak:'Sie haben eine offene Pause. Wenn Sie jetzt ausstempeln, bleibt sie ohne Abschluss. Fortfahren?',outNoBreak:'Keine Pause erfasst. Wenn Sie ausstempeln, wird der Manager informiert. Fortfahren?',clockInFirst:'Bitte zuerst einstempeln',breakAlready:'Pause läuft bereits',breakDone:'Pause beendet',logout:'Abmelden',tour:'Tour ansehen',today:'Heute',week:'Diese Woche',vac:'Ferien',medical:'Krankheit',personal:'Persönlich',monthHours:'Monatsstunden',calendar:'Kalender',absence:'Abwesenheit beantragen',type:'Typ',start:'Beginn',end:'Ende',note:'Notiz',send:'Anfrage senden',todaySchedule:'Heutiger Dienstplan',expectedIn:'Geplanter Beginn',expectedOut:'Geplantes Ende',off:'Freier Tag',todayPunches:'Heutige Buchungen',noneToday:'Keine Buchungen heute',in:'Eingang',out:'Ausgang',badge:'Mein Ausweis',badgeOpen:'Klicken, um das Portal zu öffnen',badgeLink:'Hier klicken zum Öffnen',pdf:'PDF herunterladen',card:'Meinen Ausweis herunterladen'},
+  it:{clockIn:'Timbrata entrata',clockOut:'Timbrata uscita',breakStart:'Inizia pausa',breakEnd:'Termina pausa',breakChoose:'Scegli durata',breakActive:'In pausa dalle',breakRemaining:'Tempo rimanente',breakOver:'Tempo di pausa terminato',latePrompt:'Sei arrivato in ritardo. Puoi scrivere il motivo:',outOpenBreak:'Hai una pausa aperta. Se timbri l’uscita ora, la pausa resterà senza chiusura. Continuare?',outNoBreak:'Non hai registrato una pausa. Se timbri l’uscita, il manager sarà avvisato. Continuare?',clockInFirst:"Prima registra l'entrata",breakAlready:'Pausa già in corso',breakDone:'Pausa terminata',logout:'Esci',tour:'Vedi tour',today:'Oggi',week:'Questa settimana',vac:'Vacanze',medical:'Malattia',personal:'Personale',monthHours:'Ore del mese',calendar:'Calendario',absence:'Richiedere assenza',type:'Tipo',start:'Inizio',end:'Fine',note:'Nota',send:'Invia richiesta',todaySchedule:'Orario di oggi',expectedIn:'Entrata prevista',expectedOut:'Uscita prevista',off:'Giorno libero',todayPunches:'Timbrature di oggi',noneToday:'Nessuna timbratura oggi',in:'Entrata',out:'Uscita',badge:'Il mio badge',badgeOpen:'Clicca per aprire il tuo portale',badgeLink:'Clicca qui per aprire',pdf:'Scarica PDF',card:'Scarica il mio badge'}
 };
 const ETT=()=>EMP_UI[lang]||EMP_UI.fr;
+const ATT_WORDS={
+  fr:{late:'retard',reason:'Motif',breakOpen:'Pause commencée',noClose:'sans fermeture'},
+  es:{late:'retardo',reason:'Motivo',breakOpen:'Pausa iniciada',noClose:'sin cierre'},
+  en:{late:'late',reason:'Reason',breakOpen:'Break started',noClose:'no end'},
+  de:{late:'verspätet',reason:'Grund',breakOpen:'Pause gestartet',noClose:'ohne Ende'},
+  it:{late:'ritardo',reason:'Motivo',breakOpen:'Pausa iniziata',noClose:'senza chiusura'}
+};
+const ATW=()=>ATT_WORDS[lang]||ATT_WORDS.fr;
 
 // ═══════ DB ═══════
 let DB={
@@ -1511,18 +1519,19 @@ function attLabel(type){
 }
 async function register(empId,type){
   const emp=DB.employees.find(e=>e.id===empId);
+  const et=ETT();
   if(!emp){toast('Employé non trouvé','#ef4444');return;}
   if(!canReg(empId,type)){toast(type==='in'?'Entrée déjà enregistrée':'Pas d\'entrée enregistrée','#f59e0b');return;}
   let note='';
   if(type==='out'&&openBreakOn(empId)){
-    if(!confirm('Tienes una pausa abierta. Si fichas salida ahora, la pausa quedará sin cierre. ¿Continuar?'))return;
+    if(!confirm(et.outOpenBreak))return;
     note='Salida con pausa abierta';
   }else if(type==='out'&&!breakInfoOn(empId,new Date())?.ranges?.length&&scheduledHoursOn(emp,new Date())>=5.5){
-    if(!confirm('No tienes una pausa registrada. Si fichas salida, se avisará al manager. ¿Continuar?'))return;
+    if(!confirm(et.outNoBreak))return;
     note='Salida sin pausa registrada';
   }
   if(type==='in'&&wouldBeLate(emp,new Date())){
-    note=clean(prompt('Llegaste tarde. Puedes escribir el motivo:')||'');
+    note=clean(prompt(et.latePrompt)||'');
   }
   const rec={id:uid(),empId,empName:fullName(emp),type,ts:new Date().toISOString(),note};
   DB.history.unshift(rec);saveLocal();
@@ -1554,8 +1563,9 @@ async function startEmpBreak(empId,minutes){
   const emp=DB.employees.find(e=>e.id===empId),mins=parseInt(minutes,10)||0;
   if(!emp||!mins){toast('Employé non trouvé','#ef4444');return;}
   const today=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,new Date()));
-  if(!today.some(h=>h.type==='in')||today.some(h=>h.type==='out')){toast('Primero registra entrada','#f59e0b');return;}
-  if(openBreakOn(empId)){toast('Pause déjà en cours','#f59e0b');return;}
+  const et=ETT();
+  if(!today.some(h=>h.type==='in')||today.some(h=>h.type==='out')){toast(et.clockInFirst,'#f59e0b');return;}
+  if(openBreakOn(empId)){toast(et.breakAlready,'#f59e0b');return;}
   const rec={id:uid(),empId,empName:fullName(emp),type:'break_start',ts:new Date().toISOString(),note:`${mins} min`};
   DB.history.unshift(rec);breakPickerEmpId=null;saveLocal();renderEmpView(emp);
   toast(`☕ Pause ${mins} min — ${emp.name}`);
@@ -1568,7 +1578,7 @@ async function endEmpBreak(empId){
   const rec={id:uid(),empId,empName:fullName(emp),type:'break_end',ts:new Date().toISOString(),note:open.note||''};
   DB.history.unshift(rec);saveLocal();renderEmpView(emp);
   const mins=Math.max(1,Math.round((new Date(rec.ts)-new Date(open.ts))/60000));
-  toast(`✅ Pause terminée · ${mins} min`);
+  toast(`✅ ${ETT().breakDone} · ${mins} min`);
   if(currentUser?.role==='employee'&&emp.email&&emp.pin)sbEmployeeRegister(emp,'break_end',rec.note).catch(console.error);
   else sbRegAt(empId,fullName(emp),'break_end',rec.ts,rec.note).catch(console.error);
 }
@@ -1629,13 +1639,51 @@ function breakInfoOn(empId,date){
   });
   return {ranges,open:start};
 }
+function plannedBreakMinutes(open){
+  const m=String(open?.note||'').match(/(\d+)/);
+  return m?parseInt(m[1],10):0;
+}
+function formatDuration(ms){
+  const total=Math.max(0,Math.ceil(ms/1000)),m=Math.floor(total/60),s=total%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function breakCountdownData(open){
+  const mins=plannedBreakMinutes(open);
+  if(!open||!mins)return null;
+  const end=new Date(open.ts).getTime()+mins*60000;
+  return {mins,end,remaining:end-Date.now()};
+}
+function breakCountdownHTML(open,et=ETT()){
+  const data=breakCountdownData(open);
+  if(!data)return '';
+  const done=data.remaining<=0;
+  return `<div id="emp-break-countdown" data-break-end="${data.end}" data-break-alerted="${done?'1':'0'}" style="margin-top:8px;font-size:26px;font-weight:900;color:${done?'var(--red)':'var(--orange)'};letter-spacing:.5px">${done?et.breakOver:formatDuration(data.remaining)}</div><div class="fs11 muted mt4">${done?et.breakEnd:et.breakRemaining}</div>`;
+}
+function updateEmpBreakCountdown(){
+  const el=document.getElementById('emp-break-countdown');if(!el)return;
+  const end=parseInt(el.dataset.breakEnd,10);if(!end)return;
+  const rem=end-Date.now(),et=ETT();
+  if(rem<=0){
+    el.textContent=et.breakOver;
+    el.style.color='var(--red)';
+    const sub=el.nextElementSibling;if(sub)sub.textContent=et.breakEnd;
+    if(el.dataset.breakAlerted!=='1'){el.dataset.breakAlerted='1';toast('☕ '+et.breakOver,'#f59e0b');}
+  }else{
+    el.textContent=formatDuration(rem);
+    const sub=el.nextElementSibling;if(sub)sub.textContent=et.breakRemaining;
+  }
+}
 function breakStatusHTML(emp,date,hasClockIn){
   const info=breakInfoOn(emp.id,date);
   const planned=scheduledHoursOn(emp,date);
   if(info?.ranges?.length){
     return info.ranges.map(b=>`<div style="font-size:11px;color:var(--orange);margin-top:2px">☕ Pausa ${fmtTime(b.start)}–${fmtTime(b.end)} · ${b.mins} min</div>`).join('');
   }
-  if(info?.open)return `<div style="font-size:11px;color:var(--orange);margin-top:2px">☕ Pausa iniciada ${fmtTime(info.open.ts)} · sin cierre</div>`;
+  if(info?.open){
+    const data=breakCountdownData(info.open),words=ATW();
+    const remain=data?` · ${data.remaining>0?formatDuration(data.remaining):words.noClose}`:` · ${words.noClose}`;
+    return `<div style="font-size:11px;color:var(--orange);margin-top:2px">☕ ${words.breakOpen} ${fmtTime(info.open.ts)}${remain}</div>`;
+  }
   if(hasClockIn&&planned>=5.5)return `<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ Sin pausa registrada</div>`;
   if(hasClockIn)return `<div style="font-size:11px;color:var(--text2);margin-top:2px">☕ Sin pausa registrada</div>`;
   return '';
@@ -2149,7 +2197,7 @@ function renderEmpView(emp){
     <div class="emp-clock" id="emp-clock">${now.toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'})}</div>
     <button class="btn btn-success" onclick="register('${emp.id}','in');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">✅ ${et.clockIn}</button>
     ${openBreak?`
-      <div style="background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.28);border-radius:var(--r2);padding:12px;text-align:center;color:var(--orange);font-size:13px;font-weight:800">☕ ${et.breakActive} ${fmtTime(openBreak.ts)}</div>
+      <div style="background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.28);border-radius:var(--r2);padding:12px;text-align:center;color:var(--orange);font-size:13px;font-weight:800">☕ ${et.breakActive} ${fmtTime(openBreak.ts)}${breakCountdownHTML(openBreak,et)}</div>
       <button class="btn btn-primary" onclick="endEmpBreak('${emp.id}')">✅ ${et.breakEnd}</button>
     `:`
       <button class="btn btn-ghost" onclick="toggleBreakPicker('${emp.id}')">☕ ${et.breakStart}</button>
@@ -2168,7 +2216,8 @@ function renderEmpView(emp){
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       ${et.logout}
     </button>`;
-  empClockTimer=setInterval(()=>{const el=document.getElementById('emp-clock');if(el)el.textContent=new Date().toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'});},1000);
+  empClockTimer=setInterval(()=>{const el=document.getElementById('emp-clock');if(el)el.textContent=new Date().toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'});updateEmpBreakCountdown();},1000);
+  updateEmpBreakCountdown();
 
   const todayRecs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,now));
   document.getElementById('evs').innerHTML=`
@@ -2551,8 +2600,8 @@ function renderAtt(){
         <div style="font-weight:700;font-size:14px">${safeEmpName(emp)}</div>
         <div style="font-size:11px;color:var(--text2)">${esc(emp.position)} · ${esc(sch.entry)}–${esc(sch.exit)}</div>
         ${abs?`<div style="font-size:11px;color:var(--orange);margin-top:2px">🌴 ${abs.type}</div>`:''}
-        ${inn?`<div style="font-size:11px;color:var(--green);margin-top:2px">✅ ${ex.in} ${fmtTime(inn.ts)}${late?' ⚠️ retard':''}</div>`:''}
-        ${inn?.note?`<div style="font-size:11px;color:var(--orange);margin-top:2px">Motivo: ${esc(inn.note)}</div>`:''}
+        ${inn?`<div style="font-size:11px;color:var(--green);margin-top:2px">✅ ${ex.in} ${fmtTime(inn.ts)}${late?' ⚠️ '+ATW().late:''}</div>`:''}
+        ${inn?.note?`<div style="font-size:11px;color:var(--orange);margin-top:2px">${ATW().reason}: ${esc(inn.note)}</div>`:''}
         ${breakStatusHTML(emp,now,!!inn)}
         ${out?`<div style="font-size:11px;color:var(--red);margin-top:2px">🔴 ${ex.out} ${fmtTime(out.ts)}</div>`:''}
         ${out?.note?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ ${esc(out.note)}</div>`:''}
