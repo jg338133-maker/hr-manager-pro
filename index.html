@@ -983,8 +983,8 @@ loadLocal();
 
 function demoDB(){
   const today=new Date(),fmt=d=>d.toISOString().split('T')[0],day=n=>fmt(new Date(today.getTime()-n*86400000));
-  const sched={};for(let i=0;i<7;i++)sched[i]={enabled:i>=1&&i<=5,entry:'09:00',exit:'17:00'};
-  const split={...sched,1:{enabled:true,entry:'10:00',exit:'15:00'},3:{enabled:true,entry:'18:00',exit:'23:00'}};
+  const sched={};for(let i=0;i<7;i++)sched[i]={enabled:i>=1&&i<=5,blocks:[{start:'09:00',end:'17:00'}]};
+  const split={...sched,1:{enabled:true,blocks:[{start:'10:00',end:'14:00'},{start:'17:30',end:'22:00'}]},3:{enabled:true,blocks:[{start:'18:00',end:'23:00'}]}};
   const employees=[
     {id:'demo-emp-1',name:'Sofia',last:'Martin',num:'D-001',position:'Serveur',dept:'Salle',phone:'+41 79 111 22 33',email:'sofia.demo@hrmanagerpro.local',startDate:day(120),contract:'CDI',payType:'hourly',rate:25,salary:0,vacWeeks:5,avs:'756.0000.0000.01',emergency:'Marco +41 79 444 55 66',notes:'Disponible soirs et week-end',status:'active',photo:null,color:'#4f6ef7',schedules:sched,pin:'1234'},
     {id:'demo-emp-2',name:'Luca',last:'Rossi',num:'D-002',position:'Chef',dept:'Cuisine',phone:'+41 79 222 33 44',email:'luca.demo@hrmanagerpro.local',startDate:day(240),contract:'CDI',payType:'monthly',rate:0,salary:4800,vacWeeks:5,avs:'756.0000.0000.02',emergency:'Anna +41 79 555 66 77',notes:'Responsable cuisine',status:'active',photo:null,color:'#10b981',schedules:sched,pin:'2345'},
@@ -1000,7 +1000,7 @@ function demoDB(){
     {id:'demo-h7',empId:'demo-emp-1',empName:'Sofia Martin',type:'out',ts:localDateTimeISO(day(1),'17:05'),note:''}
   ];
   const shifts={};
-  employees.forEach(emp=>{for(let i=0;i<5;i++){const d=new Date(getMonday(today).getTime()+i*86400000),ds=fmt(d),sch=emp.schedules[d.getDay()];shifts[`${emp.id}_${ds}`]=sch?.enabled?{type:'morning',in:sch.entry,out:sch.exit,notes:'Demo'}:{type:'off',in:null,out:null,notes:'Demo'};}});
+  employees.forEach(emp=>{for(let i=0;i<5;i++){const d=new Date(getMonday(today).getTime()+i*86400000),ds=fmt(d),sch=empDaySchedule(emp,d),first=sch.blocks[0];shifts[`${emp.id}_${ds}`]=sch?.enabled&&first?{type:'morning',in:first.start,out:first.end,blocks:sch.blocks,notes:'Demo'}:{type:'off',in:null,out:null,notes:'Demo'};}});
   return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,settings:{company:'Demo Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
 }
 
@@ -1200,26 +1200,50 @@ function saveCfg(k,v){
   if(k==='company')document.getElementById('sb-rn').textContent=v;
   sbSaveSettings(DB.settings).catch(console.error);
 }
-function defOpeningHours(){const h={};for(let i=0;i<7;i++)h[i]={open:i>=1&&i<=6,start:'09:00',end:'23:00'};return h;}
-function restaurantDay(date){const h=DB.settings.openingHours||defOpeningHours();return h[new Date(date).getDay()]||{open:true,start:'09:00',end:'23:00'};}
-function isRestaurantOpen(date){return restaurantDay(date).open!==false;}
+function defOpeningHours(){const h={};for(let i=0;i<7;i++)h[i]={open:i>=1&&i<=6,blocks:[{start:'09:00',end:'23:00'}]};return h;}
+function normalizeBlocks(day,kind='restaurant'){
+  if(!day)return[];
+  const startKey=kind==='employee'?'entry':'start',endKey=kind==='employee'?'exit':'end';
+  const blocks=Array.isArray(day.blocks)?day.blocks:[];
+  const out=blocks.map(b=>({start:b.start||b.entry||'09:00',end:b.end||b.exit||'17:00'})).filter(b=>b.start&&b.end);
+  if(out.length)return out;
+  const s=day[startKey]||day.start||day.entry,e=day[endKey]||day.end||day.exit;
+  return s&&e?[{start:s,end:e}]:[];
+}
+function dayOpen(day,kind='restaurant'){return kind==='restaurant'?day?.open!==false:!!day?.enabled;}
+function restaurantDay(date){const h=DB.settings.openingHours||defOpeningHours(),d=h[new Date(date).getDay()]||{open:true,blocks:[{start:'09:00',end:'23:00'}]};return{...d,blocks:normalizeBlocks(d,'restaurant')};}
+function isRestaurantOpen(date){const d=restaurantDay(date);return d.open!==false&&d.blocks.length>0;}
+function empDaySchedule(emp,date){const raw=emp?.schedules?.[new Date(date).getDay()];return{...(raw||{}),enabled:!!raw?.enabled,blocks:normalizeBlocks(raw,'employee')};}
+function fmtBlocks(blocks,sep='<br>'){return (blocks||[]).map(b=>`${esc(b.start)}–${esc(b.end)}`).join(sep)||'Libre';}
+function timeOn(date,time){const[h,m]=String(time||'00:00').split(':').map(Number),d=new Date(date);d.setHours(h||0,m||0,0,0);return d;}
+function blockHours(date,b){const s=timeOn(date,b.start),e=timeOn(date,b.end);if(e<=s)e.setDate(e.getDate()+1);return Math.max(0,(e-s)/3600000);}
+function firstRelevantBlock(emp,date){
+  const blocks=empDaySchedule(emp,date).blocks;
+  if(!blocks.length)return null;
+  const now=new Date(date),tol=DB.settings?.lateTol||10;
+  return blocks.find(b=>now<=new Date(timeOn(date,b.end).getTime()+tol*60000))||blocks[blocks.length-1];
+}
 function saveOpeningDay(i){
   const h=DB.settings.openingHours||defOpeningHours();
-  h[i]={open:document.getElementById(`ro-${i}`)?.classList.contains('on')||false,start:document.getElementById(`rs-${i}`)?.value||'09:00',end:document.getElementById(`re-${i}`)?.value||'23:00'};
+  const blocks=[0,1].map(n=>({start:document.getElementById(`rs-${i}-${n}`)?.value,end:document.getElementById(`re-${i}-${n}`)?.value})).filter(b=>b.start&&b.end);
+  h[i]={open:document.getElementById(`ro-${i}`)?.classList.contains('on')||false,blocks:blocks.length?blocks:[{start:'09:00',end:'23:00'}]};
   DB.settings.openingHours=h;saveLocal();renderOpeningHours();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);
 }
 function renderOpeningHours(){
   const box=document.getElementById('opening-hours-box');if(!box)return;
   const h=DB.settings.openingHours||defOpeningHours();
-  box.innerHTML=L().daysFull.map((d,i)=>{const v=h[i]||{open:true,start:'09:00',end:'23:00'};return`
+  box.innerHTML=L().daysFull.map((d,i)=>{const v={...(h[i]||{open:true}),blocks:normalizeBlocks(h[i]||{start:'09:00',end:'23:00'},'restaurant')};const blocks=[v.blocks[0]||{start:'09:00',end:'23:00'},v.blocks[1]||{start:'',end:''}];return`
     <div style="background:var(--s3);border-radius:var(--r3);padding:10px 12px;margin-bottom:6px">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:${v.open!==false?'10px':'0'}">
         <span style="font-weight:700;font-size:13px">${esc(d)}</span>
         <div class="tgl ${v.open!==false?'on':''}" id="ro-${i}" onclick="this.classList.toggle('on');saveOpeningDay(${i})"></div>
       </div>
-      <div style="display:${v.open!==false?'grid':'none'};grid-template-columns:1fr 1fr;gap:8px">
-        <div class="fg" style="margin:0"><label>Apertura</label><input type="time" id="rs-${i}" value="${esc(v.start||'09:00')}" onchange="saveOpeningDay(${i})"></div>
-        <div class="fg" style="margin:0"><label>Cierre</label><input type="time" id="re-${i}" value="${esc(v.end||'23:00')}" onchange="saveOpeningDay(${i})"></div>
+      <div style="display:${v.open!==false?'grid':'none'};gap:8px">
+        ${blocks.map((b,n)=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="fg" style="margin:0"><label>${n?'Apertura 2':'Apertura'}</label><input type="time" id="rs-${i}-${n}" value="${esc(b.start||'')}" onchange="saveOpeningDay(${i})"></div>
+          <div class="fg" style="margin:0"><label>${n?'Cierre 2':'Cierre'}</label><input type="time" id="re-${i}-${n}" value="${esc(b.end||'')}" onchange="saveOpeningDay(${i})"></div>
+        </div>`).join('')}
+        <div style="font-size:10px;color:var(--text2)">Usa el segundo bloque para servicio partido, por ejemplo 10:00–14:00 y 17:30–22:00.</div>
       </div>
     </div>`;}).join('');
 }
@@ -1509,9 +1533,10 @@ async function loadEmployeePortal(emp){
 
 // ═══════ ATTENDANCE ═══════
 function canReg(empId,type){
-  const t=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,new Date()));
-  if(type==='in')return!t.some(h=>h.type==='in');
-  if(type==='out')return t.some(h=>h.type==='in')&&!t.some(h=>h.type==='out');
+  const t=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,new Date())&&['in','out'].includes(h.type)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  const last=t[t.length-1];
+  if(type==='in')return!last||last.type==='out';
+  if(type==='out')return last?.type==='in';
   return true;
 }
 function attLabel(type){
@@ -1562,9 +1587,9 @@ function toggleBreakPicker(empId){
 async function startEmpBreak(empId,minutes){
   const emp=DB.employees.find(e=>e.id===empId),mins=parseInt(minutes,10)||0;
   if(!emp||!mins){toast('Employé non trouvé','#ef4444');return;}
-  const today=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,new Date()));
+  const today=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,new Date())&&['in','out'].includes(h.type)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
   const et=ETT();
-  if(!today.some(h=>h.type==='in')||today.some(h=>h.type==='out')){toast(et.clockInFirst,'#f59e0b');return;}
+  if(today[today.length-1]?.type!=='in'){toast(et.clockInFirst,'#f59e0b');return;}
   if(openBreakOn(empId)){toast(et.breakAlready,'#f59e0b');return;}
   const rec={id:uid(),empId,empName:fullName(emp),type:'break_start',ts:new Date().toISOString(),note:`${mins} min`};
   DB.history.unshift(rec);breakPickerEmpId=null;saveLocal();renderEmpView(emp);
@@ -1619,6 +1644,8 @@ async function saveManualAttendance(){
   sbDelAttendanceDay(empId,date).then(()=>Promise.all(recs.map(r=>sbRegAt(empId,fullName(emp),r.type,r.ts)))).catch(console.error);
 }
 const lastAction=empId=>DB.history.find(h=>h.empId===empId&&['in','out'].includes(h.type));
+function dayPunches(empId,date=new Date()){return DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,date)&&['in','out'].includes(h.type)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));}
+function isClockedIn(empId,date=new Date()){const p=dayPunches(empId,date);return p[p.length-1]?.type==='in';}
 function breakMinutesOn(empId,date){
   const r=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,date)&&['break_start','break_end'].includes(h.type)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
   let total=0,start=null;
@@ -1690,9 +1717,13 @@ function breakStatusHTML(emp,date,hasClockIn){
 }
 function workedOn(empId,date){
   const r=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,date)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
-  const inn=r.find(h=>h.type==='in'),out=[...r].reverse().find(h=>h.type==='out');
-  if(!inn||!out)return null;
-  return Math.max(0,(new Date(out.ts)-new Date(inn.ts))/3600000-breakMinutesOn(empId,date)/60);
+  let open=null,total=0;
+  r.forEach(h=>{
+    if(h.type==='in')open=h;
+    if(h.type==='out'&&open){total+=Math.max(0,(new Date(h.ts)-new Date(open.ts))/3600000);open=null;}
+  });
+  if(total<=0)return null;
+  return Math.max(0,total-breakMinutesOn(empId,date)/60);
 }
 function getAbs(empId,date){
   const d=new Date(date);d.setHours(0,0,0,0);
@@ -1724,30 +1755,32 @@ function conflictNoticeHTML(conflicts,scope='manager'){
 const vacUsed=empId=>DB.absences.filter(a=>a.empId===empId&&a.type==='vacation'&&a.approved).reduce((s,a)=>s+Math.round((new Date(a.end)-new Date(a.start))/86400000)+1,0);
 function dayStatus(emp,date){
   const d=new Date(date);d.setHours(0,0,0,0);
-  const today=todayStart(),dow=d.getDay(),sch=emp.schedules?.[dow];
+  const today=todayStart(),sch=empDaySchedule(emp,d);
   const abs=getAbs(emp.id,date);
   if(!isRestaurantOpen(date))return{type:'free',sub:'closed'};
   if(abs)return{type:'absent',sub:abs.type};
   const hasRec=DB.history.some(h=>h.empId===emp.id&&sameDay(h.ts,date));
   if(hasRec)return{type:'worked'};
-  if(d>today)return sch?.enabled?{type:'future'}:{type:'free'};
-  if(sch?.enabled)return{type:'missing'};
+  if(d>today)return sch?.enabled&&sch.blocks.length?{type:'future'}:{type:'free'};
+  if(sch?.enabled&&sch.blocks.length)return{type:'missing'};
   return{type:'free'};
 }
 function isLate(emp,date){
   if(!isRestaurantOpen(date))return false;
-  const sch=emp.schedules?.[new Date(date).getDay()];if(!sch?.enabled)return false;
+  const sch=empDaySchedule(emp,date);if(!sch?.enabled||!sch.blocks.length)return false;
   const recs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,date));
-  const inn=recs.find(h=>h.type==='in');if(!inn)return false;
-  const[eh,em]=sch.entry.split(':').map(Number);
-  const exp=new Date(date);exp.setHours(eh,em+(DB.settings?.lateTol||10),0,0);
-  return new Date(inn.ts)>exp;
+  return recs.filter(h=>h.type==='in').some(inn=>isPunchLate(emp,inn.ts));
+}
+function isPunchLate(emp,ts){
+  const date=new Date(ts),sch=empDaySchedule(emp,date);if(!sch?.enabled||!sch.blocks.length)return false;
+  const b=firstRelevantBlock(emp,date)||sch.blocks[0],exp=new Date(timeOn(date,b.start).getTime()+(DB.settings?.lateTol||10)*60000);
+  return date>exp;
 }
 function wouldBeLate(emp,date=new Date()){
   if(!isRestaurantOpen(date))return false;
-  const sch=emp.schedules?.[date.getDay()];if(!sch?.enabled||!sch.entry)return false;
-  const[eh,em]=sch.entry.split(':').map(Number);
-  const exp=new Date(date);exp.setHours(eh,em+(DB.settings?.lateTol||10),0,0);
+  const sch=empDaySchedule(emp,date);if(!sch?.enabled||!sch.blocks.length)return false;
+  const b=firstRelevantBlock(emp,date);if(!b)return false;
+  const exp=new Date(timeOn(date,b.start).getTime()+(DB.settings?.lateTol||10)*60000);
   return date>exp;
 }
 
@@ -2126,10 +2159,10 @@ function empCalendarHTML(emp,date=new Date()){
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:6px">${[1,2,3,4,5,6,0].map(i=>`<div class="fs11 muted tc fw7">${names[i]}</div>`).join('')}</div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px">${days.map(d=>{
       if(!d)return`<div style="min-height:46px"></div>`;
-      const sh=emp.schedules?.[d.getDay()],abs=getAbs(emp.id,d),w=workedOn(emp.id,d),today=sameDay(d,new Date());
-      const bg=abs?'rgba(245,158,11,.18)':w?'rgba(16,185,129,.16)':sh?.enabled?'var(--s3)':'rgba(91,95,120,.08)';
+      const sh=empDaySchedule(emp,d),abs=getAbs(emp.id,d),w=workedOn(emp.id,d),today=sameDay(d,new Date());
+      const bg=abs?'rgba(245,158,11,.18)':w?'rgba(16,185,129,.16)':sh?.enabled&&sh.blocks.length?'var(--s3)':'rgba(91,95,120,.08)';
       const bd=today?'var(--orange)':'var(--border)';
-      const sub=abs?abs.type:w?`${w.toFixed(1)}h`:sh?.enabled?`${sh.entry}-${sh.exit}`:'Libre';
+      const sub=abs?abs.type:w?`${w.toFixed(1)}h`:sh?.enabled?fmtBlocks(sh.blocks,' / '):'Libre';
       return`<div style="min-height:54px;border:1px solid ${bd};background:${bg};border-radius:8px;padding:6px 5px;text-align:center;overflow:hidden">
         <div class="fw8 fs13">${d.getDate()}</div>
         <div class="fs11 muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</div>
@@ -2168,7 +2201,7 @@ async function updateEmpAbsConflictWarning(){
 function renderEmpView(emp){
   if(empClockTimer){clearInterval(empClockTimer);empClockTimer=null;}
   const et=ETT();
-  const now=new Date(),dow=now.getDay(),last=lastAction(emp.id),w=workedOn(emp.id,now),sch=emp.schedules?.[dow];
+  const now=new Date(),last=lastAction(emp.id),w=workedOn(emp.id,now),sch=empDaySchedule(emp,now);
   const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));
   const monthHrs=monthHours(emp,now);
   const c=empColor(emp);
@@ -2240,13 +2273,13 @@ function renderEmpView(emp){
       <div class="fg"><label>${et.note}</label><input id="emp-abs-notes" placeholder="-"></div>
       <button class="btn btn-primary" onclick="requestEmpAbsence()">${et.send}</button>
     </div>
-    ${sch?.enabled?`<div class="card" style="margin-bottom:12px">
+    ${sch?.enabled&&sch.blocks.length?`<div class="card" style="margin-bottom:12px">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">${et.todaySchedule}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-size:11px;color:var(--text2)">${et.expectedIn}</div><div style="font-size:22px;font-weight:800;color:var(--green)">${sch.entry}</div></div>
+      ${sch.blocks.map((b,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;${i?'margin-top:10px;padding-top:10px;border-top:1px solid var(--border)':''}">
+        <div><div style="font-size:11px;color:var(--text2)">${et.expectedIn}${sch.blocks.length>1?' '+(i+1):''}</div><div style="font-size:22px;font-weight:800;color:var(--green)">${esc(b.start)}</div></div>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        <div style="text-align:right"><div style="font-size:11px;color:var(--text2)">${et.expectedOut}</div><div style="font-size:22px;font-weight:800;color:var(--red)">${sch.exit}</div></div>
-      </div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--text2)">${et.expectedOut}${sch.blocks.length>1?' '+(i+1):''}</div><div style="font-size:22px;font-weight:800;color:var(--red)">${esc(b.end)}</div></div>
+      </div>`).join('')}
     </div>`:`<div class="card" style="text-align:center;color:var(--text2);margin-bottom:12px">🌙 ${et.off}</div>`}
     <div style="margin-bottom:20px">
       <div class="section-lbl">${et.todayPunches}</div>
@@ -2496,8 +2529,8 @@ function renderDash(){
   const tx=T().dash;
   const now=new Date(),dow=now.getDay();
   const active=DB.employees.filter(e=>e.status==='active');
-  const present=active.filter(e=>DB.history.some(h=>h.empId===e.id&&sameDay(h.ts,now)));
-  const scheduled=isRestaurantOpen(now)?active.filter(e=>e.schedules?.[dow]?.enabled):[];
+  const present=active.filter(e=>isClockedIn(e.id,now));
+  const scheduled=isRestaurantOpen(now)?active.filter(e=>{const s=empDaySchedule(e,now);return s.enabled&&s.blocks.length;}):[];
   const missing=scheduled.filter(e=>!present.some(p=>p.id===e.id)&&!getAbs(e.id,now));
   const onVac=active.filter(e=>getAbs(e.id,now)?.type==='vacation');
 
@@ -2528,10 +2561,9 @@ function renderDash(){
       <div style="display:flex;flex-wrap:wrap;gap:12px">`;
     present.forEach(emp=>{
       const w=workedOn(emp.id,now);
-      const out=DB.history.find(h=>h.empId===emp.id&&sameDay(h.ts,now)&&h.type==='out');
       liveHTML+=`<div style="text-align:center;cursor:pointer" onclick="openDetail('${emp.id}')">
         <div style="position:relative;margin-bottom:4px">${mkAv(emp,'av-44')}
-          <div class="av-dot" style="background:${out?'#ef4444':'#10b981'}"></div>
+          <div class="av-dot" style="background:#10b981"></div>
         </div>
         <div style="font-size:10px;max-width:48px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${emp.name}</div>
         ${w?`<div style="font-size:9px;color:var(--text2)">${w.toFixed(1)}h</div>`:''}
@@ -2579,8 +2611,8 @@ function renderAtt(){
   const now=new Date(),dow=now.getDay();
   document.getElementById('att-date').textContent=now.toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'});
   const active=DB.employees.filter(e=>e.status==='active');
-  const sched=isRestaurantOpen(now)?active.filter(e=>e.schedules?.[dow]?.enabled):[];
-  const present=active.filter(e=>DB.history.some(h=>h.empId===e.id&&sameDay(h.ts,now)));
+  const sched=isRestaurantOpen(now)?active.filter(e=>{const s=empDaySchedule(e,now);return s.enabled&&s.blocks.length;}):[];
+  const present=active.filter(e=>isClockedIn(e.id,now));
   document.getElementById('att-kpi').innerHTML=`
     <div class="kpi"><div class="kpi-glow" style="background:var(--green)"></div>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
@@ -2590,21 +2622,19 @@ function renderAtt(){
       <div class="kpi-val" style="color:var(--red)">${sched.filter(e=>!present.some(p=>p.id===e.id)&&!getAbs(e.id,now)).length}</div><div class="kpi-sub">${tx.absent}</div></div>`;
   if(!sched.length){document.getElementById('att-list').innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><h3>${tx.none}</h3></div>`;return;}
   document.getElementById('att-list').innerHTML=sched.map(emp=>{
-    const sch=emp.schedules[dow];
+    const sch=empDaySchedule(emp,now);
     const recs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,now)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
-    const inn=recs.find(h=>h.type==='in'),out=recs.find(h=>h.type==='out'),w=workedOn(emp.id,now),late=isLate(emp,now),abs=getAbs(emp.id,now);
+    const ins=recs.filter(h=>h.type==='in'),outs=recs.filter(h=>h.type==='out'),inn=ins[0],out=outs[outs.length-1],w=workedOn(emp.id,now),late=isLate(emp,now),abs=getAbs(emp.id,now);
     const sc=abs?'#f59e0b':inn?'#10b981':'#ef4444';
     return`<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:12px">
       <div style="position:relative">${mkAv(emp,'av-44')}<div class="av-dot" style="background:${sc}"></div></div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:14px">${safeEmpName(emp)}</div>
-        <div style="font-size:11px;color:var(--text2)">${esc(emp.position)} · ${esc(sch.entry)}–${esc(sch.exit)}</div>
+        <div style="font-size:11px;color:var(--text2)">${esc(emp.position)} · ${fmtBlocks(sch.blocks,' / ')}</div>
         ${abs?`<div style="font-size:11px;color:var(--orange);margin-top:2px">🌴 ${abs.type}</div>`:''}
-        ${inn?`<div style="font-size:11px;color:var(--green);margin-top:2px">✅ ${ex.in} ${fmtTime(inn.ts)}${late?' ⚠️ '+ATW().late:''}</div>`:''}
-        ${inn?.note?`<div style="font-size:11px;color:var(--orange);margin-top:2px">${ATW().reason}: ${esc(inn.note)}</div>`:''}
+        ${ins.map((p,idx)=>`<div style="font-size:11px;color:var(--green);margin-top:2px">✅ ${ex.in}${ins.length>1?' '+(idx+1):''} ${fmtTime(p.ts)}${isPunchLate(emp,p.ts)?' ⚠️ '+ATW().late:''}</div>${p.note?`<div style="font-size:11px;color:var(--orange);margin-top:2px">${ATW().reason}: ${esc(p.note)}</div>`:''}`).join('')}
         ${breakStatusHTML(emp,now,!!inn)}
-        ${out?`<div style="font-size:11px;color:var(--red);margin-top:2px">🔴 ${ex.out} ${fmtTime(out.ts)}</div>`:''}
-        ${out?.note?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ ${esc(out.note)}</div>`:''}
+        ${outs.map((p,idx)=>`<div style="font-size:11px;color:var(--red);margin-top:2px">🔴 ${ex.out}${outs.length>1?' '+(idx+1):''} ${fmtTime(p.ts)}</div>${p.note?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ ${esc(p.note)}</div>`:''}`).join('')}
         ${w?`<div style="font-size:11px;color:var(--brand);margin-top:2px">⏱ ${w.toFixed(2)}h</div>`:''}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px" onclick="event.stopPropagation()">
@@ -2675,32 +2705,37 @@ async function copyText(text,msg='Copié'){
   try{await navigator.clipboard.writeText(text);toast(msg);}
   catch(e){toast(text,'#4f6ef7');}
 }
-const defSched=()=>{const s={};for(let i=0;i<7;i++)s[i]={enabled:i>=1&&i<=5,entry:'09:00',exit:'17:00'};return s;};
+const defSched=()=>{const s={};for(let i=0;i<7;i++)s[i]={enabled:i>=1&&i<=5,blocks:[{start:'09:00',end:'17:00'}]};return s;};
 function updatePL(){document.getElementById('ef-paylbl').textContent=document.getElementById('ef-paytype').value==='hourly'?'Taux/h (CHF)':'Salaire/mois (CHF)';}
 function handlePhoto(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{photoData=e.target.result;document.getElementById('photo-ring').innerHTML=`<img src="${photoData}">`;};r.readAsDataURL(f);}
 function renderSchedEd(sched){
-  document.getElementById('ef-sched').innerHTML=L().daysFull.map((d,i)=>`
+  document.getElementById('ef-sched').innerHTML=L().daysFull.map((d,i)=>{
+    const day={...(sched[i]||{}),blocks:normalizeBlocks(sched[i],'employee')},blocks=[day.blocks[0]||{start:'09:00',end:'17:00'},day.blocks[1]||{start:'',end:''}];
+    return`
     <div style="background:var(--s3);border-radius:var(--r3);padding:10px 12px;margin-bottom:6px">
-      <div style="display:flex;align-items:center;justify-content:space-between;${sched[i]?.enabled?'margin-bottom:10px':''}">
+      <div style="display:flex;align-items:center;justify-content:space-between;${day.enabled?'margin-bottom:10px':''}">
         <span style="font-weight:700;font-size:13px">${d}</span>
-        <div class="tgl ${sched[i]?.enabled?'on':''}" id="st-${i}" onclick="toggleSD(${i})"></div>
+        <div class="tgl ${day.enabled?'on':''}" id="st-${i}" onclick="toggleSD(${i})"></div>
       </div>
-      <div id="stimes-${i}" style="display:${sched[i]?.enabled?'grid':'none'};grid-template-columns:1fr 1fr;gap:8px">
-        <div class="fg" style="margin:0"><label>Entrée</label><input type="time" id="se-${i}" value="${sched[i]?.entry||'09:00'}"></div>
-        <div class="fg" style="margin:0"><label>Sortie</label><input type="time" id="sx-${i}" value="${sched[i]?.exit||'17:00'}"></div>
+      <div id="stimes-${i}" style="display:${day.enabled?'grid':'none'};gap:8px">
+        ${blocks.map((b,n)=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="fg" style="margin:0"><label>${n?'Entrée 2':'Entrée'}</label><input type="time" id="se-${i}-${n}" value="${esc(b.start||'')}"></div>
+          <div class="fg" style="margin:0"><label>${n?'Sortie 2':'Sortie'}</label><input type="time" id="sx-${i}-${n}" value="${esc(b.end||'')}"></div>
+        </div>`).join('')}
+        <div style="font-size:10px;color:var(--text2)">Segundo bloque opcional para turnos partidos.</div>
       </div>
-    </div>`).join('');
+    </div>`;}).join('');
 }
 function toggleSD(i){const t=document.getElementById(`st-${i}`),m=document.getElementById(`stimes-${i}`);t.classList.toggle('on');m.style.display=t.classList.contains('on')?'grid':'none';}
-function getSchedEd(){const s={};for(let i=0;i<7;i++){const on=document.getElementById(`st-${i}`)?.classList.contains('on')||false;s[i]={enabled:on,entry:document.getElementById(`se-${i}`)?.value||'09:00',exit:document.getElementById(`sx-${i}`)?.value||'17:00'};}return s;}
+function getSchedEd(){const s={};for(let i=0;i<7;i++){const on=document.getElementById(`st-${i}`)?.classList.contains('on')||false;const blocks=[0,1].map(n=>({start:document.getElementById(`se-${i}-${n}`)?.value,end:document.getElementById(`sx-${i}-${n}`)?.value})).filter(b=>b.start&&b.end);s[i]={enabled:on,blocks:blocks.length?blocks:[{start:'09:00',end:'17:00'}]};}return s;}
 function seedVisibleWeekFromSchedule(emp){
   if(!emp?.id||!emp.schedules)return;
   for(let i=0;i<7;i++){
     const d=new Date(shiftWS.getTime()+i*86400000),ds=d.toISOString().split('T')[0],key=`${emp.id}_${ds}`;
     if(DB.shifts[key]&&DB.shifts[key].notes!=='Horaire de base')continue;
-    const sch=emp.schedules[d.getDay()];
-    if(sch?.enabled){
-      DB.shifts[key]={type:'morning',in:sch.entry||'09:00',out:sch.exit||'17:00',notes:'Horaire de base'};
+    const sch=empDaySchedule(emp,d),first=sch.blocks[0];
+    if(sch?.enabled&&first){
+      DB.shifts[key]={type:'morning',in:first.start||'09:00',out:first.end||'17:00',blocks:sch.blocks,notes:'Horaire de base'};
       sbSaveShift(key,DB.shifts[key]).catch(console.error);
     }else if(DB.shifts[key]?.notes==='Horaire de base'){
       DB.shifts[key]={type:'off',in:null,out:null,notes:'Horaire de base'};
@@ -2735,7 +2770,7 @@ function openDetail(empId){
   const seniority=startDays<30?`${startDays}j`:startDays<365?`${Math.floor(startDays/30)}m`:`${Math.floor(startDays/365)}a`;
   const sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
   const c=empColor(emp);
-  const schedHTML=L().daysFull.map((d,i)=>{const sch=emp.schedules?.[i];return`<div class="rrow"><span class="muted">${esc(d)}</span><span style="font-weight:700;text-align:right;color:${sch?.enabled?'var(--text)':'var(--text3)'}">${sch?.enabled?`${esc(sch.entry||'09:00')} - ${esc(sch.exit||'17:00')}`:'Libre'}</span></div>`;}).join('');
+  const schedHTML=L().daysFull.map((d,i)=>{const sch=empDaySchedule(emp,new Date(2026,0,4+i));return`<div class="rrow"><span class="muted">${esc(d)}</span><span style="font-weight:700;text-align:right;color:${sch?.enabled&&sch.blocks.length?'var(--text)':'var(--text3)'}">${sch?.enabled&&sch.blocks.length?fmtBlocks(sch.blocks,'<br>'):'Libre'}</span></div>`;}).join('');
 
   document.getElementById('detail-content').innerHTML=`
     <div class="modal-handle"></div>
@@ -2835,6 +2870,7 @@ function shiftLabel(sh){
   if(sh.type==='rest')return 'Repos';
   if(sh.type==='off')return 'Libre';
   if(sh.type==='abs')return 'ABS';
+  if(Array.isArray(sh.blocks)&&sh.blocks.length)return fmtBlocks(sh.blocks,'<br>');
   return `${sh.in||'09:00'}-${sh.out||'17:00'}`;
 }
 function renderShifts(){
@@ -2848,12 +2884,13 @@ function renderShifts(){
   document.getElementById('shift-grid').innerHTML=active.map(emp=>{
     let row=`<div class="shift-row" style="grid-template-columns:${cols}"><div style="display:flex;align-items:center;gap:6px;min-width:0">${mkAv(emp,'av-28')}<span style="font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${emp.name}</span></div>`;
     dates.forEach(d=>{
-      const ds=d.toISOString().split('T')[0],key=`${emp.id}_${ds}`,manual=DB.shifts[key],sch=emp.schedules?.[d.getDay()],abs=getAbs(emp.id,d);
+      const ds=d.toISOString().split('T')[0],key=`${emp.id}_${ds}`,manual=DB.shifts[key],sch=empDaySchedule(emp,d),abs=getAbs(emp.id,d);
       let sh=null,type='off';
       if(!isRestaurantOpen(d)){sh={type:'closed'};type='off';}
       else if(abs){sh={type:'abs'};type='abs';}
+      else if(manual&&manual.notes!=='Horaire de base'){sh=manual;type=manual.type;}
+      else if(sch?.enabled&&sch.blocks.length){sh={type:'morning',blocks:sch.blocks,in:sch.blocks[0].start,out:sch.blocks[0].end};type='morning';}
       else if(manual){sh=manual;type=manual.type;}
-      else if(sch?.enabled){sh={type:'morning',in:sch.entry||'09:00',out:sch.exit||'17:00'};type='morning';}
       row+=`<div class="s-cell ${type}" ${sh?.type==='closed'?'':`onclick="openShiftModal(${jsArg(emp.id)},${jsArg(ds)})"`} style="font-size:10px;line-height:1.2">${shiftLabel(sh)}</div>`;
     });
     row+='</div>';return row;
@@ -2862,10 +2899,11 @@ function renderShifts(){
 function openShiftModal(empId,dateStr){
   const emp=DB.employees.find(e=>e.id===empId);
   shiftKey=`${empId}_${dateStr}`;const sh=DB.shifts[shiftKey];
+  const base=empDaySchedule(emp,new Date(dateStr)),first=base.blocks[0]||{};
   document.getElementById('shift-mtitle').textContent=`${emp?.name||'?'} · ${new Date(dateStr).toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'})}`;
   shiftType=sh?.type||'morning';
-  document.getElementById('sh-in').value=sh?.in||emp?.schedules?.[new Date(dateStr).getDay()]?.entry||'09:00';
-  document.getElementById('sh-out').value=sh?.out||emp?.schedules?.[new Date(dateStr).getDay()]?.exit||'17:00';
+  document.getElementById('sh-in').value=sh?.in||first.start||'09:00';
+  document.getElementById('sh-out').value=sh?.out||first.end||'17:00';
   document.getElementById('sh-notes').value=sh?.notes||'';
   const tx=TL('shift');
   const opts=[{v:'morning',l:'🌅 '+tx.morning,c:'#06b6d4'},{v:'afternoon',l:'☀️ '+tx.afternoon,c:'#f59e0b'},{v:'evening',l:'🌆 '+tx.evening,c:'#7c3aed'},{v:'night',l:'🌙 '+tx.night,c:'#4f6ef7'},{v:'rest',l:'✅ '+tx.rest,c:'#10b981'},{v:'off',l:'❌ '+tx.off,c:'#5a5e78'}];
@@ -2962,12 +3000,9 @@ function payModeLabel(emp){return emp.payType==='monthly'?'Mensuel fixe':'Horair
 function payBaseLabel(emp){return emp.payType==='monthly'?`CHF ${(emp.salary||0).toFixed(2)}/mois`:`CHF ${(emp.rate||0).toFixed(2)}/h`;}
 function scheduledHoursOn(emp,date){
   if(!isRestaurantOpen(date))return 0;
-  const sch=emp.schedules?.[date.getDay()];
-  if(!sch?.enabled||!sch.entry||!sch.exit)return 0;
-  const [ih,im]=sch.entry.split(':').map(Number),[oh,om]=sch.exit.split(':').map(Number);
-  const start=new Date(date),end=new Date(date);start.setHours(ih,im,0,0);end.setHours(oh,om,0,0);
-  if(end<=start)end.setDate(end.getDate()+1);
-  return Math.max(0,(end-start)/3600000);
+  const sch=empDaySchedule(emp,date);
+  if(!sch?.enabled||!sch.blocks.length)return 0;
+  return sch.blocks.reduce((sum,b)=>sum+blockHours(date,b),0);
 }
 function annualExtraHours(emp,year=new Date().getFullYear()){
   const days=new Set(DB.history.filter(h=>h.empId===emp.id&&new Date(h.ts).getFullYear()===year).map(h=>new Date(h.ts).toDateString()));
@@ -3005,16 +3040,15 @@ function monthlyEmployeeReport(emp,y,m){
     const date=new Date(y,m,d);
     if(date>new Date())continue;
     if(!isRestaurantOpen(date))continue;
-    const sch=emp.schedules?.[date.getDay()];
-    if(!sch?.enabled)continue;
+    const sch=empDaySchedule(emp,date);
+    if(!sch?.enabled||!sch.blocks.length)continue;
     const dr=recs.filter(h=>sameDay(h.ts,date));
     if(!dr.length&&!getAbs(emp.id,date)){abs++;absentDates.push(fmtDate(date));continue;}
-    const inn=dr.find(h=>h.type==='in');
-    if(inn){
-      const[eh,em]=sch.entry.split(':').map(Number);
-      const exp=new Date(date);exp.setHours(eh,em+tol,0,0);
-      if(new Date(inn.ts)>exp)late++;
-    }
+    if(dr.filter(h=>h.type==='in').some(inn=>{
+      const b=firstRelevantBlock(emp,new Date(inn.ts))||sch.blocks[0];
+      const exp=new Date(timeOn(date,b.start).getTime()+tol*60000);
+      return new Date(inn.ts)>exp;
+    }))late++;
   }
   const lateNotes=recs.filter(r=>r.type==='in'&&r.note).map(r=>`${fmtDate(r.ts)}: ${r.note}`);
   const att=days.size+abs>0?((days.size/(days.size+abs))*100):0;
