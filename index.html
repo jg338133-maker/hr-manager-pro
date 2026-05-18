@@ -1015,6 +1015,10 @@ let MASTER={restaurants:[],profiles:[],stats:{}};
 const isDemo=()=>currentUser?.demo===true;
 function loadLocal(){try{const s=localStorage.getItem('hrm_pro');if(s)DB={...DB,...JSON.parse(s)};}catch(e){}}
 function saveLocal(){try{if(isDemo())return;localStorage.setItem('hrm_pro',JSON.stringify(DB));}catch(e){}}
+const activeBreakKey=empId=>`hrm_active_break_${REST_ID}_${empId}`;
+function saveActiveBreak(empId,rec){try{localStorage.setItem(activeBreakKey(empId),JSON.stringify({empId,ts:rec.ts,note:rec.note||'',type:'break_start'}));}catch(e){}}
+function readActiveBreak(empId){try{const raw=localStorage.getItem(activeBreakKey(empId));return raw?JSON.parse(raw):null;}catch(e){return null;}}
+function clearActiveBreak(empId){try{localStorage.removeItem(activeBreakKey(empId));}catch(e){}}
 loadLocal();
 
 function demoDB(){
@@ -1577,6 +1581,7 @@ async function loadEmployeePortal(emp){
   try{
     const data=await sbEmployeePortalData(emp);
     DB.history=(data.attendance||[]).map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||fullName(emp),type:x.type,ts:x.timestamp,note:x.note||''}));
+    restoreActiveBreak(emp);
     DB.absences=(data.absences||[]).map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     DB.shifts={};
     (data.shifts||[]).forEach(x=>{const blocks=normalizeBlocks({blocks:x.blocks,start:x.start_time,end:x.end_time},'restaurant');DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,blocks,notes:x.notes||''};});
@@ -1629,8 +1634,22 @@ async function registerBreak(empId,minutes){
   if(currentUser?.role==='employee'&&emp.email&&emp.pin)sbEmployeeBreak(emp,mins).catch(console.error);
   else Promise.all([sbRegAt(empId,fullName(emp),'break_start',recStart.ts),sbRegAt(empId,fullName(emp),'break_end',recEnd.ts)]).catch(console.error);
 }
+function restoreActiveBreak(emp){
+  if(!emp?.id)return null;
+  const saved=readActiveBreak(emp.id);if(!saved?.ts||!sameDay(saved.ts,new Date())){clearActiveBreak(emp.id);return null;}
+  const closed=DB.history.some(h=>h.empId===emp.id&&h.type==='break_end'&&new Date(h.ts)>new Date(saved.ts));
+  if(closed){clearActiveBreak(emp.id);return null;}
+  const exists=DB.history.some(h=>h.empId===emp.id&&h.type==='break_start'&&Math.abs(new Date(h.ts)-new Date(saved.ts))<2000);
+  const rec={id:'local-active-break',empId:emp.id,empName:fullName(emp),type:'break_start',ts:saved.ts,note:saved.note||''};
+  if(!exists)DB.history.unshift(rec);
+  return rec;
+}
 function openBreakOn(empId,date=new Date()){
-  return breakInfoOn(empId,date)?.open||null;
+  const open=breakInfoOn(empId,date)?.open;
+  if(open)return open;
+  const emp=DB.employees.find(e=>e.id===empId)||currentUser?.emp;
+  if(emp?.id===empId)return restoreActiveBreak(emp);
+  return null;
 }
 function toggleBreakPicker(empId){
   breakPickerEmpId=breakPickerEmpId===empId?null:empId;
@@ -1644,6 +1663,7 @@ async function startEmpBreak(empId,minutes){
   if(today[today.length-1]?.type!=='in'){toast(et.clockInFirst,'#f59e0b');return;}
   if(openBreakOn(empId)){toast(et.breakAlready,'#f59e0b');return;}
   const rec={id:uid(),empId,empName:fullName(emp),type:'break_start',ts:new Date().toISOString(),note:`${mins} min`};
+  saveActiveBreak(empId,rec);
   DB.history.unshift(rec);breakPickerEmpId=null;saveLocal();renderEmpView(emp);
   toast(`☕ Pause ${mins} min — ${emp.name}`);
   if(currentUser?.role==='employee'&&emp.email&&emp.pin)sbEmployeeRegister(emp,'break_start',rec.note).catch(console.error);
@@ -1653,6 +1673,7 @@ async function endEmpBreak(empId){
   const emp=DB.employees.find(e=>e.id===empId),open=openBreakOn(empId);
   if(!emp||!open){toast('Aucune pause en cours','#f59e0b');return;}
   const rec={id:uid(),empId,empName:fullName(emp),type:'break_end',ts:new Date().toISOString(),note:open.note||''};
+  clearActiveBreak(empId);
   DB.history.unshift(rec);saveLocal();renderEmpView(emp);
   const mins=Math.max(1,Math.round((new Date(rec.ts)-new Date(open.ts))/60000));
   toast(`✅ ${ETT().breakDone} · ${mins} min`);
@@ -1709,10 +1730,10 @@ function breakInfoOn(empId,date){
   if(!r.length)return null;
   const ranges=[];let start=null;
   r.forEach(h=>{
-    if(h.type==='break_start')start=h;
+    if(h.type==='break_start'&&(!start||new Date(h.ts)>new Date(start.ts)))start=h;
     if(h.type==='break_end'&&start){
       const mins=Math.max(0,Math.round((new Date(h.ts)-new Date(start.ts))/60000));
-      ranges.push({start:start.ts,end:h.ts,mins});
+      if(mins>=0)ranges.push({start:start.ts,end:h.ts,mins});
       start=null;
     }
   });
