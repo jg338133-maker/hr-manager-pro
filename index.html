@@ -223,9 +223,26 @@ input[type=date],input[type=time]{color-scheme:dark}
 /* EMP VIEW */
 #emp-view{position:fixed;inset:0;background:var(--bg);z-index:700;display:none;flex-direction:column;overflow-y:auto}
 #emp-view.open{display:flex}
-.emp-view-header{padding:60px 24px 28px;text-align:center}
+.emp-view-header{padding:60px 24px 28px;text-align:center;position:relative}
 .emp-view-actions{padding:0 20px 20px;display:flex;flex-direction:column;gap:10px}
 .emp-view-section{padding:0 20px;margin-bottom:20px}
+.emp-help-btn{position:absolute;right:18px;top:18px;width:42px;height:42px;border-radius:14px;border:1px solid var(--border);background:rgba(24,28,50,.84);color:var(--text);font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(0,0,0,.28);cursor:pointer}
+.emp-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.emp-action{min-height:74px;border-radius:20px;border:1px solid var(--border);font-family:inherit;color:#fff;font-weight:850;font-size:17px;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 12px 26px rgba(0,0,0,.22);cursor:pointer}
+.emp-action svg{width:22px;height:22px;stroke:currentColor;stroke-width:2.4;fill:none}
+.emp-action.in{background:linear-gradient(135deg,#10b981,#16c79a)}
+.emp-action.out{background:linear-gradient(135deg,#ef4444,#f87171)}
+.emp-action.pause,.emp-action.logout{grid-column:1/-1;background:var(--s2);color:var(--text);box-shadow:none}
+.emp-action.logout{min-height:58px;color:var(--text2);font-size:15px}
+.emp-downloads{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.emp-download-btn{border:1px solid var(--border);background:var(--s2);border-radius:14px;padding:13px 10px;color:var(--text);font:800 13px inherit;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.emp-download-btn.primary{background:linear-gradient(135deg,var(--brand),#6b7cff);border-color:transparent;color:#fff}
+.emp-download-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2.2;fill:none}
+.emp-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:5px;margin-bottom:14px;position:sticky;top:0;z-index:3}
+.emp-nav button{border:0;background:transparent;color:var(--text2);border-radius:12px;padding:10px 4px;font:700 11px inherit;cursor:pointer}
+.emp-nav button.active{background:var(--brand);color:#fff;box-shadow:0 8px 22px rgba(79,110,247,.24)}
+.emp-schedule-block{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;background:var(--s3);border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:8px}
+.emp-schedule-time{font-size:24px;font-weight:900;line-height:1}
 .emp-clock{font-size:48px;font-weight:800;text-align:center;margin:16px 0;font-variant-numeric:tabular-nums;letter-spacing:-2px}
 .emp-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
 .emp-stat{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:12px 10px;text-align:center}
@@ -960,7 +977,15 @@ const EMP_UI={
   de:{clockIn:'Einstempeln',clockOut:'Ausstempeln',breakStart:'Pause starten',breakEnd:'Pause beenden',breakChoose:'Dauer wählen',breakActive:'In Pause seit',breakRemaining:'Verbleibende Zeit',breakOver:'Pausenzeit beendet',latePrompt:'Sie sind zu spät angekommen. Sie können den Grund eingeben:',outOpenBreak:'Sie haben eine offene Pause. Wenn Sie jetzt ausstempeln, bleibt sie ohne Abschluss. Fortfahren?',outNoBreak:'Keine Pause erfasst. Wenn Sie ausstempeln, wird der Manager informiert. Fortfahren?',clockInFirst:'Bitte zuerst einstempeln',breakAlready:'Pause läuft bereits',breakDone:'Pause beendet',logout:'Abmelden',tour:'Tour ansehen',today:'Heute',week:'Diese Woche',vac:'Ferien',medical:'Krankheit',personal:'Persönlich',monthHours:'Monatsstunden',calendar:'Kalender',absence:'Abwesenheit beantragen',type:'Typ',start:'Beginn',end:'Ende',note:'Notiz',send:'Anfrage senden',todaySchedule:'Heutiger Dienstplan',expectedIn:'Geplanter Beginn',expectedOut:'Geplantes Ende',off:'Freier Tag',todayPunches:'Heutige Buchungen',noneToday:'Keine Buchungen heute',in:'Eingang',out:'Ausgang',badge:'Mein Ausweis',badgeOpen:'Klicken, um das Portal zu öffnen',badgeLink:'Hier klicken zum Öffnen',pdf:'PDF herunterladen',card:'Meinen Ausweis herunterladen'},
   it:{clockIn:'Timbrata entrata',clockOut:'Timbrata uscita',breakStart:'Inizia pausa',breakEnd:'Termina pausa',breakChoose:'Scegli durata',breakActive:'In pausa dalle',breakRemaining:'Tempo rimanente',breakOver:'Tempo di pausa terminato',latePrompt:'Sei arrivato in ritardo. Puoi scrivere il motivo:',outOpenBreak:'Hai una pausa aperta. Se timbri l’uscita ora, la pausa resterà senza chiusura. Continuare?',outNoBreak:'Non hai registrato una pausa. Se timbri l’uscita, il manager sarà avvisato. Continuare?',clockInFirst:"Prima registra l'entrata",breakAlready:'Pausa già in corso',breakDone:'Pausa terminata',logout:'Esci',tour:'Vedi tour',today:'Oggi',week:'Questa settimana',vac:'Vacanze',medical:'Malattia',personal:'Personale',monthHours:'Ore del mese',calendar:'Calendario',absence:'Richiedere assenza',type:'Tipo',start:'Inizio',end:'Fine',note:'Nota',send:'Invia richiesta',todaySchedule:'Orario di oggi',expectedIn:'Entrata prevista',expectedOut:'Uscita prevista',off:'Giorno libero',todayPunches:'Timbrature di oggi',noneToday:'Nessuna timbratura oggi',in:'Entrata',out:'Uscita',badge:'Il mio badge',badgeOpen:'Clicca per aprire il tuo portale',badgeLink:'Clicca qui per aprire',pdf:'Scarica PDF',card:'Scarica il mio badge'}
 };
+const EMP_PORTAL={
+  fr:{tabHome:'Pointer',tabCalendar:'Calendrier',tabRequests:'Demandes',tabBadge:'Badge',correction:'Demander une correction',correctionDate:'Jour à corriger',correctionType:'Type de correction',correctionNote:'Expliquez ce qui s’est passé',correctionSent:'Correction envoyée',forgotIn:'Entrée oubliée',forgotOut:'Sortie oubliée',wrongTime:'Heure incorrecte',other:'Autre',myRequests:'Mes demandes',pending:'En attente',approved:'Approuvé',noRequests:'Aucune demande',scheduleBlock:'Service'},
+  es:{tabHome:'Fichar',tabCalendar:'Calendario',tabRequests:'Solicitudes',tabBadge:'Carnet',correction:'Solicitar corrección',correctionDate:'Día a corregir',correctionType:'Tipo de corrección',correctionNote:'Explica qué pasó',correctionSent:'Corrección enviada',forgotIn:'Olvidé entrada',forgotOut:'Olvidé salida',wrongTime:'Hora incorrecta',other:'Otro',myRequests:'Mis solicitudes',pending:'Pendiente',approved:'Aprobado',noRequests:'Sin solicitudes',scheduleBlock:'Turno'},
+  en:{tabHome:'Clock',tabCalendar:'Calendar',tabRequests:'Requests',tabBadge:'Card',correction:'Request correction',correctionDate:'Day to correct',correctionType:'Correction type',correctionNote:'Explain what happened',correctionSent:'Correction sent',forgotIn:'Forgot clock-in',forgotOut:'Forgot clock-out',wrongTime:'Wrong time',other:'Other',myRequests:'My requests',pending:'Pending',approved:'Approved',noRequests:'No requests',scheduleBlock:'Shift'},
+  de:{tabHome:'Buchen',tabCalendar:'Kalender',tabRequests:'Anfragen',tabBadge:'Ausweis',correction:'Korrektur anfragen',correctionDate:'Tag korrigieren',correctionType:'Korrekturtyp',correctionNote:'Erklären Sie, was passiert ist',correctionSent:'Korrektur gesendet',forgotIn:'Einstempeln vergessen',forgotOut:'Ausstempeln vergessen',wrongTime:'Falsche Zeit',other:'Andere',myRequests:'Meine Anfragen',pending:'Offen',approved:'Genehmigt',noRequests:'Keine Anfragen',scheduleBlock:'Schicht'},
+  it:{tabHome:'Timbratura',tabCalendar:'Calendario',tabRequests:'Richieste',tabBadge:'Badge',correction:'Richiedi correzione',correctionDate:'Giorno da correggere',correctionType:'Tipo di correzione',correctionNote:'Spiega cosa è successo',correctionSent:'Correzione inviata',forgotIn:'Entrata dimenticata',forgotOut:'Uscita dimenticata',wrongTime:'Orario errato',other:'Altro',myRequests:'Le mie richieste',pending:'In attesa',approved:'Approvata',noRequests:'Nessuna richiesta',scheduleBlock:'Turno'}
+};
 const ETT=()=>EMP_UI[lang]||EMP_UI.fr;
+const EPT=()=>EMP_PORTAL[lang]||EMP_PORTAL.fr;
 const ATT_WORDS={
   fr:{late:'retard',reason:'Motif',breakOpen:'Pause commencée',noClose:'sans fermeture'},
   es:{late:'retardo',reason:'Motivo',breakOpen:'Pausa iniciada',noClose:'sin cierre'},
@@ -1136,6 +1161,12 @@ const jsArg=v=>esc(JSON.stringify(String(v??'')));
 const clean=v=>String(v??'').replace(/[<>]/g,'').trim();
 const csvCell=v=>`"${String(v??'').replace(/"/g,'""')}"`;
 const initials=n=>(n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
+const iconIn=()=>`<svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>`;
+const iconOut=()=>`<svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/></svg>`;
+const iconPause=()=>`<svg viewBox="0 0 24 24"><path d="M8 5v14"/><path d="M16 5v14"/></svg>`;
+const iconLogout=()=>`<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>`;
+const iconFile=()=>`<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>`;
+const iconCard=()=>`<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10h5"/><path d="M7 14h3"/><path d="M15 14h2"/></svg>`;
 const LOCALES={fr:'fr-CH',es:'es-ES',en:'en-GB',de:'de-CH',it:'it-CH'};
 const appLocale=()=>LOCALES[lang]||'fr-CH';
 const fmtTime=iso=>new Date(iso).toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'});
@@ -2187,6 +2218,19 @@ async function requestEmpAbsence(){
     toast('Demande envoyée');
   }catch(e){console.error(e);toast('Impossible d’envoyer la demande','#ef4444');}
 }
+async function requestEmpCorrection(){
+  const emp=currentUser?.emp;if(!emp)return;
+  const ep=EPT(),date=document.getElementById('emp-cor-date')?.value,type=document.getElementById('emp-cor-type')?.value,notes=clean(document.getElementById('emp-cor-notes')?.value);
+  if(!date||!notes){toast(ep.correctionNote,'#ef4444');return;}
+  const label=ep[type]||type;
+  const payload=`${label}: ${notes}`;
+  try{
+    await sbEmployeeRequestAbsence(emp,'correction',date,date,payload);
+    DB.absences.unshift({id:uid(),empId:emp.id,type:'correction',start:date,end:date,approved:false,notes:payload});
+    renderEmpView(emp);
+    toast('✅ '+ep.correctionSent);
+  }catch(e){console.error(e);toast('Impossible d’envoyer la demande','#ef4444');}
+}
 async function updateEmpAbsConflictWarning(){
   const emp=currentUser?.emp,box=document.getElementById('emp-abs-conflict');if(!emp||!box)return;
   const type=document.getElementById('emp-abs-type')?.value,start=document.getElementById('emp-abs-start')?.value,end=document.getElementById('emp-abs-end')?.value;
@@ -2198,6 +2242,77 @@ async function updateEmpAbsConflictWarning(){
 }
 
 // ═══════ EMP VIEW ═══════
+let empSection='home';
+function setEmpSection(section){
+  empSection=section;
+  if(currentUser?.emp)renderEmpView(currentUser.emp);
+}
+function empScheduleCardHTML(sch,et,ep){
+  if(!(sch?.enabled&&sch.blocks.length))return `<div class="card" style="text-align:center;color:var(--text2);margin-bottom:12px">🌙 ${et.off}</div>`;
+  return `<div class="card" style="margin-bottom:12px">
+    <div style="font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">${et.todaySchedule}</div>
+    ${sch.blocks.map((b,i)=>`<div class="emp-schedule-block">
+      <div><div class="fs11 muted fw7">${ep.scheduleBlock} ${sch.blocks.length>1?i+1:''}</div><div class="emp-schedule-time" style="color:var(--green)">${esc(b.start)}</div></div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <div style="text-align:right"><div class="fs11 muted fw7">${et.expectedOut}</div><div class="emp-schedule-time" style="color:var(--red)">${esc(b.end)}</div></div>
+    </div>`).join('')}
+  </div>`;
+}
+function empPunchesHTML(emp,et,now=new Date()){
+  const todayRecs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,now));
+  return `<div style="margin-bottom:20px">
+    <div class="section-lbl">${et.todayPunches}</div>
+    ${todayRecs.length?todayRecs.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:6px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${r.type==='in'?'var(--green)':r.type==='out'?'var(--red)':'var(--orange)'}"></div>
+      <span style="font-weight:600">${r.type==='in'?et.in:r.type==='out'?et.out:attLabel(r.type)}</span>
+      <span style="margin-left:auto;color:var(--text2)">${fmtTime(r.ts)}</span>
+    </div>`).join(''):`<div style="color:var(--text2);font-size:13px;text-align:center;padding:12px 0">${et.noneToday}</div>`}
+  </div>`;
+}
+function empRequestsHTML(emp,et,ep){
+  const reqs=DB.absences.filter(a=>a.empId===emp.id).sort((a,b)=>new Date(b.start)-new Date(a.start)).slice(0,6);
+  return `<div class="card" id="emp-tour-absence">
+    <div class="section-lbl" style="margin-top:0">${et.absence}</div>
+    <div class="fg"><label>${et.type}</label><select id="emp-abs-type" onchange="updateEmpAbsConflictWarning()"><option value="vacation">🌴 ${et.vac}</option><option value="medical">🏥 ${et.medical}</option><option value="personal">👤 ${et.personal}</option></select></div>
+    <div class="frow"><div class="fg"><label>${et.start}</label><input type="date" id="emp-abs-start" onchange="updateEmpAbsConflictWarning()"></div><div class="fg"><label>${et.end}</label><input type="date" id="emp-abs-end" onchange="updateEmpAbsConflictWarning()"></div></div>
+    <div id="emp-abs-conflict" style="display:none"></div>
+    <div class="fg"><label>${et.note}</label><input id="emp-abs-notes" placeholder="-"></div>
+    <button class="btn btn-primary" onclick="requestEmpAbsence()">${et.send}</button>
+  </div>
+  <div class="card">
+    <div class="section-lbl" style="margin-top:0">${ep.correction}</div>
+    <div class="fg"><label>${ep.correctionDate}</label><input type="date" id="emp-cor-date" value="${new Date().toISOString().split('T')[0]}"></div>
+    <div class="fg"><label>${ep.correctionType}</label><select id="emp-cor-type"><option value="forgotIn">${ep.forgotIn}</option><option value="forgotOut">${ep.forgotOut}</option><option value="wrongTime">${ep.wrongTime}</option><option value="other">${ep.other}</option></select></div>
+    <div class="fg"><label>${ep.correctionNote}</label><input id="emp-cor-notes" placeholder="-"></div>
+    <button class="btn btn-primary" onclick="requestEmpCorrection()">${et.send}</button>
+  </div>
+  <div class="card">
+    <div class="section-lbl" style="margin-top:0">${ep.myRequests}</div>
+    ${reqs.length?reqs.map(a=>`<div class="rrow"><span class="muted">${esc(fmtDate(a.start))} · ${esc(a.type)}</span><span class="chip ${a.approved?'chip-green':'chip-orange'}">${a.approved?ep.approved:ep.pending}</span></div>${a.notes?`<div class="fs11 muted" style="margin:-4px 0 8px">${esc(a.notes)}</div>`:''}`).join(''):`<div class="fs12 muted tc">${ep.noRequests}</div>`}
+  </div>`;
+}
+function empBadgeHTML(emp,et,c){
+  return `<div style="margin-bottom:20px">
+    <div class="section-lbl">${et.badge}</div>
+    <div class="badge-card">
+      <div class="badge-header" style="min-height:250px;background:radial-gradient(circle at 18% 5%,${c}55,transparent 34%),linear-gradient(180deg,${c}33,transparent)">
+        <div class="badge-kicker">${esc((DB.settings?.company||'MON RESTAURANT').toUpperCase())}</div>
+        <div class="badge-photo">${safeImgSrc(emp.photo)?`<img src="${esc(safeImgSrc(emp.photo))}" alt="">`:esc(initials(fullName(emp)))}</div>
+        <div class="badge-emp-name">${safeEmpName(emp)}</div>
+        <div class="badge-emp-role">${esc(emp.position)} · ${esc(emp.dept)}</div>
+      </div>
+      <div class="badge-body">
+      <div class="qr-wrap" style="margin:0 auto">${genQR(employeeAccessUrl(emp),150)}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:8px">${et.badgeOpen}</div>
+      <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">${et.badgeLink}</a>
+      <div class="emp-downloads">
+        <button class="emp-download-btn primary" onclick="downloadBadgePDF(currentUser.emp)">${iconFile()} ${et.pdf}</button>
+        <button class="emp-download-btn" onclick="downloadBadge(currentUser.emp)">${iconCard()} ${et.card}</button>
+      </div>
+      </div>
+    </div>
+  </div>`;
+}
 function renderEmpView(emp){
   if(empClockTimer){clearInterval(empClockTimer);empClockTimer=null;}
   const et=ETT();
@@ -2213,6 +2328,7 @@ function renderEmpView(emp){
 
   document.getElementById('evh').style.background=`linear-gradient(160deg,${c}33,transparent)`;
   document.getElementById('evh').innerHTML=`
+    <button class="emp-help-btn" onclick="startTour('employee',true)" aria-label="${esc(et.tour)}">?</button>
     ${renderEmployeeLangBar()}
     <div style="position:relative;display:inline-block;margin-bottom:14px">
       ${mkAv(emp,'av-72')}
@@ -2228,12 +2344,14 @@ function renderEmpView(emp){
 
   document.getElementById('eva').innerHTML=`
     <div class="emp-clock" id="emp-clock">${now.toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'})}</div>
-    <button class="btn btn-success" onclick="register('${emp.id}','in');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">✅ ${et.clockIn}</button>
+    <div class="emp-action-grid">
+    <button class="emp-action in" onclick="register('${emp.id}','in');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">${iconIn()} ${et.clockIn}</button>
+    <button class="emp-action out" onclick="register('${emp.id}','out');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">${iconOut()} ${et.clockOut}</button>
     ${openBreak?`
-      <div style="background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.28);border-radius:var(--r2);padding:12px;text-align:center;color:var(--orange);font-size:13px;font-weight:800">☕ ${et.breakActive} ${fmtTime(openBreak.ts)}${breakCountdownHTML(openBreak,et)}</div>
-      <button class="btn btn-primary" onclick="endEmpBreak('${emp.id}')">✅ ${et.breakEnd}</button>
+      <div style="grid-column:1/-1;background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.28);border-radius:var(--r2);padding:12px;text-align:center;color:var(--orange);font-size:13px;font-weight:800">${et.breakActive} ${fmtTime(openBreak.ts)}${breakCountdownHTML(openBreak,et)}</div>
+      <button class="emp-action pause" onclick="endEmpBreak('${emp.id}')">${iconPause()} ${et.breakEnd}</button>
     `:`
-      <button class="btn btn-ghost" onclick="toggleBreakPicker('${emp.id}')">☕ ${et.breakStart}</button>
+      <button class="emp-action pause" onclick="toggleBreakPicker('${emp.id}')">${iconPause()} ${et.breakStart}</button>
       ${showBreakPicker?`<div style="background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:10px">
         <div class="fs12 muted tc fw7 mb8">${et.breakChoose}</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
@@ -2243,71 +2361,26 @@ function renderEmpView(emp){
         </div>
       </div>`:''}
     `}
-    <button class="btn btn-danger" onclick="register('${emp.id}','out');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">🔴 ${et.clockOut}</button>
-    <button class="btn btn-ghost" onclick="startTour('employee',true)">${et.tour}</button>
-    <button class="btn btn-ghost" onclick="logout()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      ${et.logout}
-    </button>`;
+    <button class="emp-action logout" onclick="logout()">${iconLogout()} ${et.logout}</button>
+    </div>`;
   empClockTimer=setInterval(()=>{const el=document.getElementById('emp-clock');if(el)el.textContent=new Date().toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'});updateEmpBreakCountdown();},1000);
   updateEmpBreakCountdown();
 
-  const todayRecs=DB.history.filter(h=>h.empId===emp.id&&sameDay(h.ts,now));
-  document.getElementById('evs').innerHTML=`
-    <div class="emp-stat-row" id="emp-tour-stats">
-      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--brand)">${w?w.toFixed(1)+'h':'-'}</div><div class="emp-stat-lbl">${et.today}</div></div>
-      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--orange)">${wkHrs.toFixed(1)}h</div><div class="emp-stat-lbl">${et.week}</div></div>
-      <div class="emp-stat"><div class="emp-stat-val" style="color:var(--green)">${vacLeft}j</div><div class="emp-stat-lbl">${et.vac}</div></div>
-    </div>
-    <div class="card" id="emp-tour-month" style="margin-bottom:12px;text-align:center">
-      <div class="section-lbl" style="margin-top:0">${et.monthHours}</div>
-      <div style="font-size:34px;font-weight:800;color:var(--brand)">${monthHrs.toFixed(1)}h</div>
-      <div class="fs12 muted">${fmtMonth(now)}</div>
-    </div>
-    ${empCalendarHTML(emp,now)}
-    <div class="card" id="emp-tour-absence">
-      <div class="section-lbl" style="margin-top:0">${et.absence}</div>
-      <div class="fg"><label>${et.type}</label><select id="emp-abs-type" onchange="updateEmpAbsConflictWarning()"><option value="vacation">🌴 ${et.vac}</option><option value="medical">🏥 ${et.medical}</option><option value="personal">👤 ${et.personal}</option></select></div>
-      <div class="frow"><div class="fg"><label>${et.start}</label><input type="date" id="emp-abs-start" onchange="updateEmpAbsConflictWarning()"></div><div class="fg"><label>${et.end}</label><input type="date" id="emp-abs-end" onchange="updateEmpAbsConflictWarning()"></div></div>
-      <div id="emp-abs-conflict" style="display:none"></div>
-      <div class="fg"><label>${et.note}</label><input id="emp-abs-notes" placeholder="-"></div>
-      <button class="btn btn-primary" onclick="requestEmpAbsence()">${et.send}</button>
-    </div>
-    ${sch?.enabled&&sch.blocks.length?`<div class="card" style="margin-bottom:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">${et.todaySchedule}</div>
-      ${sch.blocks.map((b,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;${i?'margin-top:10px;padding-top:10px;border-top:1px solid var(--border)':''}">
-        <div><div style="font-size:11px;color:var(--text2)">${et.expectedIn}${sch.blocks.length>1?' '+(i+1):''}</div><div style="font-size:22px;font-weight:800;color:var(--green)">${esc(b.start)}</div></div>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        <div style="text-align:right"><div style="font-size:11px;color:var(--text2)">${et.expectedOut}${sch.blocks.length>1?' '+(i+1):''}</div><div style="font-size:22px;font-weight:800;color:var(--red)">${esc(b.end)}</div></div>
-      </div>`).join('')}
-    </div>`:`<div class="card" style="text-align:center;color:var(--text2);margin-bottom:12px">🌙 ${et.off}</div>`}
-    <div style="margin-bottom:20px">
-      <div class="section-lbl">${et.todayPunches}</div>
-      ${todayRecs.length?todayRecs.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:6px">
-        <div style="width:8px;height:8px;border-radius:50%;background:${r.type==='in'?'var(--green)':'var(--red)'}"></div>
-        <span style="font-weight:600">${r.type==='in'?et.in:et.out}</span>
-        <span style="margin-left:auto;color:var(--text2)">${fmtTime(r.ts)}</span>
-      </div>`).join(''):
-      `<div style="color:var(--text2);font-size:13px;text-align:center;padding:12px 0">${et.noneToday}</div>`}
-    </div>
-    <div style="margin-bottom:20px">
-      <div class="section-lbl">${et.badge}</div>
-      <div class="badge-card">
-        <div class="badge-header" style="min-height:250px;background:radial-gradient(circle at 18% 5%,${c}55,transparent 34%),linear-gradient(180deg,${c}33,transparent)">
-          <div class="badge-kicker">${esc((DB.settings?.company||'MON RESTAURANT').toUpperCase())}</div>
-          <div class="badge-photo">${safeImgSrc(emp.photo)?`<img src="${esc(safeImgSrc(emp.photo))}" alt="">`:esc(initials(fullName(emp)))}</div>
-          <div class="badge-emp-name">${safeEmpName(emp)}</div>
-          <div class="badge-emp-role">${esc(emp.position)} · ${esc(emp.dept)}</div>
-        </div>
-        <div class="badge-body">
-        <div class="qr-wrap" style="margin:0 auto">${genQR(employeeAccessUrl(emp),150)}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:8px">${et.badgeOpen}</div>
-        <a class="badge-link-pill mt12" href="${esc(employeeAccessUrl(emp))}" target="_blank" rel="noopener">${et.badgeLink}</a>
-        <button class="btn btn-primary mt12" onclick="downloadBadgePDF(currentUser.emp)">⬇️ ${et.pdf}</button>
-        <button class="btn btn-ghost mt12" onclick="downloadBadge(currentUser.emp)">⬇️ ${et.card}</button>
-        </div>
-      </div>
-    </div>`;
+  const ep=EPT();
+  const stats=`<div class="emp-stat-row" id="emp-tour-stats">
+    <div class="emp-stat"><div class="emp-stat-val" style="color:var(--brand)">${w?w.toFixed(1)+'h':'-'}</div><div class="emp-stat-lbl">${et.today}</div></div>
+    <div class="emp-stat"><div class="emp-stat-val" style="color:var(--orange)">${wkHrs.toFixed(1)}h</div><div class="emp-stat-lbl">${et.week}</div></div>
+    <div class="emp-stat"><div class="emp-stat-val" style="color:var(--green)">${vacLeft}j</div><div class="emp-stat-lbl">${et.vac}</div></div>
+  </div>`;
+  const body={
+    home:`${stats}${empScheduleCardHTML(sch,et,ep)}${empPunchesHTML(emp,et,now)}`,
+    calendar:`${stats}<div class="card" id="emp-tour-month" style="margin-bottom:12px;text-align:center"><div class="section-lbl" style="margin-top:0">${et.monthHours}</div><div style="font-size:34px;font-weight:800;color:var(--brand)">${monthHrs.toFixed(1)}h</div><div class="fs12 muted">${fmtMonth(now)}</div></div>${empCalendarHTML(emp,now)}`,
+    requests:empRequestsHTML(emp,et,ep),
+    badge:empBadgeHTML(emp,et,c)
+  };
+  document.getElementById('evs').innerHTML=`<div class="emp-nav">
+    ${[['home',ep.tabHome],['calendar',ep.tabCalendar],['requests',ep.tabRequests],['badge',ep.tabBadge]].map(([k,l])=>`<button class="${empSection===k?'active':''}" onclick="setEmpSection('${k}')">${esc(l)}</button>`).join('')}
+  </div>${body[empSection]||body.home}`;
   renderQRCodes(document.getElementById('evs'));
 }
 
