@@ -10,6 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/6.0.1/tesseract.min.js"></script>
 <script>
 /**
  * Minified by jsDelivr using Terser v5.37.0.
@@ -2876,7 +2877,7 @@ function normalizeContractDate(s){
   return '';
 }
 function parseMoneyValue(s){
-  const raw=String(s||'').replace(/[’'\s]/g,'').replace(/,/g,'.');
+  const raw=String(s||'').replace(/[^\d,.'’]/g,'').replace(/[’']/g,'').replace(/,/g,'.');
   const n=parseFloat(raw);
   return Number.isFinite(n)?n:'';
 }
@@ -2908,7 +2909,7 @@ function detectContractFields(text){
   else if(/(apprent|aprendiz|apprentissage|lehrling|apprendistato)/i.test(t))addContractField(out,'contract','Aprendizaje','high');
   else if(/(stagiaire|practicante|praktikant|tirocinante|intern)/i.test(t))addContractField(out,'contract','Practicante','medium');
   const hourly=/((?:chf|fr\.?)\s*([0-9'’.,]{1,8})\s*(?:\/h|par heure|por hora|per hour|pro stunde|all.?ora)|(?:taux horaire|salaire horaire|salario por hora|hourly rate|stundenlohn|paga oraria)[^0-9]{0,40}([0-9'’.,]{1,8}))/i.exec(t);
-  const monthly=/((?:salaire mensuel|salario mensual|monthly salary|monatslohn|stipendio mensile|brutto monatlich)[^0-9]{0,50}(?:chf|fr\.?)?\s*([0-9'’.,]{3,})|(?:chf|fr\.?)\s*([0-9'’.,]{3,})\s*(?:par mois|mensuel|monthly|monatlich|al mese))/i.exec(t);
+  const monthly=/((?:salaire mensuel|salario mensual|monthly salary|monatslohn|stipendio mensile|brutto monatlich)[^0-9]{0,50}(?:chf|fr\.?)?\s*([0-9'’.,\s]{3,})|(?:chf|fr\.?)\s*([0-9'’.,\s]{3,})\s*(?:par mois|mensuel|monthly|monatlich|al mese))/i.exec(t);
   if(hourly){addContractField(out,'payType','hourly','high');addContractField(out,'rate',parseMoneyValue(hourly[2]||hourly[3]),'high');}
   else if(monthly){addContractField(out,'payType','monthly','high');addContractField(out,'rate',parseMoneyValue(monthly[2]||monthly[3]),'high');}
   const pct=t.match(/(?:taux d[’']activité|porcentaje|work(?:ing)? percentage|pensum|beschäftigungsgrad|percentuale)[^0-9]{0,40}(\d{1,3})\s*%/i)||t.match(/(\d{1,3})\s*%\s*(?:taux|pensum|activité|working|beschäftigung)/i);
@@ -2917,8 +2918,9 @@ function detectContractFields(text){
   addContractField(out,'weeklyHours',weekly?.[1]?.replace(',','.'),'medium');
   const vac=t.match(/(?:vacances|vacaciones|vacation|urlaub|ferie)[^0-9]{0,40}(\d{1,2})\s*(?:semaines|semanas|weeks|wochen|settimane)/i);
   addContractField(out,'vacWeeks',vac?.[1],'medium');
+  const directName=raw.match(/(?:nom\s+et\s+pr\s*[eé]\s*nom|pr\s*[eé]\s*nom\s+et\s+nom|nombre\s+y\s+apellido|nombre\s+completo|full\s+name|name\s+and\s+surname|nome\s+e\s+cognome|vorname\s+und\s+name)\s*[:;]\s*([A-ZÀ-ÖØ-Ý][A-Za-zÀ-ÿ' -]{2,80})/i);
   const nameLabels=['employé(?:e)?','salarié(?:e)?','collaborateur','trabajador(?:a)?','empleado(?:a)?','employee','worker','mitarbeiter(?:in)?','arbeitnehmer(?:in)?','dipendente','lavoratore'];
-  const nameValue=findAfterLabels(raw,nameLabels,/([A-ZÀ-ÖØ-Ý][A-Za-zÀ-ÿ' -]{2,70})/,90);
+  const nameValue=directName?.[1]||findAfterLabels(raw,nameLabels,/([A-ZÀ-ÖØ-Ý][A-Za-zÀ-ÿ' -]{2,70})/,90);
   if(nameValue){
     const cleanName=nameValue.replace(/\s{2,}/g,' ').trim().split(/\n|,|;| adresse| address| dirección| adresse/i)[0].trim();
     const parts=cleanName.split(/\s+/).filter(Boolean);
@@ -3005,15 +3007,45 @@ async function extractPdfText(file){
   }
   return pages.join('\n\n').trim();
 }
+async function extractPdfTextWithOcr(file){
+  if(!window.pdfjsLib)throw new Error('PDF.js no disponible');
+  if(!window.Tesseract)throw new Error('OCR no disponible');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  const total=Math.min(pdf.numPages,3);
+  const pages=[];
+  for(let i=1;i<=total;i++){
+    toast(`Leyendo contrato escaneado ${i}/${total}...`,'#4f6ef7');
+    const page=await pdf.getPage(i);
+    const viewport=page.getViewport({scale:1.8});
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext('2d');
+    canvas.width=Math.ceil(viewport.width);
+    canvas.height=Math.ceil(viewport.height);
+    await page.render({canvasContext:ctx,viewport}).promise;
+    const result=await Tesseract.recognize(canvas,'spa+fra+deu+ita+eng');
+    pages.push(result?.data?.text||'');
+  }
+  return pages.join('\n\n').trim();
+}
 async function extractContractText(file){
   const isPdf=file.type==='application/pdf'||/\.pdf$/i.test(file.name);
   if(isPdf){
     try{
       const text=await extractPdfText(file);
       if(text.length>40)return text;
-      return `PDF sin texto seleccionable. Archivo: ${file.name}`;
+      const ocrText=await extractPdfTextWithOcr(file);
+      if(ocrText.length>40)return ocrText;
+      return `PDF sin texto seleccionable ni OCR legible. Archivo: ${file.name}`;
     }catch(e){
       console.warn('PDF text extraction failed',e);
+      try{
+        const ocrText=await extractPdfTextWithOcr(file);
+        if(ocrText.length>40)return ocrText;
+      }catch(ocrError){
+        console.warn('PDF OCR extraction failed',ocrError);
+      }
       return `No se pudo extraer texto del PDF. Archivo: ${file.name}`;
     }
   }
