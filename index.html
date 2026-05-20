@@ -762,6 +762,7 @@ input[type=date],input[type=time]{color-scheme:dark}
     <input type="file" id="contract-assist-file" accept=".pdf,.txt,.doc,.docx" style="display:none" onchange="handleContractAssist(event)">
     <button class="btn btn-ghost" onclick="document.getElementById('contract-assist-file').click()">Subir contrato para completar perfil</button>
     <div id="contract-ai-tools" style="display:none;margin-top:8px;gap:8px;grid-template-columns:1fr 1fr">
+      <button class="btn btn-primary btn-sm" onclick="analyzeContractWithAI()">Analizar con IA</button>
       <button class="btn btn-ghost btn-sm" onclick="copyContractPrompt()">Copiar prompt para Claude</button>
       <button class="btn btn-primary btn-sm" onclick="openContractAIBox()">Pegar JSON de Claude</button>
     </div>
@@ -2943,6 +2944,27 @@ function openContractAIBox(){
 function copyContractPrompt(){
   if(!pendingContractText){toast('Primero sube un contrato','#ef4444');return;}
   copyText(contractAIPrompt(),'Prompt copiado para Claude');
+}
+async function analyzeContractWithAI(){
+  if(!pendingContractText){toast('Primero sube un contrato','#ef4444');return;}
+  const btn=[...document.querySelectorAll('#contract-ai-tools .btn')].find(b=>b.textContent.includes('Analizar'));
+  const old=btn?.textContent;
+  if(btn){btn.disabled=true;btn.textContent='Analizando...';}
+  try{
+    const {data,error}=await sb.functions.invoke('analyze-contract',{body:{text:pendingContractText,fileName:pendingContractDoc?.fileName||'contrato'}});
+    if(error)throw error;
+    const fields=normalizeAIContractFields(data||{});
+    if(!Object.keys(fields).length)throw new Error('Sin datos detectados');
+    pendingContractDoc.fields={...(pendingContractDoc.fields||{}),...fields};
+    renderContractAssistResult(pendingContractDoc.fields,pendingContractDoc.fileName||'Resultado IA');
+    applyContractFields();
+    toast('IA aplicada. Revisa antes de guardar.');
+  }catch(e){
+    console.error(e);
+    toast('No pude analizar con IA. Revisa la función o usa Claude manual.','#ef4444');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=old||'Analizar con IA';}
+  }
 }
 function normalizeAIContractFields(obj){
   const confidence=obj.confidence||{},out={};
