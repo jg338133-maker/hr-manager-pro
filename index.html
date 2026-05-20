@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 /**
  * Minified by jsDelivr using Terser v5.37.0.
@@ -2991,11 +2992,38 @@ function applyContractAIJson(){
     toast('JSON inválido. Pide a Claude que devuelva solo JSON.','#ef4444');
   }
 }
+async function extractPdfText(file){
+  if(!window.pdfjsLib)throw new Error('PDF.js no disponible');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+  const pages=[];
+  for(let i=1;i<=pdf.numPages;i++){
+    const page=await pdf.getPage(i);
+    const content=await page.getTextContent();
+    pages.push(content.items.map(item=>item.str||'').join(' '));
+  }
+  return pages.join('\n\n').trim();
+}
+async function extractContractText(file){
+  const isPdf=file.type==='application/pdf'||/\.pdf$/i.test(file.name);
+  if(isPdf){
+    try{
+      const text=await extractPdfText(file);
+      if(text.length>40)return text;
+      return `PDF sin texto seleccionable. Archivo: ${file.name}`;
+    }catch(e){
+      console.warn('PDF text extraction failed',e);
+      return `No se pudo extraer texto del PDF. Archivo: ${file.name}`;
+    }
+  }
+  return await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result||''));r.onerror=rej;r.readAsText(file);});
+}
 async function handleContractAssist(ev){
   const file=ev.target.files?.[0];if(!file)return;
   if(file.size>3*1024*1024){toast('Contrato muy grande. Máximo 3 MB por ahora.','#ef4444');ev.target.value='';return;}
   const data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
-  const raw=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result||''));r.onerror=rej;r.readAsText(file);});
+  const raw=await extractContractText(file);
   pendingContractText=raw;
   const fields=detectContractFields(raw);
   pendingContractDoc={id:uid(),type:'contract',name:'Contrato de trabajo',fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data,notes:'Subido al crear perfil',expiresAt:'',createdAt:new Date().toISOString(),fields};

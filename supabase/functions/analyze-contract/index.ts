@@ -76,6 +76,64 @@ function normalizeResult(input: Record<string, unknown>): ContractResult {
   return out;
 }
 
+async function callOpenAICompatible(apiKey: string, model: string, system: string, user: string) {
+  const baseUrl = (Deno.env.get("AI_BASE_URL") || "https://api.openai.com/v1").replace(/\/$/, "");
+  const aiRes = await fetch(`${baseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      temperature: 0.1,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    }),
+  });
+
+  if (!aiRes.ok) {
+    const detail = await aiRes.text();
+    throw new Error(`AI request failed: ${detail}`);
+  }
+
+  const payload = await aiRes.json();
+  return payload?.choices?.[0]?.message?.content || "{}";
+}
+
+async function callAnthropic(apiKey: string, model: string, system: string, user: string) {
+  const baseUrl = (Deno.env.get("AI_BASE_URL") || "https://api.anthropic.com/v1").replace(/\/$/, "");
+  const aiRes = await fetch(`${baseUrl}/messages`, {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "anthropic-version": Deno.env.get("ANTHROPIC_VERSION") || "2023-06-01",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 1200,
+      temperature: 0.1,
+      system,
+      messages: [{ role: "user", content: user }],
+    }),
+  });
+
+  if (!aiRes.ok) {
+    const detail = await aiRes.text();
+    throw new Error(`Anthropic request failed: ${detail}`);
+  }
+
+  const payload = await aiRes.json();
+  return (payload?.content || [])
+    .filter((part: { type?: string; text?: string }) => part.type === "text")
+    .map((part: { text?: string }) => part.text || "")
+    .join("\n") || "{}";
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405);
@@ -84,8 +142,8 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get("AI_API_KEY") || Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) return jsonResponse({ error: "Missing AI_API_KEY secret" }, 500);
 
-    const baseUrl = (Deno.env.get("AI_BASE_URL") || "https://api.openai.com/v1").replace(/\/$/, "");
-    const model = Deno.env.get("AI_MODEL") || Deno.env.get("OPENAI_MODEL") || "gpt-4o-mini";
+    const provider = (Deno.env.get("AI_PROVIDER") || (apiKey.startsWith("sk-ant-") ? "anthropic" : "openai")).toLowerCase();
+    const model = Deno.env.get("AI_MODEL") || Deno.env.get("OPENAI_MODEL") || (provider === "anthropic" ? "claude-sonnet-4-20250514" : "gpt-4o-mini");
     const { text = "", fileName = "contract" } = await req.json();
     const contractText = String(text || "").slice(0, 18000);
     if (!contractText.trim()) return jsonResponse({ error: "Contract text is required" }, 400);
@@ -131,30 +189,9 @@ Return this exact JSON shape:
 CONTRACT:
 ${contractText}`;
 
-    const aiRes = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.1,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-      }),
-    });
-
-    if (!aiRes.ok) {
-      const detail = await aiRes.text();
-      return jsonResponse({ error: "AI request failed", detail }, 502);
-    }
-
-    const payload = await aiRes.json();
-    const content = payload?.choices?.[0]?.message?.content || "{}";
+    const content = provider === "anthropic"
+      ? await callAnthropic(apiKey, model, system, user)
+      : await callOpenAICompatible(apiKey, model, system, user);
     return jsonResponse(normalizeResult(extractJson(content)));
   } catch (error) {
     return jsonResponse({ error: error instanceof Error ? error.message : String(error) }, 500);
