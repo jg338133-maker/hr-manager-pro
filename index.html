@@ -2543,6 +2543,9 @@ function assistantAddMessage(role,text){
 }
 function openManagerAssistant(){
   if(!currentUser||currentUser?.role==='employee'){toast('Asistente disponible para managers','#ef4444');return;}
+  assistantBusy=false;
+  const btn=document.getElementById('assistant-send-btn');
+  if(btn){btn.disabled=false;btn.textContent='Preguntar';}
   const log=document.getElementById('assistant-log');
   if(log&&!assistantHistory.length){
     log.innerHTML='';
@@ -2563,7 +2566,8 @@ function managerAssistantContext(){
   const openBreaks=active.filter(e=>readActiveBreak(e.id)).map(fullName).slice(0,8);
   const pendingAbs=absences.filter(a=>!a.approved).map(a=>`${fullName(employees.find(e=>e.id===a.empId)||{})}: ${a.type} ${a.start} - ${a.end}`).slice(0,8);
   const lateToday=todayRecs.filter(h=>h.type==='in'&&String(h.note||'').toLowerCase().includes('retard')).map(h=>h.empName||h.empId).slice(0,8);
-  const monthRows=employees.map(emp=>reportRow(emp,month)).filter(Boolean);
+  const monthRows=employees.map(emp=>{try{return reportRow(emp,month);}catch(e){console.warn('Assistant report row error',emp?.id,e);return null;}}).filter(Boolean);
+  const topWorkers=monthRows.map(r=>({name:fullName(r.emp),position:r.emp.position||'',hours:+r.hrs.toFixed(1),days:r.days,pay:+r.pay.toFixed(2)})).sort((a,b)=>b.hours-a.hours).slice(0,5);
   return {
     app:'Mananger Pro',
     restaurant:DB.settings?.company||'Restaurant',
@@ -2574,6 +2578,7 @@ function managerAssistantContext(){
     settings:{lateTolerance:DB.settings?.lateTol,maxHoursWeek:DB.settings?.maxHours},
     counts:{employees:employees.length,activeEmployees:active.length,todayPunches:todayRecs.length,pendingAbsences:absences.filter(a=>!a.approved).length},
     alerts:{missingSalary,openBreaks,pendingAbs,lateToday},
+    topWorkers,
     currentMonth:{
       totalHours:monthRows.reduce((s,r)=>s+r.hrs,0).toFixed(1),
       totalAbsences:monthRows.reduce((s,r)=>s+r.abs,0),
@@ -2586,7 +2591,11 @@ function localAssistantAnswer(question,ctx){
   const q=String(question||'').toLowerCase();
   let category='app_help',shouldSaveSignal=false;
   let answer='Puedo ayudarte con fichajes, horarios, pausas, ausencias, empleados, contratos y reportes disponibles en Mananger Pro. No tengo suficiente información para responder eso con seguridad.';
-  if(/cerrar|mes|reporte|n[oó]mina|salario|pago/.test(q)){
+  if(/(qui[eé]n|persona|empleado).*(m[aá]s|mas).*(trabaj|hora)|m[aá]s horas|mas horas|top.*trabaj/.test(q)){
+    category='reporting';
+    const top=ctx.topWorkers||[];
+    answer=top.length?`La persona que más ha trabajado este mes es ${top[0].name}, con ${top[0].hours}h registradas en ${top[0].days} día(s). Top 3: ${top.slice(0,3).map((x,i)=>`${i+1}. ${x.name}: ${x.hours}h`).join(' · ')}.`:'Todavía no hay horas suficientes registradas este mes para calcular quién ha trabajado más.';
+  }else if(/cerrar|mes|reporte|n[oó]mina|salario|pago/.test(q)){
     category='reporting';
     answer=`Antes de cerrar el mes revisa: salarios sin configurar (${ctx.alerts.missingSalary.length}), ausencias pendientes (${ctx.counts.pendingAbsences}), pausas abiertas (${ctx.alerts.openBreaks.length}) y retardos del mes (${ctx.currentMonth.totalLate}). Estimado de nómina actual: CHF ${ctx.currentMonth.estimatedPayroll}.`;
   }else if(/alerta|hoy|revisar/.test(q)){
@@ -2603,6 +2612,9 @@ function localAssistantAnswer(question,ctx){
   }
   return {answer,category,shouldSaveSignal};
 }
+function withTimeout(promise,ms,message='Tiempo agotado'){
+  return Promise.race([promise,new Promise((_,rej)=>setTimeout(()=>rej(new Error(message)),ms))]);
+}
 async function sendManagerAssistant(){
   const input=document.getElementById('assistant-question'),btn=document.getElementById('assistant-send-btn');
   const question=clean(input?.value||'');if(!question){toast('Escribe una pregunta','#ef4444');return;}
@@ -2610,11 +2622,12 @@ async function sendManagerAssistant(){
   assistantBusy=true;if(btn){btn.disabled=true;btn.textContent='Pensando...';}
   if(input)input.value='';
   assistantAddMessage('user',question);
-  const ctx=managerAssistantContext();
+  let ctx={app:'Mananger Pro',page:currentPage,lang,alerts:{missingSalary:[],openBreaks:[]},counts:{pendingAbsences:0,todayPunches:0},currentMonth:{totalLate:0,estimatedPayroll:'0.00'},topWorkers:[]};
   try{
+    ctx=managerAssistantContext();
     let result=null;
     if(!isDemo()){
-      const {data,error}=await sb.functions.invoke('manager-assistant',{body:{question,context:ctx,history:assistantHistory.slice(-8)}});
+      const {data,error}=await withTimeout(sb.functions.invoke('manager-assistant',{body:{question,context:ctx,history:assistantHistory.slice(-8)}}),12000,'La IA tardó demasiado');
       if(error)throw error;
       result=data;
     }else{
