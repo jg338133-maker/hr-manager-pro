@@ -5,6 +5,23 @@
 
 create extension if not exists pgcrypto;
 
+-- Employee documents / expediente.
+-- Stores small documents directly for now. Keep uploads modest; future versions can move files to Supabase Storage.
+create table if not exists public.employee_documents (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.restaurants(id) on delete cascade,
+  employee_id uuid not null references public.employees(id) on delete cascade,
+  type text not null default 'other',
+  name text,
+  file_name text,
+  mime_type text,
+  size_bytes integer default 0,
+  file_data text,
+  notes text default '',
+  expires_at date,
+  created_at timestamptz default now()
+);
+
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   email text unique not null,
@@ -20,6 +37,7 @@ alter table public.employees enable row level security;
 alter table public.attendance enable row level security;
 alter table public.absences enable row level security;
 alter table public.shifts enable row level security;
+alter table public.employee_documents enable row level security;
 
 create or replace function public.is_super_admin()
 returns boolean
@@ -106,6 +124,12 @@ on public.shifts for all
 using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
 with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
 
+drop policy if exists "employee documents scoped all" on public.employee_documents;
+create policy "employee documents scoped all"
+on public.employee_documents for all
+using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
+with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
+
 -- Promote your own account to master after it exists in Supabase Auth.
 -- Replace jg338133@gmail.com with your email.
 insert into public.profiles (user_id,email,name,role,restaurant_id)
@@ -130,6 +154,7 @@ update public.restaurants set brand_color2 = '#7c3aed' where brand_color2 is nul
 update public.restaurants set status = 'active' where status is null or status = '';
 update public.restaurants set opening_hours = '{}'::jsonb where opening_hours is null;
 create unique index if not exists shifts_employee_date_unique on public.shifts(employee_id, shift_date);
+create index if not exists employee_documents_employee_idx on public.employee_documents(employee_id, created_at desc);
 
 -- Employee self-service login by email + PIN.
 -- This lets employees access only their own badge screen without knowing the restaurant id.
@@ -469,6 +494,7 @@ begin
   delete from public.attendance where restaurant_id = p_restaurant_id;
   delete from public.absences where restaurant_id = p_restaurant_id;
   delete from public.shifts where restaurant_id = p_restaurant_id;
+  delete from public.employee_documents where restaurant_id = p_restaurant_id;
   delete from public.employees where restaurant_id = p_restaurant_id;
   update public.profiles set restaurant_id = null where restaurant_id = p_restaurant_id;
   delete from public.restaurants where id = p_restaurant_id;

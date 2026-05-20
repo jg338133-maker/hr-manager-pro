@@ -1008,7 +1008,7 @@ const ATW=()=>ATT_WORDS[lang]||ATT_WORDS.fr;
 
 // ═══════ DB ═══════
 let DB={
-  employees:[],history:[],absences:[],shifts:{},
+  employees:[],history:[],absences:[],shifts:{},documents:[],
   settings:{company:'Mon Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],stats:{}};
@@ -1041,7 +1041,8 @@ function demoDB(){
   ];
   const shifts={};
   employees.forEach(emp=>{for(let i=0;i<5;i++){const d=new Date(getMonday(today).getTime()+i*86400000),ds=fmt(d),sch=empDaySchedule(emp,d),first=sch.blocks[0];shifts[`${emp.id}_${ds}`]=sch?.enabled&&first?{type:'morning',in:first.start,out:first.end,blocks:sch.blocks,notes:'Demo'}:{type:'off',in:null,out:null,notes:'Demo'};}});
-  return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,settings:{company:'Demo Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
+  const documents=[{id:'demo-doc-1',empId:'demo-emp-1',type:'contract',name:'Contrat de travail',fileName:'contrat-demo.pdf',mimeType:'application/pdf',size:245000,data:'',notes:'Ejemplo de expediente',expiresAt:'',createdAt:new Date().toISOString()}];
+  return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,documents,settings:{company:'Demo Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
 }
 
 function setRestaurantId(id){
@@ -1076,6 +1077,14 @@ async function loadSB(){
     if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     if(sh.data){DB.shifts={};sh.data.forEach(x=>{const blocks=normalizeBlocks({blocks:x.blocks,start:x.start_time,end:x.end_time},'restaurant');DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,blocks,notes:x.notes||''};});}
     if(r.data){DB.settings={company:r.data.name||'Mon Restaurant',emoji:r.data.emoji||'🍽️',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active',openingHours:r.data.opening_hours||defOpeningHours()};lang=DB.settings.lang;}
+    try{
+      const docs=await sb.from('employee_documents').select('*').eq('restaurant_id',REST_ID).order('created_at',{ascending:false});
+      if(!docs.error)DB.documents=(docs.data||[]).map(docFromSBRow);
+      else DB.documents=DB.documents||[];
+    }catch(docErr){
+      console.warn('Employee documents not available yet:',docErr);
+      DB.documents=DB.documents||[];
+    }
     saveLocal();return true;
   }catch(e){console.warn('SB error:',e);return false;}
 }
@@ -1105,7 +1114,15 @@ async function sbSaveEmp(emp){
   const{error}=await sb.from('employees').upsert({id:emp.id,restaurant_id:REST_ID,name:emp.name,last_name:emp.last||'',employee_number:emp.num||'',position:emp.position||'',department:emp.dept||'',phone:emp.phone||'',email:emp.email||'',start_date:emp.startDate||null,contract_type:emp.contract||'CDI',pay_type:emp.payType||'hourly',hourly_rate:emp.rate||0,monthly_salary:emp.salary||0,vacation_weeks:emp.vacWeeks||5,avs_number:emp.avs||'',emergency_contact:emp.emergency||'',notes:emp.notes||'',status:emp.status||'active',photo_url:emp.photo||null,color:emp.color||'#4f6ef7',schedules:emp.schedules||{},pin:emp.pin||'0000'});
   if(error)console.error(error);
 }
-async function sbDelEmp(id){if(isDemo())return;await Promise.all([sb.from('employees').delete().eq('id',id),sb.from('attendance').delete().eq('employee_id',id),sb.from('absences').delete().eq('employee_id',id),sb.from('shifts').delete().eq('employee_id',id)]);}
+function docFromSBRow(x){return{id:x.id,empId:x.employee_id,type:x.type||'other',name:x.name||'',fileName:x.file_name||'',mimeType:x.mime_type||'',size:x.size_bytes||0,data:x.file_data||'',notes:x.notes||'',expiresAt:x.expires_at||'',createdAt:x.created_at||new Date().toISOString()};}
+async function sbSaveDoc(doc){
+  if(isDemo())return;
+  const payload={id:doc.id,restaurant_id:REST_ID,employee_id:doc.empId,type:doc.type||'other',name:doc.name||'',file_name:doc.fileName||'',mime_type:doc.mimeType||'',size_bytes:doc.size||0,file_data:doc.data||'',notes:doc.notes||'',expires_at:doc.expiresAt||null};
+  const{error}=await sb.from('employee_documents').upsert(payload);
+  if(error)console.error(error);
+}
+async function sbDelDoc(id){if(isDemo())return;await sb.from('employee_documents').delete().eq('id',id);}
+async function sbDelEmp(id){if(isDemo())return;await Promise.all([sb.from('employees').delete().eq('id',id),sb.from('attendance').delete().eq('employee_id',id),sb.from('absences').delete().eq('employee_id',id),sb.from('shifts').delete().eq('employee_id',id),sb.from('employee_documents').delete().eq('employee_id',id)]);}
 async function sbReg(empId,empName,type,note=''){if(isDemo())return;await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:new Date().toISOString(),note});}
 async function sbRegAt(empId,empName,type,ts,note=''){if(isDemo())return;await sb.from('attendance').insert({restaurant_id:REST_ID,employee_id:empId,employee_name:empName,type,timestamp:ts,note});}
 async function sbDelAttendanceDay(empId,dateStr){
@@ -1134,6 +1151,7 @@ async function sbDeleteAll(){
     sb.from('attendance').delete().eq('restaurant_id',REST_ID),
     sb.from('absences').delete().eq('restaurant_id',REST_ID),
     sb.from('shifts').delete().eq('restaurant_id',REST_ID),
+    sb.from('employee_documents').delete().eq('restaurant_id',REST_ID),
     sb.from('employees').delete().eq('restaurant_id',REST_ID)
   ]);
 }
@@ -2908,6 +2926,58 @@ function saveEmp(){
 }
 
 // ═══════ DETAIL ═══════
+const DOC_TYPES={contract:'Contrato',id:'Documento identidad',permit:'Permiso trabajo',medical:'Certificado médico',training:'Formación',annex:'Anexo',other:'Otro'};
+function employeeDocs(empId){return (DB.documents||[]).filter(d=>d.empId===empId).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));}
+function docTypeLabel(t){return DOC_TYPES[t]||DOC_TYPES.other;}
+function fmtBytes(n){n=Number(n)||0;if(n<1024)return `${n} B`;if(n<1048576)return `${(n/1024).toFixed(0)} KB`;return `${(n/1048576).toFixed(1)} MB`;}
+function employeeDocsHTML(emp){
+  const docs=employeeDocs(emp.id);
+  const typeOpts=Object.entries(DOC_TYPES).map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join('');
+  return `<div class="card" style="margin-bottom:10px">
+    <div class="card-header" style="justify-content:space-between"><span>Expediente</span><span class="chip chip-blue">${docs.length}</span></div>
+    <div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px;margin-bottom:10px">
+      <div class="fg"><label>Tipo de documento</label><select id="doc-type">${typeOpts}</select></div>
+      <div class="fg"><label>Vencimiento opcional</label><input id="doc-exp" type="date"></div>
+      <div class="fg"><label>Nota</label><input id="doc-notes" placeholder="Ej: Contrato firmado, permiso B, anexo salario"></div>
+      <input id="doc-file-${emp.id}" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx" style="display:none" onchange="handleEmployeeDocUpload(event,'${emp.id}')">
+      <button class="btn btn-primary" onclick="document.getElementById('doc-file-${emp.id}').click()">Subir documento</button>
+      <div class="fs11 muted mt8">Por ahora guarda el archivo en el expediente del empleado. La lectura automática del contrato será la siguiente fase.</div>
+    </div>
+    ${docs.length?docs.map(d=>`<div class="rrow" style="align-items:flex-start;gap:10px">
+      <div style="flex:1;min-width:0">
+        <div class="fw8">${esc(d.name||d.fileName||'Documento')}</div>
+        <div class="fs11 muted">${esc(docTypeLabel(d.type))} · ${esc(d.fileName||'archivo')} · ${fmtBytes(d.size)}</div>
+        ${d.expiresAt?`<div class="fs11" style="color:var(--orange)">Vence: ${fmtDate(d.expiresAt)}</div>`:''}
+        ${d.notes?`<div class="fs11 muted">${esc(d.notes)}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc('${d.id}')">Abrir</button>`:''}
+        <button class="btn btn-sm btn-ghost" style="color:var(--red)" onclick="deleteEmployeeDoc('${d.id}','${emp.id}')">Eliminar</button>
+      </div>
+    </div>`).join(''):`<div class="empty-state" style="padding:16px"><h3>Sin documentos</h3><p>Sube contrato, permiso o certificados para tener el expediente completo.</p></div>`}
+  </div>`;
+}
+function handleEmployeeDocUpload(ev,empId){
+  const file=ev.target.files?.[0];if(!file)return;
+  if(file.size>3*1024*1024){toast('Documento muy grande. Máximo 3 MB por ahora.','#ef4444');ev.target.value='';return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const type=document.getElementById('doc-type')?.value||'other';
+    const doc={id:uid(),empId,type,name:docTypeLabel(type),fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data:reader.result,notes:clean(document.getElementById('doc-notes')?.value||''),expiresAt:document.getElementById('doc-exp')?.value||'',createdAt:new Date().toISOString()};
+    DB.documents=[doc,...(DB.documents||[])];saveLocal();openDetail(empId);toast('✅ Documento guardado');
+    sbSaveDoc(doc).catch(console.error);
+  };
+  reader.readAsDataURL(file);
+}
+function openEmployeeDoc(id){
+  const doc=(DB.documents||[]).find(d=>d.id===id);if(!doc?.data){toast('Archivo no disponible','#ef4444');return;}
+  const a=document.createElement('a');a.href=doc.data;a.target='_blank';a.rel='noopener';a.download=doc.fileName||'documento';a.click();
+}
+function deleteEmployeeDoc(id,empId){
+  if(!confirm('¿Eliminar este documento del expediente?'))return;
+  DB.documents=(DB.documents||[]).filter(d=>d.id!==id);saveLocal();openDetail(empId);toast('Documento eliminado');sbDelDoc(id).catch(console.error);
+}
+
 function openDetail(empId){
   const emp=DB.employees.find(e=>e.id===empId);if(!emp)return;
   const now=new Date(),last=lastAction(empId),w=workedOn(empId,now);
@@ -2917,6 +2987,7 @@ function openDetail(empId){
   const seniority=startDays<30?`${startDays}j`:startDays<365?`${Math.floor(startDays/30)}m`:`${Math.floor(startDays/365)}a`;
   const sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
   const c=empColor(emp);
+  const docCount=employeeDocs(empId).length;
   const schedHTML=L().daysFull.map((d,i)=>{const sch=empDaySchedule(emp,new Date(2026,0,4+i));return`<div class="rrow"><span class="muted">${esc(d)}</span><span style="font-weight:700;text-align:right;color:${sch?.enabled&&sch.blocks.length?'var(--text)':'var(--text3)'}">${sch?.enabled&&sch.blocks.length?fmtBlocks(sch.blocks,'<br>'):'Libre'}</span></div>`;}).join('');
 
   document.getElementById('detail-content').innerHTML=`
@@ -2936,6 +3007,7 @@ function openDetail(empId){
     <div class="tabs" id="dtabs">
       <button class="tab active" onclick="dtab('dt-pt',this)">⏱ Pointer</button>
       <button class="tab" onclick="dtab('dt-badge',this)">🪪 Badge QR</button>
+      <button class="tab" onclick="dtab('dt-docs',this)">📁 Expediente${docCount?` (${docCount})`:''}</button>
       <button class="tab" onclick="dtab('dt-info',this)">ℹ️ Info</button>
     </div>
     <div id="dt-pt">
@@ -2974,6 +3046,7 @@ function openDetail(empId){
       <button class="btn btn-primary mt12" onclick="downloadBadgePDF(DB.employees.find(e=>e.id==='${empId}'))">⬇️ Télécharger PDF</button>
       <button class="btn btn-ghost mt12" onclick="downloadBadge(DB.employees.find(e=>e.id==='${empId}'))">⬇️ Télécharger carnet</button>
     </div>
+    <div id="dt-docs" style="display:none">${employeeDocsHTML(emp)}</div>
     <div id="dt-info" style="display:none">
       <div class="card">
         ${[['Téléphone',emp.phone],['Email',emp.email],['Contrat',emp.contract],['Salaire',`${emp.payType==='hourly'?'Horaire':'Mensuel'} · CHF ${emp.payType==='hourly'?emp.rate+'/h':emp.salary+'/mois'}`],['Vacances',`${emp.vacWeeks} sem. · ${vacLeft}j restants`],['Urgence',emp.emergency],['AVS',emp.avs]].filter(r=>r[1]).map(([l,v])=>`<div class="rrow"><span class="muted">${esc(l)}</span><span style="font-weight:500;text-align:right;max-width:55%">${esc(v)}</span></div>`).join('')}
@@ -3005,8 +3078,8 @@ function resetEmpPin(empId){
   openDetail(empId);
   copyText(pin,`Nouveau PIN: ${pin}`);
 }
-function dtab(id,btn){['dt-pt','dt-badge','dt-info'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});document.getElementById('dtabs')?.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const el=document.getElementById(id);if(el)el.style.display='block';}
-function deleteEmp(id){if(!confirm('Supprimer cet employé?'))return;DB.employees=DB.employees.filter(e=>e.id!==id);DB.history=DB.history.filter(h=>h.empId!==id);DB.absences=DB.absences.filter(a=>a.empId!==id);saveLocal();closeModal('detail-modal');renderPage(currentPage);toast('Employé supprimé');sbDelEmp(id).catch(console.error);}
+function dtab(id,btn){['dt-pt','dt-badge','dt-docs','dt-info'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});document.getElementById('dtabs')?.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const el=document.getElementById(id);if(el)el.style.display='block';}
+function deleteEmp(id){if(!confirm('Supprimer cet employé?'))return;DB.employees=DB.employees.filter(e=>e.id!==id);DB.history=DB.history.filter(h=>h.empId!==id);DB.absences=DB.absences.filter(a=>a.empId!==id);DB.documents=(DB.documents||[]).filter(d=>d.empId!==id);saveLocal();closeModal('detail-modal');renderPage(currentPage);toast('Employé supprimé');sbDelEmp(id).catch(console.error);}
 
 // ═══════ SHIFTS ═══════
 let shiftWS=getMonday(new Date()),shiftKey=null,shiftType='morning';
@@ -3352,8 +3425,8 @@ function openMaintenance(kind){
 async function deleteAllConfirm(){
   const tx=TL('settings');
   if(!confirm('⚠️ '+tx.confirmDelete))return;
-  const old={employees:DB.employees,history:DB.history,absences:DB.absences,shifts:DB.shifts};
-  DB={employees:[],history:[],absences:[],shifts:{},settings:DB.settings};saveLocal();renderPage(currentPage);
+  const old={employees:DB.employees,history:DB.history,absences:DB.absences,shifts:DB.shifts,documents:DB.documents};
+  DB={employees:[],history:[],absences:[],shifts:{},documents:[],settings:DB.settings};saveLocal();renderPage(currentPage);
   try{await sbDeleteAll();toast('🗑 '+tx.deleted,'#ef4444');}
   catch(e){DB={...DB,...old};saveLocal();renderPage(currentPage);toast(tx.deleteError,'#ef4444');console.error(e);}
 }
