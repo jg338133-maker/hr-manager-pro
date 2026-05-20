@@ -761,6 +761,14 @@ input[type=date],input[type=time]{color-scheme:dark}
     </div>
     <input type="file" id="contract-assist-file" accept=".pdf,.txt,.doc,.docx" style="display:none" onchange="handleContractAssist(event)">
     <button class="btn btn-ghost" onclick="document.getElementById('contract-assist-file').click()">Subir contrato para completar perfil</button>
+    <div id="contract-ai-tools" style="display:none;margin-top:8px;gap:8px;grid-template-columns:1fr 1fr">
+      <button class="btn btn-ghost btn-sm" onclick="copyContractPrompt()">Copiar prompt para Claude</button>
+      <button class="btn btn-primary btn-sm" onclick="openContractAIBox()">Pegar JSON de Claude</button>
+    </div>
+    <div id="contract-ai-box" style="display:none;margin-top:8px">
+      <textarea id="contract-ai-json" rows="7" placeholder='Pega aquí el JSON de Claude, por ejemplo {"name":"Ana","last":"Rossi","startDate":"2026-06-01"}'></textarea>
+      <button class="btn btn-primary btn-sm mt8" onclick="applyContractAIJson()">Aplicar JSON IA</button>
+    </div>
     <div id="contract-assist-result" class="fs11 muted mt8">Lee contratos en español, francés, italiano, alemán e inglés. Detecta datos clave y tú confirmas antes de guardar.</div>
   </div>
   <div onclick="document.getElementById('photo-input').click()" style="cursor:pointer">
@@ -2845,7 +2853,7 @@ function renderEmps(){
 }
 
 // ═══════ EMP FORM ═══════
-let editEmpId=null,photoData=null,pendingContractDoc=null;
+let editEmpId=null,photoData=null,pendingContractDoc=null,pendingContractText='';
 function setFieldIfEmpty(id,value){
   const el=document.getElementById(id);if(!el||!value)return;
   if(!String(el.value||'').trim())el.value=value;
@@ -2920,18 +2928,56 @@ function detectContractFields(text){
 }
 function renderContractAssistResult(fields,fileName){
   const box=document.getElementById('contract-assist-result');if(!box)return;
-  const labels={name:'Nombre',last:'Apellido',email:'Email',phone:'Teléfono',startDate:'Inicio',endDate:'Fin contrato',contract:'Contrato',payType:'Tipo salario',rate:'Salario',position:'Cargo',workPercent:'Porcentaje',weeklyHours:'Horas/semana',vacWeeks:'Vacaciones'};
+  const labels={name:'Nombre',last:'Apellido',email:'Email',phone:'Teléfono',startDate:'Inicio',endDate:'Fin contrato',contract:'Contrato',payType:'Tipo salario',rate:'Salario',position:'Cargo',department:'Departamento',workPercent:'Porcentaje',weeklyHours:'Horas/semana',vacWeeks:'Vacaciones',avs:'AVS',emergency:'Emergencia',notes:'Notas',warnings:'Alertas'};
   const found=Object.entries(fields).filter(([,v])=>contractPlainValue(v));
   const chipColor=c=>c==='high'?'chip-blue':c==='medium'?'chip-gray':'chip-red';
   box.innerHTML=`<div style="color:var(--text);font-weight:800;margin-bottom:6px">${esc(fileName||'Contrato cargado')}</div>${found.length?found.map(([k,v])=>`<span class="chip ${chipColor(v.confidence)}" title="Confianza ${esc(v.confidence||'media')}" style="margin:0 5px 5px 0">${esc(labels[k]||k)}: ${esc(contractPlainValue(v))}</span>`).join(''):'<div>No detecté campos claros, pero el contrato se guardará en el expediente al crear el empleado.</div>'}<div class="fs11 muted mt8">Azul: confianza alta. Gris: revisar. Rojo: baja confianza.</div><button class="btn btn-primary btn-sm mt8" onclick="applyContractFields()" ${found.length?'':'disabled'}>Aplicar datos detectados</button>`;
+}
+function contractAIPrompt(){
+  const text=(pendingContractText||'').slice(0,12000);
+  return `Analiza este contrato laboral y devuelve SOLO un JSON válido, sin markdown ni explicación.\n\nReglas:\n- Si un dato no aparece, usa null.\n- Fechas en formato YYYY-MM-DD.\n- contract debe ser uno de: Indefinido, Temporal, Aprendizaje, Practicante, Otro.\n- payType debe ser hourly, monthly o null.\n- rate debe ser el salario por hora si payType es hourly, o salario mensual si payType es monthly.\n- workPercent debe ser número sin %, por ejemplo 80.\n- weeklyHours y vacWeeks deben ser números.\n- Agrega confidence por campo con high, medium o low.\n- Agrega warnings con dudas o contradicciones importantes.\n\nJSON esperado:\n{\n  "name": null,\n  "last": null,\n  "email": null,\n  "phone": null,\n  "startDate": null,\n  "endDate": null,\n  "contract": null,\n  "position": null,\n  "department": null,\n  "payType": null,\n  "rate": null,\n  "workPercent": null,\n  "weeklyHours": null,\n  "vacWeeks": null,\n  "avs": null,\n  "emergency": null,\n  "notes": null,\n  "confidence": {},\n  "warnings": []\n}\n\nCONTRATO:\n${text}`;
+}
+function openContractAIBox(){
+  const box=document.getElementById('contract-ai-box');if(box)box.style.display=box.style.display==='none'?'block':'none';
+}
+function copyContractPrompt(){
+  if(!pendingContractText){toast('Primero sube un contrato','#ef4444');return;}
+  copyText(contractAIPrompt(),'Prompt copiado para Claude');
+}
+function normalizeAIContractFields(obj){
+  const confidence=obj.confidence||{},out={};
+  ['name','last','email','phone','startDate','endDate','contract','position','department','payType','rate','workPercent','weeklyHours','vacWeeks','avs','emergency','notes'].forEach(k=>{
+    if(obj[k]!==undefined&&obj[k]!==null&&obj[k]!=='')addContractField(out,k,obj[k],confidence[k]||'high');
+  });
+  if(Array.isArray(obj.warnings)&&obj.warnings.length)addContractField(out,'warnings',obj.warnings.join(' · '),'medium');
+  return out;
+}
+function applyContractAIJson(){
+  const raw=document.getElementById('contract-ai-json')?.value.trim();
+  if(!raw){toast('Pega el JSON de Claude','#ef4444');return;}
+  try{
+    const cleaned=raw.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+    const obj=JSON.parse(cleaned);
+    const fields=normalizeAIContractFields(obj);
+    if(!pendingContractDoc)pendingContractDoc={id:uid(),type:'contract',name:'Contrato de trabajo',fileName:'contrato-ia.txt',mimeType:'text/plain',size:pendingContractText.length,data:'',notes:'Analizado con IA manual',expiresAt:'',createdAt:new Date().toISOString(),fields};
+    pendingContractDoc.fields={...(pendingContractDoc.fields||{}),...fields};
+    renderContractAssistResult(pendingContractDoc.fields,pendingContractDoc.fileName||'Resultado IA');
+    applyContractFields();
+    toast('JSON de IA aplicado');
+  }catch(e){
+    console.error(e);
+    toast('JSON inválido. Pide a Claude que devuelva solo JSON.','#ef4444');
+  }
 }
 async function handleContractAssist(ev){
   const file=ev.target.files?.[0];if(!file)return;
   if(file.size>3*1024*1024){toast('Contrato muy grande. Máximo 3 MB por ahora.','#ef4444');ev.target.value='';return;}
   const data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
   const raw=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result||''));r.onerror=rej;r.readAsText(file);});
+  pendingContractText=raw;
   const fields=detectContractFields(raw);
   pendingContractDoc={id:uid(),type:'contract',name:'Contrato de trabajo',fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data,notes:'Subido al crear perfil',expiresAt:'',createdAt:new Date().toISOString(),fields};
+  const tools=document.getElementById('contract-ai-tools');if(tools)tools.style.display='grid';
   renderContractAssistResult(fields,file.name);
   toast('Contrato cargado para revisión');
 }
@@ -2940,24 +2986,30 @@ function applyContractFields(){
   const val=k=>contractPlainValue(f[k]);
   setFieldIfEmpty('ef-name',val('name'));setFieldIfEmpty('ef-last',val('last'));setFieldIfEmpty('ef-phone',val('phone'));setFieldIfEmpty('ef-email',val('email'));setFieldIfEmpty('ef-start',val('startDate'));setFieldIfEmpty('ef-vac',val('vacWeeks'));
   if(val('position')){const sel=document.getElementById('ef-pos');[...sel.options].forEach(o=>{if(o.textContent.toLowerCase().includes(String(val('position')).toLowerCase())||String(val('position')).toLowerCase().includes(o.textContent.toLowerCase()))sel.value=o.value;});}
+  if(val('department')){const sel=document.getElementById('ef-dept');[...sel.options].forEach(o=>{if(o.textContent.toLowerCase().includes(String(val('department')).toLowerCase())||String(val('department')).toLowerCase().includes(o.textContent.toLowerCase()))sel.value=o.value;});}
+  setFieldIfEmpty('ef-avs',val('avs'));setFieldIfEmpty('ef-emergency',val('emergency'));
   if(val('payType')){document.getElementById('ef-paytype').value=val('payType');updatePL();}
   if(val('rate'))document.getElementById('ef-rate').value=val('rate');
   if(val('contract')){
     const sel=document.getElementById('ef-contract');
     [...sel.options].forEach(o=>{if(o.textContent.toLowerCase().includes(String(val('contract')).toLowerCase())||String(val('contract')).toLowerCase().includes(o.textContent.toLowerCase()))sel.value=o.value;});
   }
-  const extras=[val('endDate')?`Fin contrato: ${val('endDate')}`:'',val('workPercent')?`Porcentaje: ${val('workPercent')}`:'',val('weeklyHours')?`Horas/semana: ${val('weeklyHours')}`:''].filter(Boolean).join(' · ');
+  const extras=[val('endDate')?`Fin contrato: ${val('endDate')}`:'',val('workPercent')?`Porcentaje: ${val('workPercent')}`:'',val('weeklyHours')?`Horas/semana: ${val('weeklyHours')}`:'',val('department')?`Departamento: ${val('department')}`:'',val('warnings')?`Revisar: ${val('warnings')}`:'',val('notes')?val('notes'):''].filter(Boolean).join(' · ');
   if(extras)setFieldIfEmpty('ef-notes',extras);
   toast('Datos aplicados. Revisa antes de guardar.');
 }
 function openEmpModal(id){
-  editEmpId=id;photoData=null;pendingContractDoc=null;
+  editEmpId=id;photoData=null;pendingContractDoc=null;pendingContractText='';
   const emp=id?DB.employees.find(e=>e.id===id):null;
   document.getElementById('emp-modal-title').textContent=emp?`${T().emp.edit} — ${emp.name}`:T().emp.new;
   const assist=document.getElementById('contract-assist-card'),assistResult=document.getElementById('contract-assist-result'),assistFile=document.getElementById('contract-assist-file');
   if(assist)assist.style.display=emp?'none':'block';
   if(assistResult)assistResult.textContent='Lee contratos en español, francés, italiano, alemán e inglés. Detecta datos clave y tú confirmas antes de guardar.';
   if(assistFile)assistFile.value='';
+  const aiTools=document.getElementById('contract-ai-tools'),aiBox=document.getElementById('contract-ai-box'),aiJson=document.getElementById('contract-ai-json');
+  if(aiTools)aiTools.style.display='none';
+  if(aiBox)aiBox.style.display='none';
+  if(aiJson)aiJson.value='';
   const fields={name:'name',last:'last',num:'num',start:'startDate',phone:'phone',email:'email',vac:'vacWeeks',avs:'avs',emergency:'emergency',notes:'notes'};
   Object.entries(fields).forEach(([f,k])=>{const el=document.getElementById('ef-'+f);if(el)el.value=emp?.[k]||'';});
   document.getElementById('ef-start').value=emp?.startDate||new Date().toISOString().split('T')[0];
