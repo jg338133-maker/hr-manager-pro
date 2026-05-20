@@ -757,11 +757,11 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div class="card" id="contract-assist-card" style="margin-bottom:14px;border-color:rgba(79,109,245,.32)">
     <div class="card-header" style="justify-content:space-between">
       <span>Crear desde contrato</span>
-      <span class="chip chip-blue">Fase 2</span>
+      <span class="chip chip-blue">Fase 2.1</span>
     </div>
     <input type="file" id="contract-assist-file" accept=".pdf,.txt,.doc,.docx" style="display:none" onchange="handleContractAssist(event)">
     <button class="btn btn-ghost" onclick="document.getElementById('contract-assist-file').click()">Subir contrato para completar perfil</button>
-    <div id="contract-assist-result" class="fs11 muted mt8">La app intentará detectar nombre, email, teléfono, fecha de inicio, tipo de contrato y salario. Tú revisas antes de guardar.</div>
+    <div id="contract-assist-result" class="fs11 muted mt8">Lee contratos en español, francés, italiano, alemán e inglés. Detecta datos clave y tú confirmas antes de guardar.</div>
   </div>
   <div onclick="document.getElementById('photo-input').click()" style="cursor:pointer">
     <div class="photo-ring" id="photo-ring">
@@ -2850,39 +2850,80 @@ function setFieldIfEmpty(id,value){
   const el=document.getElementById(id);if(!el||!value)return;
   if(!String(el.value||'').trim())el.value=value;
 }
+function contractValue(value,confidence='medium'){return value?{value,confidence}:null;}
+function addContractField(out,key,value,confidence='medium'){if(value&&!out[key])out[key]=contractValue(value,confidence);}
+function contractPlainValue(v){return v&&typeof v==='object'&&'value'in v?v.value:v;}
 function normalizeContractDate(s){
   if(!s)return '';
-  const m=String(s).match(/(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/);
-  if(!m)return '';
-  const y=m[3].length===2?`20${m[3]}`:m[3];
-  return `${y}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
+  const months={janvier:1,january:1,januar:1,gennaio:1,enero:1,february:2,février:2,februar:2,febbraio:2,febrero:2,march:3,mars:3,märz:3,marzo:3,april:4,avril:4,abril:4,aprile:4,may:5,mai:5,mayo:5,maggio:5,june:6,juin:6,juni:6,junio:6,giugno:6,july:7,juillet:7,juli:7,julio:7,luglio:7,august:8,août:8,agosto:8,september:9,septembre:9,settembre:9,septiembre:9,october:10,octobre:10,oktober:10,octubre:10,ottobre:10,november:11,novembre:11,noviembre:11,dezember:12,december:12,décembre:12,diciembre:12,dicembre:12};
+  const raw=String(s).trim().toLowerCase();
+  let m=raw.match(/(\d{4})[./-](\d{1,2})[./-](\d{1,2})/);
+  if(m)return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  m=raw.match(/(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/);
+  if(m){const y=m[3].length===2?`20${m[3]}`:m[3];return `${y}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;}
+  m=raw.match(/(\d{1,2})\s+([a-zà-ÿäöüéèêîôûç]+)\s+(\d{4})/i);
+  if(m&&months[m[2]])return `${m[3]}-${String(months[m[2]]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
+  return '';
+}
+function parseMoneyValue(s){
+  const raw=String(s||'').replace(/[’'\s]/g,'').replace(/,/g,'.');
+  const n=parseFloat(raw);
+  return Number.isFinite(n)?n:'';
+}
+function findAfterLabels(text,labels,pattern,max=140){
+  for(const label of labels){
+    const re=new RegExp(`(?:${label})[^\\n:;]{0,35}[:;\\-]?\\s*([\\s\\S]{0,${max}}?)(${pattern.source})`,'i');
+    const m=text.match(re);
+    if(m)return m[m.length-1]||m[2];
+  }
+  return '';
 }
 function detectContractFields(text){
-  const t=String(text||'').replace(/\s+/g,' ').trim(),out={};
+  const raw=String(text||'').replace(/\r/g,'\n'),t=raw.replace(/\s+/g,' ').trim(),out={};
   const email=t.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
-  if(email)out.email=email[0].toLowerCase();
-  const phone=t.match(/(?:\+41|0041|0)\s?(?:\d[\s.-]?){8,12}/);
-  if(phone)out.phone=phone[0].replace(/\s+/g,' ').trim();
-  const start=t.match(/(?:début|debut|inicio|start|beginn|inizio|entrée en fonction|commence).*?(\d{1,2}[./-]\d{1,2}[./-]\d{2,4})/i)||t.match(/(\d{1,2}[./-]\d{1,2}[./-]\d{4})/);
-  if(start)out.startDate=normalizeContractDate(start[1]);
-  if(/(cdi|ind[eé]termin|indefinido|unbefristet|indeterminato)/i.test(t))out.contract='Indefinido';
-  else if(/(cdd|temporal|befristet|determinato)/i.test(t))out.contract='Temporal';
-  else if(/(apprent|aprendiz|lehrling|apprendistato)/i.test(t))out.contract='Aprendizaje';
-  const monthly=t.match(/(?:salaire|salario|lohn|stipendio).*?(?:chf|fr\.?)\s*([0-9'’.,]{3,})/i);
-  const hourly=t.match(/(?:heure|hora|hour|stunde|ora).*?(?:chf|fr\.?)\s*([0-9'’.,]{1,6})/i)||t.match(/(?:chf|fr\.?)\s*([0-9'’.,]{1,6})\s*(?:\/h|par heure|por hora|pro stunde|all.?ora)/i);
-  if(hourly){out.payType='hourly';out.rate=parseFloat(hourly[1].replace(/[’']/g,'').replace(',','.'))||'';}
-  else if(monthly){out.payType='monthly';out.rate=parseFloat(monthly[1].replace(/[’']/g,'').replace(',','.'))||'';}
-  const name=t.match(/(?:employé|employe|trabajador|salarié|salarié\(e\)|mitarbeiter|dipendente)\s*:?\s*([A-ZÀ-ÖØ-Ý][A-Za-zÀ-ÿ' -]{2,60})/i);
-  if(name){
-    const parts=name[1].trim().split(/\s+/);
-    out.name=parts.shift()||'';out.last=parts.join(' ');
+  addContractField(out,'email',email?.[0]?.toLowerCase(),'high');
+  const phone=t.match(/(?:\+41|0041|0)\s?(?:\d[\s./-]?){8,12}/);
+  addContractField(out,'phone',phone?.[0]?.replace(/\s+/g,' ').trim(),'medium');
+  const datePattern=/(\d{4}[./-]\d{1,2}[./-]\d{1,2}|\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{1,2}\s+[A-Za-zÀ-ÿäöüéèêîôûç]+\s+\d{4})/;
+  const startLabels=['début(?: du)? contrat',"date d[’']entrée",'entrée en fonction','inicio(?: del)? contrato','fecha de inicio','start date','employment start','beginn','eintritt','vertragsbeginn','inizio(?: del)? contratto','data inizio'];
+  const endLabels=['fin(?: du)? contrat','date de fin','fecha de fin','end date','contract end','vertragsende','befristet bis','fine contratto','data fine'];
+  addContractField(out,'startDate',normalizeContractDate(findAfterLabels(t,startLabels,datePattern)),'high');
+  addContractField(out,'endDate',normalizeContractDate(findAfterLabels(t,endLabels,datePattern)),'medium');
+  if(!out.startDate){
+    const firstDate=t.match(datePattern);
+    addContractField(out,'startDate',normalizeContractDate(firstDate?.[1]),'low');
   }
+  if(/(cdi|contrat.*dur[ée]e ind[eé]termin[ée]e|ind[eé]termin|indefinido|unbefristet|indeterminato|permanent contract)/i.test(t))addContractField(out,'contract','Indefinido','high');
+  else if(/(cdd|dur[ée]e d[eé]termin[ée]e|temporal|befristet|determinato|fixed[- ]term)/i.test(t))addContractField(out,'contract','Temporal','high');
+  else if(/(apprent|aprendiz|apprentissage|lehrling|apprendistato)/i.test(t))addContractField(out,'contract','Aprendizaje','high');
+  else if(/(stagiaire|practicante|praktikant|tirocinante|intern)/i.test(t))addContractField(out,'contract','Practicante','medium');
+  const hourly=/((?:chf|fr\.?)\s*([0-9'’.,]{1,8})\s*(?:\/h|par heure|por hora|per hour|pro stunde|all.?ora)|(?:taux horaire|salaire horaire|salario por hora|hourly rate|stundenlohn|paga oraria)[^0-9]{0,40}([0-9'’.,]{1,8}))/i.exec(t);
+  const monthly=/((?:salaire mensuel|salario mensual|monthly salary|monatslohn|stipendio mensile|brutto monatlich)[^0-9]{0,50}(?:chf|fr\.?)?\s*([0-9'’.,]{3,})|(?:chf|fr\.?)\s*([0-9'’.,]{3,})\s*(?:par mois|mensuel|monthly|monatlich|al mese))/i.exec(t);
+  if(hourly){addContractField(out,'payType','hourly','high');addContractField(out,'rate',parseMoneyValue(hourly[2]||hourly[3]),'high');}
+  else if(monthly){addContractField(out,'payType','monthly','high');addContractField(out,'rate',parseMoneyValue(monthly[2]||monthly[3]),'high');}
+  const pct=t.match(/(?:taux d[’']activité|porcentaje|work(?:ing)? percentage|pensum|beschäftigungsgrad|percentuale)[^0-9]{0,40}(\d{1,3})\s*%/i)||t.match(/(\d{1,3})\s*%\s*(?:taux|pensum|activité|working|beschäftigung)/i);
+  addContractField(out,'workPercent',pct?.[1]?`${pct[1]}%`:'','medium');
+  const weekly=t.match(/(?:heures hebdomadaires|horas semanales|weekly hours|wochenstunden|ore settimanali)[^0-9]{0,40}(\d{1,2}(?:[.,]\d)?)/i)||t.match(/(\d{1,2}(?:[.,]\d)?)\s*(?:h|heures|horas|hours|stunden|ore)\s*(?:\/|par|por|per)?\s*(?:semaine|semana|week|woche|settimana)/i);
+  addContractField(out,'weeklyHours',weekly?.[1]?.replace(',','.'),'medium');
+  const vac=t.match(/(?:vacances|vacaciones|vacation|urlaub|ferie)[^0-9]{0,40}(\d{1,2})\s*(?:semaines|semanas|weeks|wochen|settimane)/i);
+  addContractField(out,'vacWeeks',vac?.[1],'medium');
+  const nameLabels=['employé(?:e)?','salarié(?:e)?','collaborateur','trabajador(?:a)?','empleado(?:a)?','employee','worker','mitarbeiter(?:in)?','arbeitnehmer(?:in)?','dipendente','lavoratore'];
+  const nameValue=findAfterLabels(raw,nameLabels,/([A-ZÀ-ÖØ-Ý][A-Za-zÀ-ÿ' -]{2,70})/,90);
+  if(nameValue){
+    const cleanName=nameValue.replace(/\s{2,}/g,' ').trim().split(/\n|,|;| adresse| address| dirección| adresse/i)[0].trim();
+    const parts=cleanName.split(/\s+/).filter(Boolean);
+    if(parts.length){addContractField(out,'name',parts.shift(),'medium');addContractField(out,'last',parts.join(' '),'medium');}
+  }
+  const pos=findAfterLabels(t,['poste','fonction','cargo','position','role','stelle','funktion','mansione','ruolo'],/([A-Za-zÀ-ÿ' -]{3,50})/,80);
+  addContractField(out,'position',pos?.trim(),'low');
   return out;
 }
 function renderContractAssistResult(fields,fileName){
   const box=document.getElementById('contract-assist-result');if(!box)return;
-  const found=Object.entries(fields).filter(([,v])=>v);
-  box.innerHTML=`<div style="color:var(--text);font-weight:800;margin-bottom:6px">${esc(fileName||'Contrato cargado')}</div>${found.length?found.map(([k,v])=>`<span class="chip chip-blue" style="margin:0 5px 5px 0">${esc(k)}: ${esc(v)}</span>`).join(''):'<div>No detecté campos claros, pero el contrato se guardará en el expediente al crear el empleado.</div>'}<button class="btn btn-primary btn-sm mt8" onclick="applyContractFields()" ${found.length?'':'disabled'}>Aplicar datos detectados</button>`;
+  const labels={name:'Nombre',last:'Apellido',email:'Email',phone:'Teléfono',startDate:'Inicio',endDate:'Fin contrato',contract:'Contrato',payType:'Tipo salario',rate:'Salario',position:'Cargo',workPercent:'Porcentaje',weeklyHours:'Horas/semana',vacWeeks:'Vacaciones'};
+  const found=Object.entries(fields).filter(([,v])=>contractPlainValue(v));
+  const chipColor=c=>c==='high'?'chip-blue':c==='medium'?'chip-gray':'chip-red';
+  box.innerHTML=`<div style="color:var(--text);font-weight:800;margin-bottom:6px">${esc(fileName||'Contrato cargado')}</div>${found.length?found.map(([k,v])=>`<span class="chip ${chipColor(v.confidence)}" title="Confianza ${esc(v.confidence||'media')}" style="margin:0 5px 5px 0">${esc(labels[k]||k)}: ${esc(contractPlainValue(v))}</span>`).join(''):'<div>No detecté campos claros, pero el contrato se guardará en el expediente al crear el empleado.</div>'}<div class="fs11 muted mt8">Azul: confianza alta. Gris: revisar. Rojo: baja confianza.</div><button class="btn btn-primary btn-sm mt8" onclick="applyContractFields()" ${found.length?'':'disabled'}>Aplicar datos detectados</button>`;
 }
 async function handleContractAssist(ev){
   const file=ev.target.files?.[0];if(!file)return;
@@ -2896,13 +2937,17 @@ async function handleContractAssist(ev){
 }
 function applyContractFields(){
   const f=pendingContractDoc?.fields||{};
-  setFieldIfEmpty('ef-name',f.name);setFieldIfEmpty('ef-last',f.last);setFieldIfEmpty('ef-phone',f.phone);setFieldIfEmpty('ef-email',f.email);setFieldIfEmpty('ef-start',f.startDate);
-  if(f.payType){document.getElementById('ef-paytype').value=f.payType;updatePL();}
-  if(f.rate)document.getElementById('ef-rate').value=f.rate;
-  if(f.contract){
+  const val=k=>contractPlainValue(f[k]);
+  setFieldIfEmpty('ef-name',val('name'));setFieldIfEmpty('ef-last',val('last'));setFieldIfEmpty('ef-phone',val('phone'));setFieldIfEmpty('ef-email',val('email'));setFieldIfEmpty('ef-start',val('startDate'));setFieldIfEmpty('ef-vac',val('vacWeeks'));
+  if(val('position')){const sel=document.getElementById('ef-pos');[...sel.options].forEach(o=>{if(o.textContent.toLowerCase().includes(String(val('position')).toLowerCase())||String(val('position')).toLowerCase().includes(o.textContent.toLowerCase()))sel.value=o.value;});}
+  if(val('payType')){document.getElementById('ef-paytype').value=val('payType');updatePL();}
+  if(val('rate'))document.getElementById('ef-rate').value=val('rate');
+  if(val('contract')){
     const sel=document.getElementById('ef-contract');
-    [...sel.options].forEach(o=>{if(o.textContent.toLowerCase().includes(f.contract.toLowerCase())||f.contract.toLowerCase().includes(o.textContent.toLowerCase()))sel.value=o.value;});
+    [...sel.options].forEach(o=>{if(o.textContent.toLowerCase().includes(String(val('contract')).toLowerCase())||String(val('contract')).toLowerCase().includes(o.textContent.toLowerCase()))sel.value=o.value;});
   }
+  const extras=[val('endDate')?`Fin contrato: ${val('endDate')}`:'',val('workPercent')?`Porcentaje: ${val('workPercent')}`:'',val('weeklyHours')?`Horas/semana: ${val('weeklyHours')}`:''].filter(Boolean).join(' · ');
+  if(extras)setFieldIfEmpty('ef-notes',extras);
   toast('Datos aplicados. Revisa antes de guardar.');
 }
 function openEmpModal(id){
@@ -2911,7 +2956,7 @@ function openEmpModal(id){
   document.getElementById('emp-modal-title').textContent=emp?`${T().emp.edit} — ${emp.name}`:T().emp.new;
   const assist=document.getElementById('contract-assist-card'),assistResult=document.getElementById('contract-assist-result'),assistFile=document.getElementById('contract-assist-file');
   if(assist)assist.style.display=emp?'none':'block';
-  if(assistResult)assistResult.textContent='La app intentará detectar nombre, email, teléfono, fecha de inicio, tipo de contrato y salario. Tú revisas antes de guardar.';
+  if(assistResult)assistResult.textContent='Lee contratos en español, francés, italiano, alemán e inglés. Detecta datos clave y tú confirmas antes de guardar.';
   if(assistFile)assistFile.value='';
   const fields={name:'name',last:'last',num:'num',start:'startDate',phone:'phone',email:'email',vac:'vacWeeks',avs:'avs',emergency:'emergency',notes:'notes'};
   Object.entries(fields).forEach(([f,k])=>{const el=document.getElementById('ef-'+f);if(el)el.value=emp?.[k]||'';});
