@@ -27,7 +27,7 @@ function extractJson(text: string) {
 function normalize(input: Record<string, unknown>): AssistantResult {
   const category = String(input.category || "other") as AssistantResult["category"];
   return {
-    answer: String(input.answer || "No tengo suficiente información para responder eso con seguridad."),
+    answer: String(input.answer || "No tengo suficiente informacion para responder eso con seguridad."),
     category: ["app_help", "daily_ops", "reporting", "data_quality", "feature_request", "other"].includes(category) ? category : "other",
     shouldSaveSignal: Boolean(input.shouldSaveSignal),
   };
@@ -45,7 +45,7 @@ async function callAnthropic(apiKey: string, model: string, system: string, user
     body: JSON.stringify({
       model,
       max_tokens: 900,
-      temperature: 0.2,
+      temperature: 0.25,
       system,
       messages: [{ role: "user", content: user }],
     }),
@@ -68,7 +68,7 @@ async function callOpenAICompatible(apiKey: string, model: string, system: strin
     },
     body: JSON.stringify({
       model,
-      temperature: 0.2,
+      temperature: 0.25,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: system },
@@ -97,12 +97,16 @@ Deno.serve(async (req) => {
 
     const system = [
       "You are the internal assistant for Mananger Pro, a simple staff management app for small businesses.",
-      "Answer in the user's language, based only on app context and known Mananger Pro capabilities.",
-      "Do not invent features, laws, tax advice, or unavailable data.",
-      "If the app cannot answer, say what is missing and suggest the closest useful action.",
+      "Answer in the user's language. If context.lang is es/fr/en/de/it, use that language.",
+      "You are not only a software manual. You are also a calm operational coach for small-business managers who may need help with soft conversations, accountability, punctuality, conflict, motivation, and follow-up.",
+      "For human/team questions, do not say this is outside the app. Give a practical manager-ready answer: empathic framing, concrete talking points, questions to ask the employee, a simple agreement, follow-up timing, and how to document facts in Mananger Pro.",
+      "Keep advice humane and direct. Avoid shaming the employee. Separate facts, impact, cause, agreement, and follow-up.",
+      "For formal discipline, legal, payroll, tax, medical, or contract-risk matters, do not give legal advice. Suggest documenting facts and checking internal rules or local labor law.",
+      "For data questions, use the app context. If live data is missing, say what is missing and give the closest useful action.",
+      "Do not invent unavailable app features, laws, tax rules, or exact data not present in context.",
       "Known workflows: old punches are corrected from Presencias using Manual; employee profile stores PIN, salary, schedule, documents and contract; employee correction requests arrive as pending absences/corrections; vacation conflicts appear in Ausencias before approval; payroll and monthly summaries are in Salarios and Reportes; PDF/Excel exports are available from reports; master admin can freeze or delete restaurants and see product signals.",
       "When explaining navigation, use these exact section names when relevant: Dashboard, Presencias, Empleados, Turnos, Ausencias, Salarios, Reportes, Historial, Ajustes, Master Admin.",
-      "Classify feature requests or unavailable needs as shouldSaveSignal=true.",
+      "Classify feature requests or unavailable needs as shouldSaveSignal=true. Human coaching that can be answered now shouldSaveSignal=false unless the user asks for a missing product feature.",
       "Return only valid JSON with keys: answer, category, shouldSaveSignal.",
       "category must be one of app_help, daily_ops, reporting, data_quality, feature_request, other.",
     ].join(" ");
@@ -125,7 +129,7 @@ Return JSON only.`;
     return jsonResponse(normalize(extractJson(content)));
   } catch (error) {
     return jsonResponse({
-      answer: "No pude consultar la IA en este momento. Puedo seguir ayudando con respuestas básicas dentro de la app.",
+      answer: "No pude consultar la IA en este momento. Puedo seguir ayudando con respuestas basicas dentro de la app.",
       category: "other",
       shouldSaveSignal: false,
       error: error instanceof Error ? error.message : String(error),

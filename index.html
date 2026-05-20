@@ -31,6 +31,14 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   --r:16px; --r2:12px; --r3:10px; --r4:8px;
   --brand:#4f6ef7; --brand2:#7c3aed; --brand-light:rgba(79,110,247,0.12);
 }
+body.manager-theme {
+  --bg:#f4f6fb; --s1:#ffffff; --s2:#ffffff; --s3:#eef2f8; --s4:#e7ecf5;
+  --border:#dce2ee; --border2:#c9d3e4;
+  --accent:#3468ff; --accent2:#7b4bb3; --cyan:#0ea5c6;
+  --green:#16a872; --red:#dc3545; --orange:#f0a020;
+  --text:#172033; --text2:#667189; --text3:#98a2b8;
+  --brand:#3468ff; --brand2:#6d5dfc; --brand-light:rgba(52,104,255,.1);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden}
 body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
@@ -325,6 +333,96 @@ input[type=date],input[type=time]{color-scheme:dark}
 .tour-progress{display:flex;gap:5px;margin-top:12px}
 .tour-dot{height:4px;flex:1;border-radius:8px;background:var(--border2)}
 .tour-dot.active{background:var(--brand)}
+
+/* MANAGER LIGHT THEME */
+body.manager-theme #topbar{background:#fff;border-bottom:1px solid var(--border);box-shadow:0 1px 0 rgba(17,24,39,.03)}
+body.manager-theme #main{background:var(--bg)}
+body.manager-theme #sidebar{background:#fff;box-shadow:18px 0 42px rgba(25,36,60,.08)}
+body.manager-theme .sb-item.active{background:var(--brand-light);color:var(--brand)}
+body.manager-theme .top-btn{background:#f5f7fb;border-color:#e2e7f1;color:#40506a}
+body.manager-theme .top-btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+body.manager-theme .card,
+body.manager-theme .kpi,
+body.manager-theme .emp-row,
+body.manager-theme .login-card{box-shadow:0 10px 30px rgba(25,36,60,.06)}
+body.manager-theme .card{border-color:#dfe5f0}
+body.manager-theme #pg-dashboard{width:min(100%,1680px);margin:0 auto}
+body.manager-theme #dash-hero{position:relative;overflow:hidden;min-height:138px;padding:22px 24px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;color:#f8fbff;border:0!important;background:linear-gradient(135deg,#172554 0%,#1e2f62 48%,#155e75 100%)!important;box-shadow:0 18px 44px rgba(24,35,80,.24)}
+body.manager-theme #dash-hero::before{content:'';position:absolute;right:-86px;bottom:-112px;width:360px;height:230px;border-radius:34px;background:linear-gradient(135deg,rgba(52,104,255,.32),rgba(22,168,114,.2));transform:rotate(-13deg)}
+body.manager-theme #dash-hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:5px;background:linear-gradient(90deg,#3468ff,#16a872,#f0a020)}
+body.manager-theme .dash-hero-content{position:relative;z-index:1;min-width:0}
+body.manager-theme .dash-date{font-size:12px;color:#b8c7ee;margin-bottom:8px;font-weight:700;text-transform:capitalize}
+body.manager-theme .dash-title{font-size:30px;font-weight:900;line-height:1.05;color:#fff;margin-bottom:7px}
+body.manager-theme .dash-subtitle{font-size:13px;color:#c4d0ef}
+body.manager-theme .dash-status-card{position:relative;z-index:1;min-width:210px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:14px 16px;backdrop-filter:blur(12px)}
+body.manager-theme .dash-status-kicker{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:#c4d0ef;font-weight:800;margin-bottom:6px}
+body.manager-theme .dash-status-value{font-size:25px;font-weight:900;color:#fff}
+body.manager-theme .dash-status-note{font-size:11px;color:#c4d0ef;margin-top:3px}
+body.manager-theme #pg-dashboard .kpi-grid{grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+body.manager-theme #pg-dashboard .kpi{min-height:132px;border:0;background:#fff;padding:16px;box-shadow:0 14px 34px rgba(25,36,60,.08)}
+body.manager-theme #pg-dashboard .kpi::before{content:'';position:absolute;left:0;right:0;top:0;height:4px;background:var(--brand)}
+body.manager-theme #pg-dashboard .kpi:nth-child(2)::before{background:var(--green)}
+body.manager-theme #pg-dashboard .kpi:nth-child(3)::before{background:var(--red)}
+body.manager-theme #pg-dashboard .kpi:nth-child(4)::before{background:var(--orange)}
+body.manager-theme #pg-dashboard .kpi>svg{width:36px;height:36px;padding:8px;border-radius:13px;background:#f1f5ff}
+body.manager-theme #pg-dashboard .kpi:nth-child(2)>svg{background:#ecfdf5}
+body.manager-theme #pg-dashboard .kpi:nth-child(3)>svg{background:#fff1f2}
+body.manager-theme #pg-dashboard .kpi:nth-child(4)>svg{background:#fff7ed}
+body.manager-theme #pg-dashboard .kpi-val{font-size:32px;margin-top:14px}
+body.manager-theme #pg-dashboard .kpi-sub{font-size:12px;font-weight:700;color:#667189}
+body.manager-theme #dash-alerts .card{border:0;box-shadow:0 14px 34px rgba(25,36,60,.07)}
+body.manager-theme #dash-actions{display:none!important}
+body.manager-theme .daily-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:14px;margin-bottom:14px}
+body.manager-theme .attention-card{border:0;background:#fff;box-shadow:0 14px 34px rgba(25,36,60,.07)}
+body.manager-theme .attention-row{display:flex;align-items:center;gap:12px;border-radius:12px;padding:13px 14px;margin-bottom:9px;border:1px solid transparent}
+body.manager-theme .attention-row.danger{background:#fff1f2;border-color:#fecdd3;color:#991b1b}
+body.manager-theme .attention-row.warn{background:#fffbeb;border-color:#fde68a;color:#92400e}
+body.manager-theme .attention-row.ok{background:#ecfdf5;border-color:#bbf7d0;color:#047857}
+body.manager-theme .attention-row button{margin-left:auto;border:1px solid rgba(15,23,42,.16);background:rgba(255,255,255,.72);border-radius:10px;padding:7px 11px;font:800 12px inherit;color:inherit;cursor:pointer}
+body.manager-theme .quick-card{border:0;background:#fff;box-shadow:0 14px 34px rgba(25,36,60,.07)}
+body.manager-theme .quick-actions{display:grid;gap:10px}
+body.manager-theme .quick-action{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:13px 14px;border-radius:13px;border:1px solid #dce2ee;background:#fff;color:var(--text);font:800 13px inherit;cursor:pointer;transition:all .15s}
+body.manager-theme .quick-action:hover{border-color:#b8c5dc;background:#f8fafc;transform:translateY(-1px)}
+body.manager-theme .quick-icon{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;background:var(--brand);flex-shrink:0}
+body.manager-theme .timeline-card{border:0;background:#fff;box-shadow:0 14px 34px rgba(25,36,60,.07)}
+body.manager-theme .timeline-list{display:grid;gap:0}
+body.manager-theme .timeline-row{display:grid;grid-template-columns:58px 18px 1fr auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #eef2f8}
+body.manager-theme .timeline-row:last-child{border-bottom:0}
+body.manager-theme .timeline-time{font-size:13px;font-weight:800;color:#667189;font-variant-numeric:tabular-nums}
+body.manager-theme .timeline-dot{width:10px;height:10px;border-radius:999px;background:#94a3b8}
+body.manager-theme .timeline-dot.in{background:var(--green)}
+body.manager-theme .timeline-dot.missing{background:var(--red)}
+body.manager-theme .timeline-dot.vacation{background:var(--orange)}
+body.manager-theme .timeline-name{font-size:13px;font-weight:800;color:var(--text)}
+body.manager-theme .timeline-note{font-size:11px;color:#667189;margin-top:2px}
+body.manager-theme .kpi{background:#fff;border-color:#dfe5f0}
+body.manager-theme .kpi-glow{opacity:.11}
+body.manager-theme .btn-primary{box-shadow:0 10px 22px rgba(52,104,255,.18)}
+body.manager-theme .btn-success{box-shadow:0 10px 22px rgba(22,168,114,.16)}
+body.manager-theme .btn-danger{box-shadow:0 10px 22px rgba(220,53,69,.16)}
+body.manager-theme .btn-ghost{background:#f7f9fc;color:var(--text);border-color:#dce2ee}
+body.manager-theme .fg input,
+body.manager-theme .fg select,
+body.manager-theme .fg textarea,
+body.manager-theme .search-wrap input{background:#fff;border-color:#dce2ee;color:var(--text)}
+body.manager-theme input[type=date],
+body.manager-theme input[type=time]{color-scheme:light}
+body.manager-theme .tabs{background:#e9eef7}
+body.manager-theme .tab.active{background:#fff;box-shadow:0 6px 18px rgba(25,36,60,.08)}
+body.manager-theme .modal{background:#fff}
+body.manager-theme .ov{background:rgba(15,23,42,.36)}
+body.manager-theme #pg-employees .emp-row{background:#fff;border-color:#dfe5f0;border-radius:12px;padding:14px 16px}
+body.manager-theme #pg-employees .emp-row:hover{border-color:#b9c7df;background:#fbfcff;transform:translateY(-1px)}
+body.manager-theme .assistant-msg.bot{background:#fff}
+body.manager-theme .assistant-chip{background:#f4f6fb}
+@media(max-width:640px){
+  body.manager-theme #dash-hero{display:block;min-height:auto;padding:20px}
+  body.manager-theme .dash-title{font-size:25px}
+  body.manager-theme .dash-status-card{min-width:0;margin-top:18px}
+  body.manager-theme #pg-dashboard .kpi-grid{grid-template-columns:1fr 1fr}
+  body.manager-theme #pg-dashboard .kpi{min-height:118px}
+  body.manager-theme .daily-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -539,7 +637,7 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div class="kpi-grid" id="kpi-grid"></div>
   <div id="dash-live"></div>
   <div id="dash-alerts"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+  <div id="dash-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
     <button class="btn btn-primary" id="dash-scan-btn" onclick="openScanner()">📷 Scanner QR</button>
     <button class="btn btn-ghost" id="dash-add-emp-btn" onclick="openEmpModal(null)">+ Employé</button>
   </div>
@@ -941,23 +1039,24 @@ input[type=date],input[type=time]{color-scheme:dark}
 
 <!-- Manager Assistant -->
 <div class="ov" id="assistant-modal">
-<div class="modal">
+  <div class="modal">
   <div class="modal-handle"></div>
-  <div class="modal-title">Asistente Mananger Pro</div>
-  <div class="fs12 muted mb12">Pregunta sobre fichajes, horarios, ausencias, contratos, reportes o uso de la app. Si algo falta, lo guardamos como señal de mejora.</div>
+  <div class="modal-title" id="assistant-title">Asistente Mananger Pro</div>
+  <div class="fs12 muted mb12" id="assistant-subtitle">Pregunta sobre fichajes, horarios, ausencias, contratos, reportes o uso de la app. Si algo falta, lo guardamos como señal de mejora.</div>
   <div class="assistant-chips">
-    <button class="assistant-chip" onclick="askAssistantPreset('¿Qué debo revisar antes de cerrar el mes?')">Cerrar mes</button>
-    <button class="assistant-chip" onclick="askAssistantPreset('¿Hay alertas importantes hoy?')">Alertas de hoy</button>
-    <button class="assistant-chip" onclick="askAssistantPreset('¿Cómo corrijo un fichaje antiguo?')">Corregir fichaje</button>
-    <button class="assistant-chip" onclick="askAssistantPreset('¿Qué información falta en mis empleados?')">Datos faltantes</button>
+    <button class="assistant-chip" data-assistant-chip="closeMonth" onclick="askAssistantPresetKey('qClose')">Cerrar mes</button>
+    <button class="assistant-chip" data-assistant-chip="alerts" onclick="askAssistantPresetKey('qAlerts')">Alertas de hoy</button>
+    <button class="assistant-chip" data-assistant-chip="fix" onclick="askAssistantPresetKey('qFix')">Corregir fichaje</button>
+    <button class="assistant-chip" data-assistant-chip="missing" onclick="askAssistantPresetKey('qMissing')">Datos faltantes</button>
+    <button class="assistant-chip" data-assistant-chip="people" onclick="askAssistantPresetKey('qPeople')">Conversación difícil</button>
   </div>
   <div class="assistant-log" id="assistant-log"></div>
   <div class="fg"><textarea id="assistant-question" rows="3" placeholder="Escribe tu pregunta..."></textarea></div>
   <div class="modal-actions">
-    <button class="btn btn-ghost" onclick="closeModal('assistant-modal')">Cerrar</button>
+    <button class="btn btn-ghost" id="assistant-close-btn" onclick="closeModal('assistant-modal')">Cerrar</button>
     <button class="btn btn-primary" id="assistant-send-btn" onclick="sendManagerAssistant()">Preguntar</button>
   </div>
-</div>
+  </div>
 </div>
 
 <script>
@@ -1019,6 +1118,22 @@ const UI={
 };
 const T=()=>UI[lang]||UI.fr;
 const TL=section=>({...UI.fr[section],...(T()[section]||{})});
+const DASH_TEXT={
+  fr:{today:"Aujourd'hui",attention:'Requiert votre attention',noUrgencies:'Aucune urgence à traiter maintenant.',quick:'Actions rapides',add:'Ajouter employé',fix:'Corriger un pointage',report:'Générer rapport mensuel',scan:'Scanner QR',review:'Revoir',markReviewed:'Marquer comme revue',problem:'Problème détecté',openFix:'Corriger maintenant',reviewed:'Alerte marquée comme revue',timeline:'Ligne du jour',realIn:'Entrée réelle',realOut:'Sortie réelle',breakStart:'Pause démarrée',breakEnd:'Pause terminée',registered:'Entrée enregistrée',expected:'Entrée prévue',block:'bloc',approved:'approuvé',noShifts:'Aucun horaire prévu',noActivity:'Aucune activité programmée pour aujourd’hui.'},
+  es:{today:'Hoy',attention:'Requiere tu atención',noUrgencies:'No hay urgencias por resolver ahora.',quick:'Acciones rápidas',add:'Añadir empleado',fix:'Corregir fichaje',report:'Generar reporte mensual',scan:'Escanear QR',review:'Revisar',markReviewed:'Marcar como revisada',problem:'Problema detectado',openFix:'Corregir ahora',reviewed:'Alerta marcada como revisada',timeline:'Línea del día',realIn:'Entrada real',realOut:'Salida real',breakStart:'Pausa iniciada',breakEnd:'Pausa terminada',registered:'Entrada registrada',expected:'Entrada prevista',block:'bloque',approved:'aprobado',noShifts:'Sin turnos previstos',noActivity:'No hay actividad programada para hoy.'},
+  en:{today:'Today',attention:'Needs your attention',noUrgencies:'No urgent items right now.',quick:'Quick actions',add:'Add employee',fix:'Fix punch',report:'Generate monthly report',scan:'Scan QR',review:'Review',markReviewed:'Mark as reviewed',problem:'Detected issue',openFix:'Fix now',reviewed:'Alert marked as reviewed',timeline:'Day timeline',realIn:'Actual clock-in',realOut:'Actual clock-out',breakStart:'Break started',breakEnd:'Break ended',registered:'Clock-in registered',expected:'Expected clock-in',block:'block',approved:'approved',noShifts:'No scheduled shifts',noActivity:'No activity scheduled for today.'},
+  de:{today:'Heute',attention:'Benötigt Aufmerksamkeit',noUrgencies:'Aktuell gibt es keine dringenden Punkte.',quick:'Schnellaktionen',add:'Mitarbeiter hinzufügen',fix:'Buchung korrigieren',report:'Monatsbericht erstellen',scan:'QR scannen',review:'Prüfen',markReviewed:'Als geprüft markieren',problem:'Erkanntes Problem',openFix:'Jetzt korrigieren',reviewed:'Warnung als geprüft markiert',timeline:'Tageslinie',realIn:'Tatsächlicher Eintritt',realOut:'Tatsächlicher Austritt',breakStart:'Pause begonnen',breakEnd:'Pause beendet',registered:'Eintritt registriert',expected:'Erwarteter Eintritt',block:'Block',approved:'genehmigt',noShifts:'Keine geplanten Schichten',noActivity:'Heute ist keine Aktivität geplant.'},
+  it:{today:'Oggi',attention:'Richiede attenzione',noUrgencies:'Nessuna urgenza da risolvere ora.',quick:'Azioni rapide',add:'Aggiungi dipendente',fix:'Correggi timbratura',report:'Genera report mensile',scan:'Scansiona QR',review:'Rivedi',markReviewed:'Segna come rivista',problem:'Problema rilevato',openFix:'Correggi ora',reviewed:'Avviso segnato come rivisto',timeline:'Linea del giorno',realIn:'Entrata reale',realOut:'Uscita reale',breakStart:'Pausa iniziata',breakEnd:'Pausa terminata',registered:'Entrata registrata',expected:'Entrata prevista',block:'blocco',approved:'approvata',noShifts:'Nessun turno previsto',noActivity:'Nessuna attività programmata per oggi.'}
+};
+const DX=()=>DASH_TEXT[lang]||DASH_TEXT.fr;
+const ASSIST_TEXT={
+  fr:{title:'Assistant Mananger Pro',sub:"Posez une question sur pointages, horaires, absences, contrats, rapports ou situations d'équipe. Si quelque chose manque, nous le gardons comme signal d'amélioration.",hello:"Bonjour. Je peux vous aider avec l'app, mais aussi préparer une conversation humaine avec un employé quand une situation est délicate.",closeMonth:'Clôturer le mois',alerts:'Alertes du jour',fix:'Corriger pointage',missing:'Données manquantes',people:'Conversation difficile',qClose:"Que dois-je vérifier avant de clôturer le mois ?",qAlerts:"Y a-t-il des alertes importantes aujourd'hui ?",qFix:"Comment corriger un ancien pointage ?",qMissing:"Quelles informations manquent dans mes employés ?",qPeople:"Comment parler à un employé qui arrive souvent en retard ?",placeholder:'Écrivez votre question...',close:'Fermer',ask:'Demander',thinking:'Réflexion...',empty:'Écrivez une question',managerOnly:'Assistant disponible pour managers',local:'Réponse en mode local',saved:'Signal d’amélioration enregistré',sqlMissing:'Assistant local. Il manque le SQL du radar.'},
+  es:{title:'Asistente Mananger Pro',sub:'Pregunta sobre fichajes, horarios, ausencias, contratos, reportes o situaciones con el equipo. Si algo falta, lo guardamos como señal de mejora.',hello:'Hola. Puedo ayudarte con la app, pero también a preparar conversaciones humanas con empleados cuando una situación es delicada.',closeMonth:'Cerrar mes',alerts:'Alertas de hoy',fix:'Corregir fichaje',missing:'Datos faltantes',people:'Conversación difícil',qClose:'¿Qué debo revisar antes de cerrar el mes?',qAlerts:'¿Hay alertas importantes hoy?',qFix:'¿Cómo corrijo un fichaje antiguo?',qMissing:'¿Qué información falta en mis empleados?',qPeople:'¿Cómo hablo con un empleado que llega tarde muchas veces?',placeholder:'Escribe tu pregunta...',close:'Cerrar',ask:'Preguntar',thinking:'Pensando...',empty:'Escribe una pregunta',managerOnly:'Asistente disponible para managers',local:'Respondí en modo local',saved:'Se guardó como señal de mejora',sqlMissing:'Asistente local. Falta ejecutar SQL del radar.'},
+  en:{title:'Mananger Pro Assistant',sub:'Ask about punches, schedules, absences, contracts, reports or team situations. If something is missing, we save it as an improvement signal.',hello:'Hi. I can help with the app, and also help you prepare human conversations with employees when a situation is delicate.',closeMonth:'Close month',alerts:'Today alerts',fix:'Fix punch',missing:'Missing data',people:'Difficult conversation',qClose:'What should I review before closing the month?',qAlerts:'Are there important alerts today?',qFix:'How do I fix an old punch?',qMissing:'What employee information is missing?',qPeople:'How do I talk to an employee who is often late?',placeholder:'Write your question...',close:'Close',ask:'Ask',thinking:'Thinking...',empty:'Write a question',managerOnly:'Assistant available for managers',local:'Answered in local mode',saved:'Saved as an improvement signal',sqlMissing:'Local assistant. Radar SQL is missing.'},
+  de:{title:'Mananger Pro Assistent',sub:'Fragen Sie zu Buchungen, Dienstplänen, Abwesenheiten, Verträgen, Berichten oder Teamsituationen. Wenn etwas fehlt, speichern wir es als Verbesserungssignal.',hello:'Hallo. Ich helfe bei der App und auch dabei, menschliche Gespräche mit Mitarbeitenden in heiklen Situationen vorzubereiten.',closeMonth:'Monat schließen',alerts:'Heutige Warnungen',fix:'Buchung korrigieren',missing:'Fehlende Daten',people:'Schwieriges Gespräch',qClose:'Was soll ich vor dem Monatsabschluss prüfen?',qAlerts:'Gibt es heute wichtige Warnungen?',qFix:'Wie korrigiere ich eine alte Buchung?',qMissing:'Welche Mitarbeiterdaten fehlen?',qPeople:'Wie spreche ich mit einem Mitarbeiter, der oft zu spät kommt?',placeholder:'Frage schreiben...',close:'Schließen',ask:'Fragen',thinking:'Denke nach...',empty:'Schreiben Sie eine Frage',managerOnly:'Assistent für Manager verfügbar',local:'Im lokalen Modus beantwortet',saved:'Als Verbesserungssignal gespeichert',sqlMissing:'Lokaler Assistent. Radar-SQL fehlt.'},
+  it:{title:'Assistente Mananger Pro',sub:"Fai domande su timbrature, orari, assenze, contratti, report o situazioni con il team. Se manca qualcosa, lo salviamo come segnale di miglioramento.",hello:"Ciao. Posso aiutarti con l'app, ma anche a preparare conversazioni umane con i dipendenti quando una situazione è delicata.",closeMonth:'Chiudere mese',alerts:'Avvisi di oggi',fix:'Correggi timbratura',missing:'Dati mancanti',people:'Conversazione difficile',qClose:'Cosa devo controllare prima di chiudere il mese?',qAlerts:'Ci sono avvisi importanti oggi?',qFix:'Come correggo una timbratura vecchia?',qMissing:'Quali informazioni mancano nei dipendenti?',qPeople:'Come parlo con un dipendente che arriva spesso in ritardo?',placeholder:'Scrivi la tua domanda...',close:'Chiudi',ask:'Chiedi',thinking:'Sto pensando...',empty:'Scrivi una domanda',managerOnly:'Assistente disponibile per manager',local:'Risposta in modalità locale',saved:'Salvato come segnale di miglioramento',sqlMissing:'Assistente locale. Manca il SQL del radar.'}
+};
+const ATX=()=>ASSIST_TEXT[lang]||ASSIST_TEXT.fr;
 Object.assign(UI.es,{att:{today:'Fichajes del día',scheduled:'Programados hoy',manual:'Manual',present:'Presentes',absent:'Ausentes',none:'Nadie programado',manualTitle:'Fichaje manual',employee:'Empleado',date:'Fecha',reason:'Motivo',save:'Guardar',cancel:'Cancelar'},shift:{title:'Planificación',morning:'Mañana',afternoon:'Tarde',evening:'Noche',night:'Madrugada',rest:'Descanso',off:'Libre',none:'Sin empleados activos',scheduleSaved:'Horario guardado'},vac:{pending:'Pendientes',approved:'Aprobados',balance:'Saldos',new:'+ Nueva ausencia',title:'Nueva ausencia',none:'Sin solicitudes',noneApproved:'Ninguna ausencia aprobada',nonePending:'Ninguna solicitud pendiente',remaining:'restantes',used:'días usados'}});
 Object.assign(UI.en,{att:{today:'Today’s punches',scheduled:'Scheduled today',manual:'Manual',present:'Present',absent:'Absent',none:'Nobody scheduled',manualTitle:'Manual attendance',employee:'Employee',date:'Date',reason:'Reason',save:'Save',cancel:'Cancel'},shift:{title:'Planning',morning:'Morning',afternoon:'Afternoon',evening:'Evening',night:'Night',rest:'Rest',off:'Off',none:'No active employees',scheduleSaved:'Shift saved'},vac:{pending:'Pending',approved:'Approved',balance:'Balances',new:'+ New absence',title:'New absence',none:'No requests',noneApproved:'No approved leave',nonePending:'No pending requests',remaining:'remaining',used:'days used'}});
 Object.assign(UI.de,{att:{today:'Heutige Buchungen',scheduled:'Heute geplant',manual:'Manuell',present:'Anwesend',absent:'Abwesend',none:'Niemand geplant',manualTitle:'Manuelle Buchung',employee:'Mitarbeiter',date:'Datum',reason:'Grund',save:'Speichern',cancel:'Abbrechen'},shift:{title:'Planung',morning:'Morgen',afternoon:'Nachmittag',evening:'Abend',night:'Nacht',rest:'Ruhezeit',off:'Frei',none:'Keine aktiven Mitarbeiter',scheduleSaved:'Dienst gespeichert'},vac:{pending:'Ausstehend',approved:'Genehmigt',balance:'Salden',new:'+ Neue Abwesenheit',title:'Neue Abwesenheit',none:'Keine Anträge',noneApproved:'Keine genehmigten Abwesenheiten',nonePending:'Keine offenen Anträge',remaining:'übrig',used:'Tage genutzt'}});
@@ -1068,13 +1183,21 @@ const ATW=()=>ATT_WORDS[lang]||ATT_WORDS.fr;
 
 // ═══════ DB ═══════
 let DB={
-  employees:[],history:[],absences:[],shifts:{},documents:[],
+  employees:[],history:[],absences:[],shifts:{},documents:[],reviewedAlerts:{},
   settings:{company:'Mon Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],signals:[],stats:{}};
 const isDemo=()=>currentUser?.demo===true;
 function loadLocal(){try{const s=localStorage.getItem('hrm_pro');if(s)DB={...DB,...JSON.parse(s)};}catch(e){}}
 function saveLocal(){try{if(isDemo())return;localStorage.setItem('hrm_pro',JSON.stringify(DB));}catch(e){}}
+const alertDayKey=date=>new Date(date).toISOString().slice(0,10);
+const alertKey=(date,empId,type)=>`${alertDayKey(date)}_${empId}_${type}`;
+function isAlertReviewed(key){return !!DB.reviewedAlerts?.[key];}
+function markAlertReviewed(key){
+  DB.reviewedAlerts=DB.reviewedAlerts||{};
+  DB.reviewedAlerts[key]={reviewedAt:new Date().toISOString(),user:currentUser?.email||currentUser?.name||'manager'};
+  saveLocal();
+}
 const activeBreakKey=empId=>`hrm_active_break_${REST_ID}_${empId}`;
 function saveActiveBreak(empId,rec){try{localStorage.setItem(activeBreakKey(empId),JSON.stringify({empId,ts:rec.ts,note:rec.note||'',type:'break_start'}));}catch(e){}}
 function readActiveBreak(empId){try{const raw=localStorage.getItem(activeBreakKey(empId));return raw?JSON.parse(raw):null;}catch(e){return null;}}
@@ -1441,12 +1564,11 @@ function applyUITexts(){
   const sub=document.querySelector('.login-sub');if(sub)sub.textContent=lt.sub;
   const empSearch=document.getElementById('emp-search');if(empSearch)empSearch.placeholder=t.emp.search;
   const topNew=document.querySelector('.top-btn.primary');if(topNew)topNew.lastChild.textContent=' '+t.emp.new.split(' ')[0];
-  const dashBtns=document.querySelectorAll('#pg-dashboard .btn');if(dashBtns[0])dashBtns[0].textContent='📷 '+t.dash.scan;if(dashBtns[1])dashBtns[1].textContent=t.dash.addEmp;
   const empTabs=document.querySelectorAll('#pg-employees .tab');if(empTabs[0])empTabs[0].textContent=t.emp.all;if(empTabs[1])empTabs[1].textContent=t.emp.active;if(empTabs[2])empTabs[2].textContent=t.emp.inactive;
   const empAdd=document.querySelector('#pg-employees .btn-primary.mt12');if(empAdd)empAdd.lastChild.textContent=' '+t.emp.new;
   const at=TL('att'),sh=TL('shift'),vc=TL('vac');
   const attSub=document.querySelector('#pg-attendance .muted');if(attSub)attSub.textContent=at.today;
-  const attManual=document.querySelector('[onclick="openManualModal()"]');if(attManual)attManual.textContent=at.manual;
+  const attManual=document.getElementById('att-manual-btn');if(attManual)attManual.textContent=at.manual;
   const attLbl=document.querySelector('#pg-attendance .section-lbl');if(attLbl)attLbl.textContent=at.scheduled;
   const shiftTitle=document.querySelector('#pg-shifts .fw7.fs14');if(shiftTitle)shiftTitle.textContent=sh.title;
   const chips=document.querySelectorAll('#pg-shifts .chip'),st=STT();if(chips[0])chips[0].textContent=st.work;if(chips[1])chips[1].textContent='✅ '+sh.rest;if(chips[2])chips[2].textContent='❌ '+sh.off;
@@ -1489,6 +1611,14 @@ function applyUITexts(){
   if(masterCardHeaders[2])masterCardHeaders[2].querySelector('span').textContent='Radar de mejora';
   if(masterCardHeaders[3])masterCardHeaders[3].textContent=master.maintenance;
   const maintBtns=document.querySelectorAll('#pg-master > .card:last-child .btn');if(maintBtns[0])maintBtns[0].textContent=master.github;if(maintBtns[1])maintBtns[1].textContent=master.site;if(maintBtns[2])maintBtns[2].textContent=master.supabase;if(maintBtns[3])maintBtns[3].textContent=master.backupJson;
+  updateAssistantTexts();
+}
+function updateAssistantTexts(){
+  const a=ATX();
+  const setText=(id,text)=>{const el=document.getElementById(id);if(el)el.textContent=text;};
+  setText('assistant-title',a.title);setText('assistant-subtitle',a.sub);setText('assistant-close-btn',a.close);setText('assistant-send-btn',assistantBusy?a.thinking:a.ask);
+  const q=document.getElementById('assistant-question');if(q)q.placeholder=a.placeholder;
+  document.querySelectorAll('[data-assistant-chip]').forEach(btn=>{btn.textContent=a[btn.dataset.assistantChip]||btn.textContent;});
 }
 function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();applyUITexts();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);}
 function setEmployeeLang(l){
@@ -1646,6 +1776,7 @@ function logout(){
   stopAutoRefresh();
   sb.auth?.signOut?.().catch?.(()=>{});
   currentUser=null;
+  document.body.classList.remove('manager-theme','employee-theme');
   document.getElementById('topbar').style.display='none';
   document.getElementById('main').style.display='none';
   document.getElementById('emp-view').classList.remove('open');
@@ -1667,6 +1798,8 @@ function applyEmployeeAccessLink(){
 }
 
 function showManagerUI(){
+  document.body.classList.add('manager-theme');
+  document.body.classList.remove('employee-theme');
   document.getElementById('login-screen').style.display='none';
   document.getElementById('topbar').style.display='flex';
   document.getElementById('main').style.display='block';
@@ -1681,6 +1814,8 @@ function showManagerUI(){
 }
 
 function showEmpUI(emp){
+  document.body.classList.remove('manager-theme');
+  document.body.classList.add('employee-theme');
   document.getElementById('login-screen').style.display='none';
   document.getElementById('emp-view').classList.add('open');
   renderEmpView(emp);
@@ -2542,18 +2677,21 @@ function assistantAddMessage(role,text){
   log.scrollTop=log.scrollHeight;
 }
 function openManagerAssistant(){
-  if(!currentUser||currentUser?.role==='employee'){toast('Asistente disponible para managers','#ef4444');return;}
+  const a=ATX();
+  if(!currentUser||currentUser?.role==='employee'){toast(a.managerOnly,'#ef4444');return;}
   assistantBusy=false;
+  updateAssistantTexts();
   const btn=document.getElementById('assistant-send-btn');
-  if(btn){btn.disabled=false;btn.textContent='Preguntar';}
+  if(btn){btn.disabled=false;btn.textContent=a.ask;}
   const log=document.getElementById('assistant-log');
   if(log&&!assistantHistory.length){
     log.innerHTML='';
-    assistantAddMessage('bot','Hola. Puedo ayudarte a entender fichajes, horarios, ausencias, contratos, reportes y próximos pasos dentro de Mananger Pro.');
+    assistantAddMessage('bot',a.hello);
   }
   openModal('assistant-modal');
   setTimeout(()=>document.getElementById('assistant-question')?.focus(),120);
 }
+function askAssistantPresetKey(key){askAssistantPreset(ATX()[key]||'');}
 function askAssistantPreset(q){
   const el=document.getElementById('assistant-question');if(el)el.value=q;
   sendManagerAssistant();
@@ -2587,6 +2725,18 @@ function managerAssistantContext(){
     }
   };
 }
+function assistantPeopleCoachingAnswer(ctx){
+  const lateCount=ctx.currentMonth?.totalLate||0;
+  const tolerance=ctx.settings?.lateTolerance??10;
+  const copy={
+    fr:`Oui. Ici l'objectif n'est pas seulement de sanctionner, mais de comprendre le motif, poser une limite claire et laisser une trace.\n\nTu peux préparer la conversation comme ça:\n\n1. Commence calmement: "Je veux parler des retards, pas pour te juger, mais parce que ça affecte l'équipe et le service."\n\n2. Montre le fait concret: "Ce mois-ci, j'ai ${lateCount} retard(s) enregistrés. La tolérance actuelle est de ${tolerance} minutes."\n\n3. Pose une vraie question: "Qu'est-ce qui rend l'arrivée à l'heure difficile en ce moment ? Transport, horaire, fatigue, organisation ?"\n\n4. Mets un accord simple: "À partir de demain, j'ai besoin que tu sois prêt à l'heure prévue. Si quelque chose arrive, préviens-moi avant le début du service."\n\n5. Termine avec suivi: "On revoit ça dans une semaine. Si ça s'améliore, parfait. Si ça continue, on devra formaliser une mesure."\n\nDans Mananger Pro, garde la partie factuelle: rapport d'assiduité, dates de retard, commentaire du retard et une note dans le profil. Pour une sanction formelle, vérifie toujours les règles internes et le droit local.`,
+    es:`Sí. Aquí la idea no es solo "regañar", sino entender la causa, poner un límite claro y dejar seguimiento.\n\nPuedes llevar la conversación así:\n\n1. Empieza tranquilo: "Quiero hablar de las llegadas tarde, no para atacarte, sino porque afecta al equipo y al servicio."\n\n2. Muestra el dato concreto: "Este mes tengo ${lateCount} retardo(s) registrados. La tolerancia actual es de ${tolerance} minutos."\n\n3. Pregunta de verdad: "¿Qué está haciendo difícil que llegues a tiempo? ¿Transporte, horario, cansancio, organización?"\n\n4. Define un acuerdo simple: "Desde mañana necesito que estés listo a la hora programada. Si pasa algo, avísame antes de iniciar el turno."\n\n5. Cierra con seguimiento: "Lo revisamos en una semana. Si mejora, perfecto. Si continúa, tendremos que formalizar una medida."\n\nEn Mananger Pro usa la parte objetiva: reporte de asistencia, fechas de retardos, comentarios del empleado y una nota en su perfil. Si vas a tomar una medida disciplinaria formal, revisa primero las reglas internas y la ley laboral local.`,
+    en:`Yes. The goal is not just to reprimand the employee, but to understand the cause, set a clear boundary and follow up.\n\nYou can run the conversation like this:\n\n1. Start calmly: "I want to talk about the late arrivals, not to attack you, but because they affect the team and the service."\n\n2. Use the concrete data: "This month I have ${lateCount} late arrival(s) registered. The current tolerance is ${tolerance} minutes."\n\n3. Ask a real question: "What is making it difficult to arrive on time right now? Transport, schedule, tiredness, organization?"\n\n4. Set a simple agreement: "From tomorrow I need you ready at the scheduled time. If something happens, tell me before the shift starts."\n\n5. Close with follow-up: "We will review this in one week. If it improves, great. If it continues, we will need to formalize the next step."\n\nIn Mananger Pro, keep the objective record: attendance report, late dates, employee comments and a note in the profile. For formal discipline, check your internal rules and local labor law first.`,
+    de:`Ja. Ziel ist nicht nur eine Ermahnung, sondern die Ursache zu verstehen, eine klare Grenze zu setzen und nachzuverfolgen.\n\nDu kannst das Gespräch so führen:\n\n1. Ruhig beginnen: "Ich möchte über die Verspätungen sprechen, nicht um dich anzugreifen, sondern weil sie das Team und den Service beeinflussen."\n\n2. Konkrete Daten nennen: "Diesen Monat sind ${lateCount} Verspätung(en) erfasst. Die aktuelle Toleranz liegt bei ${tolerance} Minuten."\n\n3. Ernsthaft fragen: "Was macht es im Moment schwierig, pünktlich zu kommen? Verkehr, Dienstplan, Müdigkeit, Organisation?"\n\n4. Ein klares Abkommen setzen: "Ab morgen brauche ich dich zur geplanten Zeit bereit. Wenn etwas passiert, informiere mich vor Schichtbeginn."\n\n5. Mit Follow-up schließen: "Wir prüfen das in einer Woche. Wenn es besser wird, gut. Wenn es weitergeht, müssen wir den nächsten Schritt formalisieren."\n\nIn Mananger Pro dokumentierst du die Fakten: Anwesenheitsbericht, Verspätungsdaten, Kommentare des Mitarbeiters und eine Notiz im Profil. Für formelle Maßnahmen bitte interne Regeln und lokales Arbeitsrecht prüfen.`,
+    it:`Sì. Qui l'obiettivo non è solo rimproverare, ma capire la causa, mettere un limite chiaro e fare seguito.\n\nPuoi gestire la conversazione così:\n\n1. Inizia con calma: "Voglio parlare dei ritardi, non per attaccarti, ma perché influenzano il team e il servizio."\n\n2. Usa il dato concreto: "Questo mese ho ${lateCount} ritardo/i registrati. La tolleranza attuale è di ${tolerance} minuti."\n\n3. Fai una domanda vera: "Cosa rende difficile arrivare puntuale in questo periodo? Trasporto, orario, stanchezza, organizzazione?"\n\n4. Definisci un accordo semplice: "Da domani ho bisogno che tu sia pronto all'orario programmato. Se succede qualcosa, avvisami prima dell'inizio del turno."\n\n5. Chiudi con un controllo: "Lo rivediamo tra una settimana. Se migliora, perfetto. Se continua, dovremo formalizzare un prossimo passo."\n\nIn Mananger Pro conserva la parte oggettiva: report presenze, date dei ritardi, commenti del dipendente e una nota nel profilo. Per misure disciplinari formali, verifica prima regole interne e diritto del lavoro locale.`
+  };
+  return copy[lang]||copy.es;
+}
 function localAssistantAnswer(question,ctx){
   const q=String(question||'').toLowerCase();
   let category='app_help',shouldSaveSignal=false;
@@ -2598,6 +2748,9 @@ function localAssistantAnswer(question,ctx){
   }else if(/cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)/.test(q)){
     category='daily_ops';
     answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.restaurant}.`;
+  }else if(/tarde|retard|late|ritardo|versp[aä]t|p[uü]nkt|puntual|conversaci[oó]n|conversat|hablar|parler|talk|sprechen|disciplina|disciplin|conducta|comport/.test(q)){
+    category='daily_ops';
+    answer=assistantPeopleCoachingAnswer(ctx);
   }else if(/cerrar|mes|reporte|n[oó]mina|salario|pago/.test(q)){
     category='reporting';
     answer=`Antes de cerrar el mes revisa: salarios sin configurar (${ctx.alerts.missingSalary.length}), ausencias pendientes (${ctx.counts.pendingAbsences}), pausas abiertas (${ctx.alerts.openBreaks.length}) y retardos del mes (${ctx.currentMonth.totalLate}). Estimado de nómina actual: CHF ${ctx.currentMonth.estimatedPayroll}.`;
@@ -2626,9 +2779,10 @@ function withTimeout(promise,ms,message='Tiempo agotado'){
 }
 async function sendManagerAssistant(){
   const input=document.getElementById('assistant-question'),btn=document.getElementById('assistant-send-btn');
-  const question=clean(input?.value||'');if(!question){toast('Escribe una pregunta','#ef4444');return;}
+  const a=ATX();
+  const question=clean(input?.value||'');if(!question){toast(a.empty,'#ef4444');return;}
   if(assistantBusy)return;
-  assistantBusy=true;if(btn){btn.disabled=true;btn.textContent='Pensando...';}
+  assistantBusy=true;if(btn){btn.disabled=true;btn.textContent=a.thinking;}
   if(input)input.value='';
   assistantAddMessage('user',question);
   let ctx={app:'Mananger Pro',page:currentPage,lang,alerts:{missingSalary:[],openBreaks:[]},counts:{pendingAbsences:0,todayPunches:0},currentMonth:{totalLate:0,estimatedPayroll:'0.00'},topWorkers:[]};
@@ -2652,19 +2806,19 @@ async function sendManagerAssistant(){
     const answer=result?.answer||fallback.answer;
     assistantAddMessage('bot',answer);
     if(result?.shouldSaveSignal){
-      try{await sbSaveAssistantSignal({question,answer,category:result.category||'feature_request',page:currentPage,metadata:{context:ctx}});toast('Se guardó como señal de mejora','#10b981');}
-      catch(saveErr){console.warn('Signal save failed',saveErr);toast('Respuesta lista. Falta ejecutar SQL del radar.','#f59e0b');}
+      try{await sbSaveAssistantSignal({question,answer,category:result.category||'feature_request',page:currentPage,metadata:{context:ctx}});toast(a.saved,'#10b981');}
+      catch(saveErr){console.warn('Signal save failed',saveErr);toast(a.sqlMissing,'#f59e0b');}
     }
   }catch(e){
     console.warn('Assistant error:',e);
     const fallback=localAssistantAnswer(question,ctx);
     assistantAddMessage('bot',fallback.answer);
     if(fallback.shouldSaveSignal){
-      try{await sbSaveAssistantSignal({question,answer:fallback.answer,category:fallback.category,page:currentPage,metadata:{fallback:true,context:ctx}});toast('Se guardó como señal de mejora','#10b981');}
-      catch(saveErr){console.warn('Signal save failed',saveErr);toast('Asistente local. Falta ejecutar SQL del radar.','#f59e0b');}
-    }else toast('Respondí en modo local','#f59e0b');
+      try{await sbSaveAssistantSignal({question,answer:fallback.answer,category:fallback.category,page:currentPage,metadata:{fallback:true,context:ctx}});toast(a.saved,'#10b981');}
+      catch(saveErr){console.warn('Signal save failed',saveErr);toast(a.sqlMissing,'#f59e0b');}
+    }else toast(a.local,'#f59e0b');
   }finally{
-    assistantBusy=false;if(btn){btn.disabled=false;btn.textContent='Preguntar';}
+    assistantBusy=false;if(btn){btn.disabled=false;btn.textContent=ATX().ask;}
   }
 }
 
@@ -2682,6 +2836,10 @@ function nav(page,el){
   el.classList.add('active');
   document.getElementById('page-title').textContent=T().pages[page]||page;
   currentPage=page;renderPage(page);
+}
+function goPage(page){
+  const item=[...document.querySelectorAll('.sb-item')].find(x=>(x.getAttribute('onclick')||'').includes(`'${page}'`));
+  nav(page,item||document.querySelector('.sb-item'));
 }
 function renderPage(p){
   if(p==='dashboard')renderDash();
@@ -2899,6 +3057,7 @@ window.addEventListener('resize',()=>{if(tourRole)renderTour();});
 // ═══════ DASHBOARD ═══════
 function renderDash(){
   const tx=T().dash;
+  const dx=DX();
   const now=new Date(),dow=now.getDay();
   const active=DB.employees.filter(e=>e.status==='active');
   const present=active.filter(e=>isClockedIn(e.id,now));
@@ -2907,9 +3066,16 @@ function renderDash(){
   const onVac=active.filter(e=>getAbs(e.id,now)?.type==='vacation');
 
   document.getElementById('dash-hero').innerHTML=`
-    <div style="font-size:11px;color:var(--text2);margin-bottom:5px">${now.toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
-    <div style="font-size:22px;font-weight:800;margin-bottom:4px">${esc(DB.settings?.company||'Mon Restaurant')}</div>
-    <div style="font-size:12px;color:var(--text2)">Gestion du personnel</div>`;
+    <div class="dash-hero-content">
+      <div class="dash-date">${now.toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+      <div class="dash-title">${esc(DB.settings?.company||'Mon Restaurant')}</div>
+      <div class="dash-subtitle">Gestion du personnel</div>
+    </div>
+    <div class="dash-status-card">
+      <div class="dash-status-kicker">${esc(dx.today)}</div>
+      <div class="dash-status-value">${present.length}/${scheduled.length}</div>
+      <div class="dash-status-note">${tx.present}</div>
+    </div>`;
 
   document.getElementById('kpi-grid').innerHTML=`
     <div class="kpi"><div class="kpi-glow" style="background:var(--brand)"></div>
@@ -2925,55 +3091,81 @@ function renderDash(){
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M2 20h20M5 20V8.5L12 3l7 5.5V20"/></svg>
       <div class="kpi-val" style="color:var(--orange)">${onVac.length}</div><div class="kpi-sub">${tx.vacation}</div></div>`;
 
-  let liveHTML='';
-  if(present.length>0){
-    liveHTML=`<div class="card" style="margin-bottom:10px"><div class="card-header">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      ${tx.live}</div>
-      <div style="display:flex;flex-wrap:wrap;gap:12px">`;
-    present.forEach(emp=>{
-      const w=workedOn(emp.id,now);
-      liveHTML+=`<div style="text-align:center;cursor:pointer" onclick="openDetail('${emp.id}')">
-        <div style="position:relative;margin-bottom:4px">${mkAv(emp,'av-44')}
-          <div class="av-dot" style="background:#10b981"></div>
-        </div>
-        <div style="font-size:10px;max-width:48px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${emp.name}</div>
-        ${w?`<div style="font-size:9px;color:var(--text2)">${w.toFixed(1)}h</div>`:''}
-      </div>`;
-    });
-    liveHTML+='</div></div>';
-  }
-  document.getElementById('dash-live').innerHTML=liveHTML;
-
   const alerts=[];
   active.forEach(emp=>{
     const ds=dayStatus(emp,now);
     const outNoBreak=DB.history.find(h=>h.empId===emp.id&&sameDay(h.ts,now)&&h.type==='out'&&h.note==='Salida sin pausa registrada');
     const outOpenBreak=DB.history.find(h=>h.empId===emp.id&&sameDay(h.ts,now)&&h.type==='out'&&h.note==='Salida con pausa abierta');
-    if(ds.type==='missing')alerts.push({emp,msg:tx.missing,color:'var(--orange)'});
-    if(isLate(emp,now))alerts.push({emp,msg:tx.late,color:'var(--red)'});
-    if(outNoBreak)alerts.push({emp,msg:'Salida sin pausa registrada',color:'var(--red)'});
-    if(outOpenBreak)alerts.push({emp,msg:'Salida con pausa abierta',color:'var(--orange)'});
+    if(ds.type==='missing')alerts.push({key:alertKey(now,emp.id,'missing-in'),type:'missing-in',emp,msg:tx.missing,color:'var(--orange)'});
+    if(isLate(emp,now))alerts.push({key:alertKey(now,emp.id,'late'),type:'late',emp,msg:tx.late,color:'var(--red)'});
+    if(outNoBreak)alerts.push({key:alertKey(now,emp.id,'out-no-break'),type:'out-no-break',emp,msg:'Salida sin pausa registrada',color:'var(--red)'});
+    if(outOpenBreak)alerts.push({key:alertKey(now,emp.id,'out-open-break'),type:'out-open-break',emp,msg:'Salida con pausa abierta',color:'var(--orange)'});
   });
+  const visibleAlerts=alerts.filter(a=>!isAlertReviewed(a.key));
 
-  let aHTML=`<div class="card"><div class="card-header" style="justify-content:space-between">
-    <div style="display:flex;align-items:center;gap:8px">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      ${tx.alerts}
-    </div>
-    ${alerts.length>0?`<span style="background:rgba(239,68,68,.15);color:var(--red);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700">${alerts.length}</span>`:''}
-  </div>`;
-  if(!alerts.length)aHTML+=`<div style="text-align:center;padding:14px 0;color:var(--green);font-size:13px;font-weight:600">✅ ${tx.allGood}</div>`;
-  else alerts.forEach(a=>{aHTML+=`<div class="alert-item">
-    <div class="alert-icon" style="background:${a.color}22;color:${a.color};font-size:16px">⚠️</div>
-    <div><div style="font-weight:700;font-size:13px">${safeEmpName(a.emp)}</div><div style="font-size:11px;color:${a.color}">${esc(a.msg)}</div></div>
-    <div style="margin-left:auto;cursor:pointer" onclick="openDetail('${a.emp.id}')">›</div>
-  </div>`;});
-  aHTML+='</div>';
-  document.getElementById('dash-alerts').innerHTML=aHTML;
+  const attentionRows=visibleAlerts.length?visibleAlerts.slice(0,4).map(a=>`
+    <div class="attention-row ${a.color.includes('red')?'danger':'warn'}">
+      <div style="font-size:17px">⚠</div>
+      <div style="min-width:0">
+        <div style="font-weight:900;font-size:13px">${safeEmpName(a.emp)}</div>
+        <div style="font-size:12px;margin-top:2px">${esc(a.msg)}</div>
+      </div>
+      <button onclick="openAlertReview(${jsArg(a.key)},${jsArg(a.emp.id)},${jsArg(a.type)},${jsArg(a.msg)})">${esc(dx.review)} ↗</button>
+    </div>`).join(''):`<div class="attention-row ok"><div style="font-size:17px">✓</div><div><div style="font-weight:900;font-size:13px">${tx.allGood}</div><div style="font-size:12px;margin-top:2px">${esc(dx.noUrgencies)}</div></div></div>`;
+
+  document.getElementById('dash-live').innerHTML=`
+    <div class="daily-grid">
+      <div class="card attention-card">
+        <div class="card-header" style="justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            ${esc(dx.attention)}
+          </div>
+          ${visibleAlerts.length?`<span class="chip chip-red">${visibleAlerts.length}</span>`:''}
+        </div>
+        ${attentionRows}
+      </div>
+      <div class="card quick-card">
+        <div class="card-header">${esc(dx.quick)}</div>
+        <div class="quick-actions">
+          <button class="quick-action" onclick="openEmpModal(null)"><span class="quick-icon">+</span><span>${esc(dx.add)}</span></button>
+          <button class="quick-action" onclick="openManualModal()"><span class="quick-icon" style="background:var(--orange)">✎</span><span>${esc(dx.fix)}</span></button>
+          <button class="quick-action" onclick="goPage('reports')"><span class="quick-icon" style="background:var(--green)">↧</span><span>${esc(dx.report)}</span></button>
+          <button class="quick-action" onclick="openScanner()"><span class="quick-icon" style="background:var(--cyan)">▣</span><span>${esc(dx.scan)}</span></button>
+        </div>
+      </div>
+    </div>`;
+
+  const timeline=[];
+  scheduled.forEach(emp=>{
+    const sch=empDaySchedule(emp,now),abs=getAbs(emp.id,now),isIn=present.some(p=>p.id===emp.id);
+    (sch?.blocks||[]).forEach((b,i)=>{
+      timeline.push({time:b.start||'--:--',emp,note:abs?`${abs.type} ${dx.approved}`:isIn?dx.registered:`${dx.expected}${i?` · ${dx.block} ${i+1}`:''}`,state:abs?'vacation':isIn?'in':'missing'});
+    });
+  });
+  DB.history.filter(h=>sameDay(h.ts,now)&&['in','out','break_start','break_end'].includes(h.type)).forEach(h=>{
+    const emp=DB.employees.find(e=>e.id===h.empId),label=h.type==='in'?dx.realIn:h.type==='out'?dx.realOut:h.type==='break_start'?dx.breakStart:dx.breakEnd;
+    if(emp)timeline.push({time:fmtTime(h.ts),emp,note:label,state:h.type==='in'?'in':''});
+  });
+  timeline.sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  document.getElementById('dash-alerts').innerHTML=`
+    <div class="card timeline-card">
+      <div class="card-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="10"/></svg>
+        ${esc(dx.timeline)}
+      </div>
+      <div class="timeline-list">
+        ${timeline.length?timeline.slice(0,10).map(x=>`<div class="timeline-row" onclick="openDetail('${x.emp.id}')" style="cursor:pointer">
+          <div class="timeline-time">${esc(x.time)}</div>
+          <div class="timeline-dot ${x.state}"></div>
+          <div><div class="timeline-name">${safeEmpName(x.emp)}</div><div class="timeline-note">${esc(x.note)}</div></div>
+          <div style="color:var(--text3);font-weight:900">›</div>
+        </div>`).join(''):`<div class="timeline-row"><div class="timeline-time">--:--</div><div class="timeline-dot"></div><div><div class="timeline-name">${esc(dx.noShifts)}</div><div class="timeline-note">${esc(dx.noActivity)}</div></div></div>`}
+      </div>
+    </div>`;
 
   const badge=document.getElementById('sb-badge');
-  if(missing.length>0){badge.textContent=missing.length;badge.style.display='flex';}
+  if(visibleAlerts.length>0){badge.textContent=visibleAlerts.length;badge.style.display='flex';}
   else badge.style.display='none';
 }
 
@@ -3034,7 +3226,13 @@ function renderEmps(){
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${safeEmpName(emp)}</div>
         <div style="font-size:11px;color:var(--text2);margin-top:2px">${esc(emp.position)} · ${esc(emp.dept)}</div>
-        <div style="font-size:11px;color:${sc};margin-top:3px">${last?`${last.type==='in'?tx.in:tx.out} ${fmtTime(last.ts)}${w?' · '+w.toFixed(1)+'h':''}`:'-'}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:7px">
+          <span class="chip ${emp.status==='active'?'chip-green':'chip-gray'}">${emp.status==='active'?tx.active:tx.inactive}</span>
+          ${emp.contract?`<span class="chip chip-blue">${esc(emp.contract)}</span>`:''}
+          ${emp.payType?`<span class="chip chip-gray">${emp.payType==='monthly'?'Mensual':'Horaire'}</span>`:''}
+        </div>
+        <div style="font-size:11px;color:${sc};margin-top:7px">${last?`${last.type==='in'?tx.in:tx.out} ${fmtTime(last.ts)}${w?' · '+w.toFixed(1)+'h hoy':''}`:'Sin fichaje hoy'}</div>
+        ${(emp.email||emp.phone)?`<div style="font-size:11px;color:var(--text2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(emp.email||emp.phone)}</div>`:''}
       </div>
       <div style="display:flex;gap:5px" onclick="event.stopPropagation()">
         <button class="btn btn-success btn-sm" style="width:34px;height:34px;padding:0" onclick="register('${emp.id}','in')">↗</button>
@@ -3423,7 +3621,16 @@ function deleteEmployeeDoc(id,empId){
   DB.documents=(DB.documents||[]).filter(d=>d.id!==id);saveLocal();openDetail(empId);toast('Documento eliminado');sbDelDoc(id).catch(console.error);
 }
 
-function openDetail(empId){
+function openAlertReview(key,empId,type,msg){
+  openDetail(empId,{alert:{key,type,msg}});
+}
+function resolveAlert(key){
+  markAlertReviewed(key);
+  closeModal('detail-modal');
+  renderDash();
+  toast(DX().reviewed,'#10b981');
+}
+function openDetail(empId,opts={}){
   const emp=DB.employees.find(e=>e.id===empId);if(!emp)return;
   const now=new Date(),last=lastAction(empId),w=workedOn(empId,now);
   const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(empId));
@@ -3434,6 +3641,16 @@ function openDetail(empId){
   const c=empColor(emp);
   const docCount=employeeDocs(empId).length;
   const schedHTML=L().daysFull.map((d,i)=>{const sch=empDaySchedule(emp,new Date(2026,0,4+i));return`<div class="rrow"><span class="muted">${esc(d)}</span><span style="font-weight:700;text-align:right;color:${sch?.enabled&&sch.blocks.length?'var(--text)':'var(--text3)'}">${sch?.enabled&&sch.blocks.length?fmtBlocks(sch.blocks,'<br>'):'Libre'}</span></div>`;}).join('');
+  const al=opts.alert,dx=DX();
+  const alertHTML=al?`<div class="card" style="border-color:${al.type==='late'||al.type==='out-no-break'?'rgba(239,68,68,.35)':'rgba(245,158,11,.35)'};background:${al.type==='late'||al.type==='out-no-break'?'rgba(239,68,68,.08)':'rgba(245,158,11,.1)'}">
+    <div class="card-header" style="color:${al.type==='late'||al.type==='out-no-break'?'var(--red)':'var(--orange)'}">⚠ ${esc(dx.problem)}</div>
+    <div style="font-size:14px;font-weight:800;margin-bottom:6px">${esc(al.msg)}</div>
+    <div class="fs12 muted mb12">${safeEmpName(emp)} · ${new Date().toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'})}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn btn-primary" onclick="closeModal('detail-modal');openManualModal('${empId}')">${esc(dx.openFix)}</button>
+      <button class="btn btn-ghost" onclick="resolveAlert(${jsArg(al.key)})">${esc(dx.markReviewed)}</button>
+    </div>
+  </div>`:'';
 
   document.getElementById('detail-content').innerHTML=`
     <div class="modal-handle"></div>
@@ -3446,6 +3663,7 @@ function openDetail(empId){
       ${emp.num?`<span class="chip chip-blue" style="margin-top:8px">#${emp.num}</span>`:''}
       ${emp.pin?`<button class="chip chip-gray" style="margin-top:8px;margin-left:4px;border:none;cursor:pointer" onclick="copyText('${esc(emp.pin)}','PIN copié')">PIN: ${emp.pin}</button>`:''}
     </div>
+    ${alertHTML}
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
       ${[['Ancienneté',seniority,'var(--brand)'],['Vacances',`${vacLeft}j`,'var(--orange)'],["Auj.",w?w.toFixed(1)+'h':'-','var(--green)']].map(([l,v,c])=>`<div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px 8px;text-align:center"><div style="font-size:19px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:3px">${l}</div></div>`).join('')}
     </div>
