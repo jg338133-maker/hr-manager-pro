@@ -754,6 +754,15 @@ input[type=date],input[type=time]{color-scheme:dark}
 <div class="modal">
   <div class="modal-handle"></div>
   <div class="modal-title" id="emp-modal-title">Nouvel employé</div>
+  <div class="card" id="contract-assist-card" style="margin-bottom:14px;border-color:rgba(79,109,245,.32)">
+    <div class="card-header" style="justify-content:space-between">
+      <span>Crear desde contrato</span>
+      <span class="chip chip-blue">Fase 2</span>
+    </div>
+    <input type="file" id="contract-assist-file" accept=".pdf,.txt,.doc,.docx" style="display:none" onchange="handleContractAssist(event)">
+    <button class="btn btn-ghost" onclick="document.getElementById('contract-assist-file').click()">Subir contrato para completar perfil</button>
+    <div id="contract-assist-result" class="fs11 muted mt8">La app intentará detectar nombre, email, teléfono, fecha de inicio, tipo de contrato y salario. Tú revisas antes de guardar.</div>
+  </div>
   <div onclick="document.getElementById('photo-input').click()" style="cursor:pointer">
     <div class="photo-ring" id="photo-ring">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -2836,11 +2845,74 @@ function renderEmps(){
 }
 
 // ═══════ EMP FORM ═══════
-let editEmpId=null,photoData=null;
+let editEmpId=null,photoData=null,pendingContractDoc=null;
+function setFieldIfEmpty(id,value){
+  const el=document.getElementById(id);if(!el||!value)return;
+  if(!String(el.value||'').trim())el.value=value;
+}
+function normalizeContractDate(s){
+  if(!s)return '';
+  const m=String(s).match(/(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/);
+  if(!m)return '';
+  const y=m[3].length===2?`20${m[3]}`:m[3];
+  return `${y}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`;
+}
+function detectContractFields(text){
+  const t=String(text||'').replace(/\s+/g,' ').trim(),out={};
+  const email=t.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  if(email)out.email=email[0].toLowerCase();
+  const phone=t.match(/(?:\+41|0041|0)\s?(?:\d[\s.-]?){8,12}/);
+  if(phone)out.phone=phone[0].replace(/\s+/g,' ').trim();
+  const start=t.match(/(?:début|debut|inicio|start|beginn|inizio|entrée en fonction|commence).*?(\d{1,2}[./-]\d{1,2}[./-]\d{2,4})/i)||t.match(/(\d{1,2}[./-]\d{1,2}[./-]\d{4})/);
+  if(start)out.startDate=normalizeContractDate(start[1]);
+  if(/(cdi|ind[eé]termin|indefinido|unbefristet|indeterminato)/i.test(t))out.contract='Indefinido';
+  else if(/(cdd|temporal|befristet|determinato)/i.test(t))out.contract='Temporal';
+  else if(/(apprent|aprendiz|lehrling|apprendistato)/i.test(t))out.contract='Aprendizaje';
+  const monthly=t.match(/(?:salaire|salario|lohn|stipendio).*?(?:chf|fr\.?)\s*([0-9'’.,]{3,})/i);
+  const hourly=t.match(/(?:heure|hora|hour|stunde|ora).*?(?:chf|fr\.?)\s*([0-9'’.,]{1,6})/i)||t.match(/(?:chf|fr\.?)\s*([0-9'’.,]{1,6})\s*(?:\/h|par heure|por hora|pro stunde|all.?ora)/i);
+  if(hourly){out.payType='hourly';out.rate=parseFloat(hourly[1].replace(/[’']/g,'').replace(',','.'))||'';}
+  else if(monthly){out.payType='monthly';out.rate=parseFloat(monthly[1].replace(/[’']/g,'').replace(',','.'))||'';}
+  const name=t.match(/(?:employé|employe|trabajador|salarié|salarié\(e\)|mitarbeiter|dipendente)\s*:?\s*([A-ZÀ-ÖØ-Ý][A-Za-zÀ-ÿ' -]{2,60})/i);
+  if(name){
+    const parts=name[1].trim().split(/\s+/);
+    out.name=parts.shift()||'';out.last=parts.join(' ');
+  }
+  return out;
+}
+function renderContractAssistResult(fields,fileName){
+  const box=document.getElementById('contract-assist-result');if(!box)return;
+  const found=Object.entries(fields).filter(([,v])=>v);
+  box.innerHTML=`<div style="color:var(--text);font-weight:800;margin-bottom:6px">${esc(fileName||'Contrato cargado')}</div>${found.length?found.map(([k,v])=>`<span class="chip chip-blue" style="margin:0 5px 5px 0">${esc(k)}: ${esc(v)}</span>`).join(''):'<div>No detecté campos claros, pero el contrato se guardará en el expediente al crear el empleado.</div>'}<button class="btn btn-primary btn-sm mt8" onclick="applyContractFields()" ${found.length?'':'disabled'}>Aplicar datos detectados</button>`;
+}
+async function handleContractAssist(ev){
+  const file=ev.target.files?.[0];if(!file)return;
+  if(file.size>3*1024*1024){toast('Contrato muy grande. Máximo 3 MB por ahora.','#ef4444');ev.target.value='';return;}
+  const data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+  const raw=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result||''));r.onerror=rej;r.readAsText(file);});
+  const fields=detectContractFields(raw);
+  pendingContractDoc={id:uid(),type:'contract',name:'Contrato de trabajo',fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data,notes:'Subido al crear perfil',expiresAt:'',createdAt:new Date().toISOString(),fields};
+  renderContractAssistResult(fields,file.name);
+  toast('Contrato cargado para revisión');
+}
+function applyContractFields(){
+  const f=pendingContractDoc?.fields||{};
+  setFieldIfEmpty('ef-name',f.name);setFieldIfEmpty('ef-last',f.last);setFieldIfEmpty('ef-phone',f.phone);setFieldIfEmpty('ef-email',f.email);setFieldIfEmpty('ef-start',f.startDate);
+  if(f.payType){document.getElementById('ef-paytype').value=f.payType;updatePL();}
+  if(f.rate)document.getElementById('ef-rate').value=f.rate;
+  if(f.contract){
+    const sel=document.getElementById('ef-contract');
+    [...sel.options].forEach(o=>{if(o.textContent.toLowerCase().includes(f.contract.toLowerCase())||f.contract.toLowerCase().includes(o.textContent.toLowerCase()))sel.value=o.value;});
+  }
+  toast('Datos aplicados. Revisa antes de guardar.');
+}
 function openEmpModal(id){
-  editEmpId=id;photoData=null;
+  editEmpId=id;photoData=null;pendingContractDoc=null;
   const emp=id?DB.employees.find(e=>e.id===id):null;
   document.getElementById('emp-modal-title').textContent=emp?`${T().emp.edit} — ${emp.name}`:T().emp.new;
+  const assist=document.getElementById('contract-assist-card'),assistResult=document.getElementById('contract-assist-result'),assistFile=document.getElementById('contract-assist-file');
+  if(assist)assist.style.display=emp?'none':'block';
+  if(assistResult)assistResult.textContent='La app intentará detectar nombre, email, teléfono, fecha de inicio, tipo de contrato y salario. Tú revisas antes de guardar.';
+  if(assistFile)assistFile.value='';
   const fields={name:'name',last:'last',num:'num',start:'startDate',phone:'phone',email:'email',vac:'vacWeeks',avs:'avs',emergency:'emergency',notes:'notes'};
   Object.entries(fields).forEach(([f,k])=>{const el=document.getElementById('ef-'+f);if(el)el.value=emp?.[k]||'';});
   document.getElementById('ef-start').value=emp?.startDate||new Date().toISOString().split('T')[0];
@@ -2919,6 +2991,11 @@ function saveEmp(){
   const data={id:editEmpId||uid(),name,last:clean(document.getElementById('ef-last').value),num:clean(document.getElementById('ef-num').value),position:clean(document.getElementById('ef-pos').value),dept:clean(document.getElementById('ef-dept').value),startDate:document.getElementById('ef-start').value,createdAt:existing?.createdAt||new Date().toISOString(),phone:clean(document.getElementById('ef-phone').value),email:empEmail,contract:clean(document.getElementById('ef-contract').value),status:document.getElementById('ef-status').value,payType,rate:payType==='hourly'?rateVal:0,salary:payType==='monthly'?rateVal:0,vacWeeks:parseInt(document.getElementById('ef-vac').value)||5,avs:clean(document.getElementById('ef-avs').value),emergency:clean(document.getElementById('ef-emergency').value),notes:clean(document.getElementById('ef-notes').value),photo:photoData,schedules:getSchedEd(),pin:generatedPin,color:editEmpId?(existing?.color||EMP_COLORS[DB.employees.length%EMP_COLORS.length]):EMP_COLORS[DB.employees.length%EMP_COLORS.length]};
   if(editEmpId){const i=DB.employees.findIndex(e=>e.id===editEmpId);if(i>=0)DB.employees[i]={...DB.employees[i],...data};}
   else DB.employees.push(data);
+  if(!editEmpId&&pendingContractDoc){
+    const doc={...pendingContractDoc,empId:data.id,fields:undefined};
+    DB.documents=[doc,...(DB.documents||[])];
+    sbSaveDoc(doc).catch(console.error);
+  }
   seedVisibleWeekFromSchedule(data);
   saveLocal();closeModal('emp-modal');renderPage(currentPage);
   toast((editEmpId?'✅ Employé mis à jour':'✅ Employé ajouté')+(!typedPin&&!existing?.pin?` · PIN ${generatedPin}`:''));
