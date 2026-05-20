@@ -2566,7 +2566,7 @@ function managerAssistantContext(){
   const openBreaks=active.filter(e=>readActiveBreak(e.id)).map(fullName).slice(0,8);
   const pendingAbs=absences.filter(a=>!a.approved).map(a=>`${fullName(employees.find(e=>e.id===a.empId)||{})}: ${a.type} ${a.start} - ${a.end}`).slice(0,8);
   const lateToday=todayRecs.filter(h=>h.type==='in'&&String(h.note||'').toLowerCase().includes('retard')).map(h=>h.empName||h.empId).slice(0,8);
-  const monthRows=employees.map(emp=>{try{return reportRow(emp,month);}catch(e){console.warn('Assistant report row error',emp?.id,e);return null;}}).filter(Boolean);
+  const monthRows=employees.map(emp=>{try{return monthlyEmployeeReport(emp,month.getFullYear(),month.getMonth());}catch(e){console.warn('Assistant report row error',emp?.id,e);return null;}}).filter(Boolean);
   const topWorkers=monthRows.map(r=>({name:fullName(r.emp),position:r.emp.position||'',hours:+r.hrs.toFixed(1),days:r.days,pay:+r.pay.toFixed(2)})).sort((a,b)=>b.hours-a.hours).slice(0,5);
   return {
     app:'Mananger Pro',
@@ -2595,6 +2595,9 @@ function localAssistantAnswer(question,ctx){
     category='reporting';
     const top=ctx.topWorkers||[];
     answer=top.length?`La persona que más ha trabajado este mes es ${top[0].name}, con ${top[0].hours}h registradas en ${top[0].days} día(s). Top 3: ${top.slice(0,3).map((x,i)=>`${i+1}. ${x.name}: ${x.hours}h`).join(' · ')}.`:'Todavía no hay horas suficientes registradas este mes para calcular quién ha trabajado más.';
+  }else if(/cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)/.test(q)){
+    category='daily_ops';
+    answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.restaurant}.`;
   }else if(/cerrar|mes|reporte|n[oó]mina|salario|pago/.test(q)){
     category='reporting';
     answer=`Antes de cerrar el mes revisa: salarios sin configurar (${ctx.alerts.missingSalary.length}), ausencias pendientes (${ctx.counts.pendingAbsences}), pausas abiertas (${ctx.alerts.openBreaks.length}) y retardos del mes (${ctx.currentMonth.totalLate}). Estimado de nómina actual: CHF ${ctx.currentMonth.estimatedPayroll}.`;
@@ -2612,6 +2615,12 @@ function localAssistantAnswer(question,ctx){
   }
   return {answer,category,shouldSaveSignal};
 }
+function isAssistantDataQuestion(question){
+  const q=String(question||'').toLowerCase();
+  return /(qui[eé]n|persona|empleado).*(m[aá]s|mas).*(trabaj|hora)|m[aá]s horas|mas horas|top.*trabaj/.test(q)
+    || /cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)/.test(q)
+    || /salario|n[oó]mina|pago|ausencia|retardo|pausa/.test(q);
+}
 function withTimeout(promise,ms,message='Tiempo agotado'){
   return Promise.race([promise,new Promise((_,rej)=>setTimeout(()=>rej(new Error(message)),ms))]);
 }
@@ -2624,7 +2633,13 @@ async function sendManagerAssistant(){
   assistantAddMessage('user',question);
   let ctx={app:'Mananger Pro',page:currentPage,lang,alerts:{missingSalary:[],openBreaks:[]},counts:{pendingAbsences:0,todayPunches:0},currentMonth:{totalLate:0,estimatedPayroll:'0.00'},topWorkers:[]};
   try{
+    if(!isDemo())await withTimeout(loadSB(),8000,'No se pudo actualizar desde Supabase');
     ctx=managerAssistantContext();
+    if(isAssistantDataQuestion(question)){
+      const local=localAssistantAnswer(question,ctx);
+      assistantAddMessage('bot',local.answer);
+      return;
+    }
     let result=null;
     if(!isDemo()){
       const {data,error}=await withTimeout(sb.functions.invoke('manager-assistant',{body:{question,context:ctx,history:assistantHistory.slice(-8)}}),12000,'La IA tardó demasiado');
