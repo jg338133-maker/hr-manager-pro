@@ -197,6 +197,15 @@ input[type=date],input[type=time]{color-scheme:dark}
 @keyframes scanAnim{0%{top:0}100%{top:100%}}
 .scan-close-btn{position:absolute;top:52px;right:18px;pointer-events:all;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;width:44px;height:44px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
 
+/* ASSISTANT */
+.assistant-log{display:flex;flex-direction:column;gap:10px;max-height:42vh;overflow-y:auto;margin-bottom:12px;padding-right:2px}
+.assistant-msg{border:1px solid var(--border);border-radius:var(--r2);padding:11px 12px;font-size:13px;line-height:1.45;white-space:pre-wrap}
+.assistant-msg.user{align-self:flex-end;max-width:88%;background:var(--brand);border-color:var(--brand);color:#fff}
+.assistant-msg.bot{align-self:flex-start;max-width:94%;background:var(--s2);color:var(--text)}
+.assistant-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.assistant-chip{border:1px solid var(--border);background:var(--s3);color:var(--text2);border-radius:999px;padding:7px 10px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.assistant-chip:active{transform:scale(.98)}
+
 /* TOAST */
 #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:11px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:600;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:90vw}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -508,6 +517,9 @@ input[type=date],input[type=time]{color-scheme:dark}
     <button class="top-btn" onclick="startTour('manager',true)" title="Tour">
       ?
     </button>
+    <button class="top-btn" onclick="openManagerAssistant()" title="Asistente IA">
+      AI
+    </button>
     <button class="top-btn" id="top-qr-btn" onclick="openScanner()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       QR
@@ -737,6 +749,13 @@ input[type=date],input[type=time]{color-scheme:dark}
     <div id="master-restaurants"></div>
   </div>
   <div class="card">
+    <div class="card-header" style="justify-content:space-between">
+      <span>Radar de mejora</span>
+      <span class="chip chip-purple" id="master-signal-chip">0</span>
+    </div>
+    <div id="master-signals"></div>
+  </div>
+  <div class="card">
     <div class="card-header">Centro de mantenimiento</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">
       <button class="btn btn-ghost" onclick="openMaintenance('github')">GitHub repo</button>
@@ -920,6 +939,27 @@ input[type=date],input[type=time]{color-scheme:dark}
 <!-- QR Action -->
 <div class="ov" id="qr-modal"><div class="modal" id="qr-content"></div></div>
 
+<!-- Manager Assistant -->
+<div class="ov" id="assistant-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title">Asistente Mananger Pro</div>
+  <div class="fs12 muted mb12">Pregunta sobre fichajes, horarios, ausencias, contratos, reportes o uso de la app. Si algo falta, lo guardamos como señal de mejora.</div>
+  <div class="assistant-chips">
+    <button class="assistant-chip" onclick="askAssistantPreset('¿Qué debo revisar antes de cerrar el mes?')">Cerrar mes</button>
+    <button class="assistant-chip" onclick="askAssistantPreset('¿Hay alertas importantes hoy?')">Alertas de hoy</button>
+    <button class="assistant-chip" onclick="askAssistantPreset('¿Cómo corrijo un fichaje antiguo?')">Corregir fichaje</button>
+    <button class="assistant-chip" onclick="askAssistantPreset('¿Qué información falta en mis empleados?')">Datos faltantes</button>
+  </div>
+  <div class="assistant-log" id="assistant-log"></div>
+  <div class="fg"><textarea id="assistant-question" rows="3" placeholder="Escribe tu pregunta..."></textarea></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('assistant-modal')">Cerrar</button>
+    <button class="btn btn-primary" id="assistant-send-btn" onclick="sendManagerAssistant()">Preguntar</button>
+  </div>
+</div>
+</div>
+
 <script>
 // ═══════ SUPABASE ═══════
 const SB_URL='https://grztncvdsvtrwekekpss.supabase.co';
@@ -1031,7 +1071,7 @@ let DB={
   employees:[],history:[],absences:[],shifts:{},documents:[],
   settings:{company:'Mon Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
-let MASTER={restaurants:[],profiles:[],stats:{}};
+let MASTER={restaurants:[],profiles:[],signals:[],stats:{}};
 const isDemo=()=>currentUser?.demo===true;
 function loadLocal(){try{const s=localStorage.getItem('hrm_pro');if(s)DB={...DB,...JSON.parse(s)};}catch(e){}}
 function saveLocal(){try{if(isDemo())return;localStorage.setItem('hrm_pro',JSON.stringify(DB));}catch(e){}}
@@ -1124,6 +1164,13 @@ async function loadMaster(){
       employees:e.data||[],
       attendance:a.data||[]
     };
+    try{
+      const s=await sb.from('manager_assistant_signals').select('*').order('created_at',{ascending:false}).limit(80);
+      MASTER.signals=s.error?[]:(s.data||[]);
+    }catch(signalErr){
+      console.warn('Assistant signals not available yet:',signalErr);
+      MASTER.signals=[];
+    }
     localStorage.setItem('hrm_restaurant_directory',JSON.stringify(MASTER.restaurants.map(x=>({id:x.id,name:x.name,emoji:x.emoji}))));
     return true;
   }catch(e){console.warn('Master load error:',e);return false;}
@@ -1181,6 +1228,12 @@ async function sbDeleteRestaurant(id){
 }
 async function sbSetRestaurantStatus(id,status){
   const {error}=await sb.rpc('master_set_restaurant_status',{p_restaurant_id:id,p_status:status});
+  if(error)throw error;
+}
+async function sbSaveAssistantSignal(signal){
+  if(isDemo())return;
+  const payload={restaurant_id:REST_ID,question:signal.question||'',answer:signal.answer||'',category:signal.category||'other',page:signal.page||currentPage,status:'new',metadata:signal.metadata||{}};
+  const {error}=await sb.from('manager_assistant_signals').insert(payload);
   if(error)throw error;
 }
 async function sbCreateRestaurant(name,email){
@@ -1433,7 +1486,8 @@ function applyUITexts(){
   const masterBtns=document.querySelectorAll('#pg-master > .card:first-child .btn');if(masterBtns[0])masterBtns[0].textContent=master.backup;if(masterBtns[1])masterBtns[1].textContent=master.refresh;
   const masterCardHeaders=document.querySelectorAll('#pg-master > .card .card-header');
   if(masterCardHeaders[1])masterCardHeaders[1].querySelector('span').textContent=master.managed;
-  if(masterCardHeaders[2])masterCardHeaders[2].textContent=master.maintenance;
+  if(masterCardHeaders[2])masterCardHeaders[2].querySelector('span').textContent='Radar de mejora';
+  if(masterCardHeaders[3])masterCardHeaders[3].textContent=master.maintenance;
   const maintBtns=document.querySelectorAll('#pg-master > .card:last-child .btn');if(maintBtns[0])maintBtns[0].textContent=master.github;if(maintBtns[1])maintBtns[1].textContent=master.site;if(maintBtns[2])maintBtns[2].textContent=master.supabase;if(maintBtns[3])maintBtns[3].textContent=master.backupJson;
 }
 function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();applyUITexts();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);}
@@ -2477,6 +2531,113 @@ function renderEmpView(emp){
     ${[['home',ep.tabHome],['calendar',ep.tabCalendar],['requests',ep.tabRequests],['badge',ep.tabBadge]].map(([k,l])=>`<button class="${empSection===k?'active':''}" onclick="setEmpSection('${k}')">${esc(l)}</button>`).join('')}
   </div>${body[empSection]||body.home}`;
   renderQRCodes(document.getElementById('evs'));
+}
+
+// ═══════ MANAGER ASSISTANT ═══════
+let assistantBusy=false,assistantHistory=[];
+function assistantAddMessage(role,text){
+  const log=document.getElementById('assistant-log');if(!log)return;
+  assistantHistory.push({role,text,ts:new Date().toISOString()});
+  log.innerHTML+=`<div class="assistant-msg ${role==='user'?'user':'bot'}">${esc(text)}</div>`;
+  log.scrollTop=log.scrollHeight;
+}
+function openManagerAssistant(){
+  if(!currentUser||currentUser?.role==='employee'){toast('Asistente disponible para managers','#ef4444');return;}
+  const log=document.getElementById('assistant-log');
+  if(log&&!assistantHistory.length){
+    log.innerHTML='';
+    assistantAddMessage('bot','Hola. Puedo ayudarte a entender fichajes, horarios, ausencias, contratos, reportes y próximos pasos dentro de Mananger Pro.');
+  }
+  openModal('assistant-modal');
+  setTimeout(()=>document.getElementById('assistant-question')?.focus(),120);
+}
+function askAssistantPreset(q){
+  const el=document.getElementById('assistant-question');if(el)el.value=q;
+  sendManagerAssistant();
+}
+function managerAssistantContext(){
+  const today=todayStart(),month=new Date(),employees=DB.employees||[],history=DB.history||[],absences=DB.absences||[];
+  const active=employees.filter(e=>e.status==='active');
+  const todayRecs=history.filter(h=>sameDay(h.ts,today));
+  const missingSalary=employees.filter(e=>(e.payType==='monthly'&&!(+e.salary))||(e.payType!=='monthly'&&!(+e.rate))).map(fullName).slice(0,8);
+  const openBreaks=active.filter(e=>readActiveBreak(e.id)).map(fullName).slice(0,8);
+  const pendingAbs=absences.filter(a=>!a.approved).map(a=>`${fullName(employees.find(e=>e.id===a.empId)||{})}: ${a.type} ${a.start} - ${a.end}`).slice(0,8);
+  const lateToday=todayRecs.filter(h=>h.type==='in'&&String(h.note||'').toLowerCase().includes('retard')).map(h=>h.empName||h.empId).slice(0,8);
+  const monthRows=employees.map(emp=>reportRow(emp,month)).filter(Boolean);
+  return {
+    app:'Mananger Pro',
+    restaurant:DB.settings?.company||'Restaurant',
+    page:currentPage,
+    role:currentUser?.role||'manager',
+    lang,
+    date:new Date().toISOString(),
+    settings:{lateTolerance:DB.settings?.lateTol,maxHoursWeek:DB.settings?.maxHours},
+    counts:{employees:employees.length,activeEmployees:active.length,todayPunches:todayRecs.length,pendingAbsences:absences.filter(a=>!a.approved).length},
+    alerts:{missingSalary,openBreaks,pendingAbs,lateToday},
+    currentMonth:{
+      totalHours:monthRows.reduce((s,r)=>s+r.hrs,0).toFixed(1),
+      totalAbsences:monthRows.reduce((s,r)=>s+r.abs,0),
+      totalLate:monthRows.reduce((s,r)=>s+r.late,0),
+      estimatedPayroll:monthRows.reduce((s,r)=>s+r.pay,0).toFixed(2)
+    }
+  };
+}
+function localAssistantAnswer(question,ctx){
+  const q=String(question||'').toLowerCase();
+  let category='app_help',shouldSaveSignal=false;
+  let answer='Puedo ayudarte con fichajes, horarios, pausas, ausencias, empleados, contratos y reportes disponibles en Mananger Pro. No tengo suficiente información para responder eso con seguridad.';
+  if(/cerrar|mes|reporte|n[oó]mina|salario|pago/.test(q)){
+    category='reporting';
+    answer=`Antes de cerrar el mes revisa: salarios sin configurar (${ctx.alerts.missingSalary.length}), ausencias pendientes (${ctx.counts.pendingAbsences}), pausas abiertas (${ctx.alerts.openBreaks.length}) y retardos del mes (${ctx.currentMonth.totalLate}). Estimado de nómina actual: CHF ${ctx.currentMonth.estimatedPayroll}.`;
+  }else if(/alerta|hoy|revisar/.test(q)){
+    category='daily_ops';
+    answer=`Hoy hay ${ctx.counts.todayPunches} fichajes registrados. Revisa pausas abiertas: ${ctx.alerts.openBreaks.length?ctx.alerts.openBreaks.join(', '):'ninguna'}. Ausencias pendientes: ${ctx.counts.pendingAbsences}. Empleados sin salario: ${ctx.alerts.missingSalary.length?ctx.alerts.missingSalary.join(', '):'ninguno'}.`;
+  }else if(/corr|antigu|manual|fichaje/.test(q)){
+    category='app_help';
+    answer='Para corregir un fichaje antiguo entra en Presencias y usa el botón Manual. También puedes abrir el perfil del empleado y revisar su historial. Si el empleado lo pide desde su portal, la solicitud llega como corrección pendiente en Ausencias.';
+  }else if(/falta|faltan|configurar|empleado/.test(q)){
+    category='data_quality';
+    answer=`Datos para revisar: ${ctx.alerts.missingSalary.length?`salario de ${ctx.alerts.missingSalary.join(', ')}`:'no veo salarios faltantes en este resumen'}. También conviene confirmar inicio de contrato, PIN, horario base y vacaciones de cada empleado.`;
+  }else{
+    category='feature_request';shouldSaveSignal=true;
+  }
+  return {answer,category,shouldSaveSignal};
+}
+async function sendManagerAssistant(){
+  const input=document.getElementById('assistant-question'),btn=document.getElementById('assistant-send-btn');
+  const question=clean(input?.value||'');if(!question){toast('Escribe una pregunta','#ef4444');return;}
+  if(assistantBusy)return;
+  assistantBusy=true;if(btn){btn.disabled=true;btn.textContent='Pensando...';}
+  if(input)input.value='';
+  assistantAddMessage('user',question);
+  const ctx=managerAssistantContext();
+  try{
+    let result=null;
+    if(!isDemo()){
+      const {data,error}=await sb.functions.invoke('manager-assistant',{body:{question,context:ctx,history:assistantHistory.slice(-8)}});
+      if(error)throw error;
+      result=data;
+    }else{
+      result=localAssistantAnswer(question,ctx);
+    }
+    const fallback=localAssistantAnswer(question,ctx);
+    const answer=result?.answer||fallback.answer;
+    assistantAddMessage('bot',answer);
+    if(result?.shouldSaveSignal){
+      try{await sbSaveAssistantSignal({question,answer,category:result.category||'feature_request',page:currentPage,metadata:{context:ctx}});toast('Se guardó como señal de mejora','#10b981');}
+      catch(saveErr){console.warn('Signal save failed',saveErr);toast('Respuesta lista. Falta ejecutar SQL del radar.','#f59e0b');}
+    }
+  }catch(e){
+    console.warn('Assistant error:',e);
+    const fallback=localAssistantAnswer(question,ctx);
+    assistantAddMessage('bot',fallback.answer);
+    if(fallback.shouldSaveSignal){
+      try{await sbSaveAssistantSignal({question,answer:fallback.answer,category:fallback.category,page:currentPage,metadata:{fallback:true,context:ctx}});toast('Se guardó como señal de mejora','#10b981');}
+      catch(saveErr){console.warn('Signal save failed',saveErr);toast('Asistente local. Falta ejecutar SQL del radar.','#f59e0b');}
+    }else toast('Respondí en modo local','#f59e0b');
+  }finally{
+    assistantBusy=false;if(btn){btn.disabled=false;btn.textContent='Preguntar';}
+  }
 }
 
 // ═══════ NAV ═══════
@@ -3592,6 +3753,7 @@ async function renderMaster(){
   const tx=TL('master');
   const restaurants=MASTER.restaurants||[],profiles=MASTER.profiles||[];
   const emps=MASTER.stats?.employees||[],atts=MASTER.stats?.attendance||[];
+  const signals=MASTER.signals||[];
   const today=todayStart();
   const activeRest=restaurants.find(r=>r.id===REST_ID);
   document.getElementById('master-version').textContent=`${tx.version} ${APP_VERSION} · Build ${APP_BUILD} · ${currentUser?.email||currentUser?.name||'Super Admin'}`;
@@ -3624,7 +3786,30 @@ async function renderMaster(){
       </div>
     </div>`;
   }).join(''):`<div class="empty-state"><h3>${tx.noneTitle}</h3><p>${tx.noneText}</p></div>`;
+  renderMasterSignals(signals,restaurants);
   applyUITexts();
+}
+
+function renderMasterSignals(signals=[],restaurants=[]){
+  const box=document.getElementById('master-signals'),chip=document.getElementById('master-signal-chip');
+  if(chip)chip.textContent=String(signals.length||0);
+  if(!box)return;
+  if(!signals.length){
+    box.innerHTML='<div class="empty-state"><h3>Sin señales todavía</h3><p>Cuando un manager pregunte algo que la app no pueda resolver, aparecerá aquí.</p></div>';
+    return;
+  }
+  const restName=id=>restaurants.find(r=>r.id===id)?.name||'Restaurante';
+  const colors={feature_request:'chip-purple',data_quality:'chip-orange',reporting:'chip-blue',daily_ops:'chip-green',app_help:'chip-gray',other:'chip-gray'};
+  box.innerHTML=signals.slice(0,12).map(s=>`<div class="card" style="margin-bottom:8px">
+    <div style="display:flex;align-items:flex-start;gap:10px;justify-content:space-between">
+      <div style="min-width:0">
+        <div class="fw7 fs13">${esc(s.question||'Pregunta')}</div>
+        <div class="fs11 muted mt4">${esc(restName(s.restaurant_id))} · ${esc(s.page||'app')} · ${fmtDate(s.created_at||new Date())}</div>
+      </div>
+      <span class="chip ${colors[s.category]||'chip-gray'}">${esc(s.category||'other')}</span>
+    </div>
+    ${s.answer?`<div class="fs11 muted mt8" style="border-top:1px solid var(--border);padding-top:8px">${esc(s.answer).slice(0,220)}${String(s.answer).length>220?'...':''}</div>`:''}
+  </div>`).join('');
 }
 
 async function switchRestaurant(id){

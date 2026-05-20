@@ -22,6 +22,20 @@ create table if not exists public.employee_documents (
   created_at timestamptz default now()
 );
 
+-- Manager assistant product radar.
+-- Stores unanswered questions and feature signals so the master account can see what managers need.
+create table if not exists public.manager_assistant_signals (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid references public.restaurants(id) on delete set null,
+  question text not null,
+  answer text default '',
+  category text default 'other',
+  page text default '',
+  status text default 'new',
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz default now()
+);
+
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   email text unique not null,
@@ -38,6 +52,7 @@ alter table public.attendance enable row level security;
 alter table public.absences enable row level security;
 alter table public.shifts enable row level security;
 alter table public.employee_documents enable row level security;
+alter table public.manager_assistant_signals enable row level security;
 
 create or replace function public.is_super_admin()
 returns boolean
@@ -129,6 +144,15 @@ create policy "employee documents scoped all"
 on public.employee_documents for all
 using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
 with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
+
+drop policy if exists "assistant signals scoped all" on public.manager_assistant_signals;
+create policy "assistant signals scoped all"
+on public.manager_assistant_signals for all
+using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
+with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
+
+create index if not exists manager_assistant_signals_restaurant_idx
+on public.manager_assistant_signals (restaurant_id, created_at desc);
 
 -- Promote your own account to master after it exists in Supabase Auth.
 -- Replace jg338133@gmail.com with your email.
