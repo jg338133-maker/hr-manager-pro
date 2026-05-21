@@ -2111,7 +2111,34 @@ function logout(){
   document.getElementById('login-screen').style.display='block';
   document.getElementById('login-screen').classList.remove('auth-open');
   pinBuf='';updatePinDisp();
+  setAppHistoryState('landing','replace');
 }
+
+function setAppHistoryState(view,mode='push'){
+  if(!history?.pushState||!history?.replaceState)return;
+  const state={...(history.state||{}),hrmView:view};
+  try{
+    if(mode==='replace')history.replaceState(state,'',location.href);
+    else if(history.state?.hrmView!==view)history.pushState(state,'',location.href);
+  }catch(e){console.warn('History state skipped',e);}
+}
+
+function showPublicLandingFromHistory(){
+  if(empClockTimer){clearInterval(empClockTimer);empClockTimer=null;}
+  stopAutoRefresh();
+  document.body.classList.remove('manager-theme','employee-theme');
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('main').style.display='none';
+  document.getElementById('emp-view').classList.remove('open');
+  document.getElementById('login-screen').style.display='block';
+  document.getElementById('login-screen').classList.remove('auth-open');
+  applyUITexts();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+window.addEventListener('popstate',ev=>{
+  if(ev.state?.hrmView==='landing')showPublicLandingFromHistory();
+});
 
 function applyEmployeeAccessLink(){
   const params=new URLSearchParams(location.search);
@@ -2127,6 +2154,7 @@ function applyEmployeeAccessLink(){
 }
 
 function showManagerUI(){
+  setAppHistoryState('app');
   document.body.classList.add('manager-theme');
   document.body.classList.remove('employee-theme');
   document.getElementById('login-screen').style.display='none';
@@ -2144,6 +2172,7 @@ function showManagerUI(){
 }
 
 function showEmpUI(emp){
+  setAppHistoryState('app');
   document.body.classList.remove('manager-theme');
   document.body.classList.add('employee-theme');
   document.getElementById('login-screen').style.display='none';
@@ -4575,6 +4604,7 @@ async function exportMasterJSON(){
 
 // ═══════ INIT ═══════
 async function init(){
+  setAppHistoryState('landing','replace');
   const publicLang=localStorage.getItem('hrm_public_lang');
   if(publicLang&&LANGS[publicLang])lang=publicLang;
   const loadingCopy=LOADING_UI[lang]||LOADING_UI.es;
