@@ -219,19 +219,117 @@ input[type=date],input[type=time]{color-scheme:dark}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* LOADING */
-#loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
-.spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--brand);border-radius:50%;animation:spin .8s linear infinite}
+#loading-overlay{position:fixed;inset:0;background:#eef2f7;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#111827}
+.loading-card{width:min(360px,calc(100vw - 44px));background:#fff;border:1px solid #dfe7f2;border-radius:28px;padding:30px 26px;text-align:center;box-shadow:0 28px 80px rgba(15,23,42,.14)}
+.loading-mark{width:74px;height:74px;border-radius:24px;background:linear-gradient(135deg,#2563eb,#14b8a6);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;color:#fff;font-size:24px;font-weight:950;box-shadow:0 18px 42px rgba(37,99,235,.28)}
+.loading-title{font-size:22px;font-weight:950;letter-spacing:0;margin-bottom:5px}
+.loading-sub{font-size:13px;color:#64748b;font-weight:700;margin-bottom:18px}
+.spinner{width:38px;height:38px;border:3px solid #dbe4f0;border-top-color:#2563eb;border-right-color:#14b8a6;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto}
+.loading-line{height:4px;border-radius:999px;background:#e8eef7;overflow:hidden;margin-top:18px}
+.loading-line::after{content:'';display:block;width:42%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#2563eb,#14b8a6);animation:loadLine 1.35s ease-in-out infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes loadLine{0%{transform:translateX(-110%)}100%{transform:translateX(250%)}}
 
 /* LOGIN */
-#login-screen{position:fixed;inset:0;background:var(--bg);z-index:800;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;overflow-y:auto}
-.login-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:20px;box-shadow:0 8px 32px rgba(79,110,247,.4)}
-.login-title{font-size:26px;font-weight:800;margin-bottom:4px}
-.login-sub{font-size:14px;color:var(--text2);margin-bottom:36px;text-align:center}
-.login-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:24px;width:100%;max-width:360px}
-.login-tabs{display:flex;background:var(--s3);border-radius:var(--r3);padding:3px;margin-bottom:20px;gap:2px}
-.login-tab{flex:1;padding:8px;border-radius:var(--r4);border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--text2);transition:all .2s}
-.login-tab.active{background:var(--s2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+#login-screen{position:fixed;inset:0;background:#eef2f7;color:#111827;z-index:800;display:none;padding:0;overflow-y:auto}
+.login-shell{width:100%;min-height:100%;display:block}
+.login-topbar{height:76px;display:flex;align-items:center;justify-content:space-between;gap:22px;max-width:1280px;margin:0 auto;padding:0 34px}
+.login-brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900;color:#111827}
+.login-brand-mark{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#14b8a6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;box-shadow:0 12px 26px rgba(37,99,235,.22)}
+.login-nav{display:flex;gap:34px;align-items:center;color:#374151;font-weight:800;font-size:14px}
+.login-top-actions{display:flex;gap:10px;align-items:center}
+.login-lang-wrap{display:flex;align-items:center;gap:8px;margin-left:auto}
+.login-lang-label{font-size:11px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.08em}
+.login-lang-select{height:40px;border:1px solid #dbe3ef;border-radius:999px;background:#fff;color:#111827;padding:0 34px 0 14px;font:900 12px inherit;box-shadow:0 8px 18px rgba(15,23,42,.06);cursor:pointer}
+.login-link-btn{border:0;background:transparent;color:#374151;font:800 14px inherit;padding:10px 12px;border-radius:10px;cursor:pointer}
+.login-demo-btn{border:0;background:#2563eb;color:#fff;font:900 14px inherit;padding:12px 18px;border-radius:10px;cursor:pointer;box-shadow:0 16px 34px rgba(37,99,235,.22)}
+.login-landing{display:block}
+.login-hero{position:relative;overflow:hidden;min-height:590px;padding:104px 34px 92px;text-align:left;background:#231b16;color:#fff}
+.login-hero::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(26,18,13,.82) 0%,rgba(26,18,13,.66) 42%,rgba(26,18,13,.24) 73%,rgba(26,18,13,.08) 100%),linear-gradient(180deg,rgba(26,18,13,.08),rgba(26,18,13,.42))}
+.login-hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:9px;background:linear-gradient(90deg,#f59e0b,#14b8a6,#2563eb);z-index:2}
+.login-hero-photos{position:absolute;inset:0;z-index:0}
+.login-hero-photo{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:translateX(8%) scale(1.04);animation:loginPhotoSlide 32s infinite ease-in-out;filter:saturate(1.02) contrast(1.01) brightness(1.03)}
+.login-hero-photo:nth-child(1){background-image:url('assets/hero-1.png'),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=82');animation-delay:0s;background-position:center}
+.login-hero-photo:nth-child(2){background-image:url('assets/hero-2.png'),url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=82');animation-delay:8s;background-position:center}
+.login-hero-photo:nth-child(3){background-image:url('assets/hero-3.png'),url('https://images.unsplash.com/photo-1556745757-8d76bdb6984b?auto=format&fit=crop&w=1800&q=82');animation-delay:16s;background-position:center}
+.login-hero-photo:nth-child(4){background-image:url('assets/hero-4.png'),url('https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&w=1800&q=82');animation-delay:24s;background-position:center}
+@keyframes loginPhotoSlide{
+  0%{opacity:0;transform:translateX(9%) scale(1.05)}
+  7%,25%{opacity:1;transform:translateX(0) scale(1.05)}
+  32%,100%{opacity:0;transform:translateX(-9%) scale(1.05)}
+}
+.login-hero-inner{position:relative;z-index:1;max-width:1160px;margin:0 auto}
+.login-logo{display:none}
+.login-eyebrow{display:none}
+.login-title{position:relative;z-index:1;font-size:58px;font-weight:900;line-height:1.04;margin:0 0 18px;color:#fff;max-width:790px;letter-spacing:0;text-shadow:0 18px 45px rgba(0,0,0,.42)}
+.login-title-accent{display:inline-block;position:relative}
+.login-title-accent::after{content:'';position:absolute;left:2%;right:1%;bottom:5px;height:13px;background:#f59e0b;border-radius:999px;z-index:-1;transform:rotate(-1.5deg);opacity:.92}
+.login-sub{position:relative;z-index:1;font-size:18px;color:#f8fafc;margin:0;line-height:1.55;max-width:680px;font-weight:750;text-shadow:0 12px 34px rgba(0,0,0,.42)}
+.login-hero-strip{display:none}
+.login-hero-chip{border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border-radius:16px;padding:11px 10px;text-align:left}
+.login-hero-chip b{display:block;font-size:12px;font-weight:950;color:#fff;margin-bottom:2px}
+.login-hero-chip span{display:block;font-size:10px;color:#cbd5e1;font-weight:750}
+.login-kicker,.login-copy,.login-proof-grid{display:none}
+.login-cta-row{display:flex;gap:12px;justify-content:flex-start;align-items:center;margin-top:28px;flex-wrap:wrap}
+.login-cta{border:0;border-radius:12px;padding:14px 22px;font:900 15px inherit;cursor:pointer}
+.login-cta.primary{background:#fff;color:#172554;box-shadow:0 18px 42px rgba(15,23,42,.26)}
+.login-cta.secondary{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.24)}
+.login-story{max-width:1160px;margin:-46px auto 0;padding:0 24px;position:relative;z-index:2}
+.login-story-card{background:#fff;border:1px solid #dfe7f2;border-radius:24px;padding:28px;display:grid;grid-template-columns:1.2fr .8fr;gap:24px;box-shadow:0 24px 70px rgba(15,23,42,.12)}
+.login-story-kicker{font-size:12px;font-weight:950;color:#2563eb;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.login-story-title{font-size:28px;font-weight:950;color:#111827;margin-bottom:10px;line-height:1.12}
+.login-story-text{font-size:15px;line-height:1.6;color:#52627a;font-weight:650}
+.login-story-points{display:grid;gap:10px}
+.login-story-point{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid #e5ebf5;border-radius:16px;background:#f8fafc}
+.login-story-dot{width:12px;height:12px;border-radius:999px;background:#14b8a6;margin-top:4px;box-shadow:0 0 0 5px rgba(20,184,166,.12);flex-shrink:0}
+.login-story-point b{display:block;font-size:13px;color:#111827;margin-bottom:2px}
+.login-story-point span{display:block;font-size:12px;color:#64748b;font-weight:650;line-height:1.35}
+.login-business{max-width:1160px;margin:0 auto;padding:34px 24px 0}
+.login-business-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:16px}
+.login-business-title{font-size:24px;font-weight:950;color:#111827}
+.login-business-text{max-width:560px;text-align:right;color:#64748b;font-size:14px;line-height:1.45;font-weight:650}
+.login-business-grid{display:grid;grid-template-columns:1.15fr .85fr .85fr;gap:16px}
+.login-business-card{position:relative;min-height:230px;border-radius:24px;overflow:hidden;background:#111827;box-shadow:0 22px 55px rgba(15,23,42,.14)}
+.login-business-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.98) contrast(1.02)}
+.login-business-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.05),rgba(15,23,42,.72))}
+.login-business-card:first-child{grid-row:span 2;min-height:476px}
+.login-business-caption{position:absolute;left:18px;right:18px;bottom:18px;z-index:1;color:#fff}
+.login-business-caption b{display:block;font-size:18px;font-weight:950;margin-bottom:4px}
+.login-business-caption span{display:block;font-size:12px;color:#dbeafe;font-weight:700;line-height:1.35}
+.login-modules{max-width:1160px;margin:0 auto;padding:34px 24px 86px}
+.login-module-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:16px}
+.login-module-title{font-size:24px;font-weight:950;margin:0;color:#111827}
+.login-module-sub{max-width:520px;color:#64748b;font-size:14px;line-height:1.45;font-weight:650;text-align:right}
+.login-module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 16px;margin-bottom:36px}
+.login-module{min-height:120px;background:#fff;border:1px solid #dfe7f2;border-radius:18px;box-shadow:0 12px 34px rgba(15,23,42,.07);display:flex;align-items:flex-start;gap:16px;padding:18px;color:#111827}
+.login-module-icon{position:relative;width:44px;height:44px;border-radius:14px;background:#eef4ff;flex-shrink:0;overflow:hidden}
+.login-module-icon::before,.login-module-icon::after{content:'';position:absolute;border-radius:999px;background:#2563eb}
+.login-module-icon::before{width:24px;height:24px;left:7px;top:7px}
+.login-module-icon::after{width:20px;height:20px;right:5px;bottom:5px;background:#14b8a6;mix-blend-mode:multiply}
+.login-module:nth-child(2) .login-module-icon::before{background:#f59e0b}.login-module:nth-child(2) .login-module-icon::after{background:#2563eb}
+.login-module:nth-child(3) .login-module-icon::before{background:#14b8a6}.login-module:nth-child(3) .login-module-icon::after{background:#79506f}
+.login-module:nth-child(4) .login-module-icon::before{background:#79506f}.login-module:nth-child(4) .login-module-icon::after{background:#f59e0b}
+.login-module:nth-child(5) .login-module-icon::before{background:#ef4444}.login-module:nth-child(5) .login-module-icon::after{background:#14b8a6}
+.login-module:nth-child(6) .login-module-icon::before{background:#0ea5e9}.login-module:nth-child(6) .login-module-icon::after{background:#79506f}
+.login-module-content{min-width:0}
+.login-module-status{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;margin-bottom:9px;background:#e0f2fe;color:#0369a1;font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.06em}
+.login-module-status.upcoming{background:#fff7ed;color:#9a3412}
+.login-module-name{font-size:16px;font-weight:950;margin-bottom:5px;color:#111827}
+.login-module-desc{font-size:12px;color:#64748b;line-height:1.4;font-weight:650}
+.login-card{display:none;background:#fff;border:1px solid #dfe7f2;border-radius:22px;padding:24px;width:min(100% - 40px,430px);box-shadow:0 24px 70px rgba(17,24,39,.16);margin:42px auto;color:#111827}
+#login-screen.auth-open .login-landing{display:none}
+#login-screen.auth-open .login-card{display:block}
+#login-screen.auth-open .login-topbar{border-bottom:1px solid #e5e7eb;background:#fff}
+.login-card-head{display:none;margin-bottom:18px}
+.login-card-title{font-size:22px;font-weight:900}
+.login-card-sub{font-size:12px;color:#6b7280;margin-top:4px}
+.login-tabs{display:flex;background:#f1f5f9;border-radius:var(--r3);padding:4px;margin-bottom:20px;gap:4px}
+.login-tab{flex:1;padding:10px 8px;border-radius:14px;border:none;font-family:inherit;font-size:13px;font-weight:850;cursor:pointer;background:transparent;color:#64748b;transition:all .2s}
+.login-tab.active{background:#fff;color:#111827;box-shadow:0 2px 8px rgba(17,24,39,.1)}
+.login-mode-note{border:1px solid rgba(79,110,247,.24);background:rgba(79,110,247,.08);border-radius:16px;padding:12px 14px;margin-bottom:18px;font-size:12px;color:#64748b;line-height:1.45}
+.login-card input,.login-card select,.login-card textarea{background:#f8fafc!important;color:#111827!important;border-color:#dbe3ef!important}
+.login-card .btn-ghost{background:#f8fafc;color:#111827;border-color:#dbe3ef}
+.login-card .btn-primary{background:#2563eb;box-shadow:0 14px 30px rgba(37,99,235,.22)}
 .pin-display{display:flex;gap:10px;justify-content:center;margin-bottom:20px}
 .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2);transition:all .2s}
 .pin-dot.filled{background:var(--brand);border-color:var(--brand)}
@@ -423,29 +521,168 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   body.manager-theme #pg-dashboard .kpi{min-height:118px}
   body.manager-theme .daily-grid{grid-template-columns:1fr}
 }
+@media(max-width:860px){
+  .login-topbar{height:auto;padding:18px 20px;align-items:flex-start}
+  .login-nav{display:none}
+  .login-lang-wrap{margin-left:0}
+  .login-top-actions{margin-left:auto}
+  .login-hero{min-height:auto;padding:42px 20px 76px}
+  .login-title{font-size:40px}
+  .login-cta-row{justify-content:flex-start}
+  .login-hero-strip{grid-template-columns:1fr 1fr}
+  .login-story-card{grid-template-columns:1fr}
+  .login-business-head{display:block}
+  .login-business-text{text-align:left;margin-top:8px}
+  .login-business-grid{grid-template-columns:1fr 1fr}
+  .login-business-card:first-child{grid-row:auto;min-height:230px}
+  .login-module-head{display:block}
+  .login-module-sub{text-align:left;margin-top:8px}
+  .login-module-grid{grid-template-columns:1fr 1fr}
+  .login-modules{padding:32px 20px 60px}
+}
+@media(max-width:540px){
+  .login-topbar{display:grid;grid-template-columns:1fr;gap:12px}
+  .login-lang-wrap{justify-content:flex-end}
+  .login-lang-select{width:100%}
+  .login-top-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;margin:0}
+  .login-link-btn,.login-demo-btn{width:100%}
+  .login-hero{text-align:center}
+  .login-title{font-size:34px}
+  .login-sub{font-size:15px}
+  .login-title,.login-sub{margin-left:auto;margin-right:auto}
+  .login-cta-row{justify-content:center}
+  .login-hero-strip{grid-template-columns:1fr}
+  .login-story{padding:0 14px}
+  .login-story-card{padding:20px;border-radius:20px}
+  .login-story-title{font-size:22px}
+  .login-business-grid{grid-template-columns:1fr}
+  .login-module-grid{grid-template-columns:1fr}
+  .login-card-head{display:block}
+  .login-card{border-radius:22px}
+}
 </style>
 </head>
 <body>
 
 <!-- LOADING -->
 <div id="loading-overlay">
-  <div style="width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 8px 32px rgba(79,110,247,.4)">🍽️</div>
-  <div style="font-size:19px;font-weight:800;margin-top:8px">Mananger Pro</div>
-  <div class="spinner" style="margin-top:12px"></div>
-  <div id="loading-msg" style="font-size:13px;color:var(--text2);margin-top:12px">Connexion...</div>
+  <div class="loading-card">
+    <div class="loading-mark">M</div>
+    <div class="loading-title">Mananger Pro</div>
+    <div class="loading-sub" id="loading-sub">Una ayuda simple para tu negocio.</div>
+    <div class="spinner"></div>
+    <div class="loading-line"></div>
+    <div id="loading-msg" style="font-size:13px;color:#64748b;margin-top:14px;font-weight:700">Preparando tu espacio...</div>
+  </div>
 </div>
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-logo">🍽️</div>
-  <div class="login-title">Mananger Pro</div>
-  <div class="login-sub">Gestion du personnel</div>
+  <div class="login-shell">
+  <div class="login-topbar">
+    <div class="login-brand"><span class="login-brand-mark">M</span><span>Mananger Pro</span></div>
+    <div class="login-nav">
+      <span id="login-nav-1">Personal</span>
+      <span id="login-nav-2">Planificación</span>
+      <span id="login-nav-3">Reportes</span>
+      <span id="login-nav-4">IA</span>
+    </div>
+    <div class="login-top-actions">
+      <div class="login-lang-wrap">
+        <select class="login-lang-select" id="login-lang-switch" onchange="setLang(this.value)" aria-label="Language"></select>
+      </div>
+      <button class="login-link-btn" id="login-open-btn" onclick="showLoginAuth('manager')">Inicia sesión</button>
+      <button class="login-demo-btn" id="login-demo-top" onclick="loginDemo()">Pruébalo gratis</button>
+    </div>
+  </div>
+  <div class="login-landing">
+    <section class="login-hero">
+      <div class="login-hero-photos" aria-hidden="true">
+        <span class="login-hero-photo"></span>
+        <span class="login-hero-photo"></span>
+        <span class="login-hero-photo"></span>
+        <span class="login-hero-photo"></span>
+      </div>
+      <div class="login-hero-inner">
+        <div class="login-eyebrow" id="login-eyebrow">Mananger Pro</div>
+        <div class="login-title" id="login-landing-title">Gestiona tu equipo<br><span class="login-title-accent">sin complicarte</span></div>
+        <div class="login-sub" id="login-landing-sub">Controla fichajes, pausas, solicitudes, horarios y reportes desde una sola herramienta simple.</div>
+        <div class="login-cta-row">
+          <button class="login-cta primary" id="login-cta-demo" onclick="loginDemo()">Probar demo</button>
+          <button class="login-cta secondary" id="login-cta-session" onclick="showLoginAuth('manager')">Iniciar sesión</button>
+        </div>
+        <div class="login-hero-strip">
+          <div class="login-hero-chip"><b id="login-chip-1">Restaurantes</b><span id="login-chip-1-sub">Turnos y pausas</span></div>
+          <div class="login-hero-chip"><b id="login-chip-2">Tiendas</b><span id="login-chip-2-sub">Equipo y caja</span></div>
+          <div class="login-hero-chip"><b id="login-chip-3">Hoteles pequeños</b><span id="login-chip-3-sub">Horarios y solicitudes</span></div>
+          <div class="login-hero-chip"><b id="login-chip-4">Servicios</b><span id="login-chip-4-sub">Documentos y reportes</span></div>
+        </div>
+      </div>
+    </section>
+    <section class="login-story">
+      <div class="login-story-card">
+        <div>
+          <div class="login-story-kicker" id="login-story-kicker">La idea</div>
+          <div class="login-story-title" id="login-story-title">Una administración simple para negocios pequeños.</div>
+          <div class="login-story-text" id="login-story-text">Mananger Pro empieza resolviendo el control del personal y crece hacia una plataforma modular para operar ventas, compras, documentos, caja y contabilidad sin tener que saltar entre herramientas.</div>
+        </div>
+        <div class="login-story-points">
+          <div class="login-story-point"><span class="login-story-dot"></span><div><b id="login-point-1-title">Hoy</b><span id="login-point-1-text">Fichajes, horarios, pausas, solicitudes, reportes e IA de apoyo.</span></div></div>
+          <div class="login-story-point"><span class="login-story-dot"></span><div><b id="login-point-2-title">Próximamente</b><span id="login-point-2-text">Ventas, compras, documentos, caja, inventario y contabilidad.</span></div></div>
+          <div class="login-story-point"><span class="login-story-dot"></span><div><b id="login-point-3-title">Objetivo</b><span id="login-point-3-text">Que el dueño entienda su negocio sin ser experto en administración.</span></div></div>
+        </div>
+      </div>
+    </section>
+    <section class="login-business">
+      <div class="login-business-head">
+        <div class="login-business-title" id="login-business-title">Pensado para negocios reales</div>
+        <div class="login-business-text" id="login-business-text">Restaurantes, tiendas, servicios, talleres y pequeñas oficinas comparten el mismo dolor: organizar personas, documentos, tiempo y decisiones.</div>
+      </div>
+      <div class="login-business-grid">
+        <div class="login-business-card">
+          <img src="assets/business-1.png" alt="Negocio real gestionando el día a día">
+          <div class="login-business-caption"><b id="login-biz-1">Gestión diaria</b><span id="login-biz-1-sub">Un tablero para saber qué necesita atención.</span></div>
+        </div>
+        <div class="login-business-card">
+          <img src="assets/business-2.png" alt="Pequeño comercio o servicio">
+          <div class="login-business-caption"><b id="login-biz-2">Comercio y servicios</b><span id="login-biz-2-sub">Personal, turnos, solicitudes y reportes.</span></div>
+        </div>
+        <div class="login-business-card">
+          <img src="assets/business-3.png" alt="Equipo pequeño trabajando">
+          <div class="login-business-caption"><b id="login-biz-3">Equipos pequeños</b><span id="login-biz-3-sub">Procesos simples para managers ocupados.</span></div>
+        </div>
+        <div class="login-business-card">
+          <img src="assets/business-4.png" alt="Decisiones claras para un negocio pequeño">
+          <div class="login-business-caption"><b id="login-biz-4">Decisiones claras</b><span id="login-biz-4-sub">Datos e IA para entender qué está pasando.</span></div>
+        </div>
+      </div>
+    </section>
+    <div class="login-modules">
+      <div class="login-module-head">
+        <div class="login-module-title" id="login-module-title">Áreas del negocio</div>
+        <div class="login-module-sub" id="login-module-sub">Ahora nos enfocamos en RR. HH.; estos son los módulos que pueden convertirlo en un ERP simple para pequeños negocios.</div>
+      </div>
+      <div class="login-module-grid">
+        <div class="login-module"><span class="login-module-icon"></span><div class="login-module-content"><span class="login-module-status" id="login-mod-1-status">Hoy</span><div class="login-module-name" id="login-mod-1">Personal</div><div class="login-module-desc" id="login-mod-1-desc">Fichajes, horarios, pausas y solicitudes.</div></div></div>
+        <div class="login-module"><span class="login-module-icon"></span><div class="login-module-content"><span class="login-module-status" id="login-mod-2-status">Hoy</span><div class="login-module-name" id="login-mod-2">Reportes</div><div class="login-module-desc" id="login-mod-2-desc">Excel, PDF, salarios estimados y horas extra.</div></div></div>
+        <div class="login-module"><span class="login-module-icon"></span><div class="login-module-content"><span class="login-module-status" id="login-mod-3-status">Hoy</span><div class="login-module-name" id="login-mod-3">Asistente IA</div><div class="login-module-desc" id="login-mod-3-desc">Ayuda al manager a decidir y comunicarse mejor.</div></div></div>
+        <div class="login-module"><span class="login-module-icon"></span><div class="login-module-content"><span class="login-module-status upcoming" id="login-mod-4-status">Próximamente</span><div class="login-module-name" id="login-mod-4">Ventas y caja</div><div class="login-module-desc" id="login-mod-4-desc">Control diario de ingresos, turnos y cierres.</div></div></div>
+        <div class="login-module"><span class="login-module-icon"></span><div class="login-module-content"><span class="login-module-status upcoming" id="login-mod-5-status">Próximamente</span><div class="login-module-name" id="login-mod-5">Compras e inventario</div><div class="login-module-desc" id="login-mod-5-desc">Seguimiento de compras, stock y proveedores.</div></div></div>
+        <div class="login-module"><span class="login-module-icon"></span><div class="login-module-content"><span class="login-module-status upcoming" id="login-mod-6-status">Próximamente</span><div class="login-module-name" id="login-mod-6">Contabilidad</div><div class="login-module-desc" id="login-mod-6-desc">Resumen simple para entender costos y resultados.</div></div></div>
+      </div>
+    </div>
+  </div>
   <div class="login-card">
+    <div class="login-card-head">
+      <div class="login-card-title">Mananger Pro</div>
+      <div class="login-card-sub">Gestion du personnel</div>
+    </div>
     <div class="login-tabs">
       <button class="login-tab active" onclick="setLoginTab('manager',this)">👔 Manager</button>
       <button class="login-tab" onclick="setLoginTab('employee',this)">👤 Employé</button>
       <button class="login-tab" onclick="setLoginTab('register',this)">➕ Restaurant</button>
     </div>
+    <div class="login-mode-note" id="login-mode-note">Connectez-vous pour suivre votre équipe en temps réel.</div>
     <!-- Manager -->
     <div id="login-manager">
       <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="manager@restaurant.ch"></div>
@@ -456,7 +693,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
         Se connecter
       </button>
       <div class="divider"></div>
-      <button class="btn btn-ghost" onclick="loginDemo()">🎯 Accès démo (sans compte)</button>
+      <button class="btn btn-ghost" id="login-demo-card" onclick="loginDemo()">Accès démo (sans compte)</button>
     </div>
     <!-- Employee PIN -->
     <div id="login-employee" style="display:none">
@@ -493,6 +730,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
       <button class="btn btn-primary" onclick="registerRestaurant()" style="margin-bottom:10px">Créer compte admin</button>
       <div style="font-size:11px;color:var(--text2);line-height:1.5">Crée le restaurant et lie cet utilisateur comme administrateur. Si Supabase demande confirmation email, confirmez avant de vous connecter.</div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -535,12 +773,12 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 <nav id="sidebar">
   <div class="sb-head">
     <div class="sb-brand">
-      <div class="sb-logo">🍽️</div>
+    <div class="sb-logo">M</div>
       <div><div class="sb-app">Mananger Pro</div><div class="sb-ver">v2.0</div></div>
     </div>
     <div class="sb-resto">
-      <div class="sb-resto-logo" id="sb-rl">🍽️</div>
-      <div><div class="sb-resto-name" id="sb-rn">Mon Restaurant</div><div class="sb-resto-plan">✨ Période d'essai</div></div>
+      <div class="sb-resto-logo" id="sb-rl">MP</div>
+      <div><div class="sb-resto-name" id="sb-rn">Mon Business</div><div class="sb-resto-plan">✨ Période d'essai</div></div>
     </div>
   </div>
   <div class="sb-nav">
@@ -615,7 +853,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
     <button class="top-btn" onclick="startTour('manager',true)" title="Tour">
       ?
     </button>
-    <button class="top-btn" onclick="openManagerAssistant()" title="Asistente IA">
+    <button class="top-btn" id="top-ai-btn" onclick="openManagerAssistant()" title="Asistente IA">
       AI
     </button>
     <button class="top-btn" id="top-qr-btn" onclick="openScanner()">
@@ -1107,6 +1345,13 @@ const LANGS={
     days:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'],
     daysFull:['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato']}
 };
+const LOADING_UI={
+  es:{sub:'Una ayuda simple para tu negocio.',start:'Preparando tu espacio...',connect:'Conectando tus datos...',ready:'Todo listo'},
+  fr:{sub:'Une aide simple pour votre business.',start:'Préparation de votre espace...',connect:'Connexion à vos données...',ready:'Tout est prêt'},
+  en:{sub:'A simple helper for your business.',start:'Preparing your workspace...',connect:'Connecting your data...',ready:'All set'},
+  de:{sub:'Eine einfache Hilfe für Ihren Betrieb.',start:'Arbeitsbereich wird vorbereitet...',connect:'Daten werden verbunden...',ready:'Alles bereit'},
+  it:{sub:'Un aiuto semplice per il tuo business.',start:'Prepariamo il tuo spazio...',connect:'Colleghiamo i tuoi dati...',ready:'Tutto pronto'}
+};
 let lang='fr';
 const L=()=>LANGS[lang]||LANGS.fr;
 const UI={
@@ -1158,6 +1403,26 @@ Object.assign(UI.es.pages,{vacations:'Solicitudes'});Object.assign(UI.es.vac,{ne
 Object.assign(UI.en.pages,{vacations:'Requests'});Object.assign(UI.en.vac,{new:'+ New request',title:'New request',noneApproved:'No approved requests'});
 Object.assign(UI.de.pages,{vacations:'Anfragen'});Object.assign(UI.de.vac,{new:'+ Neue Anfrage',title:'Neue Anfrage',noneApproved:'Keine genehmigten Anfragen'});
 Object.assign(UI.it.pages,{vacations:'Richieste'});Object.assign(UI.it.vac,{new:'+ Nuova richiesta',title:'Nuova richiesta',noneApproved:'Nessuna richiesta approvata'});
+Object.assign(UI.fr.login,{kicker:'Pilotage du personnel',copy:'Suivez les entrées, pauses, demandes et rapports mensuels sans perdre le fil du service.',proof1:'Pointage rapide',proof2:'Aide manager',proof3:'Badges employés',managerNote:'Connectez-vous pour suivre votre équipe en temps réel.',employeeNote:'Accès employé avec email et PIN pour pointer, demander une correction ou consulter les heures.',registerNote:'Créez votre espace restaurant et invitez votre équipe.'});
+Object.assign(UI.es.login,{kicker:'Control del personal',copy:'Sigue entradas, pausas, solicitudes y reportes mensuales sin perder el ritmo del servicio.',proof1:'Fichaje rápido',proof2:'Ayuda manager',proof3:'Carnets empleados',managerNote:'Entra para ver tu equipo, alertas y reportes en tiempo real.',employeeNote:'Acceso de empleado con email y PIN para fichar, pedir correcciones o revisar horas.',registerNote:'Crea el espacio de tu restaurante e invita a tu equipo.'});
+Object.assign(UI.en.login,{kicker:'Staff control',copy:'Track clock-ins, breaks, requests and monthly reports without losing the rhythm of service.',proof1:'Fast clocking',proof2:'Manager help',proof3:'Employee cards',managerNote:'Sign in to follow your team, alerts and reports in real time.',employeeNote:'Employee access with email and PIN to clock in, request corrections or review hours.',registerNote:'Create your restaurant workspace and invite your team.'});
+Object.assign(UI.de.login,{kicker:'Personalsteuerung',copy:'Buchungen, Pausen, Anfragen und Monatsberichte verfolgen, ohne den Service aus dem Blick zu verlieren.',proof1:'Schnelle Buchung',proof2:'Manager-Hilfe',proof3:'Mitarbeiterausweise',managerNote:'Anmelden, um Team, Warnungen und Berichte in Echtzeit zu verfolgen.',employeeNote:'Mitarbeiterzugang mit E-Mail und PIN zum Buchen, Korrekturen anfragen oder Stunden prüfen.',registerNote:'Restaurantbereich erstellen und Team einladen.'});
+Object.assign(UI.it.login,{kicker:'Controllo del personale',copy:'Segui entrate, pause, richieste e report mensili senza perdere il ritmo del servizio.',proof1:'Timbratura rapida',proof2:'Aiuto manager',proof3:'Badge dipendenti',managerNote:'Accedi per seguire team, avvisi e report in tempo reale.',employeeNote:'Accesso dipendente con email e PIN per timbrare, chiedere correzioni o vedere le ore.',registerNote:'Crea lo spazio del tuo ristorante e invita il team.'});
+Object.assign(UI.fr.login,{manager:'Manager',employee:'Employé',restaurant:'Créer compte',signin:'Connexion',langLabel:'Voir en',nav1:'Personnel',nav2:'Planification',nav3:'Rapports',nav4:'IA',eyebrow:'Mananger Pro pour petits commerces',landingTitle:'Une aide simple<br><span class="login-title-accent">pour le quotidien de votre business</span>',landingSub:'Commencez par l’équipe: horaires, pointages, demandes et documents. Ajoutez ensuite ventes, achats, caisse et inventaire quand votre commerce en a besoin.',open:'Connexion',demoTop:'Essai gratuit',ctaDemo:'Essayer la démo',ctaSession:'Connexion',storyKicker:'L’idée',storyTitle:'Une app sérieuse, mais facile à adopter.',storyText:'Mananger Pro commence par vous aider à organiser votre équipe. Peu à peu, il peut accompagner d’autres zones du business sans devenir lourd ni intimidant.',point1Title:'Aujourd’hui',point1Text:'Pointages, horaires, pauses, demandes, rapports et aide IA.',point2Title:'Bientôt',point2Text:'Ventes, achats, documents, caisse, inventaire et comptabilité.',point3Title:'Objectif',point3Text:'Aider le propriétaire à comprendre son business sans jargon administratif.',moduleTitle:'Domaines du business',moduleSub:'Nous sommes focalisés sur les RH; ces modules dessinent le chemin vers un ERP simple.',current:'Aujourd’hui',upcoming:'Bientôt',mod1:'Personnel',mod1Desc:'Pointages, horaires, pauses et demandes.',mod2:'Rapports',mod2Desc:'Excel, PDF, salaires estimés et heures supplémentaires.',mod3:'Assistant IA',mod3Desc:'Aide le manager à décider et mieux communiquer.',mod4:'Ventes et caisse',mod4Desc:'Suivi quotidien des revenus, services et clôtures.',mod5:'Achats et inventaire',mod5Desc:'Achats, stock et fournisseurs sous contrôle.',mod6:'Comptabilité',mod6Desc:'Vue simple des coûts et résultats.'});
+Object.assign(UI.es.login,{manager:'Manager',employee:'Empleado',restaurant:'Crear cuenta',signin:'Iniciar sesión',langLabel:'Ver en',nav1:'Personal',nav2:'Planificación',nav3:'Reportes',nav4:'IA',eyebrow:'Mananger Pro para pequeños negocios',landingTitle:'Una ayuda simple<br><span class="login-title-accent">para llevar el día a día de tu negocio</span>',landingSub:'Empieza con tu equipo: horarios, fichajes, solicitudes y documentos. Luego suma ventas, compras, caja e inventario cuando tu negocio lo necesite.',open:'Iniciar sesión',demoTop:'Pruébalo gratis',ctaDemo:'Probar demo',ctaSession:'Iniciar sesión',storyKicker:'La idea',storyTitle:'Una app seria, pero fácil de adoptar.',storyText:'Mananger Pro empieza ayudándote a ordenar tu equipo. Poco a poco puede acompañarte en otras áreas del negocio, sin hacerlo pesado ni intimidante.',point1Title:'Hoy',point1Text:'Fichajes, horarios, pausas, solicitudes, reportes e IA de apoyo.',point2Title:'Próximamente',point2Text:'Ventas, compras, documentos, caja, inventario y contabilidad.',point3Title:'Objetivo',point3Text:'Que el dueño entienda su negocio sin hablar lenguaje administrativo.',moduleTitle:'Áreas del negocio',moduleSub:'Ahora estamos enfocados en RR. HH.; estos módulos marcan el camino hacia un sistema simple para pequeños negocios.',current:'Hoy',upcoming:'Próximamente',mod1:'Personal',mod1Desc:'Fichajes, horarios, pausas y solicitudes.',mod2:'Reportes',mod2Desc:'Excel, PDF, salarios estimados y horas extra.',mod3:'Asistente IA',mod3Desc:'Ayuda al manager a decidir y comunicarse mejor.',mod4:'Ventas y caja',mod4Desc:'Control diario de ingresos, turnos y cierres.',mod5:'Compras e inventario',mod5Desc:'Seguimiento de compras, stock y proveedores.',mod6:'Contabilidad',mod6Desc:'Resumen simple para entender costos y resultados.'});
+Object.assign(UI.en.login,{manager:'Manager',employee:'Employee',restaurant:'Sign up',signin:'Log in',langLabel:'View in',nav1:'People',nav2:'Planning',nav3:'Reports',nav4:'AI',eyebrow:'Mananger Pro for small businesses',landingTitle:'A simple helper<br><span class="login-title-accent">for the day-to-day of your business</span>',landingSub:'Start with your team: schedules, clock-ins, requests and documents. Add sales, purchases, cash and inventory when your business needs them.',open:'Log in',demoTop:'Try it free',ctaDemo:'Try demo',ctaSession:'Log in',storyKicker:'The idea',storyTitle:'A serious app that feels easy to adopt.',storyText:'Mananger Pro starts by helping you organize your team. Step by step, it can support other business areas without becoming heavy or intimidating.',point1Title:'Today',point1Text:'Clock-ins, schedules, breaks, requests, reports and AI support.',point2Title:'Coming soon',point2Text:'Sales, purchases, documents, cash, inventory and accounting.',point3Title:'Goal',point3Text:'Help owners understand their business without admin jargon.',moduleTitle:'Business areas',moduleSub:'We are focused on HR now; these modules show the path toward a simple system for small businesses.',current:'Today',upcoming:'Coming soon',mod1:'People',mod1Desc:'Clock-ins, schedules, breaks and requests.',mod2:'Reports',mod2Desc:'Excel, PDF, estimated payroll and extra hours.',mod3:'AI assistant',mod3Desc:'Helps managers decide and communicate better.',mod4:'Sales and cash',mod4Desc:'Daily control of revenue, shifts and closing.',mod5:'Purchases and inventory',mod5Desc:'Track purchases, stock and suppliers.',mod6:'Accounting',mod6Desc:'Simple view of costs and results.'});
+Object.assign(UI.de.login,{manager:'Manager',employee:'Mitarbeiter',restaurant:'Konto erstellen',signin:'Einloggen',langLabel:'Sprache',nav1:'Personal',nav2:'Planung',nav3:'Berichte',nav4:'KI',eyebrow:'Mananger Pro für kleine Betriebe',landingTitle:'Eine einfache Hilfe<br><span class="login-title-accent">für den Alltag Ihres Betriebs</span>',landingSub:'Beginnen Sie mit dem Team: Pläne, Buchungen, Anfragen und Dokumente. Später kommen Verkauf, Einkauf, Kasse und Inventar dazu, wenn Ihr Betrieb es braucht.',open:'Einloggen',demoTop:'Gratis testen',ctaDemo:'Demo testen',ctaSession:'Einloggen',storyKicker:'Die Idee',storyTitle:'Eine seriöse App, die leicht anzunehmen ist.',storyText:'Mananger Pro hilft zuerst, Ihr Team zu organisieren. Schritt für Schritt kann es weitere Bereiche begleiten, ohne schwer oder einschüchternd zu werden.',point1Title:'Heute',point1Text:'Buchungen, Pläne, Pausen, Anfragen, Berichte und KI-Hilfe.',point2Title:'Demnächst',point2Text:'Verkauf, Einkauf, Dokumente, Kasse, Inventar und Buchhaltung.',point3Title:'Ziel',point3Text:'Inhaber verstehen ihr Geschäft ohne Verwaltungsjargon.',moduleTitle:'Geschäftsbereiche',moduleSub:'Aktuell fokussieren wir HR; diese Module zeigen den Weg zu einem einfachen System für kleine Betriebe.',current:'Heute',upcoming:'Demnächst',mod1:'Personal',mod1Desc:'Buchungen, Pläne, Pausen und Anfragen.',mod2:'Berichte',mod2Desc:'Excel, PDF, geschätzte Löhne und Überstunden.',mod3:'KI-Assistent',mod3Desc:'Hilft Managern beim Entscheiden und Kommunizieren.',mod4:'Verkauf und Kasse',mod4Desc:'Tägliche Kontrolle von Umsatz, Schichten und Abschluss.',mod5:'Einkauf und Inventar',mod5Desc:'Einkäufe, Lager und Lieferanten verfolgen.',mod6:'Buchhaltung',mod6Desc:'Einfache Sicht auf Kosten und Ergebnisse.'});
+Object.assign(UI.it.login,{manager:'Manager',employee:'Dipendente',restaurant:'Crea account',signin:'Accedi',langLabel:'Vedi in',nav1:'Personale',nav2:'Pianificazione',nav3:'Report',nav4:'IA',eyebrow:'Mananger Pro per piccoli business',landingTitle:'Un aiuto semplice<br><span class="login-title-accent">per il quotidiano del tuo business</span>',landingSub:'Inizia dal team: orari, timbrature, richieste e documenti. Poi aggiungi vendite, acquisti, cassa e inventario quando il business ne ha bisogno.',open:'Accedi',demoTop:'Provalo gratis',ctaDemo:'Prova demo',ctaSession:'Accedi',storyKicker:'L’idea',storyTitle:'Un’app seria, ma facile da adottare.',storyText:'Mananger Pro inizia aiutandoti a organizzare il team. Poco a poco può accompagnare altre aree del business, senza diventare pesante o intimidatorio.',point1Title:'Oggi',point1Text:'Timbrature, orari, pause, richieste, report e supporto IA.',point2Title:'Prossimamente',point2Text:'Vendite, acquisti, documenti, cassa, inventario e contabilità.',point3Title:'Obiettivo',point3Text:'Aiutare il titolare a capire il business senza gergo amministrativo.',moduleTitle:'Aree del business',moduleSub:'Ora siamo concentrati sulle risorse umane; questi moduli indicano il percorso verso un sistema semplice per piccoli business.',current:'Oggi',upcoming:'Prossimamente',mod1:'Personale',mod1Desc:'Timbrature, orari, pause e richieste.',mod2:'Report',mod2Desc:'Excel, PDF, salari stimati e ore extra.',mod3:'Assistente IA',mod3Desc:'Aiuta il manager a decidere e comunicare meglio.',mod4:'Vendite e cassa',mod4Desc:'Controllo quotidiano di ricavi, turni e chiusure.',mod5:'Acquisti e inventario',mod5Desc:'Acquisti, stock e fornitori sotto controllo.',mod6:'Contabilità',mod6Desc:'Vista semplice di costi e risultati.'});
+Object.assign(UI.es.login,{businessTitle:'Pensado para negocios reales',businessText:'Restaurantes, tiendas, servicios, talleres y pequeñas oficinas comparten el mismo dolor: organizar personas, documentos, tiempo y decisiones.',biz1:'Gestión diaria',biz1Sub:'Un tablero para saber qué necesita atención.',biz2:'Comercio y servicios',biz2Sub:'Personal, turnos, solicitudes y reportes.',biz3:'Equipos pequeños',biz3Sub:'Procesos simples para managers ocupados.',biz4:'Decisiones claras',biz4Sub:'Datos e IA para entender qué está pasando.'});
+Object.assign(UI.en.login,{businessTitle:'Built for real businesses',businessText:'Restaurants, shops, services, workshops and small offices share the same pain: organizing people, documents, time and decisions.',biz1:'Daily management',biz1Sub:'One dashboard to know what needs attention.',biz2:'Commerce and services',biz2Sub:'People, shifts, requests and reports.',biz3:'Small teams',biz3Sub:'Simple processes for busy managers.',biz4:'Clear decisions',biz4Sub:'Data and AI to understand what is happening.'});
+Object.assign(UI.fr.login,{businessTitle:'Pensé pour les vrais commerces',businessText:'Restaurants, magasins, services, ateliers et petits bureaux partagent le même besoin: organiser personnes, documents, temps et décisions.',biz1:'Gestion quotidienne',biz1Sub:'Un tableau pour savoir ce qui demande attention.',biz2:'Commerce et services',biz2Sub:'Personnel, horaires, demandes et rapports.',biz3:'Petites équipes',biz3Sub:'Des processus simples pour managers occupés.',biz4:'Décisions claires',biz4Sub:'Données et IA pour comprendre la situation.'});
+Object.assign(UI.de.login,{businessTitle:'Für echte Betriebe gemacht',businessText:'Restaurants, Läden, Dienstleister, Werkstätten und kleine Büros teilen denselben Bedarf: Menschen, Dokumente, Zeit und Entscheidungen organisieren.',biz1:'Tägliche Steuerung',biz1Sub:'Ein Dashboard zeigt, was Aufmerksamkeit braucht.',biz2:'Handel und Services',biz2Sub:'Personal, Schichten, Anfragen und Berichte.',biz3:'Kleine Teams',biz3Sub:'Einfache Abläufe für beschäftigte Manager.',biz4:'Klare Entscheidungen',biz4Sub:'Daten und KI zeigen, was passiert.'});
+Object.assign(UI.it.login,{businessTitle:'Pensato per business reali',businessText:'Ristoranti, negozi, servizi, laboratori e piccoli uffici condividono lo stesso bisogno: organizzare persone, documenti, tempo e decisioni.',biz1:'Gestione quotidiana',biz1Sub:'Un dashboard per sapere cosa richiede attenzione.',biz2:'Commercio e servizi',biz2Sub:'Personale, turni, richieste e report.',biz3:'Team piccoli',biz3Sub:'Processi semplici per manager occupati.',biz4:'Decisioni chiare',biz4Sub:'Dati e IA per capire cosa succede.'});
+Object.assign(UI.es.login,{chip1:'Restaurantes',chip1Sub:'Turnos y pausas',chip2:'Tiendas',chip2Sub:'Equipo y caja',chip3:'Hoteles pequeños',chip3Sub:'Horarios y solicitudes',chip4:'Servicios',chip4Sub:'Documentos y reportes'});
+Object.assign(UI.en.login,{chip1:'Restaurants',chip1Sub:'Shifts and breaks',chip2:'Shops',chip2Sub:'Team and cash',chip3:'Small hotels',chip3Sub:'Schedules and requests',chip4:'Services',chip4Sub:'Documents and reports'});
+Object.assign(UI.fr.login,{chip1:'Restaurants',chip1Sub:'Services et pauses',chip2:'Magasins',chip2Sub:'Équipe et caisse',chip3:'Petits hôtels',chip3Sub:'Horaires et demandes',chip4:'Services',chip4Sub:'Documents et rapports'});
+Object.assign(UI.de.login,{chip1:'Restaurants',chip1Sub:'Schichten und Pausen',chip2:'Läden',chip2Sub:'Team und Kasse',chip3:'Kleine Hotels',chip3Sub:'Pläne und Anfragen',chip4:'Services',chip4Sub:'Dokumente und Berichte'});
+Object.assign(UI.it.login,{chip1:'Ristoranti',chip1Sub:'Turni e pause',chip2:'Negozi',chip2Sub:'Team e cassa',chip3:'Piccoli hotel',chip3Sub:'Orari e richieste',chip4:'Servizi',chip4Sub:'Documenti e report'});
 const EMP_UI={
   fr:{clockIn:"Pointer l'entrée",clockOut:'Pointer la sortie',breakStart:'Début pause',breakEnd:'Terminer pause',breakChoose:'Choisir la durée',breakActive:'En pause depuis',breakEndsAt:'À terminer à',breakEndedAt:'Devait terminer à',latePrompt:'Vous êtes arrivé en retard. Vous pouvez écrire le motif:',outOpenBreak:'Vous avez une pause ouverte. Si vous pointez la sortie maintenant, elle restera sans fermeture. Continuer?',outNoBreak:'Aucune pause enregistrée. Si vous pointez la sortie, le manager sera averti. Continuer?',clockInFirst:"Enregistrez d'abord l'entrée",breakAlready:'Pause déjà en cours',breakDone:'Pause terminée',logout:'Déconnexion',tour:'Voir le tour',today:"Aujourd'hui",week:'Cette semaine',vac:'Vacances',medical:'Incapacité / maladie',personal:'Personnel',monthHours:'Heures du mois',calendar:'Calendrier',absence:'Demander une absence',type:'Type',start:'Début',end:'Fin',note:'Note',send:'Envoyer la demande',todaySchedule:"Horaire d'aujourd'hui",expectedIn:'Entrée prévue',expectedOut:'Sortie prévue',off:'Jour non travaillé',todayPunches:"Pointages d'aujourd'hui",noneToday:"Aucun pointage aujourd'hui",in:'Entrée',out:'Sortie',badge:'Mon carnet',badgeOpen:'Cliquez pour ouvrir votre portail',badgeLink:'Cliquez ici pour ouvrir',pdf:'Télécharger PDF',card:'Télécharger mon carnet'},
   es:{clockIn:'Fichar entrada',clockOut:'Fichar salida',breakStart:'Iniciar pausa',breakEnd:'Terminar pausa',breakChoose:'Elegir duración',breakActive:'En pausa desde',breakEndsAt:'Debe terminar a las',breakEndedAt:'Debía terminar a las',latePrompt:'Llegaste tarde. Puedes escribir el motivo:',outOpenBreak:'Tienes una pausa abierta. Si fichas salida ahora, la pausa quedará sin cierre. ¿Continuar?',outNoBreak:'No tienes una pausa registrada. Si fichas salida, se avisará al manager. ¿Continuar?',clockInFirst:'Primero registra entrada',breakAlready:'Pausa ya en curso',breakDone:'Pausa terminada',logout:'Cerrar sesión',tour:'Ver tour',today:'Hoy',week:'Esta semana',vac:'Vacaciones',medical:'Incapacidad / enfermedad',personal:'Personal',monthHours:'Horas del mes',calendar:'Calendario',absence:'Solicitar ausencia',type:'Tipo',start:'Inicio',end:'Fin',note:'Nota',send:'Enviar solicitud',todaySchedule:'Horario de hoy',expectedIn:'Entrada prevista',expectedOut:'Salida prevista',off:'Día no trabajado',todayPunches:'Fichajes de hoy',noneToday:'Sin fichajes hoy',in:'Entrada',out:'Salida',badge:'Mi carnet',badgeOpen:'Haz click para abrir tu portal',badgeLink:'Haz click aquí para abrir',pdf:'Descargar PDF',card:'Descargar mi carnet'},
@@ -1194,7 +1459,7 @@ const ATW=()=>ATT_WORDS[lang]||ATT_WORDS.fr;
 // ═══════ DB ═══════
 let DB={
   employees:[],history:[],absences:[],shifts:{},documents:[],reviewedAlerts:{},
-  settings:{company:'Mon Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
+  settings:{company:'Mon Business',emoji:'MP',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],signals:[],stats:{}};
 const isDemo=()=>currentUser?.demo===true;
@@ -1235,7 +1500,7 @@ function demoDB(){
   const shifts={};
   employees.forEach(emp=>{for(let i=0;i<5;i++){const d=new Date(getMonday(today).getTime()+i*86400000),ds=fmt(d),sch=empDaySchedule(emp,d),first=sch.blocks[0];shifts[`${emp.id}_${ds}`]=sch?.enabled&&first?{type:'morning',in:first.start,out:first.end,blocks:sch.blocks,notes:'Demo'}:{type:'off',in:null,out:null,notes:'Demo'};}});
   const documents=[{id:'demo-doc-1',empId:'demo-emp-1',type:'contract',name:'Contrat de travail',fileName:'contrat-demo.pdf',mimeType:'application/pdf',size:245000,data:'',notes:'Ejemplo de expediente',expiresAt:'',createdAt:new Date().toISOString()}];
-  return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,documents,settings:{company:'Demo Restaurant',emoji:'🍽️',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
+  return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,documents,settings:{company:'Demo Business',emoji:'MP',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
 }
 
 function setRestaurantId(id){
@@ -1269,7 +1534,7 @@ async function loadSB(){
     if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp,note:x.note||''}));
     if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     if(sh.data){DB.shifts={};sh.data.forEach(x=>{const blocks=normalizeBlocks({blocks:x.blocks,start:x.start_time,end:x.end_time},'restaurant');DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,blocks,notes:x.notes||''};});}
-    if(r.data){DB.settings={company:r.data.name||'Mon Restaurant',emoji:r.data.emoji||'🍽️',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active',openingHours:r.data.opening_hours||defOpeningHours()};lang=DB.settings.lang;}
+    if(r.data){DB.settings={company:r.data.name||'Mon Business',emoji:r.data.emoji||'MP',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active',openingHours:r.data.opening_hours||defOpeningHours()};lang=DB.settings.lang;}
     try{
       const docs=await sb.from('employee_documents').select('*').eq('restaurant_id',REST_ID).order('created_at',{ascending:false});
       if(!docs.error)DB.documents=(docs.data||[]).map(docFromSBRow);
@@ -1551,27 +1816,60 @@ function renderLangBar(){
   const bar=document.getElementById('lang-bar');if(!bar)return;
   bar.innerHTML=Object.entries(LANGS).map(([k,v])=>`<button class="lang-btn ${k===lang?'active':''}" onclick="setLang('${k}')">${v.flag} ${v.name}</button>`).join('');
 }
+function renderLoginLangBar(){
+  const bar=document.getElementById('login-lang-switch');if(!bar)return;
+  bar.innerHTML=Object.entries(LANGS).map(([k,v])=>`<option value="${k}" ${k===lang?'selected':''}>${v.flag} ${k.toUpperCase()}</option>`).join('');
+  bar.value=lang;
+}
 function renderEmployeeLangBar(){
   return `<div class="emp-lang-bar" id="emp-lang-bar">${Object.entries(LANGS).map(([k,v])=>`<button class="lang-btn ${k===lang?'active':''}" onclick="setEmployeeLang('${k}')">${v.flag} ${k.toUpperCase()}</button>`).join('')}</div>`;
 }
 function applyUITexts(){
   const t=T();
+  renderLoginLangBar();
   document.querySelectorAll('.sb-section').forEach((el,i)=>{const vals=[t.nav.principal,t.nav.planning,t.nav.finance,t.nav.config,t.nav.master];if(vals[i])el.textContent=vals[i];});
   const setNav=(page,text)=>{const el=document.querySelector(`[onclick="nav('${page}',this)"] span`);if(el)el.textContent=text;};
   setNav('dashboard',t.pages.dashboard);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
   const mt=document.querySelector('[onclick="nav(\'master\',this)"] span');if(mt)mt.textContent=t.pages.master;
   document.getElementById('page-title').textContent=t.pages[currentPage]||currentPage;
-  const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].innerHTML='👔 '+t.login.manager;if(tabs[1])tabs[1].innerHTML='👤 '+t.login.employee;if(tabs[2])tabs[2].innerHTML='➕ '+t.login.restaurant;
+  const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].textContent=t.login.manager;if(tabs[1])tabs[1].textContent=t.login.employee;if(tabs[2])tabs[2].textContent=t.login.restaurant;
   const lt={...UI.fr.login,...t.login};
   const labels=document.querySelectorAll('#login-manager .fg label');if(labels[0])labels[0].textContent=lt.email;if(labels[1])labels[1].textContent=lt.password;
   const forgot=document.querySelector('[onclick="recoverPassword()"]');if(forgot)forgot.textContent=t.login.forgot;
   const signin=document.querySelector('[onclick="loginManager()"]');if(signin)signin.lastChild.textContent=' '+t.login.signin;
-  const demo=document.querySelector('[onclick="loginDemo()"]');if(demo)demo.textContent='🎯 '+t.login.demo;
+  const cardDemo=document.getElementById('login-demo-card');if(cardDemo)cardDemo.textContent=t.login.demo;
   const pinRestLabel=document.querySelector('#login-employee .fg label');if(pinRestLabel)pinRestLabel.textContent=lt.employeeEmail||lt.email;
   const pinPrompt=document.querySelector('#login-employee > div[style*="text-align:center"]');if(pinPrompt)pinPrompt.textContent=lt.pinPrompt;
   const regLabels=document.querySelectorAll('#login-register .fg label');if(regLabels[0])regLabels[0].textContent=lt.restName;if(regLabels[1])regLabels[1].textContent=lt.adminEmail;if(regLabels[2])regLabels[2].textContent=lt.password;if(regLabels[3])regLabels[3].textContent=lt.confirmPassword;
   const create=document.querySelector('[onclick="registerRestaurant()"]');if(create)create.textContent=lt.createAdmin;
   const sub=document.querySelector('.login-sub');if(sub)sub.textContent=lt.sub;
+  const cardSub=document.querySelector('.login-card-sub');if(cardSub)cardSub.textContent=lt.sub;
+  const langLabel=document.getElementById('login-lang-label');if(langLabel)langLabel.textContent=lt.langLabel;
+  ['nav1','nav2','nav3','nav4'].forEach((k,i)=>{const el=document.getElementById(`login-nav-${i+1}`);if(el)el.textContent=lt[k];});
+  const eyebrow=document.getElementById('login-eyebrow');if(eyebrow)eyebrow.textContent=lt.eyebrow;
+  const kicker=document.getElementById('login-kicker');if(kicker)kicker.textContent=lt.kicker;
+  const copy=document.getElementById('login-copy');if(copy)copy.textContent=lt.copy;
+  const p1=document.getElementById('login-proof-1');if(p1)p1.textContent=lt.proof1;
+  const p2=document.getElementById('login-proof-2');if(p2)p2.textContent=lt.proof2;
+  const p3=document.getElementById('login-proof-3');if(p3)p3.textContent=lt.proof3;
+  const landingTitle=document.getElementById('login-landing-title');if(landingTitle)landingTitle.innerHTML=lt.landingTitle;
+  const landingSub=document.getElementById('login-landing-sub');if(landingSub)landingSub.textContent=lt.landingSub;
+  const openBtn=document.getElementById('login-open-btn');if(openBtn)openBtn.textContent=lt.open;
+  const topDemo=document.getElementById('login-demo-top');if(topDemo)topDemo.textContent=lt.demoTop;
+  const ctaDemo=document.getElementById('login-cta-demo');if(ctaDemo)ctaDemo.textContent=lt.ctaDemo;
+  const ctaSession=document.getElementById('login-cta-session');if(ctaSession)ctaSession.textContent=lt.ctaSession;
+  const businessTitle=document.getElementById('login-business-title');if(businessTitle)businessTitle.textContent=lt.businessTitle;
+  const businessText=document.getElementById('login-business-text');if(businessText)businessText.textContent=lt.businessText;
+  for(let i=1;i<=4;i++){const b=document.getElementById(`login-biz-${i}`);if(b)b.textContent=lt[`biz${i}`];const bs=document.getElementById(`login-biz-${i}-sub`);if(bs)bs.textContent=lt[`biz${i}Sub`];}
+  for(let i=1;i<=4;i++){const c=document.getElementById(`login-chip-${i}`);if(c)c.textContent=lt[`chip${i}`];const cs=document.getElementById(`login-chip-${i}-sub`);if(cs)cs.textContent=lt[`chip${i}Sub`];}
+  const storyKicker=document.getElementById('login-story-kicker');if(storyKicker)storyKicker.textContent=lt.storyKicker;
+  const storyTitle=document.getElementById('login-story-title');if(storyTitle)storyTitle.textContent=lt.storyTitle;
+  const storyText=document.getElementById('login-story-text');if(storyText)storyText.textContent=lt.storyText;
+  for(let i=1;i<=3;i++){const title=document.getElementById(`login-point-${i}-title`);if(title)title.textContent=lt[`point${i}Title`];const text=document.getElementById(`login-point-${i}-text`);if(text)text.textContent=lt[`point${i}Text`];}
+  const moduleTitle=document.getElementById('login-module-title');if(moduleTitle)moduleTitle.textContent=lt.moduleTitle;
+  const moduleSub=document.getElementById('login-module-sub');if(moduleSub)moduleSub.textContent=lt.moduleSub;
+  for(let i=1;i<=6;i++){const mod=document.getElementById(`login-mod-${i}`);if(mod)mod.textContent=lt[`mod${i}`];const desc=document.getElementById(`login-mod-${i}-desc`);if(desc)desc.textContent=lt[`mod${i}Desc`];const status=document.getElementById(`login-mod-${i}-status`);if(status)status.textContent=i<=3?lt.current:lt.upcoming;}
+  updateLoginModeNote();
   const empSearch=document.getElementById('emp-search');if(empSearch)empSearch.placeholder=t.emp.search;
   const topNew=document.querySelector('.top-btn.primary');if(topNew)topNew.lastChild.textContent=' '+t.emp.new.split(' ')[0];
   const empTabs=document.querySelectorAll('#pg-employees .tab');if(empTabs[0])empTabs[0].textContent=t.emp.all;if(empTabs[1])empTabs[1].textContent=t.emp.active;if(empTabs[2])empTabs[2].textContent=t.emp.inactive;
@@ -1630,7 +1928,13 @@ function updateAssistantTexts(){
   const q=document.getElementById('assistant-question');if(q)q.placeholder=a.placeholder;
   document.querySelectorAll('[data-assistant-chip]').forEach(btn=>{btn.textContent=a[btn.dataset.assistantChip]||btn.textContent;});
 }
-function setLang(l){lang=l;DB.settings.lang=l;saveLocal();renderLangBar();applyUITexts();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);}
+function setLang(l){
+  lang=l;DB.settings.lang=l;localStorage.setItem('hrm_public_lang',l);saveLocal();
+  document.documentElement.lang=l;
+  renderLangBar();applyUITexts();
+  if(currentUser)renderPage(currentPage);
+  if(currentUser?.role&&currentUser.role!=='employee')sbSaveSettings(DB.settings).catch(console.error);
+}
 function setEmployeeLang(l){
   lang=l;localStorage.setItem('hrm_employee_lang',l);
   if(currentUser?.role==='employee'&&currentUser.emp)renderEmpView(currentUser.emp);
@@ -1638,15 +1942,29 @@ function setEmployeeLang(l){
 }
 
 // ═══════ AUTH ═══════
-let currentUser=null,pinBuf='',empClockTimer=null,breakPickerEmpId=null;
+let currentUser=null,pinBuf='',empClockTimer=null,breakPickerEmpId=null,loginMode='manager';
 let LOGIN_RESTAURANTS=[];
 
+function updateLoginModeNote(){
+  const note=document.getElementById('login-mode-note');if(!note)return;
+  const lt={...UI.fr.login,...T().login};
+  note.textContent=loginMode==='employee'?lt.employeeNote:loginMode==='register'?lt.registerNote:lt.managerNote;
+}
+function showLoginAuth(type='manager'){
+  const screen=document.getElementById('login-screen');
+  if(screen)screen.classList.add('auth-open');
+  const btn=[...document.querySelectorAll('.login-tab')].find(b=>b.getAttribute('onclick')?.includes(`'${type}'`))||document.querySelector('.login-tab');
+  if(btn)setLoginTab(type,btn);
+  setTimeout(()=>document.querySelector('.login-card')?.scrollIntoView({behavior:'smooth',block:'center'}),30);
+}
 function setLoginTab(type,btn){
+  loginMode=type;
   document.querySelectorAll('.login-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
   document.getElementById('login-manager').style.display=type==='manager'?'block':'none';
   document.getElementById('login-employee').style.display=type==='employee'?'block':'none';
   document.getElementById('login-register').style.display=type==='register'?'block':'none';
   pinBuf='';updatePinDisp();
+  updateLoginModeNote();
 }
 
 function togglePassword(id,btn){
@@ -1659,7 +1977,7 @@ function togglePassword(id,btn){
 
 async function loadLoginRestaurants(){
   const sel=document.getElementById('pin-restaurant');if(!sel)return;
-  const fallback={id:REST_ID,name:DB.settings?.company||'Mon Restaurant',emoji:DB.settings?.emoji||'🍽️'};
+  const fallback={id:REST_ID,name:DB.settings?.company||'Mon Business',emoji:DB.settings?.emoji||'MP'};
   const saved=(()=>{try{return JSON.parse(localStorage.getItem('hrm_restaurant_directory')||'[]');}catch(e){return[];}})();
   try{
     const {data,error}=await sb.from('restaurants').select('id,name,emoji').order('name');
@@ -1669,7 +1987,7 @@ async function loadLoginRestaurants(){
     LOGIN_RESTAURANTS=saved.length?saved:[fallback];
   }
   if(!LOGIN_RESTAURANTS.some(r=>r.id===REST_ID))LOGIN_RESTAURANTS.unshift(fallback);
-  sel.innerHTML=LOGIN_RESTAURANTS.map(r=>`<option value="${esc(r.id)}" ${r.id===REST_ID?'selected':''}>${esc(r.emoji||'🍽️')} ${esc(r.name||'Restaurant')}</option>`).join('');
+  sel.innerHTML=LOGIN_RESTAURANTS.map(r=>`<option value="${esc(r.id)}" ${r.id===REST_ID?'selected':''}>${esc(r.emoji||'MP')} ${esc(r.name||'Business')}</option>`).join('');
 }
 
 async function selectPinRestaurant(id){
@@ -1790,7 +2108,8 @@ function logout(){
   document.getElementById('topbar').style.display='none';
   document.getElementById('main').style.display='none';
   document.getElementById('emp-view').classList.remove('open');
-  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-screen').style.display='block';
+  document.getElementById('login-screen').classList.remove('auth-open');
   pinBuf='';updatePinDisp();
 }
 
@@ -1800,7 +2119,7 @@ function applyEmployeeAccessLink(){
   const hasEmployeeLink=params.has('employee')||params.has('emp')||params.has('employee_id')||email;
   if(!hasEmployeeLink)return;
   const btn=[...document.querySelectorAll('.login-tab')].find(b=>b.getAttribute('onclick')?.includes("'employee'"));
-  if(btn)setLoginTab('employee',btn);
+  if(btn)showLoginAuth('employee');
   const input=document.getElementById('pin-email');
   if(input&&email)input.value=email;
   const err=document.getElementById('pin-error');
@@ -1811,6 +2130,7 @@ function showManagerUI(){
   document.body.classList.add('manager-theme');
   document.body.classList.remove('employee-theme');
   document.getElementById('login-screen').style.display='none';
+  document.getElementById('login-screen').classList.remove('auth-open');
   document.getElementById('topbar').style.display='flex';
   document.getElementById('main').style.display='block';
   document.getElementById('sb-uav').textContent=(currentUser.name||'M')[0].toUpperCase();
@@ -1827,6 +2147,7 @@ function showEmpUI(emp){
   document.body.classList.remove('manager-theme');
   document.body.classList.add('employee-theme');
   document.getElementById('login-screen').style.display='none';
+  document.getElementById('login-screen').classList.remove('auth-open');
   document.getElementById('emp-view').classList.add('open');
   renderEmpView(emp);
   startAutoRefresh();
@@ -2954,22 +3275,28 @@ window.addEventListener('pageshow',resumeEmpPortal);
 
 // ═══════ ONBOARDING TOUR ═══════
 let tourRole=null,tourStep=0;
+const TOUR_VERSION='2026-05-21-manager-flow';
 const TOUR={
   manager:[
     {key:'language',kind:'language',sel:null},
     {key:'workflow',page:'dashboard',sel:'#dash-hero'},
     {key:'setupEmployee',page:'employees',sel:'#pg-employees'},
     {key:'badge',page:'employees',sel:'#pg-employees'},
+    {key:'documents',page:'employees',sel:'#pg-employees'},
     {key:'dailyCheck',page:'dashboard',sel:'#kpi-grid'},
     {key:'clocking',page:'dashboard',sel:'#dash-scan-btn'},
     {key:'attendance',page:'attendance',sel:'#att-list'},
     {key:'breaks',page:'attendance',sel:'#att-list'},
     {key:'manualFix',page:'attendance',sel:'#att-manual-btn'},
     {key:'alerts',page:'dashboard',sel:'#dash-alerts'},
+    {key:'reviewedAlerts',page:'dashboard',sel:'#dash-alerts'},
     {key:'planning',page:'shifts',sel:'#pg-shifts'},
     {key:'leave',page:'vacations',sel:'#pg-vacations'},
+    {key:'requests',page:'vacations',sel:'#pg-vacations'},
     {key:'closeMonth',page:'reports',sel:'#pg-reports'},
+    {key:'reportsDeep',page:'reports',sel:'#pg-reports'},
     {key:'payroll',page:'payroll',sel:'#pg-payroll'},
+    {key:'assistant',sel:'#top-ai-btn'},
     {key:'settings',page:'settings',sel:'#pg-settings'},
     {key:'refresh',sel:'#refresh-btn'},
     {key:'menu',page:'dashboard',sel:'#tour-menu-btn'}
@@ -2989,11 +3316,46 @@ const TOUR_TX={
   de:{buttons:{skip:'Überspringen',back:'Zurück',next:'Weiter',done:'Fertig'},manager:{language:['Sprache wählen','Wählen Sie zuerst die Sprache für die App und diese Einführung.'],workflow:['Manager-Routine','Die Routine ist einfach:\n1. Mitarbeiter und Pläne einrichten.\n2. Buchungen täglich prüfen.\n3. Ausnahmen korrigieren.\n4. Den Monat mit Berichten abschließen.'],setupEmployee:['Erster Tag: Mitarbeiter erstellen','Name, Foto, Rolle, Vertrag, Lohn, PIN und Grundplan erfassen. Das speist Planung, Berichte und Mitarbeiterportal.'],badge:['Ausweis übergeben','Im Mitarbeiterprofil den PDF-Ausweis erstellen. Mitarbeitende scannen den QR oder klicken, um ihr Portal zu öffnen.'],dailyCheck:['Tägliche Routine','Hier starten: aktiv, anwesend, abwesend, Ferien und geplante Personen. Ziel ist Klarheit in Sekunden.'],clocking:['Einstempeln erfassen','Buchungen kommen per QR, Mitarbeiterportal oder manuell. Der Manager greift vor allem bei Ausnahmen ein.'],attendance:['Anwesenheit verfolgen','In Anwesenheit sehen Sie, wer gekommen ist, wer gegangen ist und was während der Schicht offen bleibt.'],breaks:['Obligatorische Pausen','Mitarbeitende starten 15, 30 oder 60 Minuten Pause. Ohne Pause beim Ausstempeln erzeugt die App einen Hinweis.'],manualFix:['Fehler korrigieren','Wenn jemand eine Buchung vergisst oder ein Fehler entsteht, korrigieren Sie den Tag manuell ohne Historie zu verlieren.'],alerts:['Tageswarnungen','Dieser Bereich zeigt, wo Handeln nötig ist: fehlende Buchungen, Verspätungen, Ausgänge ohne Pause oder Abwesenheiten.'],planning:['Wochenplanung','Wochenpläne prüfen. Grundpläne kommen vom Mitarbeiterprofil; einzelne Änderungen verändern den Dauerplan nicht.'],leave:['Abwesenheiten','Ferien, Krankheit oder persönliche Abwesenheiten genehmigen und Salden verfolgen.'],closeMonth:['Monatsabschluss','Am Monatsende den Bericht erstellen: Stunden, Pausen, Abwesenheiten, Verspätungen, Kommentare und geschätzter Lohn.'],payroll:['Löhne','Geschätzte Zahlungen nach Arbeitszeit, Vertrag, Pausen und Überstunden prüfen. Monatslohn wird anders gelesen als Stundenlohn.'],settings:['Betrieb einrichten','Sprache, Verspätungstoleranz, Farben, Öffnungszeiten und Restaurantdaten anpassen.'],refresh:['Aktuelle Daten','Die App aktualisiert sich automatisch, dieser Button erzwingt eine Aktualisierung.'],menu:['Hauptmenü','Nutzen Sie das Menü für die Routine: Übersicht, Anwesenheit, Mitarbeiter, Planung, Abwesenheiten, Löhne und Berichte.']},employee:{languageEmployee:['Sprache wählen','Der Mitarbeiter kann seine Sprache wählen. Die Restaurantsprache bleibt unverändert.'],clock:['Buchungen und Pausen','Ein- und Ausstempeln sowie obligatorische Pausen von 15 oder 30 Minuten erfassen.'],summary:['Persönliche Übersicht','Der Mitarbeiter sieht Tagesstunden, Wochenstunden und verfügbare Ferien.'],month:['Monatsstunden','Diese Karte zeigt den Monatssaldo, ohne den Manager fragen zu müssen.'],absence:['Abwesenheiten','Hier kann Urlaub, Krankheit oder persönliche Abwesenheit beantragt werden.']}},
   it:{buttons:{skip:'Salta',back:'Indietro',next:'Avanti',done:'Fine'},manager:{language:['Scegli lingua','Prima di iniziare, scegli la lingua dell’app e di questo tour.'],workflow:['Routine del manager','La routine è semplice:\n1. Configuri dipendenti e orari.\n2. Controlli le timbrature ogni giorno.\n3. Correggi le eccezioni.\n4. Chiudi il mese con i report.'],setupEmployee:['Primo giorno: creare dipendenti','Aggiungi nome, foto, ruolo, contratto, salario, PIN e orario base. Questo alimenta pianificazione, report e portale dipendente.'],badge:['Consegnare il badge','Dal profilo dipendente generi il badge PDF. Il dipendente scansiona il QR o clicca per aprire il portale.'],dailyCheck:['Routine giornaliera','Inizia qui: attivi, presenti, assenti, vacanze e persone previste. L’obiettivo è capire la giornata in pochi secondi.'],clocking:['Registrare entrata','L’entrata può arrivare da QR, portale dipendente o inserimento manuale. Il manager interviene soprattutto nelle eccezioni.'],attendance:['Seguire le presenze','In Presenze vedi chi è entrato, chi è uscito e cosa resta da controllare durante il turno.'],breaks:['Pause obbligatorie','Il dipendente avvia una pausa da 15, 30 o 60 minuti. Se esce senza pausa, l’app avvisa e mantiene traccia.'],manualFix:['Correggere errori','Se qualcuno dimentica una timbratura o c’è un errore, correggi il giorno manualmente senza perdere lo storico.'],alerts:['Avvisi del giorno','Questo blocco mostra dove agire: entrate mancanti, ritardi, uscite senza pausa o assenze da verificare.'],planning:['Pianificazione settimanale','Controlli i turni settimanali. Gli orari base vengono dal profilo dipendente; le modifiche puntuali non cambiano quello permanente.'],leave:['Assenze','Approvi vacanze, malattie o assenze personali e controlli i saldi.'],closeMonth:['Chiusura mensile','A fine mese generi il report: ore, pause, assenze, ritardi, commenti e stipendio stimato.'],payroll:['Stipendi','Controlli pagamenti stimati secondo ore lavorate, contratto, pause e straordinari. Il salario mensile si legge diversamente dalla paga oraria.'],settings:['Configurazione attività','Regoli lingua, tolleranza ritardo, colori, orari di apertura e dati del ristorante.'],refresh:['Dati aggiornati','L’app si aggiorna da sola, ma questo pulsante forza l’aggiornamento.'],menu:['Menu principale','Usa il menu per seguire la routine: dashboard, presenze, dipendenti, pianificazione, assenze, stipendi e report.']},employee:{languageEmployee:['Scegli lingua','Il dipendente può scegliere la sua lingua. Questo non cambia la lingua del ristorante.'],clock:['Timbrature e pause','Registra entrata, uscita e pause obbligatorie da 15 o 30 minuti.'],summary:['Riepilogo personale','Il dipendente vede ore del giorno, della settimana e vacanze disponibili.'],month:['Ore del mese','Questa scheda aiuta a seguire il totale mensile senza chiedere al manager.'],absence:['Assenze','Da qui può richiedere vacanze, malattia o assenze personali.']}}
 };
+Object.assign(TOUR_TX.es.manager,{
+  documents:['Expediente del trabajador','En el perfil del empleado puedes guardar contrato, permiso, certificados y otros documentos. La lectura con IA ayuda a completar datos, pero siempre conviene revisar antes de guardar.'],
+  reviewedAlerts:['Revisar y cerrar alertas','Cuando una alerta ya fue atendida, entra en Revisar y márcala como revisada. Así el dashboard deja de mostrar ruido y queda solo lo pendiente.'],
+  requests:['Solicitudes pendientes','Esta sección ya no es solo ausencias: aquí llegan vacaciones, incapacidades, solicitudes personales y correcciones de fichaje del empleado.'],
+  reportsDeep:['Reporte útil para gestión','El reporte mensual resume horas, pausas no remuneradas, retardos, ausencias, salario estimado, banco anual de horas extra y comentarios importantes.'],
+  assistant:['Asistente IA','El botón AI ayuda a interpretar datos, preparar conversaciones difíciles y responder dudas de uso. Si falta una función, la guarda como señal de mejora.']
+});
+Object.assign(TOUR_TX.en.manager,{
+  documents:['Employee file','In the employee profile you can store contracts, permits, certificates and other documents. AI reading helps fill data, but you should review before saving.'],
+  reviewedAlerts:['Review and close alerts','When an alert has been handled, open Review and mark it as reviewed. The dashboard then shows only what still needs attention.'],
+  requests:['Pending requests','This section is not only absences anymore: vacation, sick leave, personal requests and punch corrections arrive here.'],
+  reportsDeep:['A useful management report','The monthly report summarizes hours, unpaid breaks, late arrivals, absences, estimated pay, annual overtime bank and important comments.'],
+  assistant:['AI assistant','The AI button helps interpret data, prepare difficult conversations and answer usage questions. If a feature is missing, it records it as an improvement signal.']
+});
+Object.assign(TOUR_TX.fr.manager,{
+  documents:['Dossier employé','Dans le profil employé, vous pouvez garder contrat, permis, certificats et autres documents. La lecture IA aide à remplir les données, mais il faut toujours vérifier.'],
+  reviewedAlerts:['Revoir et fermer les alertes','Quand une alerte est traitée, ouvrez Revoir et marquez-la comme revue. Le tableau garde seulement ce qui demande encore attention.'],
+  requests:['Demandes en attente','Cette section n’est plus seulement les absences: vacances, maladie, demandes personnelles et corrections de pointage arrivent ici.'],
+  reportsDeep:['Un rapport utile pour gérer','Le rapport mensuel résume heures, pauses non rémunérées, retards, absences, salaire estimé, banque annuelle d’heures extra et commentaires.'],
+  assistant:['Assistant IA','Le bouton IA aide à interpréter les données, préparer des conversations difficiles et répondre aux questions d’usage. Si une fonction manque, elle devient un signal d’amélioration.']
+});
+Object.assign(TOUR_TX.de.manager,{
+  documents:['Mitarbeiterakte','Im Mitarbeiterprofil speichern Sie Vertrag, Bewilligung, Zertifikate und weitere Dokumente. KI-Lesen hilft beim Ausfüllen, sollte aber geprüft werden.'],
+  reviewedAlerts:['Warnungen prüfen und schließen','Wenn eine Warnung erledigt ist, öffnen Sie Prüfen und markieren sie als geprüft. Das Dashboard zeigt dann nur offene Punkte.'],
+  requests:['Offene Anfragen','Dieser Bereich ist nicht nur Abwesenheit: Ferien, Krankheit, persönliche Anfragen und Buchungskorrekturen kommen hier an.'],
+  reportsDeep:['Bericht für die Führung','Der Monatsbericht fasst Stunden, unbezahlte Pausen, Verspätungen, Abwesenheiten, geschätzten Lohn, Überstundenbank und Kommentare zusammen.'],
+  assistant:['KI-Assistent','Der KI-Button hilft, Daten zu verstehen, schwierige Gespräche vorzubereiten und Fragen zur Nutzung zu beantworten. Fehlende Funktionen werden als Signal gespeichert.']
+});
+Object.assign(TOUR_TX.it.manager,{
+  documents:['Fascicolo dipendente','Nel profilo dipendente puoi salvare contratto, permessi, certificati e altri documenti. La lettura IA aiuta a compilare, ma va sempre controllata.'],
+  reviewedAlerts:['Rivedere e chiudere avvisi','Quando un avviso è gestito, apri Rivedi e segnalo come rivisto. Il dashboard mostra solo ciò che resta da fare.'],
+  requests:['Richieste in attesa','Questa sezione non è più solo assenze: qui arrivano vacanze, malattia, richieste personali e correzioni timbrature.'],
+  reportsDeep:['Report utile per gestire','Il report mensile riassume ore, pause non pagate, ritardi, assenze, stipendio stimato, banca ore annuale e commenti importanti.'],
+  assistant:['Assistente IA','Il pulsante IA aiuta a interpretare dati, preparare conversazioni difficili e rispondere a domande d’uso. Se manca una funzione, la salva come segnale di miglioramento.']
+});
 const tourTxt=(role,key)=>((TOUR_TX[lang]||TOUR_TX.es)[role]||{})[key]||TOUR_TX.es[role][key]||['',''];
 const tourButtons=()=>((TOUR_TX[lang]||TOUR_TX.es).buttons||TOUR_TX.es.buttons);
 function tourKey(role){
-  const id=role==='employee'?(currentUser?.emp?.id||'employee'):(REST_ID||'restaurant');
-  return `hrm_tour_seen_${role}_${id}`;
+  const id=currentUser?.demo?'demo':role==='employee'?(currentUser?.emp?.id||currentUser?.email||'employee'):(currentUser?.profile?.id||currentUser?.email||currentUser?.restaurant_id||REST_ID||'restaurant');
+  return `hrm_tour_seen_${TOUR_VERSION}_${role}_${id}`;
 }
 function maybeStartTour(role){
   if(localStorage.getItem(tourKey(role)))return;
@@ -3001,6 +3363,7 @@ function maybeStartTour(role){
 }
 function startTour(role,manual=false){
   if(!TOUR[role])return;
+  if(!manual&&localStorage.getItem(tourKey(role)))return;
   tourRole=role;tourStep=0;
   if(manual)localStorage.removeItem(tourKey(role));
   document.getElementById('tour-overlay').classList.add('open');
@@ -4212,16 +4575,24 @@ async function exportMasterJSON(){
 
 // ═══════ INIT ═══════
 async function init(){
-  document.getElementById('loading-msg').textContent='Connexion à la base de données...';
+  const publicLang=localStorage.getItem('hrm_public_lang');
+  if(publicLang&&LANGS[publicLang])lang=publicLang;
+  const loadingCopy=LOADING_UI[lang]||LOADING_UI.es;
+  const loadingSub=document.getElementById('loading-sub');
+  if(loadingSub)loadingSub.textContent=loadingCopy.sub;
+  document.getElementById('loading-msg').textContent=loadingCopy.connect;
   try{
     const ok=await loadSB();
-    if(ok){document.getElementById('loading-msg').textContent='Données chargées ✅';await new Promise(r=>setTimeout(r,400));}
+    if(ok){document.getElementById('loading-msg').textContent=loadingCopy.ready;await new Promise(r=>setTimeout(r,400));}
   }catch(e){console.warn('Local mode');}
   const lo=document.getElementById('loading-overlay');
   lo.style.opacity='0';lo.style.transition='opacity .3s';
   setTimeout(()=>lo.style.display='none',300);
+  document.documentElement.lang=lang;
   applyBrand();
-  document.getElementById('login-screen').style.display='flex';
+  applyUITexts();
+  document.getElementById('login-screen').style.display='block';
+  document.getElementById('login-screen').classList.remove('auth-open');
   applyEmployeeAccessLink();
 }
 init();
