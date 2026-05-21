@@ -3066,6 +3066,22 @@ function managerAssistantContext(){
   const lateToday=todayRecs.filter(h=>h.type==='in'&&String(h.note||'').toLowerCase().includes('retard')).map(h=>h.empName||h.empId).slice(0,8);
   const monthRows=employees.map(emp=>{try{return monthlyEmployeeReport(emp,month.getFullYear(),month.getMonth());}catch(e){console.warn('Assistant report row error',emp?.id,e);return null;}}).filter(Boolean);
   const topWorkers=monthRows.map(r=>({name:fullName(r.emp),position:r.emp.position||'',hours:+r.hrs.toFixed(1),days:r.days,pay:+r.pay.toFixed(2)})).sort((a,b)=>b.hours-a.hours).slice(0,5);
+  const employeeSnapshot=monthRows.map(r=>({
+    name:fullName(r.emp),
+    position:r.emp.position||'',
+    status:r.emp.status||'',
+    contract:r.emp.contract||'',
+    contractStart:r.emp.startDate||r.emp.contractStart||'',
+    payType:r.emp.payType||'hourly',
+    monthlyHours:+r.hrs.toFixed(1),
+    workedDays:r.days,
+    absences:r.abs,
+    absenceDates:r.absentDates||[],
+    lateArrivals:r.late,
+    lateNotes:r.lateNotes||[],
+    vacationLeft:r.vacLeft,
+    openBreak:!!readActiveBreak(r.emp.id)
+  })).slice(0,40);
   return {
     app:'Manager Pro',
     restaurant:DB.settings?.company||'Restaurant',
@@ -3077,6 +3093,7 @@ function managerAssistantContext(){
     counts:{employees:employees.length,activeEmployees:active.length,todayPunches:todayRecs.length,pendingAbsences:absences.filter(a=>!a.approved).length},
     alerts:{missingSalary,openBreaks,pendingAbs,lateToday},
     topWorkers,
+    employees:employeeSnapshot,
     currentMonth:{
       totalHours:monthRows.reduce((s,r)=>s+r.hrs,0).toFixed(1),
       totalAbsences:monthRows.reduce((s,r)=>s+r.abs,0),
@@ -3108,6 +3125,9 @@ function localAssistantAnswer(question,ctx){
   }else if(/cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)/.test(q)){
     category='daily_ops';
     answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.restaurant}.`;
+  }else if(/desped|despido|terminar contrato|echar|sacar|licenciar|licenciement|licenzi|dismiss|fire|terminate|kündig/.test(q)){
+    category='daily_ops';
+    answer=`Con lo que me dices, primero separaría hechos, contacto y riesgo antes de tomar la decisión.\n\n1. Verifica los hechos en Manager Pro: fechas exactas de ausencia, horario programado, si había solicitud, comentario, incapacidad médica o aviso previo.\n\n2. Contacta al empleado por escrito antes de decidir: "Hola, necesito entender qué pasó con tus ausencias de estos días. Por favor responde hoy antes de las __ para poder cerrar la situación correctamente."\n\n3. Si responde, escucha la causa y deja un acuerdo claro: qué pasó, qué necesita el negocio, qué espera el manager desde ahora y cuándo se revisa.\n\n4. Si no responde, documenta el intento de contacto y prepara una conversación o comunicación formal. Evita hacerlo en caliente.\n\n5. Antes de despedir, revisa el contrato, las reglas internas y la ley laboral local. Si estás en Suiza o hay riesgo, confirma con un asesor laboral antes de tomar la decisión.\n\n6. En Manager Pro guarda el soporte: Historial, solicitudes, reportes de Presencias, notas del perfil y documentos. Desactiva el empleado solo cuando la decisión ya sea oficial.\n\nFrase para hablarlo: "Loane, necesito entender qué pasó. Cuando no vienes y no avisas, el equipo queda descubierto y el servicio se afecta. Quiero escuchar tu explicación, pero también necesito dejar claro qué puede pasar si esto se repite."`;
   }else if(/tarde|retard|late|ritardo|versp[aä]t|p[uü]nkt|puntual|conversaci[oó]n|conversat|hablar|parler|talk|sprechen|disciplina|disciplin|conducta|comport/.test(q)){
     category='daily_ops';
     answer=assistantPeopleCoachingAnswer(ctx);
