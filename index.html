@@ -3115,10 +3115,10 @@ function assistantPeopleCoachingAnswer(ctx){
   return copy[lang]||copy.es;
 }
 function localAssistantAnswer(question,ctx){
-  const q=String(question||'').toLowerCase();
+  const q=String(question||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   let category='app_help',shouldSaveSignal=false;
-  let answer='Puedo ayudarte con fichajes, horarios, pausas, ausencias, empleados, contratos y reportes disponibles en Manager Pro. No tengo suficiente información para responder eso con seguridad.';
-  const asksTermination=/desped|despido|terminar.*contrato|contrato.*termin|finalizar.*contrato|contrato.*finaliz|rescind|cancelar.*contrato|desvincul|echar|sacar|licenciar|licenciement|licenzi|dismiss|fire|terminate|kündig/.test(q);
+  let answer='No pude consultar la IA principal en este momento. Intenta de nuevo en unos segundos.';
+  const asksTermination=/desped|despido|termin.*contrato|contrato.*termin|finaliz.*contrato|contrato.*finaliz|rescind|cancelar.*contrato|desvincul|echar|sacar|licenciar|licenciement|licenzi|dismiss|fire|terminate|kundig/.test(q);
   if(/(qui[eé]n|persona|empleado).*(m[aá]s|mas).*(trabaj|hora)|m[aá]s horas|mas horas|top.*trabaj/.test(q)){
     category='reporting';
     const top=ctx.topWorkers||[];
@@ -3128,7 +3128,7 @@ function localAssistantAnswer(question,ctx){
     answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.restaurant}.`;
   }else if(asksTermination){
     category='daily_ops';
-    answer='Esta pregunta necesita consultar la IA principal porque combina RH, contrato y posible riesgo legal. Intenta de nuevo en unos segundos. Si sigue fallando, revisa la conexión de la función de IA en Supabase.';
+    answer=isDemo()?'En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y, cuando aplica, con búsqueda web.':'Esta pregunta necesita consultar la IA principal porque combina RH, contrato y posible riesgo legal. Intenta de nuevo en unos segundos. Si sigue fallando, revisa la conexión de la función de IA en Supabase.';
   }else if(/tarde|retard|late|ritardo|versp[aä]t|p[uü]nkt|puntual|conversaci[oó]n|conversat|hablar|parler|talk|sprechen|disciplina|disciplin|conducta|comport/.test(q)){
     category='daily_ops';
     answer=assistantPeopleCoachingAnswer(ctx);
@@ -3146,6 +3146,7 @@ function localAssistantAnswer(question,ctx){
     answer=`Datos para revisar: ${ctx.alerts.missingSalary.length?`salario de ${ctx.alerts.missingSalary.join(', ')}`:'no veo salarios faltantes en este resumen'}. También conviene confirmar inicio de contrato, PIN, horario base y vacaciones de cada empleado.`;
   }else{
     category='feature_request';shouldSaveSignal=true;
+    answer=isDemo()?'En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y puede apoyarse en búsqueda web cuando aplica.':'No pude consultar la IA principal en este momento. Esta pregunta debería responderla Claude, no una respuesta local de la app. Intenta de nuevo en unos segundos.';
   }
   return {answer,category,shouldSaveSignal};
 }
@@ -3177,7 +3178,7 @@ async function sendManagerAssistant(){
     }
     let result=null;
     if(!isDemo()){
-      const {data,error}=await withTimeout(sb.functions.invoke('manager-assistant',{body:{question,context:ctx,history:assistantHistory.slice(-8)}}),12000,'La IA tardó demasiado');
+      const {data,error}=await withTimeout(sb.functions.invoke('manager-assistant',{body:{question,context:ctx,history:assistantHistory.slice(-8)}}),20000,'La IA tardó demasiado');
       if(error)throw error;
       result=data;
     }else{

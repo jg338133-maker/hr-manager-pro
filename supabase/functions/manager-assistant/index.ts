@@ -49,11 +49,16 @@ function normalize(input: Record<string, unknown>): AssistantResult {
 function shouldEnableWebSearch(question: string) {
   const flag = (Deno.env.get("AI_ENABLE_WEB_SEARCH") || "").toLowerCase();
   if (!["true", "1", "yes", "on"].includes(flag)) return false;
-  return /\b(ley|legal|derecho|contrato|desped|indemniz|preaviso|aviso|norma|regla|suiza|swiss|suisse|arbeitsrecht|licenciement|licenziamento|dismiss|termination|law|legal)\b/i.test(question);
+  return /\b(ley|legal|derecho|contrato|desped|indemniz|preaviso|aviso|norma|regla|suiza|swiss|suisse|arbeitsrecht|licenciement|licenziamento|dismiss|termination|law|legal|actual|vigente|hoy|web|internet|buscar|fuente|source)\b/i.test(question);
+}
+
+function plain(text: string) {
+  return String(text || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 function isSensitiveHrQuestion(question: string) {
-  return /\b(desped|despido|terminar.*contrato|contrato.*termin|finalizar.*contrato|rescind|desvincul|renuncia|sanci[oó]n|disciplin|ausencia.*injust|abandono|conflicto|acoso|queja|incapacidad|licenciement|licenziamento|kündig|dismiss|termination|fire|harassment|disciplinary)\b/i.test(question);
+  const q = plain(question);
+  return /desped|despido|termin.*contrato|contrato.*termin|finaliz.*contrato|contrato.*finaliz|rescind|desvincul|renuncia|sancion|disciplin|ausencia.*injust|abandono|conflicto|acoso|queja|incapacidad|licenciement|licenziamento|kundig|dismiss|termination|fire|harassment|disciplinary/.test(q);
 }
 
 async function callAnthropic(apiKey: string, model: string, system: string, user: string, enableWebSearch: boolean) {
@@ -195,11 +200,13 @@ Give the final answer directly.`;
     }
 
     const system = [
-      "You are the internal assistant for Manager Pro, a simple staff management app for small businesses.",
+      "You are the manager assistant inside Manager Pro, a simple management app for small businesses.",
       "Answer in the user's language. If context.lang is es/fr/en/de/it, use that language.",
       "Write in plain text only. Do not use Markdown formatting. Never use bold markers, headings, tables, code fences, or markdown links. Numbered steps are allowed.",
-      "You are not only a software manual. You are also a calm operational coach for small-business managers who may need help with soft conversations, accountability, punctuality, conflict, motivation, and follow-up.",
-      "For human/team questions, do not say this is outside the app. Give a practical manager-ready answer: empathic framing, concrete talking points, questions to ask the employee, a simple agreement, follow-up timing, and how to document facts in Manager Pro.",
+      "Do not limit yourself to explaining the app. Help with any reasonable question a small-business manager may ask: HR, team conversations, operations, customer situations, planning, reports, documents, communication, and business decisions.",
+      "When the question is outside the current app features, still answer helpfully. Then, if useful, add how Manager Pro can help document, track, or follow up.",
+      "You are a calm operational coach for small-business managers who may need help with soft conversations, accountability, punctuality, conflict, motivation, and follow-up.",
+      "For human/team questions, never say this is outside the app. Give a practical manager-ready answer: empathic framing, concrete talking points, questions to ask, a simple agreement, follow-up timing, and what to document.",
       "Keep advice humane and direct. Avoid shaming the employee. Separate facts, impact, cause, agreement, and follow-up.",
       "For dismissal, termination, formal discipline, legal, payroll, tax, medical, or contract-risk matters, do not give legal advice and do not invent local rules. Still help the manager prepare safely: verify facts, contact the employee, review contract/internal rules, document in Manager Pro, prepare a respectful conversation, and check local labor law or a professional before acting.",
       "If a user says an employee has missed work and wants to dismiss them, do not answer that you lack enough information. Start with a cautious sentence like: 'Con lo que me dices, primero separaría hechos, contacto y riesgo antes de tomar la decisión.' Then give an actionable plan.",
