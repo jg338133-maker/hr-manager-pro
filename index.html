@@ -3030,10 +3030,13 @@ function renderEmpView(emp){
 
 // ═══════ MANAGER ASSISTANT ═══════
 let assistantBusy=false,assistantHistory=[];
+function assistantFormatMessage(text){
+  return esc(text).replace(/(https?:\/\/[^\s<]+)/g,u=>`<a href="${u}" target="_blank" rel="noopener noreferrer">${u}</a>`);
+}
 function assistantAddMessage(role,text){
   const log=document.getElementById('assistant-log');if(!log)return;
   assistantHistory.push({role,text,ts:new Date().toISOString()});
-  log.innerHTML+=`<div class="assistant-msg ${role==='user'?'user':'bot'}">${esc(text)}</div>`;
+  log.innerHTML+=`<div class="assistant-msg ${role==='user'?'user':'bot'}">${assistantFormatMessage(text)}</div>`;
   log.scrollTop=log.scrollHeight;
 }
 function openManagerAssistant(){
@@ -3128,7 +3131,7 @@ function localAssistantAnswer(question,ctx){
     answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.restaurant}.`;
   }else if(asksTermination){
     category='daily_ops';
-    answer=isDemo()?'En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y, cuando aplica, con búsqueda web.':'Esta pregunta necesita consultar la IA principal porque combina RH, contrato y posible riesgo legal. Intenta de nuevo en unos segundos. Si sigue fallando, revisa la conexión de la función de IA en Supabase.';
+    answer=isDemo()?`En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y, cuando aplica, con búsqueda web.\n\nPara investigarlo ahora puedes abrir Claude y pegar esta pregunta:\n"${question}"\n\nhttps://claude.ai/new`:`No pude conectar con Claude desde Manager Pro en este momento. Esta pregunta necesita la IA principal porque combina RH, contrato y posible riesgo legal.\n\nPuedes intentar de nuevo o abrir Claude y pegar esta pregunta:\n"${question}"\n\nhttps://claude.ai/new`;
   }else if(/tarde|retard|late|ritardo|versp[aä]t|p[uü]nkt|puntual|conversaci[oó]n|conversat|hablar|parler|talk|sprechen|disciplina|disciplin|conducta|comport/.test(q)){
     category='daily_ops';
     answer=assistantPeopleCoachingAnswer(ctx);
@@ -3146,7 +3149,7 @@ function localAssistantAnswer(question,ctx){
     answer=`Datos para revisar: ${ctx.alerts.missingSalary.length?`salario de ${ctx.alerts.missingSalary.join(', ')}`:'no veo salarios faltantes en este resumen'}. También conviene confirmar inicio de contrato, PIN, horario base y vacaciones de cada empleado.`;
   }else{
     category='feature_request';shouldSaveSignal=true;
-    answer=isDemo()?'En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y puede apoyarse en búsqueda web cuando aplica.':'No pude consultar la IA principal en este momento. Esta pregunta debería responderla Claude, no una respuesta local de la app. Intenta de nuevo en unos segundos.';
+    answer=isDemo()?`En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y puede apoyarse en búsqueda web cuando aplica.\n\nTambién puedes abrir Claude:\nhttps://claude.ai/new`:`No pude consultar Claude desde Manager Pro en este momento. Intenta de nuevo en unos segundos.\n\nSi necesitas resolverlo ya, abre Claude aquí:\nhttps://claude.ai/new`;
   }
   return {answer,category,shouldSaveSignal};
 }

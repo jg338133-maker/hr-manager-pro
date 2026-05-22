@@ -91,7 +91,10 @@ async function callAnthropic(apiKey: string, model: string, system: string, user
     },
     body: JSON.stringify(body),
   });
-  if (!aiRes.ok && enableWebSearch) return callAnthropic(apiKey, model, system, user, false);
+  if (!aiRes.ok && enableWebSearch) {
+    const fallback = await callAnthropic(apiKey, model, system, user, false);
+    return `${fallback}\n\nNota: no pude activar la búsqueda web desde Manager Pro en este intento. Para decisiones legales o contractuales, verifica la información con una fuente oficial o un asesor local.`;
+  }
   if (!aiRes.ok) throw new Error(`Anthropic request failed: ${await aiRes.text()}`);
   const payload = await aiRes.json();
   const citations: { title: string; url: string }[] = [];
