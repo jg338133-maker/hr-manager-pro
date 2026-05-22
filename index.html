@@ -186,8 +186,9 @@ input[type=date],input[type=time]{color-scheme:dark}
 /* PAY HERO */
 .pay-hero{background:linear-gradient(135deg,#0d1228,#111835);border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden}
 .pay-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:var(--brand);opacity:.06}
-.pay-total{font-size:38px;font-weight:800;margin:10px 0 6px}
-.pay-lbl{font-size:12px;color:var(--text2)}
+.pay-hero>*{position:relative;z-index:1}
+.pay-total{font-size:38px;font-weight:800;margin:10px 0 6px;color:#fff}
+.pay-lbl{font-size:12px;color:#b8c7ee}
 
 /* SCANNER */
 #scan-wrap{position:fixed;inset:0;background:#000;z-index:500;display:none;flex-direction:column}
@@ -971,12 +972,18 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 </div>
 
 <div class="page" id="pg-history">
+  <div class="tabs">
+    <button class="tab active" id="hist-tab-punches" onclick="setHistMode('punches',this)">Fichajes</button>
+    <button class="tab" id="hist-tab-audit" onclick="setHistMode('audit',this)">Bitácora RH</button>
+  </div>
+  <div id="hist-calendar"></div>
   <div class="search-wrap">
     <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input id="hist-search" placeholder="Rechercher..." oninput="renderHistory()">
   </div>
   <button class="btn btn-ghost btn-sm mb12" onclick="clearHist()">🗑 Effacer</button>
   <div id="hist-list"></div>
+  <div id="audit-list" class="mt12"></div>
 </div>
 
 <div class="page" id="pg-settings">
@@ -1057,6 +1064,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
     <button class="btn btn-ghost mb8" onclick="exportAllJSON()">⬇️ Exporter tout (JSON)</button>
     <button class="btn btn-danger" onclick="deleteAllConfirm()">🗑 Supprimer toutes les données</button>
   </div>
+  <div class="card" id="role-access-card"></div>
 </div>
 
 <div class="page" id="pg-master">
@@ -1242,7 +1250,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   </div>
   <div class="fg"><label>Motif</label><input id="man-note" placeholder="Correction manager"></div>
   <div class="modal-actions">
-    <button class="btn btn-ghost" onclick="closeModal('manual-modal')">Annuler</button>
+    <button class="btn btn-ghost" onclick="pendingCorrectionId=null;closeModal('manual-modal')">Annuler</button>
     <button class="btn btn-primary" onclick="saveManualAttendance()">Enregistrer</button>
   </div>
 </div>
@@ -1458,20 +1466,154 @@ const ATW=()=>ATT_WORDS[lang]||ATT_WORDS.fr;
 
 // ═══════ DB ═══════
 let DB={
-  employees:[],history:[],absences:[],shifts:{},documents:[],reviewedAlerts:{},
+  employees:[],history:[],absences:[],shifts:{},documents:[],reviewedAlerts:{},audit:[],monthClosures:{},
   settings:{company:'Mon Business',emoji:'MP',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],signals:[],stats:{}};
 const isDemo=()=>currentUser?.demo===true;
 function loadLocal(){try{const s=localStorage.getItem('hrm_pro');if(s)DB={...DB,...JSON.parse(s)};}catch(e){}}
 function saveLocal(){try{if(isDemo())return;localStorage.setItem('hrm_pro',JSON.stringify(DB));}catch(e){}}
+const AUDIT_TX={
+  fr:{title:'Journal RH',punches:'Pointages',audit:'Journal RH',empty:'Aucune action sensible enregistrée',actor:'Action par'},
+  es:{title:'Bitácora RH',punches:'Fichajes',audit:'Bitácora RH',empty:'Sin acciones sensibles registradas',actor:'Acción por'},
+  en:{title:'HR audit trail',punches:'Punches',audit:'HR audit trail',empty:'No sensitive actions recorded',actor:'Action by'},
+  de:{title:'HR-Protokoll',punches:'Buchungen',audit:'HR-Protokoll',empty:'Keine sensiblen Aktionen erfasst',actor:'Aktion von'},
+  it:{title:'Registro HR',punches:'Timbrature',audit:'Registro HR',empty:'Nessuna azione sensibile registrata',actor:'Azione di'}
+};
+const auditTx=()=>AUDIT_TX[lang]||AUDIT_TX.fr;
+const CORRECTION_TX={
+  fr:{apply:'Appliquer correction',approved:'Correction traitée'},
+  es:{apply:'Aplicar corrección',approved:'Corrección procesada'},
+  en:{apply:'Apply correction',approved:'Correction processed'},
+  de:{apply:'Korrektur anwenden',approved:'Korrektur bearbeitet'},
+  it:{apply:'Applica correzione',approved:'Correzione elaborata'}
+};
+const correctionTx=()=>CORRECTION_TX[lang]||CORRECTION_TX.fr;
+const CLOSE_TX={
+  fr:{title:'Clôture mensuelle guidée',ready:'Prêt à exporter',review:'À vérifier avant clôture',closed:'Mois marqué comme révisé',mark:'Marquer comme révisé',reopen:'Marquer comme non révisé',pending:'Demandes en attente',salary:'Salaires manquants',missing:'Absences détectées',late:'Retards',breaks:'Pauses ouvertes',ok:'Tout est en ordre pour générer le rapport.',goRequests:'Voir demandes',goEmployees:'Voir employés',goAttendance:'Corriger fichage'},
+  es:{title:'Cierre mensual guiado',ready:'Listo para exportar',review:'Revisar antes de cerrar',closed:'Mes marcado como revisado',mark:'Marcar mes como revisado',reopen:'Marcar como no revisado',pending:'Solicitudes pendientes',salary:'Salarios faltantes',missing:'Ausencias detectadas',late:'Retardos',breaks:'Pausas abiertas',ok:'Todo está en orden para generar el reporte.',goRequests:'Ver solicitudes',goEmployees:'Ver empleados',goAttendance:'Corregir fichaje'},
+  en:{title:'Guided monthly close',ready:'Ready to export',review:'Review before closing',closed:'Month marked as reviewed',mark:'Mark month as reviewed',reopen:'Mark as not reviewed',pending:'Pending requests',salary:'Missing pay data',missing:'Detected absences',late:'Late arrivals',breaks:'Open breaks',ok:'Everything is ready to generate the report.',goRequests:'View requests',goEmployees:'View employees',goAttendance:'Fix punch'},
+  de:{title:'Geführter Monatsabschluss',ready:'Bereit zum Export',review:'Vor Abschluss prüfen',closed:'Monat als geprüft markiert',mark:'Monat als geprüft markieren',reopen:'Als ungeprüft markieren',pending:'Offene Anfragen',salary:'Fehlende Lohndaten',missing:'Erkannte Abwesenheiten',late:'Verspätungen',breaks:'Offene Pausen',ok:'Alles ist bereit für den Bericht.',goRequests:'Anfragen ansehen',goEmployees:'Mitarbeiter ansehen',goAttendance:'Buchung korrigieren'},
+  it:{title:'Chiusura mensile guidata',ready:'Pronto per esportare',review:'Da controllare prima della chiusura',closed:'Mese segnato come revisionato',mark:'Segna mese come revisionato',reopen:'Segna come non revisionato',pending:'Richieste in attesa',salary:'Dati salario mancanti',missing:'Assenze rilevate',late:'Ritardi',breaks:'Pause aperte',ok:'Tutto è pronto per generare il report.',goRequests:'Vedi richieste',goEmployees:'Vedi dipendenti',goAttendance:'Correggi timbratura'}
+};
+const closeTx=()=>CLOSE_TX[lang]||CLOSE_TX.fr;
+const SMART_ALERT_TX={
+  fr:{missingSalary:'Salaire à configurer',missingSchedule:'Horaire de base manquant',missingContact:'Contact employé incomplet',contractEnding:'Contrat bientôt terminé',documentEnding:'Document bientôt expiré',noContractDoc:'Contrat non archivé',manyLate:'Retards fréquents ce mois-ci',overtimeRisk:'Heures supplémentaires élevées ce mois-ci'},
+  es:{missingSalary:'Salario por configurar',missingSchedule:'Horario base faltante',missingContact:'Contacto del empleado incompleto',contractEnding:'Contrato por vencer',documentEnding:'Documento por vencer',noContractDoc:'Contrato sin archivar',manyLate:'Retardos frecuentes este mes',overtimeRisk:'Horas extra altas este mes'},
+  en:{missingSalary:'Pay data missing',missingSchedule:'Base schedule missing',missingContact:'Employee contact incomplete',contractEnding:'Contract ending soon',documentEnding:'Document expiring soon',noContractDoc:'Contract not archived',manyLate:'Frequent late arrivals this month',overtimeRisk:'High overtime this month'},
+  de:{missingSalary:'Lohndaten fehlen',missingSchedule:'Basis-Dienstplan fehlt',missingContact:'Mitarbeiterkontakt unvollständig',contractEnding:'Vertrag läuft bald aus',documentEnding:'Dokument läuft bald ab',noContractDoc:'Vertrag nicht archiviert',manyLate:'Häufige Verspätungen in diesem Monat',overtimeRisk:'Hohe Überstunden in diesem Monat'},
+  it:{missingSalary:'Dati salario da configurare',missingSchedule:'Orario base mancante',missingContact:'Contatto dipendente incompleto',contractEnding:'Contratto in scadenza',documentEnding:'Documento in scadenza',noContractDoc:'Contratto non archiviato',manyLate:'Ritardi frequenti questo mese',overtimeRisk:'Ore extra alte questo mese'}
+};
+const smartTx=()=>SMART_ALERT_TX[lang]||SMART_ALERT_TX.fr;
+const ROLE_TX={
+  fr:{owner:'Propriétaire',manager:'Manager opérationnel',master:'Master Admin',employee:'Employé',blocked:'Votre rôle ne permet pas cette action.',restricted:'Accès réservé au propriétaire',restrictedText:'Cette zone contient des salaires, documents légaux ou paramètres sensibles.',rolesTitle:'Accès et rôles',rolesIntro:'Un business peut avoir plusieurs managers, mais chacun ne doit voir que ce dont il a besoin.',ownerDesc:'Voit tout: salaires, rapports, documents, paramètres et suppression de données.',managerDesc:'Gère le quotidien: fichages, horaires, demandes et alertes, sans paie ni documents sensibles.',masterDesc:'Supervision globale de tous les restaurants/business.',currentRole:'Votre rôle actuel',future:'Prochaine étape',futureText:'Inviter un manager par email et choisir son niveau d’accès.'},
+  es:{owner:'Propietario',manager:'Manager operativo',master:'Master Admin',employee:'Empleado',blocked:'Tu rol no permite esta acción.',restricted:'Acceso reservado al propietario',restrictedText:'Esta zona contiene salarios, documentos legales o configuraciones sensibles.',rolesTitle:'Accesos y roles',rolesIntro:'Un negocio puede tener varios managers, pero cada uno debe ver solo lo que necesita.',ownerDesc:'Ve todo: salarios, reportes, documentos, configuración y eliminación de datos.',managerDesc:'Opera el día a día: fichajes, horarios, solicitudes y alertas, sin nómina ni documentos sensibles.',masterDesc:'Supervisión global de todos los restaurantes/negocios.',currentRole:'Tu rol actual',future:'Siguiente paso',futureText:'Invitar un manager por email y escoger su nivel de acceso.'},
+  en:{owner:'Owner',manager:'Operations manager',master:'Master Admin',employee:'Employee',blocked:'Your role does not allow this action.',restricted:'Owner-only access',restrictedText:'This area contains payroll, legal documents, or sensitive settings.',rolesTitle:'Access and roles',rolesIntro:'A business can have multiple managers, but each one should only see what they need.',ownerDesc:'Sees everything: payroll, reports, documents, settings, and data deletion.',managerDesc:'Runs daily operations: punches, schedules, requests, and alerts, without payroll or sensitive documents.',masterDesc:'Global supervision across all restaurants/businesses.',currentRole:'Your current role',future:'Next step',futureText:'Invite a manager by email and choose their access level.'},
+  de:{owner:'Inhaber',manager:'Operativer Manager',master:'Master Admin',employee:'Mitarbeiter',blocked:'Ihre Rolle erlaubt diese Aktion nicht.',restricted:'Nur für Inhaber',restrictedText:'Dieser Bereich enthält Löhne, rechtliche Dokumente oder sensible Einstellungen.',rolesTitle:'Zugänge und Rollen',rolesIntro:'Ein Betrieb kann mehrere Manager haben, aber jeder sollte nur sehen, was er braucht.',ownerDesc:'Sieht alles: Löhne, Berichte, Dokumente, Einstellungen und Datenlöschung.',managerDesc:'Steuert den Alltag: Buchungen, Dienstpläne, Anfragen und Warnungen, ohne Löhne oder sensible Dokumente.',masterDesc:'Globale Übersicht über alle Restaurants/Betriebe.',currentRole:'Ihre aktuelle Rolle',future:'Nächster Schritt',futureText:'Manager per E-Mail einladen und Zugriffsstufe wählen.'},
+  it:{owner:'Proprietario',manager:'Manager operativo',master:'Master Admin',employee:'Dipendente',blocked:'Il tuo ruolo non consente questa azione.',restricted:'Accesso riservato al proprietario',restrictedText:'Questa area contiene salari, documenti legali o impostazioni sensibili.',rolesTitle:'Accessi e ruoli',rolesIntro:'Un business può avere più manager, ma ognuno dovrebbe vedere solo ciò che gli serve.',ownerDesc:'Vede tutto: salari, report, documenti, impostazioni ed eliminazione dati.',managerDesc:'Gestisce il quotidiano: timbrature, turni, richieste e avvisi, senza paghe o documenti sensibili.',masterDesc:'Supervisione globale di tutti i ristoranti/business.',currentRole:'Il tuo ruolo attuale',future:'Prossimo passo',futureText:'Invitare un manager via email e scegliere il livello di accesso.'}
+};
+const roleTx=()=>ROLE_TX[lang]||ROLE_TX.fr;
+const INVITE_TX={
+  fr:{email:'Email du manager',role:'Rôle',admin:'Propriétaire/admin',manager:'Manager opérationnel',create:'Créer lien d’invitation',copy:'Copier lien',copied:'Lien copié',users:'Accès actuels',noUsers:'Aucun autre accès visible pour le moment.',expires:'Le lien expire dans 14 jours.',sqlMissing:'Exécute le SQL du paso 8 dans Supabase pour activer cette action.',change:'Changer rôle',revoke:'Retirer accès',self:'Votre compte',updated:'Rôle mis à jour',revoked:'Accès retiré',confirmRevoke:'Retirer l’accès de cet utilisateur ?'},
+  es:{email:'Email del manager',role:'Rol',admin:'Propietario/admin',manager:'Manager operativo',create:'Crear link de invitación',copy:'Copiar link',copied:'Link copiado',users:'Accesos actuales',noUsers:'No hay otros accesos visibles por ahora.',expires:'El link vence en 14 días.',sqlMissing:'Ejecuta el SQL del paso 8 en Supabase para activar esta acción.',change:'Cambiar rol',revoke:'Quitar acceso',self:'Tu cuenta',updated:'Rol actualizado',revoked:'Acceso retirado',confirmRevoke:'¿Quitar acceso a este usuario?'},
+  en:{email:'Manager email',role:'Role',admin:'Owner/admin',manager:'Operations manager',create:'Create invite link',copy:'Copy link',copied:'Link copied',users:'Current access',noUsers:'No other access visible yet.',expires:'The link expires in 14 days.',sqlMissing:'Run the step 8 SQL in Supabase to enable this action.',change:'Change role',revoke:'Remove access',self:'Your account',updated:'Role updated',revoked:'Access removed',confirmRevoke:'Remove access for this user?'},
+  de:{email:'Manager-E-Mail',role:'Rolle',admin:'Inhaber/admin',manager:'Operativer Manager',create:'Einladungslink erstellen',copy:'Link kopieren',copied:'Link kopiert',users:'Aktuelle Zugänge',noUsers:'Noch keine weiteren Zugänge sichtbar.',expires:'Der Link läuft in 14 Tagen ab.',sqlMissing:'Führe das SQL von Schritt 8 in Supabase aus, um diese Aktion zu aktivieren.',change:'Rolle ändern',revoke:'Zugriff entfernen',self:'Ihr Konto',updated:'Rolle aktualisiert',revoked:'Zugriff entfernt',confirmRevoke:'Zugriff für diesen Benutzer entfernen?'},
+  it:{email:'Email manager',role:'Ruolo',admin:'Proprietario/admin',manager:'Manager operativo',create:'Crea link invito',copy:'Copia link',copied:'Link copiato',users:'Accessi attuali',noUsers:'Nessun altro accesso visibile per ora.',expires:'Il link scade tra 14 giorni.',sqlMissing:'Esegui l’SQL del passo 8 in Supabase per attivare questa azione.',change:'Cambia ruolo',revoke:'Rimuovi accesso',self:'Il tuo account',updated:'Ruolo aggiornato',revoked:'Accesso rimosso',confirmRevoke:'Rimuovere l’accesso a questo utente?'}
+};
+const inviteTx=()=>INVITE_TX[lang]||INVITE_TX.es;
+const inviteToken=()=>new URLSearchParams(location.search).get('invite')||'';
+function roleLevel(){
+  const r=currentUser?.role||'';
+  if(r==='super_admin')return'master';
+  if(['restaurant_admin','owner','admin'].includes(r))return'owner';
+  if(['manager','restaurant_manager'].includes(r))return'manager';
+  if(r==='employee')return'employee';
+  return'owner';
+}
+function can(permission){
+  const role=roleLevel();
+  const map={
+    employee_write:['owner','master'],
+    attendance_write:['owner','manager','master'],
+    approve_requests:['owner','manager','master'],
+    view_payroll:['owner','master'],
+    view_reports:['owner','master'],
+    view_documents:['owner','master'],
+    edit_settings:['owner','master'],
+    delete_employee:['owner','master'],
+    delete_all:['owner','master'],
+    master:['master']
+  };
+  return (map[permission]||[]).includes(role);
+}
+function requirePerm(permission){
+  if(can(permission))return true;
+  toast(roleTx().blocked,'#ef4444');
+  return false;
+}
+function roleLabel(){
+  const tx=roleTx(),r=roleLevel();
+  return r==='master'?tx.master:r==='owner'?tx.owner:r==='manager'?tx.manager:tx.employee;
+}
+function canPage(page){
+  const map={payroll:'view_payroll',reports:'view_reports',settings:'edit_settings',master:'master'};
+  return !map[page]||can(map[page]);
+}
+function restrictedHTML(){
+  const tx=roleTx();
+  return `<div class="empty-state card"><h3>${esc(tx.restricted)}</h3><p>${esc(tx.restrictedText)}</p></div>`;
+}
+function auditAction(type,detail='',meta={}){
+  try{
+    DB.audit=DB.audit||[];
+    DB.audit.unshift({id:uid(),ts:new Date().toISOString(),actor:currentUser?.email||currentUser?.name||'manager',role:currentUser?.role||'manager',type,detail,meta});
+    DB.audit=DB.audit.slice(0,500);
+    saveLocal();
+  }catch(e){console.warn('audit failed',e);}
+}
 const alertDayKey=date=>new Date(date).toISOString().slice(0,10);
 const alertKey=(date,empId,type)=>`${alertDayKey(date)}_${empId}_${type}`;
+function smartAlertKey(date,empId,type){
+  const d=new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}_${empId}_${type}`;
+}
 function isAlertReviewed(key){return !!DB.reviewedAlerts?.[key];}
 function markAlertReviewed(key){
   DB.reviewedAlerts=DB.reviewedAlerts||{};
   DB.reviewedAlerts[key]={reviewedAt:new Date().toISOString(),user:currentUser?.email||currentUser?.name||'manager'};
   saveLocal();
+}
+function hasConfiguredPay(emp){
+  return emp?.payType==='monthly' ? Number(emp.salary)>0 : Number(emp.rate)>0;
+}
+function hasBaseSchedule(emp){
+  return Object.values(emp?.schedules||{}).some(day=>day?.enabled&&normalizeBlocks(day,'employee').length);
+}
+function daysUntil(value,base=new Date()){
+  const d=localDateOnly(value),b=localDateOnly(base);
+  if(!d||!b)return null;
+  return Math.round((d-b)/86400000);
+}
+function employeeContractEnd(emp){
+  return emp?.contractEnd||emp?.contractEndDate||emp?.endDate||emp?.contractEndAt||'';
+}
+function smartEmployeeAlerts(emp,now=new Date()){
+  const tx=smartTx(),out=[],y=now.getFullYear(),m=now.getMonth();
+  const push=(type,msg,color='var(--orange)',priority=1,meta={})=>out.push({key:smartAlertKey(now,emp.id,type),type,emp,msg,color,priority,meta});
+  if(!hasConfiguredPay(emp))push('missing-salary',tx.missingSalary,'var(--red)',7);
+  if(!hasBaseSchedule(emp))push('missing-schedule',tx.missingSchedule,'var(--orange)',6);
+  if(!emp.email&&!emp.phone)push('missing-contact',tx.missingContact,'var(--orange)',3);
+  const end=employeeContractEnd(emp),endDays=daysUntil(end,now);
+  if(endDays!==null&&endDays>=0&&endDays<=30)push('contract-ending',`${tx.contractEnding} · ${fmtDate(end)}`,'var(--orange)',6,{end});
+  const docs=employeeDocs(emp.id);
+  const hasContract=docs.some(d=>d.type==='contract');
+  if(!hasContract)push('no-contract-doc',tx.noContractDoc,'var(--orange)',2);
+  const expiring=docs.map(d=>({doc:d,days:daysUntil(d.expiresAt,now)})).filter(x=>x.days!==null&&x.days>=0&&x.days<=30).sort((a,b)=>a.days-b.days)[0];
+  if(expiring)out.push({key:smartAlertKey(now,emp.id,`doc-${expiring.doc.id}`),type:'document-ending',emp,msg:`${tx.documentEnding} · ${fmtDate(expiring.doc.expiresAt)}`,color:'var(--orange)',priority:5,meta:{docId:expiring.doc.id}});
+  const report=monthlyEmployeeReport(emp,y,m);
+  if(report.late>=3)push('many-late',`${tx.manyLate} · ${report.late}`,'var(--red)',5);
+  if(report.ot>=5)push('overtime-risk',`${tx.overtimeRisk} · ${report.ot.toFixed(1)}h`,'var(--orange)',4);
+  return out;
 }
 const activeBreakKey=empId=>`hrm_active_break_${REST_ID}_${empId}`;
 function saveActiveBreak(empId,rec){try{localStorage.setItem(activeBreakKey(empId),JSON.stringify({empId,ts:rec.ts,note:rec.note||'',type:'break_start'}));}catch(e){}}
@@ -1509,6 +1651,14 @@ function setRestaurantId(id){
 }
 
 async function loadProfile(user){
+  try{
+    const {data,error}=await sb.rpc('get_my_profile');
+    if(error)throw error;
+    const row=Array.isArray(data)?data[0]:data;
+    if(row)return row;
+  }catch(e){
+    console.warn('Profile RPC unavailable, falling back:',e);
+  }
   const {data,error}=await sb.from('profiles').select('*').eq('user_id',user.id).maybeSingle();
   if(error)throw error;
   return data;
@@ -1628,6 +1778,35 @@ async function sbSetRestaurantStatus(id,status){
   const {error}=await sb.rpc('master_set_restaurant_status',{p_restaurant_id:id,p_status:status});
   if(error)throw error;
 }
+async function sbCreateManagerInvite(email,role){
+  if(isDemo())throw new Error('Demo mode');
+  const {data,error}=await sb.rpc('create_manager_invite',{p_email:email,p_role:role});
+  if(error)throw error;
+  return data;
+}
+async function sbAcceptManagerInvite(token){
+  const {data,error}=await sb.rpc('accept_manager_invite',{p_token:token});
+  if(error)throw error;
+  return Array.isArray(data)?data[0]:data;
+}
+async function sbListBusinessProfiles(){
+  if(isDemo())return [];
+  const {data,error}=await sb.from('profiles').select('user_id,email,name,role,created_at').eq('restaurant_id',REST_ID).order('created_at',{ascending:true});
+  if(error)throw error;
+  return data||[];
+}
+async function sbUpdateManagerAccess(email,role){
+  if(isDemo())throw new Error('Demo mode');
+  const {data,error}=await sb.rpc('update_manager_access',{p_email:email,p_role:role});
+  if(error)throw error;
+  return data;
+}
+async function sbRevokeManagerAccess(email){
+  if(isDemo())throw new Error('Demo mode');
+  const {data,error}=await sb.rpc('revoke_manager_access',{p_email:email});
+  if(error)throw error;
+  return data;
+}
 async function sbSaveAssistantSignal(signal){
   if(isDemo())return;
   const payload={restaurant_id:REST_ID,question:signal.question||'',answer:signal.answer||'',category:signal.category||'other',page:signal.page||currentPage,status:'new',metadata:signal.metadata||{}};
@@ -1686,6 +1865,7 @@ const appLocale=()=>LOCALES[lang]||'fr-CH';
 const fmtTime=iso=>new Date(iso).toLocaleTimeString(appLocale(),{hour:'2-digit',minute:'2-digit'});
 const fmtDate=iso=>new Date(iso).toLocaleDateString(appLocale());
 const fmtMonth=d=>d.toLocaleDateString(appLocale(),{month:'long',year:'numeric'});
+const localDateKey=d=>{const x=new Date(d),p=n=>String(n).padStart(2,'0');return `${x.getFullYear()}-${p(x.getMonth()+1)}-${p(x.getDate())}`;};
 const sameDay=(a,b)=>{const x=new Date(a),y=new Date(b);return x.getFullYear()===y.getFullYear()&&x.getMonth()===y.getMonth()&&x.getDate()===y.getDate();};
 const todayStart=()=>{const d=new Date();d.setHours(0,0,0,0);return d;};
 const getMonday=d=>{const day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);const m=new Date(d);m.setDate(diff);m.setHours(0,0,0,0);return m;};
@@ -1941,6 +2121,23 @@ function setEmployeeLang(l){
   else{applyUITexts();renderPage(currentPage);}
 }
 
+function applyPermissionsUI(){
+  const visible=(sel,show)=>document.querySelectorAll(sel).forEach(el=>el.style.display=show?'':'none');
+  visible('#pg-payroll',can('view_payroll'));
+  visible('#pg-reports',can('view_reports'));
+  visible('#pg-settings',can('edit_settings'));
+  visible('.sb-item[onclick*="payroll"]',can('view_payroll'));
+  visible('.sb-item[onclick*="reports"]',can('view_reports'));
+  visible('.sb-item[onclick*="settings"]',can('edit_settings'));
+  visible('#top-new-emp-btn,#dash-add-emp-btn,#pg-employees .btn-primary.mt12',can('employee_write'));
+  visible('#pg-settings .card:nth-of-type(6) .btn-danger',can('delete_all'));
+  visible('#master-nav',can('master'));
+  if(currentPage==='payroll'&&!can('view_payroll'))goPage('dashboard');
+  if(currentPage==='reports'&&!can('view_reports'))goPage('dashboard');
+  if(currentPage==='settings'&&!can('edit_settings'))goPage('dashboard');
+  if(currentPage==='master'&&!can('master'))goPage('dashboard');
+}
+
 // ═══════ AUTH ═══════
 let currentUser=null,pinBuf='',empClockTimer=null,breakPickerEmpId=null,loginMode='manager';
 let LOGIN_RESTAURANTS=[];
@@ -1956,6 +2153,16 @@ function showLoginAuth(type='manager'){
   const btn=[...document.querySelectorAll('.login-tab')].find(b=>b.getAttribute('onclick')?.includes(`'${type}'`))||document.querySelector('.login-tab');
   if(btn)setLoginTab(type,btn);
   setTimeout(()=>document.querySelector('.login-card')?.scrollIntoView({behavior:'smooth',block:'center'}),30);
+}
+function applyInviteLanding(){
+  const token=inviteToken();
+  const restField=document.getElementById('reg-rest-name')?.closest('.fg');
+  if(restField)restField.style.display=token?'none':'';
+  if(token){
+    showLoginAuth('register');
+    const sub=document.querySelector('.login-card-sub');
+    if(sub)sub.textContent='Crea tu cuenta para aceptar la invitación del negocio.';
+  }
 }
 function setLoginTab(type,btn){
   loginMode=type;
@@ -2003,7 +2210,7 @@ async function selectPinRestaurant(id){
 
 function loginDemo(){
   DB=demoDB();lang=DB.settings.lang||'es';
-  currentUser={role:'restaurant_admin',name:'Admin Demo',restaurant_id:'demo-restaurant',demo:true};
+  currentUser={role:'restaurant_admin',name:'Admin Demo',email:'demo@manager-pro.app',restaurant_id:'demo-restaurant',demo:true};
   currentPage='dashboard';
   showManagerUI();
   toast('✅ Demo aislado: no toca tus datos reales');
@@ -2013,22 +2220,38 @@ async function loginManager(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-password').value;
   if(!email||!pass){toast('Entrez vos identifiants','#ef4444');return;}
+  const btn=document.querySelector('[onclick="loginManager()"]');
+  const oldBtn=btn?.innerHTML;
+  if(btn){btn.disabled=true;btn.innerHTML='Connexion...';}
   try{
-    const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+    const {data,error}=await withTimeout(sb.auth.signInWithPassword({email,password:pass}),12000,'Auth timeout');
     if(error)throw error;
-    let profile=await loadProfile(data.user);
+    let profile=null;
+    const token=inviteToken();
+    if(token){
+      try{profile=await sbAcceptManagerInvite(token);toast('✅ Invitación aceptada');}
+      catch(invErr){console.warn('Invite accept error:',invErr);}
+    }
+    if(!profile)profile=await withTimeout(loadProfile(data.user),10000,'Profile timeout');
     if(!profile)profile=await ensureProfile(data.user,'restaurant_admin',REST_ID);
     currentUser={role:profile.role||'restaurant_admin',name:profile.name||data.user.email?.split('@')[0]||email.split('@')[0],email:data.user.email,restaurant_id:profile.restaurant_id,profile};
     if(currentUser.restaurant_id)setRestaurantId(currentUser.restaurant_id);
-    if(currentUser.role==='super_admin')await loadMaster();
+    if(currentUser.role==='super_admin'){
+      showManagerUI();
+      toast('✅ Master connecté');
+      withTimeout(loadMaster(),8000,'Master load timeout').then(()=>renderMaster()).catch(e=>console.warn('Master preload error:',e));
+      return;
+    }
     else{
-      await loadSB();
+      await withTimeout(loadSB(),10000,'Restaurant load timeout');
       if(DB.settings?.status==='frozen'){await sb.auth.signOut();currentUser=null;toast('Acceso congelado. Contacta a HR Manager Pro.','#ef4444');return;}
     }
     showManagerUI();toast('✅ Connecté');
   }catch(e){
-    toast('Identifiants invalides. Utilisez le mode démo si besoin.','#ef4444');
+    toast(e?.message?.includes('timeout')?'No pudo cargar datos. Intenta de nuevo.':'Identifiants invalides. Utilisez le mode démo si besoin.','#ef4444');
     console.warn('Login error:',e);
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML=oldBtn;}
   }
 }
 
@@ -2050,12 +2273,26 @@ async function registerRestaurant(){
   const email=document.getElementById('reg-email').value.trim();
   const pass=document.getElementById('reg-password').value;
   const pass2=document.getElementById('reg-password2').value;
-  if(!restName||!email||pass.length<6){toast('Restaurant, email et mot de passe requis','#ef4444');return;}
+  const token=inviteToken();
+  if((!token&&!restName)||!email||pass.length<6){toast('Restaurant, email et mot de passe requis','#ef4444');return;}
   if(pass!==pass2){toast((T().login?.passwordMismatch)||UI.fr.login.passwordMismatch,'#ef4444');return;}
   try{
     const {data,error}=await sb.auth.signUp({email,password:pass});
     if(error)throw error;
     if(!data.user)throw new Error('Utilisateur non créé');
+    if(token){
+      try{
+        const profile=await sbAcceptManagerInvite(token);
+        toast('✅ Cuenta creada y conectada al negocio. Ya puedes iniciar sesión.');
+        setLoginTab('manager',document.querySelector('.login-tab'));
+        return;
+      }catch(invErr){
+        console.warn('Invite accept after signup:',invErr);
+        toast('Cuenta creada. Confirma el email y luego inicia sesión desde este mismo link.','#f59e0b');
+        setLoginTab('manager',document.querySelector('.login-tab'));
+        return;
+      }
+    }
     const restaurant=await sbCreateRestaurant(restName,email);
     await ensureProfile(data.user,'restaurant_admin',restaurant.id);
     setRestaurantId(restaurant.id);
@@ -2163,9 +2400,9 @@ function showManagerUI(){
   document.getElementById('main').style.display='block';
   document.getElementById('sb-uav').textContent=(currentUser.name||'M')[0].toUpperCase();
   document.getElementById('sb-un').textContent=currentUser.name;
-  document.getElementById('sb-ur').textContent=currentUser.role==='super_admin'?'Super Admin':'Admin restaurant';
+  document.getElementById('sb-ur').textContent=roleLabel();
   document.getElementById('master-nav').style.display=currentUser.role==='super_admin'?'block':'none';
-  applyBrand();applyUITexts();renderAll();
+  applyBrand();applyUITexts();applyPermissionsUI();renderAll();
   if(currentUser.role==='super_admin')renderMaster();
   startAutoRefresh();
   maybeStartTour('manager');
@@ -2290,17 +2527,23 @@ function localDateTimeISO(dateStr,timeStr){
   const [y,m,d]=dateStr.split('-').map(Number),[hh,mm]=timeStr.split(':').map(Number);
   return new Date(y,m-1,d,hh,mm,0,0).toISOString();
 }
-function openManualModal(empId=null){
+let pendingCorrectionId=null;
+function openManualModal(empId=null,opts={}){
+  if(!requirePerm('attendance_write'))return;
   const active=DB.employees.filter(e=>e.status==='active');
   if(!active.length){toast('Aucun employé actif','#ef4444');return;}
+  pendingCorrectionId=opts.correctionId||null;
   document.getElementById('man-emp').innerHTML=active.map(e=>`<option value="${esc(e.id)}" ${e.id===empId?'selected':''}>${safeEmpName(e)}</option>`).join('');
-  document.getElementById('man-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('man-note').value='Correction manager';
-  document.getElementById('man-break').value='0';
+  document.getElementById('man-date').value=opts.date||new Date().toISOString().split('T')[0];
+  document.getElementById('man-in').value=opts.in||'09:00';
+  document.getElementById('man-out').value=opts.out||'17:00';
+  document.getElementById('man-note').value=opts.note||'Correction manager';
+  document.getElementById('man-break').value=String(opts.breakMin||0);
   applyUITexts();
   openModal('manual-modal');
 }
 async function saveManualAttendance(){
+  if(!requirePerm('attendance_write'))return;
   const empId=document.getElementById('man-emp').value,date=document.getElementById('man-date').value;
   const tin=document.getElementById('man-in').value,tout=document.getElementById('man-out').value,note=clean(document.getElementById('man-note').value)||'Correction manager';
   const breakMin=parseInt(document.getElementById('man-break').value,10)||0;
@@ -2318,8 +2561,14 @@ async function saveManualAttendance(){
     const mid=(new Date(inTs).getTime()+new Date(outTs).getTime())/2,start=new Date(mid-(breakMin*60000/2)),end=new Date(mid+(breakMin*60000/2));
     recs.unshift({id:uid(),empId,empName:fullName(emp),type:'break_end',ts:end.toISOString(),manual:true,note},{id:uid(),empId,empName:fullName(emp),type:'break_start',ts:start.toISOString(),manual:true,note});
   }
-  DB.history.unshift(...recs);saveLocal();closeModal('manual-modal');renderPage(currentPage);
-  toast(`✅ Heures enregistrées (${oldLen-DB.history.length+recs.length} pointages)`);
+  if(pendingCorrectionId){
+    DB.absences=DB.absences.map(a=>a.id===pendingCorrectionId?{...a,approved:true,reviewedAt:new Date().toISOString(),resolution:'manual_attendance_applied'}:a);
+    sbUpdateAbsApproved(pendingCorrectionId,true).catch(console.error);
+  }
+  const appliedCorrectionId=pendingCorrectionId;
+  DB.history.unshift(...recs);auditAction('attendance',`Fichaje corregido: ${fullName(emp)} · ${date} ${tin}-${tout}`,{empId,date,breakMin,correctionId:appliedCorrectionId});saveLocal();closeModal('manual-modal');renderPage(currentPage);
+  toast(appliedCorrectionId?'✅ '+correctionTx().approved:`✅ Heures enregistrées (${oldLen-DB.history.length+recs.length} pointages)`);
+  pendingCorrectionId=null;
   sbDelAttendanceDay(empId,date).then(()=>Promise.all(recs.map(r=>sbRegAt(empId,fullName(emp),r.type,r.ts)))).catch(console.error);
 }
 const lastAction=empId=>DB.history.find(h=>h.empId===empId&&['in','out'].includes(h.type));
@@ -3214,6 +3463,11 @@ function toggleSB(){const s=document.getElementById('sidebar'),o=document.getEle
 function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').style.display='none';}
 
 function nav(page,el){
+  if(!canPage(page)){
+    const perm={payroll:'view_payroll',reports:'view_reports',settings:'edit_settings',master:'master'}[page]||'master';
+    requirePerm(perm);
+    return;
+  }
   closeSB();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
@@ -3227,6 +3481,7 @@ function goPage(page){
   nav(page,item||document.querySelector('.sb-item'));
 }
 function renderPage(p){
+  if(!canPage(p)){goPage('dashboard');return;}
   if(p==='dashboard')renderDash();
   if(p==='attendance')renderAtt();
   if(p==='employees')renderEmps();
@@ -3237,8 +3492,9 @@ function renderPage(p){
   if(p==='history')renderHistory();
   if(p==='settings')renderSettings();
   if(p==='master')renderMaster();
+  applyPermissionsUI();
 }
-function renderAll(){renderDash();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();}
+function renderAll(){renderDash();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
 
 function tickEmpPortal(){
   const el=document.getElementById('emp-clock');
@@ -3523,17 +3779,20 @@ function renderDash(){
     const ds=dayStatus(emp,now);
     const outNoBreak=DB.history.find(h=>h.empId===emp.id&&sameDay(h.ts,now)&&h.type==='out'&&h.note==='Salida sin pausa registrada');
     const outOpenBreak=DB.history.find(h=>h.empId===emp.id&&sameDay(h.ts,now)&&h.type==='out'&&h.note==='Salida con pausa abierta');
-    if(ds.type==='missing')alerts.push({key:alertKey(now,emp.id,'missing-in'),type:'missing-in',emp,msg:tx.missing,color:'var(--orange)'});
-    if(isLate(emp,now))alerts.push({key:alertKey(now,emp.id,'late'),type:'late',emp,msg:tx.late,color:'var(--red)'});
-    if(outNoBreak)alerts.push({key:alertKey(now,emp.id,'out-no-break'),type:'out-no-break',emp,msg:'Salida sin pausa registrada',color:'var(--red)'});
-    if(outOpenBreak)alerts.push({key:alertKey(now,emp.id,'out-open-break'),type:'out-open-break',emp,msg:'Salida con pausa abierta',color:'var(--orange)'});
+    if(ds.type==='missing')alerts.push({key:alertKey(now,emp.id,'missing-in'),type:'missing-in',emp,msg:tx.missing,color:'var(--orange)',priority:10});
+    if(isLate(emp,now))alerts.push({key:alertKey(now,emp.id,'late'),type:'late',emp,msg:tx.late,color:'var(--red)',priority:9});
+    if(outNoBreak)alerts.push({key:alertKey(now,emp.id,'out-no-break'),type:'out-no-break',emp,msg:'Salida sin pausa registrada',color:'var(--red)',priority:9});
+    if(outOpenBreak)alerts.push({key:alertKey(now,emp.id,'out-open-break'),type:'out-open-break',emp,msg:'Salida con pausa abierta',color:'var(--orange)',priority:8});
+    alerts.push(...smartEmployeeAlerts(emp,now));
   });
   DB.absences.filter(a=>!a.approved).forEach(a=>{
     const emp=DB.employees.find(e=>e.id===a.empId)||{};
     const msg=a.type==='correction'?dx.pendingCorrection:dx.pendingRequest;
-    alerts.push({key:alertKey(a.start||now,`request-${a.id}`,a.type||'absence'),type:'pending-request',absId:a.id,emp,msg:`${msg} · ${fmtDate(a.start)}`,color:'var(--orange)'});
+    alerts.push({key:alertKey(a.start||now,`request-${a.id}`,a.type||'absence'),type:'pending-request',absId:a.id,emp,msg:`${msg} · ${fmtDate(a.start)}`,color:'var(--orange)',priority:11});
   });
-  const visibleAlerts=alerts.filter(a=>!isAlertReviewed(a.key));
+  const visibleAlerts=alerts
+    .filter(a=>!isAlertReviewed(a.key))
+    .sort((a,b)=>(b.priority||0)-(a.priority||0));
 
   const attentionRows=visibleAlerts.length?visibleAlerts.slice(0,4).map(a=>`
     <div class="attention-row ${a.color.includes('red')?'danger':'warn'}">
@@ -3545,6 +3804,12 @@ function renderDash(){
       <button onclick="${a.absId?`openPendingRequestReview(${jsArg(a.absId)})`:`openAlertReview(${jsArg(a.key)},${jsArg(a.emp.id)},${jsArg(a.type)},${jsArg(a.msg)})`}">${esc(dx.review)} ↗</button>
     </div>`).join(''):`<div class="attention-row ok"><div style="font-size:17px">✓</div><div><div style="font-weight:900;font-size:13px">${tx.allGood}</div><div style="font-size:12px;margin-top:2px">${esc(dx.noUrgencies)}</div></div></div>`;
 
+  const quickActions=[
+    can('employee_write')?`<button class="quick-action" onclick="openEmpModal(null)"><span class="quick-icon">+</span><span>${esc(dx.add)}</span></button>`:'',
+    can('attendance_write')?`<button class="quick-action" onclick="openManualModal()"><span class="quick-icon" style="background:var(--orange)">✎</span><span>${esc(dx.fix)}</span></button>`:'',
+    can('view_reports')?`<button class="quick-action" onclick="goPage('reports')"><span class="quick-icon" style="background:var(--green)">↧</span><span>${esc(dx.report)}</span></button>`:'',
+    `<button class="quick-action" onclick="openScanner()"><span class="quick-icon" style="background:var(--cyan)">▣</span><span>${esc(dx.scan)}</span></button>`
+  ].filter(Boolean).join('');
   document.getElementById('dash-live').innerHTML=`
     <div class="daily-grid">
       <div class="card attention-card">
@@ -3560,10 +3825,7 @@ function renderDash(){
       <div class="card quick-card">
         <div class="card-header">${esc(dx.quick)}</div>
         <div class="quick-actions">
-          <button class="quick-action" onclick="openEmpModal(null)"><span class="quick-icon">+</span><span>${esc(dx.add)}</span></button>
-          <button class="quick-action" onclick="openManualModal()"><span class="quick-icon" style="background:var(--orange)">✎</span><span>${esc(dx.fix)}</span></button>
-          <button class="quick-action" onclick="goPage('reports')"><span class="quick-icon" style="background:var(--green)">↧</span><span>${esc(dx.report)}</span></button>
-          <button class="quick-action" onclick="openScanner()"><span class="quick-icon" style="background:var(--cyan)">▣</span><span>${esc(dx.scan)}</span></button>
+          ${quickActions}
         </div>
       </div>
     </div>`;
@@ -3900,6 +4162,7 @@ function applyContractFields(){
   toast('Datos aplicados. Revisa antes de guardar.');
 }
 function openEmpModal(id){
+  if(!requirePerm('employee_write'))return;
   editEmpId=id;photoData=null;pendingContractDoc=null;pendingContractText='';
   const emp=id?DB.employees.find(e=>e.id===id):null;
   document.getElementById('emp-modal-title').textContent=emp?`${T().emp.edit} — ${emp.name}`:T().emp.new;
@@ -3978,6 +4241,7 @@ function seedVisibleWeekFromSchedule(emp){
   }
 }
 function saveEmp(){
+  if(!requirePerm('employee_write'))return;
   const name=clean(document.getElementById('ef-name').value);
   if(!name){toast('Le prénom est obligatoire','#ef4444');return;}
   const empEmail=clean(document.getElementById('ef-email').value).toLowerCase();
@@ -3990,67 +4254,119 @@ function saveEmp(){
   if(editEmpId){const i=DB.employees.findIndex(e=>e.id===editEmpId);if(i>=0)DB.employees[i]={...DB.employees[i],...data};}
   else DB.employees.push(data);
   if(!editEmpId&&pendingContractDoc){
-    const doc={...pendingContractDoc,empId:data.id,fields:undefined};
+    const contractEnd=contractPlainValue(pendingContractDoc.fields?.endDate);
+    const doc={...pendingContractDoc,empId:data.id,expiresAt:pendingContractDoc.expiresAt||contractEnd||'',fields:undefined};
+    if(contractEnd&&!pendingContractDoc.notes?.includes(contractEnd))doc.notes=`${pendingContractDoc.notes||'Contrato subido'} · Fin contrato: ${contractEnd}`;
     DB.documents=[doc,...(DB.documents||[])];
     sbSaveDoc(doc).catch(console.error);
   }
   seedVisibleWeekFromSchedule(data);
+  auditAction('employee',`${editEmpId?'Empleado actualizado':'Empleado creado'}: ${fullName(data)}`,{empId:data.id});
   saveLocal();closeModal('emp-modal');renderPage(currentPage);
   toast((editEmpId?'✅ Employé mis à jour':'✅ Employé ajouté')+(!typedPin&&!existing?.pin?` · PIN ${generatedPin}`:''));
   sbSaveEmp(data).catch(console.error);
 }
 
 // ═══════ DETAIL ═══════
-const DOC_TYPES={contract:'Contrato',id:'Documento identidad',permit:'Permiso trabajo',medical:'Certificado médico',training:'Formación',annex:'Anexo',other:'Otro'};
+const DOC_TYPES={
+  fr:{contract:'Contrat',id:'Pièce identité',permit:'Permis de travail',medical:'Certificat médical',training:'Formation',annex:'Annexe',other:'Autre'},
+  es:{contract:'Contrato',id:'Documento identidad',permit:'Permiso trabajo',medical:'Certificado médico',training:'Formación',annex:'Anexo',other:'Otro'},
+  en:{contract:'Contract',id:'Identity document',permit:'Work permit',medical:'Medical certificate',training:'Training',annex:'Annex',other:'Other'},
+  de:{contract:'Vertrag',id:'Ausweis',permit:'Arbeitsbewilligung',medical:'Arztzeugnis',training:'Schulung',annex:'Anhang',other:'Andere'},
+  it:{contract:'Contratto',id:'Documento identità',permit:'Permesso lavoro',medical:'Certificato medico',training:'Formazione',annex:'Allegato',other:'Altro'}
+};
+const DOC_UI={
+  fr:{file:'Dossier',complete:'Dossier complet',review:'Dossier à compléter',critical:'À traiter',missing:'Manque',expiring:'Expire bientôt',expired:'Expiré',required:'Documents et données à vérifier',contractMissing:'Contrat non archivé',payMissing:'Salaire à configurer',scheduleMissing:'Horaire base manquant',contactMissing:'Contact employé incomplet',startMissing:'Début contrat manquant',uploadType:'Type de document',expiry:'Échéance optionnelle',note:'Note',notePh:'Ex: contrat signé, permis B, annexe salaire',upload:'Ajouter document',helper:"Le dossier sert à garder les preuves RH importantes et à déclencher des alertes avant les échéances.",open:'Ouvrir',delete:'Supprimer',emptyTitle:'Aucun document',emptyText:'Ajoutez contrat, permis ou certificats pour compléter le dossier.',expires:'Expire',ok:'OK'},
+  es:{file:'Expediente',complete:'Expediente completo',review:'Expediente por completar',critical:'Requiere acción',missing:'Falta',expiring:'Vence pronto',expired:'Vencido',required:'Documentos y datos por revisar',contractMissing:'Contrato sin archivar',payMissing:'Salario por configurar',scheduleMissing:'Horario base faltante',contactMissing:'Contacto del empleado incompleto',startMissing:'Inicio de contrato faltante',uploadType:'Tipo de documento',expiry:'Vencimiento opcional',note:'Nota',notePh:'Ej: contrato firmado, permiso B, anexo salario',upload:'Subir documento',helper:'El expediente guarda soportes RH importantes y activa alertas antes de los vencimientos.',open:'Abrir',delete:'Eliminar',emptyTitle:'Sin documentos',emptyText:'Sube contrato, permiso o certificados para tener el expediente completo.',expires:'Vence',ok:'OK'},
+  en:{file:'File',complete:'File complete',review:'File to complete',critical:'Needs action',missing:'Missing',expiring:'Expiring soon',expired:'Expired',required:'Documents and data to review',contractMissing:'Contract not archived',payMissing:'Pay data missing',scheduleMissing:'Base schedule missing',contactMissing:'Employee contact incomplete',startMissing:'Contract start missing',uploadType:'Document type',expiry:'Optional expiry',note:'Note',notePh:'E.g. signed contract, permit B, salary annex',upload:'Upload document',helper:'The file keeps important HR evidence and triggers alerts before expiry dates.',open:'Open',delete:'Delete',emptyTitle:'No documents',emptyText:'Upload contract, permit or certificates to complete the file.',expires:'Expires',ok:'OK'},
+  de:{file:'Akte',complete:'Akte vollständig',review:'Akte ergänzen',critical:'Handlungsbedarf',missing:'Fehlt',expiring:'Läuft bald ab',expired:'Abgelaufen',required:'Dokumente und Daten prüfen',contractMissing:'Vertrag nicht archiviert',payMissing:'Lohndaten fehlen',scheduleMissing:'Basis-Dienstplan fehlt',contactMissing:'Mitarbeiterkontakt unvollständig',startMissing:'Vertragsbeginn fehlt',uploadType:'Dokumenttyp',expiry:'Optionales Ablaufdatum',note:'Notiz',notePh:'z. B. unterschriebener Vertrag, Bewilligung B, Lohnanhang',upload:'Dokument hochladen',helper:'Die Akte bewahrt wichtige HR-Nachweise und löst Warnungen vor Fristen aus.',open:'Öffnen',delete:'Löschen',emptyTitle:'Keine Dokumente',emptyText:'Vertrag, Bewilligung oder Zertifikate hochladen, um die Akte zu vervollständigen.',expires:'Läuft ab',ok:'OK'},
+  it:{file:'Fascicolo',complete:'Fascicolo completo',review:'Fascicolo da completare',critical:'Richiede azione',missing:'Manca',expiring:'In scadenza',expired:'Scaduto',required:'Documenti e dati da rivedere',contractMissing:'Contratto non archiviato',payMissing:'Dati salario da configurare',scheduleMissing:'Orario base mancante',contactMissing:'Contatto dipendente incompleto',startMissing:'Inizio contratto mancante',uploadType:'Tipo documento',expiry:'Scadenza opzionale',note:'Nota',notePh:'Es: contratto firmato, permesso B, allegato salario',upload:'Carica documento',helper:'Il fascicolo conserva prove HR importanti e attiva avvisi prima delle scadenze.',open:'Apri',delete:'Elimina',emptyTitle:'Nessun documento',emptyText:'Carica contratto, permesso o certificati per completare il fascicolo.',expires:'Scade',ok:'OK'}
+};
+const docTx=()=>DOC_UI[lang]||DOC_UI.fr;
 function employeeDocs(empId){return (DB.documents||[]).filter(d=>d.empId===empId).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));}
-function docTypeLabel(t){return DOC_TYPES[t]||DOC_TYPES.other;}
+function docTypeLabel(t){const types=DOC_TYPES[lang]||DOC_TYPES.fr;return types[t]||types.other;}
 function fmtBytes(n){n=Number(n)||0;if(n<1024)return `${n} B`;if(n<1048576)return `${(n/1024).toFixed(0)} KB`;return `${(n/1048576).toFixed(1)} MB`;}
+function employeeFileStatus(emp){
+  const tx=docTx(),docs=employeeDocs(emp.id),missing=[],expired=[],expiring=[];
+  if(!docs.some(d=>d.type==='contract'))missing.push(tx.contractMissing);
+  if(!hasConfiguredPay(emp))missing.push(tx.payMissing);
+  if(!hasBaseSchedule(emp))missing.push(tx.scheduleMissing);
+  if(!emp.email&&!emp.phone)missing.push(tx.contactMissing);
+  if(!emp.startDate)missing.push(tx.startMissing);
+  docs.forEach(d=>{
+    const left=daysUntil(d.expiresAt);
+    if(left===null)return;
+    if(left<0)expired.push(d);
+    else if(left<=30)expiring.push(d);
+  });
+  const level=expired.length||missing.some(m=>m===tx.contractMissing||m===tx.payMissing)?'critical':(missing.length||expiring.length?'review':'complete');
+  return {docs,missing,expired,expiring,level};
+}
+function employeeFileSummaryHTML(emp){
+  const tx=docTx(),st=employeeFileStatus(emp),color=st.level==='complete'?'var(--green)':st.level==='critical'?'var(--red)':'var(--orange)';
+  const title=st.level==='complete'?tx.complete:st.level==='critical'?tx.critical:tx.review;
+  const issues=[...st.missing.map(x=>({label:x,type:tx.missing,color:'var(--orange)'})),...st.expired.map(d=>({label:`${docTypeLabel(d.type)} · ${fmtDate(d.expiresAt)}`,type:tx.expired,color:'var(--red)'})),...st.expiring.map(d=>({label:`${docTypeLabel(d.type)} · ${fmtDate(d.expiresAt)}`,type:tx.expiring,color:'var(--orange)'}))];
+  return `<div style="border:1px solid ${color};background:${st.level==='complete'?'rgba(16,185,129,.08)':st.level==='critical'?'rgba(239,68,68,.08)':'rgba(245,158,11,.08)'};border-radius:var(--r2);padding:12px;margin-bottom:10px">
+    <div class="flex-b" style="align-items:flex-start;gap:10px">
+      <div><div class="fw8" style="color:${color}">${esc(title)}</div><div class="fs11 muted mt4">${esc(tx.required)}</div></div>
+      <span class="chip ${st.level==='complete'?'chip-green':st.level==='critical'?'chip-red':'chip-orange'}">${st.docs.length} docs</span>
+    </div>
+    ${issues.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${issues.slice(0,6).map(i=>`<span class="chip" style="border-color:${i.color};color:${i.color};background:transparent">${esc(i.type)}: ${esc(i.label)}</span>`).join('')}</div>`:`<div class="fs11 mt10" style="color:var(--green)">${esc(tx.ok)}</div>`}
+  </div>`;
+}
 function employeeDocsHTML(emp){
+  const tx=docTx();
+  if(!can('view_documents'))return restrictedHTML();
   const docs=employeeDocs(emp.id);
-  const typeOpts=Object.entries(DOC_TYPES).map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join('');
+  const types=DOC_TYPES[lang]||DOC_TYPES.fr;
+  const typeOpts=Object.entries(types).map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join('');
   return `<div class="card" style="margin-bottom:10px">
-    <div class="card-header" style="justify-content:space-between"><span>Expediente</span><span class="chip chip-blue">${docs.length}</span></div>
+    <div class="card-header" style="justify-content:space-between"><span>${esc(tx.file)}</span><span class="chip chip-blue">${docs.length}</span></div>
+    ${employeeFileSummaryHTML(emp)}
     <div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:11px;margin-bottom:10px">
-      <div class="fg"><label>Tipo de documento</label><select id="doc-type">${typeOpts}</select></div>
-      <div class="fg"><label>Vencimiento opcional</label><input id="doc-exp" type="date"></div>
-      <div class="fg"><label>Nota</label><input id="doc-notes" placeholder="Ej: Contrato firmado, permiso B, anexo salario"></div>
+      <div class="fg"><label>${esc(tx.uploadType)}</label><select id="doc-type">${typeOpts}</select></div>
+      <div class="fg"><label>${esc(tx.expiry)}</label><input id="doc-exp" type="date"></div>
+      <div class="fg"><label>${esc(tx.note)}</label><input id="doc-notes" placeholder="${esc(tx.notePh)}"></div>
       <input id="doc-file-${emp.id}" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx" style="display:none" onchange="handleEmployeeDocUpload(event,'${emp.id}')">
-      <button class="btn btn-primary" onclick="document.getElementById('doc-file-${emp.id}').click()">Subir documento</button>
-      <div class="fs11 muted mt8">Por ahora guarda el archivo en el expediente del empleado. La lectura automática del contrato será la siguiente fase.</div>
+      <button class="btn btn-primary" onclick="document.getElementById('doc-file-${emp.id}').click()">${esc(tx.upload)}</button>
+      <div class="fs11 muted mt8">${esc(tx.helper)}</div>
     </div>
     ${docs.length?docs.map(d=>`<div class="rrow" style="align-items:flex-start;gap:10px">
       <div style="flex:1;min-width:0">
         <div class="fw8">${esc(d.name||d.fileName||'Documento')}</div>
         <div class="fs11 muted">${esc(docTypeLabel(d.type))} · ${esc(d.fileName||'archivo')} · ${fmtBytes(d.size)}</div>
-        ${d.expiresAt?`<div class="fs11" style="color:var(--orange)">Vence: ${fmtDate(d.expiresAt)}</div>`:''}
+        ${d.expiresAt?`<div class="fs11" style="color:${(daysUntil(d.expiresAt)<0)?'var(--red)':'var(--orange)'}">${esc(tx.expires)}: ${fmtDate(d.expiresAt)}</div>`:''}
         ${d.notes?`<div class="fs11 muted">${esc(d.notes)}</div>`:''}
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
-        ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc('${d.id}')">Abrir</button>`:''}
-        <button class="btn btn-sm btn-ghost" style="color:var(--red)" onclick="deleteEmployeeDoc('${d.id}','${emp.id}')">Eliminar</button>
+        ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc('${d.id}')">${esc(tx.open)}</button>`:''}
+        <button class="btn btn-sm btn-ghost" style="color:var(--red)" onclick="deleteEmployeeDoc('${d.id}','${emp.id}')">${esc(tx.delete)}</button>
       </div>
-    </div>`).join(''):`<div class="empty-state" style="padding:16px"><h3>Sin documentos</h3><p>Sube contrato, permiso o certificados para tener el expediente completo.</p></div>`}
+    </div>`).join(''):`<div class="empty-state" style="padding:16px"><h3>${esc(tx.emptyTitle)}</h3><p>${esc(tx.emptyText)}</p></div>`}
   </div>`;
 }
 function handleEmployeeDocUpload(ev,empId){
+  if(!requirePerm('view_documents')){ev.target.value='';return;}
   const file=ev.target.files?.[0];if(!file)return;
   if(file.size>3*1024*1024){toast('Documento muy grande. Máximo 3 MB por ahora.','#ef4444');ev.target.value='';return;}
   const reader=new FileReader();
   reader.onload=()=>{
     const type=document.getElementById('doc-type')?.value||'other';
     const doc={id:uid(),empId,type,name:docTypeLabel(type),fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data:reader.result,notes:clean(document.getElementById('doc-notes')?.value||''),expiresAt:document.getElementById('doc-exp')?.value||'',createdAt:new Date().toISOString()};
-    DB.documents=[doc,...(DB.documents||[])];saveLocal();openDetail(empId);toast('✅ Documento guardado');
+    DB.documents=[doc,...(DB.documents||[])];auditAction('document',`Documento agregado: ${file.name}`,{empId,type});saveLocal();openDetail(empId);toast('✅ Documento guardado');
     sbSaveDoc(doc).catch(console.error);
   };
   reader.readAsDataURL(file);
 }
 function openEmployeeDoc(id){
+  if(!requirePerm('view_documents'))return;
   const doc=(DB.documents||[]).find(d=>d.id===id);if(!doc?.data){toast('Archivo no disponible','#ef4444');return;}
   const a=document.createElement('a');a.href=doc.data;a.target='_blank';a.rel='noopener';a.download=doc.fileName||'documento';a.click();
 }
 function deleteEmployeeDoc(id,empId){
+  if(!requirePerm('view_documents'))return;
   if(!confirm('¿Eliminar este documento del expediente?'))return;
-  DB.documents=(DB.documents||[]).filter(d=>d.id!==id);saveLocal();openDetail(empId);toast('Documento eliminado');sbDelDoc(id).catch(console.error);
+  DB.documents=(DB.documents||[]).filter(d=>d.id!==id);auditAction('document','Documento eliminado',{empId,docId:id});saveLocal();openDetail(empId);toast('Documento eliminado');sbDelDoc(id).catch(console.error);
 }
 
 function openAlertReview(key,empId,type,msg){
@@ -4072,14 +4388,17 @@ function openDetail(empId,opts={}){
   const sc=last?(last.type==='in'?'#10b981':'#ef4444'):'#5a5e78';
   const c=empColor(emp);
   const docCount=employeeDocs(empId).length;
+  const canEditEmployee=can('employee_write'),canSensitive=can('view_payroll'),canDocs=can('view_documents');
   const schedHTML=L().daysFull.map((d,i)=>{const sch=empDaySchedule(emp,new Date(2026,0,4+i));return`<div class="rrow"><span class="muted">${esc(d)}</span><span style="font-weight:700;text-align:right;color:${sch?.enabled&&sch.blocks.length?'var(--text)':'var(--text3)'}">${sch?.enabled&&sch.blocks.length?fmtBlocks(sch.blocks,'<br>'):'Libre'}</span></div>`;}).join('');
   const al=opts.alert,dx=DX();
+  const manualAlertTypes=['late','missing-in','out-no-break','out-open-break'];
+  const alertNeedsManual=al&&manualAlertTypes.includes(al.type);
   const alertHTML=al?`<div class="card" style="border-color:${al.type==='late'||al.type==='out-no-break'?'rgba(239,68,68,.35)':'rgba(245,158,11,.35)'};background:${al.type==='late'||al.type==='out-no-break'?'rgba(239,68,68,.08)':'rgba(245,158,11,.1)'}">
     <div class="card-header" style="color:${al.type==='late'||al.type==='out-no-break'?'var(--red)':'var(--orange)'}">⚠ ${esc(dx.problem)}</div>
     <div style="font-size:14px;font-weight:800;margin-bottom:6px">${esc(al.msg)}</div>
     <div class="fs12 muted mb12">${safeEmpName(emp)} · ${new Date().toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'})}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <button class="btn btn-primary" onclick="closeModal('detail-modal');openManualModal('${empId}')">${esc(dx.openFix)}</button>
+      <button class="btn btn-primary" onclick="closeModal('detail-modal');${alertNeedsManual?`openManualModal('${empId}')`:`openEmpModal('${empId}')`}">${esc(alertNeedsManual?dx.openFix:T().emp.edit)}</button>
       <button class="btn btn-ghost" onclick="resolveAlert(${jsArg(al.key)})">${esc(dx.markReviewed)}</button>
     </div>
   </div>`:'';
@@ -4093,7 +4412,7 @@ function openDetail(empId,opts={}){
       <div style="font-size:21px;font-weight:800">${safeEmpName(emp)}</div>
       <div style="font-size:13px;color:var(--text2);margin-top:4px">${esc(emp.position)} · ${esc(emp.dept)}</div>
       ${emp.num?`<span class="chip chip-blue" style="margin-top:8px">#${emp.num}</span>`:''}
-      ${emp.pin?`<button class="chip chip-gray" style="margin-top:8px;margin-left:4px;border:none;cursor:pointer" onclick="copyText('${esc(emp.pin)}','PIN copié')">PIN: ${emp.pin}</button>`:''}
+      ${emp.pin&&canEditEmployee?`<button class="chip chip-gray" style="margin-top:8px;margin-left:4px;border:none;cursor:pointer" onclick="copyText('${esc(emp.pin)}','PIN copié')">PIN: ${emp.pin}</button>`:''}
     </div>
     ${alertHTML}
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
@@ -4102,7 +4421,7 @@ function openDetail(empId,opts={}){
     <div class="tabs" id="dtabs">
       <button class="tab active" onclick="dtab('dt-pt',this)">⏱ Pointer</button>
       <button class="tab" onclick="dtab('dt-badge',this)">🪪 Badge QR</button>
-      <button class="tab" onclick="dtab('dt-docs',this)">📁 Expediente${docCount?` (${docCount})`:''}</button>
+      ${canDocs?`<button class="tab" onclick="dtab('dt-docs',this)">📁 Expediente${docCount?` (${docCount})`:''}</button>`:''}
       <button class="tab" onclick="dtab('dt-info',this)">ℹ️ Info</button>
     </div>
     <div id="dt-pt">
@@ -4141,40 +4460,41 @@ function openDetail(empId,opts={}){
       <button class="btn btn-primary mt12" onclick="downloadBadgePDF(DB.employees.find(e=>e.id==='${empId}'))">⬇️ Télécharger PDF</button>
       <button class="btn btn-ghost mt12" onclick="downloadBadge(DB.employees.find(e=>e.id==='${empId}'))">⬇️ Télécharger carnet</button>
     </div>
-    <div id="dt-docs" style="display:none">${employeeDocsHTML(emp)}</div>
+    ${canDocs?`<div id="dt-docs" style="display:none">${employeeDocsHTML(emp)}</div>`:''}
     <div id="dt-info" style="display:none">
       <div class="card">
-        ${[['Téléphone',emp.phone],['Email',emp.email],['Contrat',emp.contract],['Salaire',`${emp.payType==='hourly'?'Horaire':'Mensuel'} · CHF ${emp.payType==='hourly'?emp.rate+'/h':emp.salary+'/mois'}`],['Vacances',`${emp.vacWeeks} sem. · ${vacLeft}j restants`],['Urgence',emp.emergency],['AVS',emp.avs]].filter(r=>r[1]).map(([l,v])=>`<div class="rrow"><span class="muted">${esc(l)}</span><span style="font-weight:500;text-align:right;max-width:55%">${esc(v)}</span></div>`).join('')}
-        <div class="rrow"><span class="muted">PIN</span><span style="font-weight:800">${esc(emp.pin||'0000')}</span></div>
+        ${[['Téléphone',emp.phone],['Email',emp.email],['Contrat',emp.contract],...(canSensitive?[['Salaire',`${emp.payType==='hourly'?'Horaire':'Mensuel'} · CHF ${emp.payType==='hourly'?emp.rate+'/h':emp.salary+'/mois'}`]]:[]),['Vacances',`${emp.vacWeeks} sem. · ${vacLeft}j restants`],['Urgence',emp.emergency],...(canSensitive?[['AVS',emp.avs]]:[])].filter(r=>r[1]).map(([l,v])=>`<div class="rrow"><span class="muted">${esc(l)}</span><span style="font-weight:500;text-align:right;max-width:55%">${esc(v)}</span></div>`).join('')}
+        ${canEditEmployee?`<div class="rrow"><span class="muted">PIN</span><span style="font-weight:800">${esc(emp.pin||'0000')}</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
           <button class="btn btn-ghost" onclick="copyText('${esc(emp.pin||'0000')}','PIN copié')">Copier PIN</button>
           <button class="btn btn-primary" onclick="resetEmpPin('${empId}')">Restablecer PIN</button>
-        </div>
+        </div>`:''}
         ${emp.notes?`<div style="background:var(--s3);border-radius:var(--r3);padding:10px;margin-top:8px;font-size:12px;color:var(--text2)">${esc(emp.notes)}</div>`:''}
       </div>
       <div class="card">
         <div class="card-header">Horario semanal base</div>
         ${schedHTML}
-        <button class="btn btn-primary mt12" onclick="closeModal('detail-modal');openEmpModal('${empId}')">Editar horario permanente</button>
+        ${canEditEmployee?`<button class="btn btn-primary mt12" onclick="closeModal('detail-modal');openEmpModal('${empId}')">Editar horario permanente</button>`:''}
       </div>
-      <div style="display:flex;gap:8px;margin-top:10px">
+      ${canEditEmployee?`<div style="display:flex;gap:8px;margin-top:10px">
         <button class="btn btn-ghost" onclick="closeModal('detail-modal');openEmpModal('${empId}')">✏️ Modifier</button>
         <button class="btn btn-ghost" style="color:var(--red)" onclick="deleteEmp('${empId}')">🗑 Supprimer</button>
-      </div>
+      </div>`:''}
     </div>
     <button class="btn btn-ghost mt12" onclick="closeModal('detail-modal')">Fermer</button>`;
   renderQRCodes(document.getElementById('detail-content'));
   openModal('detail-modal');
 }
 function resetEmpPin(empId){
+  if(!requirePerm('employee_write'))return;
   const emp=DB.employees.find(e=>e.id===empId);if(!emp)return;
   const pin=newPin();
-  emp.pin=pin;saveLocal();sbSaveEmp(emp).catch(console.error);
+  emp.pin=pin;auditAction('security',`PIN regenerado: ${fullName(emp)}`,{empId});saveLocal();sbSaveEmp(emp).catch(console.error);
   openDetail(empId);
   copyText(pin,`Nouveau PIN: ${pin}`);
 }
 function dtab(id,btn){['dt-pt','dt-badge','dt-docs','dt-info'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});document.getElementById('dtabs')?.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const el=document.getElementById(id);if(el)el.style.display='block';}
-function deleteEmp(id){if(!confirm('Supprimer cet employé?'))return;DB.employees=DB.employees.filter(e=>e.id!==id);DB.history=DB.history.filter(h=>h.empId!==id);DB.absences=DB.absences.filter(a=>a.empId!==id);DB.documents=(DB.documents||[]).filter(d=>d.empId!==id);saveLocal();closeModal('detail-modal');renderPage(currentPage);toast('Employé supprimé');sbDelEmp(id).catch(console.error);}
+function deleteEmp(id){if(!requirePerm('delete_employee'))return;if(!confirm('Supprimer cet employé?'))return;const emp=DB.employees.find(e=>e.id===id);DB.employees=DB.employees.filter(e=>e.id!==id);DB.history=DB.history.filter(h=>h.empId!==id);DB.absences=DB.absences.filter(a=>a.empId!==id);DB.documents=(DB.documents||[]).filter(d=>d.empId!==id);auditAction('employee',`Empleado eliminado: ${emp?fullName(emp):id}`,{empId:id});saveLocal();closeModal('detail-modal');renderPage(currentPage);toast('Employé supprimé');sbDelEmp(id).catch(console.error);}
 
 // ═══════ SHIFTS ═══════
 let shiftWS=getMonday(new Date()),shiftKey=null,shiftType='morning';
@@ -4245,6 +4565,7 @@ function saveShift(){
   if(!shiftKey)return;
   const blocks=getShiftBlocks(),first=blocks[0]||{};
   DB.shifts[shiftKey]={type:shiftType,in:first.start||null,out:first.end||null,blocks,notes:document.getElementById('sh-notes').value};
+  auditAction('shift',`Turno modificado: ${shiftKey}`,{shiftKey,shiftType,blocks});
   saveLocal();closeModal('shift-modal');renderShifts();toast('✅ '+TL('shift').scheduleSaved);sbSaveShift(shiftKey,DB.shifts[shiftKey]).catch(console.error);
 }
 
@@ -4262,6 +4583,12 @@ function openPendingRequestReview(id){
     if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.style.boxShadow='0 0 0 2px var(--orange)';setTimeout(()=>row.style.boxShadow='',1800);}
   },80);
 }
+function openCorrectionManual(id){
+  if(!requirePerm('approve_requests'))return;
+  const req=DB.absences.find(a=>a.id===id),emp=req?DB.employees.find(e=>e.id===req.empId):null;
+  if(!req||!emp){toast('Solicitud no encontrada','#ef4444');return;}
+  openManualModal(emp.id,{date:req.start,note:req.notes||'Correction employee',correctionId:id});
+}
 function renderVacs(){
   const tx=TL('vac');
   const c=document.getElementById('vac-content');
@@ -4275,20 +4602,24 @@ function renderVacs(){
   const icons={vacation:'🌴',medical:'🏥',personal:'👤',dayOff:'💤',training:'📚',maternity:'🤱',holiday:'⭐'};
   c.innerHTML=filtered.map(a=>{const emp=DB.employees.find(e=>e.id===a.empId),days=Math.round((new Date(a.end)-new Date(a.start))/86400000)+1;
     const conflicts=a.type==='vacation'?vacationConflicts(a.empId,a.start,a.end,a.id):[];
-    return`<div class="card" data-absence-id="${esc(a.id)}"><div style="display:flex;align-items:center;gap:10px">${emp?mkAv(emp,'av-36'):''}<div style="flex:1"><div style="font-weight:700;font-size:13px">${emp?safeEmpName(emp):'?'}</div><div style="font-size:11px;color:var(--text2)">${icons[a.type]||'📋'} ${esc(a.type)} · ${days}j</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${fmtDate(a.start)} — ${fmtDate(a.end)}</div></div><div style="display:flex;flex-direction:column;gap:6px">${!isAppr?`<button class="btn btn-success btn-sm" style="width:34px;height:32px;padding:0" onclick="apprAbs('${esc(a.id)}')">✓</button>`:''}<button class="btn btn-ghost btn-sm" style="width:34px;height:32px;padding:0;color:var(--red)" onclick="delAbs('${esc(a.id)}')">🗑</button></div></div>${conflicts.length?conflictNoticeHTML(conflicts,'manager'):''}${a.notes?`<div style="font-size:11px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${esc(a.notes)}</div>`:''}</div>`;}).join('');
+    return`<div class="card" data-absence-id="${esc(a.id)}"><div style="display:flex;align-items:center;gap:10px">${emp?mkAv(emp,'av-36'):''}<div style="flex:1"><div style="font-weight:700;font-size:13px">${emp?safeEmpName(emp):'?'}</div><div style="font-size:11px;color:var(--text2)">${icons[a.type]||'📋'} ${esc(a.type)} · ${days}j</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${fmtDate(a.start)} — ${fmtDate(a.end)}</div></div><div style="display:flex;flex-direction:column;gap:6px">${!isAppr?`<button class="btn btn-success btn-sm" style="width:34px;height:32px;padding:0" onclick="apprAbs('${esc(a.id)}')">✓</button>`:''}<button class="btn btn-ghost btn-sm" style="width:34px;height:32px;padding:0;color:var(--red)" onclick="delAbs('${esc(a.id)}')">🗑</button></div></div>${!isAppr&&a.type==='correction'?`<button class="btn btn-primary btn-sm mt8" onclick="openCorrectionManual('${esc(a.id)}')">${esc(correctionTx().apply)}</button>`:''}${conflicts.length?conflictNoticeHTML(conflicts,'manager'):''}${a.notes?`<div style="font-size:11px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">${esc(a.notes)}</div>`:''}</div>`;}).join('');
 }
 async function apprAbs(id){
+  if(!requirePerm('approve_requests'))return;
   const abs=DB.absences.find(a=>a.id===id);
   const conflicts=abs?.type==='vacation'?vacationConflicts(abs.empId,abs.start,abs.end,abs.id):[];
   if(conflicts.length&&!confirm('Hay vacaciones cruzadas con otro empleado. ¿Aprobar de todas formas?'))return;
-  DB.absences=DB.absences.map(a=>a.id===id?{...a,approved:true}:a);saveLocal();renderVacs();toast('✅ Approuvé');
+  DB.absences=DB.absences.map(a=>a.id===id?{...a,approved:true}:a);auditAction('absence',`Solicitud aprobada: ${abs?.type||'ausencia'} ${abs?.start||''}`,{absenceId:id,empId:abs?.empId});saveLocal();renderVacs();toast('✅ Approuvé');
   sbUpdateAbsApproved(id,true).catch(console.error);
 }
 async function delAbs(id){
-  DB.absences=DB.absences.filter(a=>a.id!==id);saveLocal();renderVacs();toast('🗑 Supprimé');
+  if(!requirePerm('approve_requests'))return;
+  const abs=DB.absences.find(a=>a.id===id);
+  DB.absences=DB.absences.filter(a=>a.id!==id);auditAction('absence',`Solicitud eliminada: ${abs?.type||'ausencia'} ${abs?.start||''}`,{absenceId:id,empId:abs?.empId});saveLocal();renderVacs();toast('🗑 Supprimé');
   sbDelAbs(id).catch(console.error);
 }
 function openAbsModal(empId){
+  if(!requirePerm('approve_requests'))return;
   document.getElementById('abs-emp').innerHTML=DB.employees.map(e=>`<option value="${e.id}" ${e.id===empId?'selected':''}>${fullName(e)}</option>`).join('');
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('abs-start').value=today;document.getElementById('abs-end').value=today;
@@ -4306,12 +4637,13 @@ function updateAbsConflictWarning(){
   box.style.display=conflicts.length?'block':'none';
 }
 function saveAbs(){
+  if(!requirePerm('approve_requests'))return;
   const empId=document.getElementById('abs-emp').value,start=document.getElementById('abs-start').value,end=document.getElementById('abs-end').value;
   if(!start||!end){toast('Sélectionnez les dates','#ef4444');return;}
   const newAbs={id:uid(),empId,type:document.getElementById('abs-type').value,start,end,approved:document.getElementById('abs-appr').classList.contains('on'),notes:document.getElementById('abs-notes').value.trim()};
   const conflicts=vacationConflicts(empId,start,end);
   if(newAbs.type==='vacation'&&newAbs.approved&&conflicts.length&&!confirm('Hay vacaciones cruzadas con otro empleado. ¿Guardar aprobada de todas formas?'))return;
-  DB.absences.unshift(newAbs);saveLocal();closeModal('abs-modal');renderPage(currentPage);toast('✅ Absence enregistrée');
+  DB.absences.unshift(newAbs);auditAction('absence',`Solicitud creada: ${newAbs.type} ${start}`,{absenceId:newAbs.id,empId,approved:newAbs.approved});saveLocal();closeModal('abs-modal');renderPage(currentPage);toast('✅ Absence enregistrée');
   sbSaveAbs(newAbs).catch(console.error);
 }
 
@@ -4337,6 +4669,7 @@ function calcPay(emp,y,m){
 }
 function payModeLabel(emp){return emp.payType==='monthly'?'Mensuel fixe':'Horaire';}
 function payBaseLabel(emp){return emp.payType==='monthly'?`CHF ${(emp.salary||0).toFixed(2)}/mois`:`CHF ${(emp.rate||0).toFixed(2)}/h`;}
+const monthKey=(y,m)=>`${y}-${String(m+1).padStart(2,'0')}`;
 function scheduledHoursOn(emp,date){
   if(isBeforeEmployeeStart(emp,date))return 0;
   if(!isRestaurantOpen(date))return 0;
@@ -4351,6 +4684,7 @@ function annualExtraHours(emp,year=new Date().getFullYear()){
   return extra;
 }
 function renderPayroll(){
+  if(!can('view_payroll')){document.getElementById('pay-list').innerHTML='';return;}
   const tx=TL('pay');
   const y=payMD.getFullYear(),m=payMD.getMonth();
   document.getElementById('pay-mlbl').textContent=fmtMonth(payMD);
@@ -4364,6 +4698,48 @@ function renderPayroll(){
 // ═══════ REPORTS ═══════
 let repMD=new Date();
 function repMN(dir){repMD=new Date(repMD.getFullYear(),repMD.getMonth()+dir,1);renderReports();}
+function monthOpenBreaks(y,m){
+  const starts=DB.history.filter(h=>h.type==='break_start'&&new Date(h.ts).getFullYear()===y&&new Date(h.ts).getMonth()===m);
+  return starts.filter(s=>!DB.history.some(h=>h.empId===s.empId&&h.type==='break_end'&&sameDay(h.ts,s.ts)&&new Date(h.ts)>new Date(s.ts)));
+}
+function monthCloseChecklist(rows,y,m){
+  const tx=closeTx();
+  const pending=DB.absences.filter(a=>!a.approved&&new Date(a.start).getFullYear()===y&&new Date(a.start).getMonth()===m);
+  const missingSalary=DB.employees.filter(e=>e.status==='active'&&((e.payType==='hourly'&&!(e.rate>0))||(e.payType==='monthly'&&!(e.salary>0))));
+  const totalAbs=rows.reduce((s,r)=>s+r.abs,0),totalLate=rows.reduce((s,r)=>s+r.late,0),openBreaks=monthOpenBreaks(y,m);
+  const items=[
+    {key:'pending',label:tx.pending,count:pending.length,bad:pending.length>0,action:tx.goRequests,go:()=>goPage('vacations')},
+    {key:'salary',label:tx.salary,count:missingSalary.length,bad:missingSalary.length>0,action:tx.goEmployees,go:()=>goPage('employees')},
+    {key:'missing',label:tx.missing,count:totalAbs,bad:totalAbs>0,action:tx.goAttendance,go:()=>goPage('attendance')},
+    {key:'late',label:tx.late,count:totalLate,bad:false},
+    {key:'breaks',label:tx.breaks,count:openBreaks.length,bad:openBreaks.length>0,action:tx.goAttendance,go:()=>goPage('attendance')}
+  ];
+  return {items,hasBlocking:items.some(i=>i.bad)};
+}
+function closeMonthAction(key){
+  const [kind]=key.split(':');
+  if(kind==='pending')goPage('vacations');
+  else if(kind==='salary')goPage('employees');
+  else if(kind==='missing'||kind==='breaks')goPage('attendance');
+}
+function toggleMonthClosed(){
+  const y=repMD.getFullYear(),m=repMD.getMonth(),key=monthKey(y,m);
+  DB.monthClosures=DB.monthClosures||{};
+  if(DB.monthClosures[key])delete DB.monthClosures[key];
+  else DB.monthClosures[key]={closedAt:new Date().toISOString(),user:currentUser?.email||currentUser?.name||'manager'};
+  auditAction('report',`${DB.monthClosures[key]?'Mes revisado':'Mes reabierto'}: ${key}`,{month:key});
+  saveLocal();renderReports();
+}
+function closeMonthHTML(rows,y,m){
+  const tx=closeTx(),key=monthKey(y,m),closed=!!DB.monthClosures?.[key],check=monthCloseChecklist(rows,y,m);
+  const status=closed?tx.closed:(check.hasBlocking?tx.review:tx.ready);
+  return `<div class="card" style="border-color:${check.hasBlocking?'rgba(245,158,11,.35)':'rgba(16,185,129,.35)'};margin-bottom:14px">
+    <div class="card-header" style="justify-content:space-between"><span>${tx.title} · ${fmtMonth(repMD)}</span><span class="chip ${closed?'chip-green':check.hasBlocking?'chip-orange':'chip-green'}">${esc(status)}</span></div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">${check.items.map(i=>`<div style="background:var(--s3);border:1px solid ${i.bad?'rgba(245,158,11,.35)':'var(--border)'};border-radius:var(--r3);padding:10px"><div style="font-size:18px;font-weight:900;color:${i.bad?'var(--orange)':'var(--green)'}">${i.count}</div><div class="fs10 muted">${esc(i.label)}</div>${i.bad&&i.action?`<button class="btn btn-ghost btn-sm mt8" onclick="closeMonthAction('${i.key}:${key}')">${esc(i.action)}</button>`:''}</div>`).join('')}</div>
+    <div class="fs11 muted mb12">${check.hasBlocking?tx.review:tx.ok}</div>
+    <button class="btn ${closed?'btn-ghost':'btn-primary'}" onclick="toggleMonthClosed()">${closed?tx.reopen:tx.mark}</button>
+  </div>`;
+}
 function monthlyEmployeeReport(emp,y,m){
   const tol=DB.settings?.lateTol||10;
   const recs=DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===y&&d.getMonth()===m&&!isBeforeEmployeeStart(emp,d);});
@@ -4397,6 +4773,7 @@ function monthlyEmployeeReport(emp,y,m){
   return{emp,recs,days:days.size,hrs,breaks,late,abs,absentDates,lateNotes,att,vacLeft,annual,...payInfo};
 }
 function renderReports(){
+  if(!can('view_reports'))return;
   const tx=TL('rep');
   const y=repMD.getFullYear(),m=repMD.getMonth();
   document.getElementById('rep-mlbl').textContent=fmtMonth(repMD);
@@ -4405,9 +4782,10 @@ function renderReports(){
   const totalPay=rows.reduce((s,r)=>s+r.pay,0),totalHrs=rows.reduce((s,r)=>s+r.hrs,0),totalBreaks=rows.reduce((s,r)=>s+r.breaks,0);
   const totalLate=rows.reduce((s,r)=>s+r.late,0),totalAbs=rows.reduce((s,r)=>s+r.abs,0),totalOt=rows.reduce((s,r)=>s+r.ot,0);
   const avgAtt=rows.length?rows.reduce((s,r)=>s+r.att,0)/rows.length:0;
+  const closeHTML=closeMonthHTML(rows,y,m);
   const summaryHTML=`<div class="card" style="border-color:rgba(79,109,245,.35)"><div class="card-header">${tx.monthlyPackage} · ${fmtMonth(repMD)}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${[[tx.payroll,'CHF '+totalPay.toFixed(2),'var(--green)'],[tx.netHours,totalHrs.toFixed(1)+'h','var(--brand)'],[tx.breaksDiscounted,totalBreaks.toFixed(1)+'h','var(--orange)'],[tx.monthOvertime,totalOt.toFixed(1)+'h',totalOt>0?'var(--red)':'var(--text3)'],[tx.late,totalLate,'var(--orange)'],[tx.absences,totalAbs,'var(--red)'],[tx.avgPresence,avgAtt.toFixed(0)+'%',avgAtt>=80?'var(--green)':avgAtt>=60?'var(--orange)':'var(--red)'],[tx.employees,rows.length,'var(--cyan)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div></div>`).join('')}</div><div class="fs11 muted mt12">${tx.summaryNote}</div></div>`;
   const annualHTML=`<div class="card" style="border-color:rgba(245,158,11,.35)"><div class="card-header">${tx.annualBank} ${y}</div>${rows.map(({emp,annual})=>`<div class="rrow"><span>${safeEmpName(emp)}</span><span class="fw8" style="color:${annual>0?'var(--orange)':'var(--text3)'}">${annual.toFixed(1)}h · ${(annual/8.4).toFixed(1)}${tx.daySuffix}</span></div>`).join('')}<div class="fs11 muted mt12">${tx.reference}</div></div>`;
-  document.getElementById('rep-content').innerHTML=summaryHTML+annualHTML+rows.map(r=>{
+  document.getElementById('rep-content').innerHTML=closeHTML+summaryHTML+annualHTML+rows.map(r=>{
     const {emp,days,hrs,breaks,late,abs,absentDates,lateNotes,att,vacLeft,annual,ot,pay}=r;
     const ac=att>=80?'var(--green)':att>=60?'var(--orange)':'var(--red)';
     return`<div class="card mb8"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">${mkAv(emp,'av-36')}<div><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">${[[tx.workedDays,days,'var(--green)'],[tx.hours,hrs.toFixed(1)+'h','var(--brand)'],[tx.breaks,breaks.toFixed(1)+'h','var(--orange)'],[tx.late,late,'var(--orange)'],[tx.absences,abs,'var(--red)'],[tx.overtime,ot>0?'+'+ot.toFixed(1)+'h':'0h',ot>0?'var(--red)':'var(--text3)'],[tx.vacLeft,vacLeft+tx.daySuffix,'var(--orange)'],[tx.annualExtra,annual.toFixed(1)+'h','var(--cyan)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div></div>`).join('')}</div>${absentDates.length?`<details style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:9px 10px;margin-bottom:10px"><summary class="fs11" style="cursor:pointer;color:var(--red);font-weight:800">${tx.viewAbsenceDays}</summary><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${absentDates.map(d=>`<span class="chip chip-red">${esc(d)}</span>`).join('')}</div></details>`:''}${lateNotes.length?`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:9px 10px;margin-bottom:10px">${lateNotes.map(n=>`<div class="fs11" style="color:var(--orange)">${esc(n)}</div>`).join('')}</div>`:''}<div class="flex-b fs12 mb8"><span class="muted">${payModeLabel(emp)} · ${payBaseLabel(emp)}</span><span style="font-weight:800;color:var(--green)">CHF ${pay.toFixed(2)}</span></div><div class="flex-b fs11 mb4"><span class="muted">${tx.attendance}</span><span style="font-weight:700;color:${ac}">${att.toFixed(0)}%</span></div><div class="prog"><div class="prog-fill" style="width:${att.toFixed(0)}%;background:${ac}"></div></div></div>`;
@@ -4415,13 +4793,56 @@ function renderReports(){
 }
 
 // ═══════ HISTORY ═══════
+let histMode='punches';
+let histMD=new Date(),histDay=localDateKey(new Date());
+function setHistMode(mode,btn){
+  histMode=mode;
+  btn?.closest('.tabs')?.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn?.classList.add('active');
+  renderHistory();
+}
+function histMN(dir){histMD=new Date(histMD.getFullYear(),histMD.getMonth()+dir,1);histDay='';renderHistory();}
+function setHistDay(key){histDay=key;renderHistory();}
+function renderHistoryCalendar(){
+  const el=document.getElementById('hist-calendar');if(!el)return;
+  el.style.display=histMode==='punches'?'block':'none';
+  if(histMode!=='punches'){el.innerHTML='';return;}
+  const y=histMD.getFullYear(),m=histMD.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),start=(first.getDay()+6)%7;
+  const counts={};(DB.history||[]).forEach(h=>{const d=new Date(h.ts);if(d.getFullYear()===y&&d.getMonth()===m){const k=localDateKey(d);counts[k]=(counts[k]||0)+1;}});
+  if(!histDay||!histDay.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)){
+    const keys=Object.keys(counts).sort();histDay=keys[0]||localDateKey(new Date(y,m,1));
+  }
+  const names=[...Array(7)].map((_,i)=>new Date(2026,0,5+i).toLocaleDateString(appLocale(),{weekday:'short'}).slice(0,3));
+  const cells=[];for(let i=0;i<start;i++)cells.push('<div></div>');
+  for(let d=1;d<=last.getDate();d++){
+    const date=new Date(y,m,d),key=localDateKey(date),cnt=counts[key]||0,sel=key===histDay,today=sameDay(date,new Date());
+    cells.push(`<button class="hist-day ${sel?'active':''}" onclick="setHistDay('${key}')" style="border:1px solid ${sel?'var(--brand)':'var(--border)'};background:${sel?'var(--brand-light)':'var(--s2)'};color:${sel?'var(--brand)':'var(--text)'};border-radius:10px;min-height:50px;padding:7px 5px;font:inherit;text-align:left;cursor:pointer"><div style="display:flex;justify-content:space-between;align-items:center"><span class="fw8 fs12">${d}</span>${today?'<span style="width:6px;height:6px;border-radius:99px;background:var(--orange)"></span>':''}</div>${cnt?`<div class="fs10 mt4" style="color:var(--text2)">${cnt} fich.</div>`:`<div class="fs10 mt4 muted">-</div>`}</button>`);
+  }
+  el.innerHTML=`<div class="card" style="margin-bottom:12px"><div class="flex-b mb12"><button class="btn btn-ghost btn-sm" onclick="histMN(-1)">‹</button><div class="fw8" style="text-transform:capitalize">${fmtMonth(histMD)}</div><button class="btn btn-ghost btn-sm" onclick="histMN(1)">›</button></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px">${names.map(n=>`<div class="fs10 muted fw8" style="text-align:center;text-transform:uppercase">${esc(n)}</div>`).join('')}</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">${cells.join('')}</div></div>`;
+}
 function renderHistory(){
   const tx=TL('hist'),et=TL('emp');
+  const at=auditTx();
+  const ptab=document.getElementById('hist-tab-punches'),atab=document.getElementById('hist-tab-audit');
+  if(ptab)ptab.textContent=at.punches;if(atab)atab.textContent=at.audit;
+  const audit=document.getElementById('audit-list'),list=document.getElementById('hist-list'),clear=document.querySelector('#pg-history .btn-ghost.mb12');
+  if(audit)audit.style.display=histMode==='audit'?'block':'none';
+  if(list)list.style.display=histMode==='punches'?'block':'none';
+  if(clear)clear.style.display=histMode==='punches'?'flex':'none';
+  renderHistoryCalendar();
+  if(histMode==='audit'){renderAuditTrail();return;}
   const search=(document.getElementById('hist-search')?.value||'').toLowerCase();
-  const src=search?DB.history.filter(h=>h.empName.toLowerCase().includes(search)):DB.history;
-  if(!src.length){document.getElementById('hist-list').innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><h3>${tx.empty}</h3></div>`;return;}
+  const src=(DB.history||[]).filter(h=>localDateKey(h.ts)===histDay&&(!search||h.empName.toLowerCase().includes(search)));
+  if(!src.length){document.getElementById('hist-list').innerHTML=`<div class="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><h3>${tx.empty}</h3><p>${fmtDate(new Date(histDay+'T12:00:00'))}</p></div>`;return;}
   const groups={};src.forEach(h=>{const k=new Date(h.ts).toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'});if(!groups[k])groups[k]=[];groups[k].push(h);});
   document.getElementById('hist-list').innerHTML=Object.entries(groups).map(([day,recs])=>`<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">${esc(day)}</div>${recs.map(r=>{const isBreak=r.type?.startsWith('break'),ico=r.type==='in'?'✅':r.type==='out'?'🔴':'☕',bg=r.type==='in'?'rgba(16,185,129,.15)':r.type==='out'?'rgba(239,68,68,.15)':'rgba(245,158,11,.15)';return`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);margin-bottom:5px"><div style="width:32px;height:32px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px">${ico}</div><div><div style="font-weight:700;font-size:13px">${isBreak?attLabel(r.type):(r.type==='in'?et.in:et.out)}</div><div style="font-size:11px;color:var(--text2)">${esc(r.empName)}</div></div><span style="margin-left:auto;color:var(--text2);font-size:12px;font-family:monospace;font-weight:600">${fmtTime(r.ts)}</span></div>`;}).join('')}</div>`).join('');
+}
+function renderAuditTrail(){
+  const el=document.getElementById('audit-list');if(!el)return;
+  const search=(document.getElementById('hist-search')?.value||'').toLowerCase();
+  const tx=auditTx(),items=(DB.audit||[]).filter(a=>!search||`${a.detail||''} ${a.actor||''} ${a.type||''}`.toLowerCase().includes(search)).slice(0,50);
+  const colors={employee:'var(--brand)',attendance:'var(--green)',absence:'var(--orange)',shift:'var(--cyan)',document:'var(--purple)',security:'var(--red)',report:'var(--cyan)'};
+  el.innerHTML=`<div class="card" style="border-style:dashed"><div class="card-header">${tx.title}</div>${items.length?items.map(a=>`<div class="rrow" style="align-items:flex-start;gap:10px"><div style="width:9px;height:9px;border-radius:99px;background:${colors[a.type]||'var(--text3)'};margin-top:6px;flex-shrink:0"></div><div style="flex:1;min-width:0"><div class="fw7 fs12">${esc(a.detail||a.type)}</div><div class="fs11 muted">${tx.actor}: ${esc(a.actor||'manager')} · ${fmtDate(a.ts)} ${fmtTime(a.ts)}</div></div></div>`).join(''):`<div class="empty-state" style="padding:16px"><h3>${tx.empty}</h3></div>`}</div>`;
 }
 function clearHist(){const tx=TL('hist');if(confirm(tx.confirmClear)){DB.history=[];saveLocal();renderHistory();toast('🗑 '+tx.cleared);}}
 
@@ -4432,8 +4853,118 @@ function renderSettings(){
   document.getElementById('cfg-maxh').value=DB.settings?.maxHours||45;
   DB.settings.openingHours=DB.settings.openingHours||defOpeningHours();
   renderOpeningHours();
+  renderRoleSettings();
   renderLangBar();
   applyUITexts();
+}
+function renderRoleSettings(){
+  const el=document.getElementById('role-access-card');if(!el)return;
+  const tx=roleTx(),itx=inviteTx(),role=roleLevel();
+  const rows=[
+    {label:tx.owner,text:tx.ownerDesc,color:'var(--brand)',active:role==='owner'},
+    {label:tx.manager,text:tx.managerDesc,color:'var(--green)',active:role==='manager'},
+    {label:tx.master,text:tx.masterDesc,color:'var(--orange)',active:role==='master'}
+  ];
+  el.innerHTML=`<div class="card-header">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    ${esc(tx.rolesTitle)}
+  </div>
+  <div class="fs12 muted mb12">${esc(tx.rolesIntro)}</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px">
+    ${rows.map(r=>`<div style="background:var(--s3);border:1px solid ${r.active?r.color:'var(--border)'};border-radius:var(--r2);padding:12px">
+      <div class="flex-b mb8"><span class="fw8" style="color:${r.color}">${esc(r.label)}</span>${r.active?`<span class="chip chip-green">${esc(tx.currentRole)}</span>`:''}</div>
+      <div class="fs11 muted" style="line-height:1.45">${esc(r.text)}</div>
+    </div>`).join('')}
+  </div>
+  ${can('edit_settings')?`<div style="background:var(--s3);border:1px solid var(--border);border-radius:var(--r2);padding:12px;margin-top:10px">
+    <div class="fw8 mb8">${esc(itx.create)}</div>
+    <div style="display:grid;grid-template-columns:minmax(180px,1fr) minmax(160px,.5fr) auto;gap:8px;align-items:end">
+      <div class="fg" style="margin:0"><label>${esc(itx.email)}</label><input id="invite-email" type="email" placeholder="manager@email.com"></div>
+      <div class="fg" style="margin:0"><label>${esc(itx.role)}</label><select id="invite-role"><option value="restaurant_manager">${esc(itx.manager)}</option><option value="restaurant_admin">${esc(itx.admin)}</option></select></div>
+      <button class="btn btn-primary" onclick="createManagerInvite()">${esc(itx.create)}</button>
+    </div>
+    <div class="fs11 muted mt8">${esc(itx.expires)}</div>
+    <div id="invite-result" style="display:none;margin-top:10px"></div>
+  </div>`:''}
+  <div id="role-users-list" style="margin-top:10px"></div>
+  <div style="background:rgba(79,109,247,.08);border:1px dashed rgba(79,109,247,.35);border-radius:var(--r2);padding:12px;margin-top:10px">
+    <div class="fw8 col-brand">${esc(tx.future)}</div>
+    <div class="fs11 muted mt4">${esc(tx.futureText)}</div>
+  </div>`;
+  renderRoleUsers();
+}
+async function renderRoleUsers(){
+  const el=document.getElementById('role-users-list');if(!el||!can('edit_settings'))return;
+  const itx=inviteTx(),tx=roleTx();
+  try{
+    const users=await sbListBusinessProfiles();
+    el.innerHTML=`<div class="card-header" style="margin-top:8px">${esc(itx.users)}</div>${users.length?users.map(u=>{
+      const email=u.email||u.name||'usuario',isSelf=(currentUser?.email||'').toLowerCase()===String(u.email||'').toLowerCase();
+      return `<div class="rrow" style="align-items:center;gap:10px">
+        <div style="flex:1;min-width:0"><div class="fw7 fs12">${esc(email)} ${isSelf?`<span class="chip chip-gray">${esc(itx.self)}</span>`:''}</div><div class="fs10 muted">${esc(u.name||'')}</div></div>
+        <select ${isSelf?'disabled':''} onchange="changeManagerAccess(${jsArg(email)},this.value)" style="max-width:180px">
+          <option value="restaurant_manager" ${u.role==='restaurant_manager'?'selected':''}>${esc(itx.manager)}</option>
+          <option value="restaurant_admin" ${u.role==='restaurant_admin'?'selected':''}>${esc(itx.admin)}</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" ${isSelf?'disabled':''} style="color:var(--red);opacity:${isSelf?0.6:1}" onclick="revokeManagerAccess(${jsArg(email)})">${esc(itx.revoke)}</button>
+      </div>`;
+    }).join(''):`<div class="fs11 muted">${esc(itx.noUsers)}</div>`}`;
+  }catch(e){
+    el.innerHTML=`<div class="fs11 muted">${esc(itx.noUsers)}</div>`;
+  }
+}
+async function changeManagerAccess(email,role){
+  if(!requirePerm('edit_settings'))return;
+  const itx=inviteTx();
+  try{
+    await sbUpdateManagerAccess(email,role);
+    auditAction('security',`Rol de acceso actualizado: ${email}`,{email,role});
+    toast(itx.updated,'#10b981');
+    renderRoleUsers();
+  }catch(e){
+    console.error(e);
+    toast(itx.sqlMissing,'#ef4444');
+    renderRoleUsers();
+  }
+}
+async function revokeManagerAccess(email){
+  if(!requirePerm('edit_settings'))return;
+  const itx=inviteTx();
+  if(!confirm(itx.confirmRevoke))return;
+  try{
+    await sbRevokeManagerAccess(email);
+    auditAction('security',`Acceso retirado: ${email}`,{email});
+    toast(itx.revoked,'#ef4444');
+    renderRoleUsers();
+  }catch(e){
+    console.error(e);
+    toast(itx.sqlMissing,'#ef4444');
+  }
+}
+async function createManagerInvite(){
+  if(!requirePerm('edit_settings'))return;
+  const email=clean(document.getElementById('invite-email')?.value||'').toLowerCase();
+  const role=document.getElementById('invite-role')?.value||'restaurant_manager';
+  const itx=inviteTx(),box=document.getElementById('invite-result');
+  if(!email||!email.includes('@')){toast(itx.email,'#ef4444');return;}
+  try{
+    const token=await sbCreateManagerInvite(email,role);
+    const url=`${APP_PUBLIC_URL}?invite=${encodeURIComponent(token)}`;
+    if(box){
+      box.style.display='block';
+      box.innerHTML=`<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:var(--r2);padding:10px">
+        <div class="fs11 muted mb8">${esc(email)} · ${esc(role==='restaurant_admin'?itx.admin:itx.manager)}</div>
+        <div class="fs11" style="word-break:break-all;font-family:monospace">${esc(url)}</div>
+        <button class="btn btn-ghost btn-sm mt8" onclick="copyText(${jsArg(url)},${jsArg(itx.copied)})">${esc(itx.copy)}</button>
+      </div>`;
+    }
+    auditAction('security',`Invitación creada para manager: ${email}`,{email,role});
+    renderRoleUsers();
+    toast(itx.copied,'#10b981');
+  }catch(e){
+    console.error(e);
+    toast(itx.sqlMissing,'#ef4444');
+  }
 }
 
 async function renderMaster(){
@@ -4553,10 +5084,11 @@ function openMaintenance(kind){
   if(url)window.open(url,'_blank','noopener');
 }
 async function deleteAllConfirm(){
+  if(!requirePerm('delete_all'))return;
   const tx=TL('settings');
   if(!confirm('⚠️ '+tx.confirmDelete))return;
-  const old={employees:DB.employees,history:DB.history,absences:DB.absences,shifts:DB.shifts,documents:DB.documents};
-  DB={employees:[],history:[],absences:[],shifts:{},documents:[],settings:DB.settings};saveLocal();renderPage(currentPage);
+  const old={employees:DB.employees,history:DB.history,absences:DB.absences,shifts:DB.shifts,documents:DB.documents,audit:DB.audit,monthClosures:DB.monthClosures};
+  DB={employees:[],history:[],absences:[],shifts:{},documents:[],reviewedAlerts:{},audit:[],monthClosures:{},settings:DB.settings};saveLocal();renderPage(currentPage);
   try{await sbDeleteAll();toast('🗑 '+tx.deleted,'#ef4444');}
   catch(e){DB={...DB,...old};saveLocal();renderPage(currentPage);toast(tx.deleteError,'#ef4444');console.error(e);}
 }
@@ -4585,6 +5117,7 @@ function xlsDownload(html,name){
   dl('\ufeff'+doc,name,'application/vnd.ms-excel;charset=utf-8');
 }
 function exportPayCSV(){
+  if(!requirePerm('view_payroll'))return;
   const y=payMD.getFullYear(),m=payMD.getMonth(),rows=DB.employees.map(emp=>({emp,...calcPay(emp,y,m)}));
   const total=rows.reduce((s,r)=>s+r.pay,0);
   const body=`<h1>Salarios · ${xlsCell(fmtMonth(payMD))}</h1><div class="muted">${xlsCell(DB.settings?.company||'Restaurant')} · Exportado ${xlsCell(fmtDate(new Date()))}</div>
@@ -4594,6 +5127,7 @@ function exportPayCSV(){
   xlsDownload(body,`salarios_${fmtMonth(payMD).replace(' ','_')}.xls`);
 }
 function exportRepCSV(){
+  if(!requirePerm('view_reports'))return;
   const tx=TL('rep');
   const rx={
     fr:{report:'Rapport mensuel',exported:'Exporté',summary:'Résumé exécutif',alerts:'Alertes à vérifier',observation:'Observation',noAlerts:'Aucune alerte importante ce mois-ci',detail:'Détail par employé',employee:'Employé',position:'Poste',contract:'Contrat',salaryType:'Type salaire',salaryBase:'Base salaire',absenceDays:'Jours absence',attendancePct:'Présence %',estimatedSalary:'Salaire estimé',restEquivalent:'Repos équiv. jours',lateComments:'Commentaires retard',absence:'absence(s)',late:'retard(s)',noHours:'sans heures enregistrées ce mois-ci',annualDays:'jours'},
@@ -4649,6 +5183,7 @@ async function init(){
   document.getElementById('login-screen').style.display='block';
   document.getElementById('login-screen').classList.remove('auth-open');
   applyEmployeeAccessLink();
+  applyInviteLanding();
 }
 init();
 </script>

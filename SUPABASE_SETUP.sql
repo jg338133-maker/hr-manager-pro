@@ -36,14 +36,51 @@ create table if not exists public.manager_assistant_signals (
   created_at timestamptz default now()
 );
 
+create table if not exists public.restaurant_invites (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.restaurants(id) on delete cascade,
+  email text not null,
+  role text not null default 'restaurant_manager' check (role in ('restaurant_admin','restaurant_manager')),
+  token text not null unique default encode(gen_random_bytes(24), 'hex'),
+  created_by uuid references auth.users(id) on delete set null,
+  accepted_by uuid references auth.users(id) on delete set null,
+  accepted_at timestamptz,
+  expires_at timestamptz default (now() + interval '14 days'),
+  created_at timestamptz default now()
+);
+
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   email text unique not null,
   name text,
-  role text not null check (role in ('super_admin','restaurant_admin','employee')),
+  role text not null check (role in ('super_admin','restaurant_admin','restaurant_manager','employee')),
   restaurant_id uuid references public.restaurants(id) on delete set null,
   created_at timestamptz default now()
 );
+
+-- Business roles.
+-- restaurant_admin = owner/admin with full access.
+-- restaurant_manager = operational manager for daily HR without payroll/documents/deletion.
+do $$
+declare
+  v_constraint text;
+begin
+  select conname
+  into v_constraint
+  from pg_constraint
+  where conrelid = 'public.profiles'::regclass
+    and contype = 'c'
+    and pg_get_constraintdef(oid) like '%role%'
+  limit 1;
+
+  if v_constraint is not null then
+    execute format('alter table public.profiles drop constraint %I', v_constraint);
+  end if;
+
+  alter table public.profiles
+  add constraint profiles_role_check
+  check (role in ('super_admin','restaurant_admin','restaurant_manager','employee'));
+end $$;
 
 alter table public.profiles enable row level security;
 alter table public.restaurants enable row level security;
@@ -53,6 +90,7 @@ alter table public.absences enable row level security;
 alter table public.shifts enable row level security;
 alter table public.employee_documents enable row level security;
 alter table public.manager_assistant_signals enable row level security;
+alter table public.restaurant_invites enable row level security;
 
 create or replace function public.is_super_admin()
 returns boolean
@@ -78,10 +116,33 @@ as $$
   limit 1;
 $$;
 
+create or replace function public.get_my_profile()
+returns public.profiles
+language sql
+security definer
+set search_path = public
+as $$
+  select *
+  from public.profiles
+  where user_id = auth.uid()
+  limit 1;
+$$;
+
 drop policy if exists "profiles read own or super" on public.profiles;
 create policy "profiles read own or super"
 on public.profiles for select
-using (user_id = auth.uid() or public.is_super_admin());
+using (
+  user_id = auth.uid()
+  or public.is_super_admin()
+  or (
+    restaurant_id = public.current_restaurant_id()
+    and exists (
+      select 1 from public.profiles p
+      where p.user_id = auth.uid()
+        and p.role in ('restaurant_admin','super_admin')
+    )
+  )
+);
 
 drop policy if exists "profiles insert own" on public.profiles;
 create policy "profiles insert own"
@@ -153,6 +214,197 @@ with check (restaurant_id = public.current_restaurant_id() or public.is_super_ad
 
 create index if not exists manager_assistant_signals_restaurant_idx
 on public.manager_assistant_signals (restaurant_id, created_at desc);
+
+drop policy if exists "restaurant invites scoped owner" on public.restaurant_invites;
+create policy "restaurant invites scoped owner"
+on public.restaurant_invites for all
+using (
+  public.is_super_admin()
+  or (
+    restaurant_id = public.current_restaurant_id()
+    and exists (
+      select 1 from public.profiles p
+      where p.user_id = auth.uid()
+        and p.role = 'restaurant_admin'
+    )
+  )
+)
+with check (
+  public.is_super_admin()
+  or (
+    restaurant_id = public.current_restaurant_id()
+    and exists (
+      select 1 from public.profiles p
+      where p.user_id = auth.uid()
+        and p.role = 'restaurant_admin'
+    )
+  )
+);
+
+create or replace function public.create_manager_invite(p_email text, p_role text default 'restaurant_manager')
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_restaurant_id uuid;
+  v_token text;
+begin
+  if p_role not in ('restaurant_admin','restaurant_manager') then
+    raise exception 'Invalid role';
+  end if;
+
+  select restaurant_id
+  into v_restaurant_id
+  from public.profiles
+  where user_id = auth.uid()
+    and role in ('restaurant_admin','super_admin')
+  limit 1;
+
+  if v_restaurant_id is null and not public.is_super_admin() then
+    raise exception 'Not allowed';
+  end if;
+
+  v_restaurant_id := coalesce(v_restaurant_id, public.current_restaurant_id());
+  if v_restaurant_id is null then
+    raise exception 'No restaurant selected';
+  end if;
+
+  insert into public.restaurant_invites (restaurant_id, email, role, created_by)
+  values (v_restaurant_id, lower(trim(p_email)), p_role, auth.uid())
+  returning token into v_token;
+
+  return v_token;
+end;
+$$;
+
+create or replace function public.accept_manager_invite(p_token text)
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_invite public.restaurant_invites%rowtype;
+  v_profile public.profiles%rowtype;
+  v_email text;
+begin
+  select lower(email)
+  into v_email
+  from auth.users
+  where id = auth.uid();
+
+  if v_email is null then
+    raise exception 'Auth required';
+  end if;
+
+  select *
+  into v_invite
+  from public.restaurant_invites
+  where token = p_token
+    and accepted_at is null
+    and expires_at > now()
+    and lower(email) = v_email
+  limit 1;
+
+  if v_invite.id is null then
+    raise exception 'Invite not valid';
+  end if;
+
+  insert into public.profiles (user_id, email, name, role, restaurant_id)
+  values (auth.uid(), v_email, split_part(v_email,'@',1), v_invite.role, v_invite.restaurant_id)
+  on conflict (user_id) do update
+    set role = case
+          when public.profiles.role = 'super_admin' then public.profiles.role
+          else excluded.role
+        end,
+        restaurant_id = case
+          when public.profiles.role = 'super_admin' then public.profiles.restaurant_id
+          else excluded.restaurant_id
+        end,
+        email = excluded.email
+  returning * into v_profile;
+
+  update public.restaurant_invites
+  set accepted_by = auth.uid(), accepted_at = now()
+  where id = v_invite.id;
+
+  return v_profile;
+end;
+$$;
+
+create or replace function public.update_manager_access(p_email text, p_role text)
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_restaurant_id uuid;
+  v_profile public.profiles%rowtype;
+begin
+  if p_role not in ('restaurant_admin','restaurant_manager') then
+    raise exception 'Invalid role';
+  end if;
+
+  select restaurant_id
+  into v_restaurant_id
+  from public.profiles
+  where user_id = auth.uid()
+    and role in ('restaurant_admin','super_admin')
+  limit 1;
+
+  if v_restaurant_id is null then
+    raise exception 'Not allowed';
+  end if;
+
+  update public.profiles
+  set role = p_role
+  where restaurant_id = v_restaurant_id
+    and lower(email) = lower(trim(p_email))
+    and role <> 'super_admin'
+  returning * into v_profile;
+
+  if v_profile.user_id is null then
+    raise exception 'Profile not found';
+  end if;
+
+  return v_profile;
+end;
+$$;
+
+create or replace function public.revoke_manager_access(p_email text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_restaurant_id uuid;
+  v_count integer;
+begin
+  select restaurant_id
+  into v_restaurant_id
+  from public.profiles
+  where user_id = auth.uid()
+    and role in ('restaurant_admin','super_admin')
+  limit 1;
+
+  if v_restaurant_id is null then
+    raise exception 'Not allowed';
+  end if;
+
+  delete from public.profiles
+  where restaurant_id = v_restaurant_id
+    and lower(email) = lower(trim(p_email))
+    and user_id <> auth.uid()
+    and role <> 'super_admin';
+
+  get diagnostics v_count = row_count;
+  return v_count > 0;
+end;
+$$;
 
 -- Promote your own account to master after it exists in Supabase Auth.
 -- Replace jg338133@gmail.com with your email.
