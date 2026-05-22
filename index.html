@@ -3585,7 +3585,7 @@ window.addEventListener('pageshow',resumeEmpPortal);
 
 // ═══════ ONBOARDING TOUR ═══════
 let tourRole=null,tourStep=0;
-const TOUR_VERSION='2026-05-21-manager-flow';
+const TOUR_VERSION='2026-05-22-hr-complete-flow';
 const TOUR={
   manager:[
     {key:'language',kind:'language',sel:null},
@@ -3606,8 +3606,11 @@ const TOUR={
     {key:'closeMonth',page:'reports',sel:'#pg-reports'},
     {key:'reportsDeep',page:'reports',sel:'#pg-reports'},
     {key:'payroll',page:'payroll',sel:'#pg-payroll'},
+    {key:'historyCalendar',page:'history',sel:'#hist-calendar'},
+    {key:'auditTrail',page:'history',sel:'#audit-list'},
     {key:'assistant',sel:'#top-ai-btn'},
     {key:'settings',page:'settings',sel:'#pg-settings'},
+    {key:'accessRoles',page:'settings',sel:'#role-access-card'},
     {key:'refresh',sel:'#refresh-btn'},
     {key:'menu',page:'dashboard',sel:'#tour-menu-btn'}
   ],
@@ -3631,6 +3634,9 @@ Object.assign(TOUR_TX.es.manager,{
   reviewedAlerts:['Revisar y cerrar alertas','Cuando una alerta ya fue atendida, entra en Revisar y márcala como revisada. Así el dashboard deja de mostrar ruido y queda solo lo pendiente.'],
   requests:['Solicitudes pendientes','Esta sección ya no es solo ausencias: aquí llegan vacaciones, incapacidades, solicitudes personales y correcciones de fichaje del empleado.'],
   reportsDeep:['Reporte útil para gestión','El reporte mensual resume horas, pausas no remuneradas, retardos, ausencias, salario estimado, banco anual de horas extra y comentarios importantes.'],
+  historyCalendar:['Historial por fechas','El historial se organiza por calendario para que no se vuelva una lista infinita. Haz click en un día para revisar fichajes y detalles.'],
+  auditTrail:['Bitácora RH','La bitácora guarda acciones importantes: cambios de empleados, documentos, solicitudes, reportes, seguridad y ajustes. Sirve como memoria administrativa.'],
+  accessRoles:['Accesos y roles','Desde aquí puedes invitar otros managers, cambiar su rol o retirar acceso. Así un negocio puede tener varias personas gestionando sin darles todo el control.'],
   assistant:['Asistente IA','El botón AI ayuda a interpretar datos, preparar conversaciones difíciles y responder dudas de uso. Si falta una función, la guarda como señal de mejora.']
 });
 Object.assign(TOUR_TX.en.manager,{
@@ -3638,6 +3644,9 @@ Object.assign(TOUR_TX.en.manager,{
   reviewedAlerts:['Review and close alerts','When an alert has been handled, open Review and mark it as reviewed. The dashboard then shows only what still needs attention.'],
   requests:['Pending requests','This section is not only absences anymore: vacation, sick leave, personal requests and punch corrections arrive here.'],
   reportsDeep:['A useful management report','The monthly report summarizes hours, unpaid breaks, late arrivals, absences, estimated pay, annual overtime bank and important comments.'],
+  historyCalendar:['History by date','History is organized by calendar so it does not become an endless list. Click a day to review punches and details.'],
+  auditTrail:['HR logbook','The logbook keeps important actions: employee changes, documents, requests, reports, security and settings. It becomes administrative memory.'],
+  accessRoles:['Access and roles','From here you can invite other managers, change their role or remove access. A business can have multiple managers without giving everyone full control.'],
   assistant:['AI assistant','The AI button helps interpret data, prepare difficult conversations and answer usage questions. If a feature is missing, it records it as an improvement signal.']
 });
 Object.assign(TOUR_TX.fr.manager,{
@@ -3645,6 +3654,9 @@ Object.assign(TOUR_TX.fr.manager,{
   reviewedAlerts:['Revoir et fermer les alertes','Quand une alerte est traitée, ouvrez Revoir et marquez-la comme revue. Le tableau garde seulement ce qui demande encore attention.'],
   requests:['Demandes en attente','Cette section n’est plus seulement les absences: vacances, maladie, demandes personnelles et corrections de pointage arrivent ici.'],
   reportsDeep:['Un rapport utile pour gérer','Le rapport mensuel résume heures, pauses non rémunérées, retards, absences, salaire estimé, banque annuelle d’heures extra et commentaires.'],
+  historyCalendar:['Historique par dates','L’historique est organisé par calendrier pour éviter une liste infinie. Cliquez un jour pour revoir pointages et détails.'],
+  auditTrail:['Journal RH','Le journal garde les actions importantes: employés, documents, demandes, rapports, sécurité et réglages. Il sert de mémoire administrative.'],
+  accessRoles:['Accès et rôles','Depuis ici, vous pouvez inviter d’autres managers, modifier leur rôle ou retirer l’accès. Un business peut être géré à plusieurs sans donner tout le contrôle.'],
   assistant:['Assistant IA','Le bouton IA aide à interpréter les données, préparer des conversations difficiles et répondre aux questions d’usage. Si une fonction manque, elle devient un signal d’amélioration.']
 });
 Object.assign(TOUR_TX.de.manager,{
@@ -3652,6 +3664,9 @@ Object.assign(TOUR_TX.de.manager,{
   reviewedAlerts:['Warnungen prüfen und schließen','Wenn eine Warnung erledigt ist, öffnen Sie Prüfen und markieren sie als geprüft. Das Dashboard zeigt dann nur offene Punkte.'],
   requests:['Offene Anfragen','Dieser Bereich ist nicht nur Abwesenheit: Ferien, Krankheit, persönliche Anfragen und Buchungskorrekturen kommen hier an.'],
   reportsDeep:['Bericht für die Führung','Der Monatsbericht fasst Stunden, unbezahlte Pausen, Verspätungen, Abwesenheiten, geschätzten Lohn, Überstundenbank und Kommentare zusammen.'],
+  historyCalendar:['Historie nach Datum','Die Historie ist als Kalender organisiert, damit sie keine endlose Liste wird. Klicken Sie auf einen Tag, um Buchungen und Details zu prüfen.'],
+  auditTrail:['HR-Protokoll','Das Protokoll speichert wichtige Aktionen: Mitarbeiter, Dokumente, Anfragen, Berichte, Sicherheit und Einstellungen. Es ist die administrative Erinnerung.'],
+  accessRoles:['Zugänge und Rollen','Hier laden Sie weitere Manager ein, ändern Rollen oder entfernen Zugriff. Ein Betrieb kann mehrere Manager haben, ohne allen volle Kontrolle zu geben.'],
   assistant:['KI-Assistent','Der KI-Button hilft, Daten zu verstehen, schwierige Gespräche vorzubereiten und Fragen zur Nutzung zu beantworten. Fehlende Funktionen werden als Signal gespeichert.']
 });
 Object.assign(TOUR_TX.it.manager,{
@@ -3659,6 +3674,9 @@ Object.assign(TOUR_TX.it.manager,{
   reviewedAlerts:['Rivedere e chiudere avvisi','Quando un avviso è gestito, apri Rivedi e segnalo come rivisto. Il dashboard mostra solo ciò che resta da fare.'],
   requests:['Richieste in attesa','Questa sezione non è più solo assenze: qui arrivano vacanze, malattia, richieste personali e correzioni timbrature.'],
   reportsDeep:['Report utile per gestire','Il report mensile riassume ore, pause non pagate, ritardi, assenze, stipendio stimato, banca ore annuale e commenti importanti.'],
+  historyCalendar:['Storico per date','Lo storico è organizzato a calendario, così non diventa una lista infinita. Clicca un giorno per rivedere timbrature e dettagli.'],
+  auditTrail:['Registro HR','Il registro conserva azioni importanti: dipendenti, documenti, richieste, report, sicurezza e impostazioni. Diventa memoria amministrativa.'],
+  accessRoles:['Accessi e ruoli','Da qui puoi invitare altri manager, cambiare ruolo o rimuovere accessi. Un business può avere più manager senza dare tutto il controllo a tutti.'],
   assistant:['Assistente IA','Il pulsante IA aiuta a interpretare dati, preparare conversazioni difficili e rispondere a domande d’uso. Se manca una funzione, la salva come segnale di miglioramento.']
 });
 const tourTxt=(role,key)=>((TOUR_TX[lang]||TOUR_TX.es)[role]||{})[key]||TOUR_TX.es[role][key]||['',''];
@@ -3668,6 +3686,10 @@ function tourKey(role){
   return `hrm_tour_seen_${TOUR_VERSION}_${role}_${id}`;
 }
 function maybeStartTour(role){
+  if(currentUser?.demo){
+    setTimeout(()=>startTour(role,true),650);
+    return;
+  }
   if(localStorage.getItem(tourKey(role)))return;
   setTimeout(()=>startTour(role,false),500);
 }
