@@ -52,6 +52,10 @@ function shouldEnableWebSearch(question: string) {
   return /\b(ley|legal|derecho|contrato|desped|indemniz|preaviso|aviso|norma|regla|suiza|swiss|suisse|arbeitsrecht|licenciement|licenziamento|dismiss|termination|law|legal)\b/i.test(question);
 }
 
+function isSensitiveHrQuestion(question: string) {
+  return /\b(desped|despido|terminar.*contrato|contrato.*termin|finalizar.*contrato|rescind|desvincul|renuncia|sanci[oó]n|disciplin|ausencia.*injust|abandono|conflicto|acoso|queja|incapacidad|licenciement|licenziamento|kündig|dismiss|termination|fire|harassment|disciplinary)\b/i.test(question);
+}
+
 async function callAnthropic(apiKey: string, model: string, system: string, user: string, enableWebSearch: boolean) {
   const baseUrl = (Deno.env.get("AI_BASE_URL") || "https://api.anthropic.com/v1").replace(/\/$/, "");
   const body: Record<string, unknown> = {
@@ -85,10 +89,20 @@ async function callAnthropic(apiKey: string, model: string, system: string, user
   if (!aiRes.ok && enableWebSearch) return callAnthropic(apiKey, model, system, user, false);
   if (!aiRes.ok) throw new Error(`Anthropic request failed: ${await aiRes.text()}`);
   const payload = await aiRes.json();
-  return (payload?.content || [])
-    .filter((part: { type?: string; text?: string }) => part.type === "text")
-    .map((part: { text?: string }) => part.text || "")
+  const citations: { title: string; url: string }[] = [];
+  const text = (payload?.content || [])
+    .filter((part: { type?: string; text?: string; citations?: { title?: string; url?: string }[] }) => part.type === "text")
+    .map((part: { text?: string; citations?: { title?: string; url?: string }[] }) => {
+      (part.citations || []).forEach((c) => {
+        if (c?.url) citations.push({ title: c.title || c.url, url: c.url });
+      });
+      return part.text || "";
+    })
     .join("\n") || "{}";
+  const uniqueSources = citations.filter((c, i, arr) => arr.findIndex((x) => x.url === c.url) === i).slice(0, 4);
+  return uniqueSources.length
+    ? `${text}\n\nFuentes consultadas:\n${uniqueSources.map((c) => `- ${c.title}: ${c.url}`).join("\n")}`
+    : text;
 }
 
 async function callOpenAICompatible(apiKey: string, model: string, system: string, user: string) {
@@ -114,6 +128,28 @@ async function callOpenAICompatible(apiKey: string, model: string, system: strin
   return payload?.choices?.[0]?.message?.content || "{}";
 }
 
+async function callOpenAIText(apiKey: string, model: string, system: string, user: string) {
+  const baseUrl = (Deno.env.get("AI_BASE_URL") || "https://api.openai.com/v1").replace(/\/$/, "");
+  const aiRes = await fetch(`${baseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      temperature: 0.35,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    }),
+  });
+  if (!aiRes.ok) throw new Error(`AI request failed: ${await aiRes.text()}`);
+  const payload = await aiRes.json();
+  return payload?.choices?.[0]?.message?.content || "";
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405);
@@ -127,6 +163,36 @@ Deno.serve(async (req) => {
     const { question = "", context = {}, history = [] } = await req.json();
     const q = String(question || "").trim();
     if (!q) return jsonResponse({ error: "Question is required" }, 400);
+
+    if (isSensitiveHrQuestion(q)) {
+      const directSystem = [
+        "You are Manager Pro's HR assistant for small businesses.",
+        "Answer in the user's language, using context.lang when available.",
+        "Write plain text only. No Markdown. No bold markers. No headings. No tables.",
+        "Be more useful than a generic disclaimer: give practical HR guidance, conversation strategy, documentation steps, risks to verify, and what Manager Pro can record.",
+        "For legal or contract termination topics, do not present yourself as a lawyer and do not invent exact legal rules. If the user mentions a country such as Switzerland, use current web information when web search is enabled, cite sources plainly, and still advise verification with a qualified local professional before acting.",
+        "Structure the answer like a manager could use it today: what to check, what to say, what to document, what not to do, and when to ask for legal help.",
+        "Avoid canned phrases. Adapt to the user's exact question.",
+      ].join(" ");
+      const directUser = `Question:
+${q}
+
+App context:
+${JSON.stringify(context).slice(0, 12000)}
+
+Recent history:
+${JSON.stringify(history).slice(0, 3000)}
+
+Give the final answer directly.`;
+      const answer = provider === "anthropic"
+        ? await callAnthropic(apiKey, model, directSystem, directUser, shouldEnableWebSearch(q))
+        : await callOpenAIText(apiKey, model, directSystem, directUser);
+      return jsonResponse({
+        answer: sanitizeAnswer(answer),
+        category: "daily_ops",
+        shouldSaveSignal: false,
+      });
+    }
 
     const system = [
       "You are the internal assistant for Manager Pro, a simple staff management app for small businesses.",

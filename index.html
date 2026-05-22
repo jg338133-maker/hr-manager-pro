@@ -3128,7 +3128,7 @@ function localAssistantAnswer(question,ctx){
     answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.restaurant}.`;
   }else if(asksTermination){
     category='daily_ops';
-    answer=`Con lo que me dices, primero separaría hechos, contacto y riesgo antes de tomar la decisión.\n\n1. Verifica los hechos en Manager Pro: fechas exactas de ausencia, horario programado, si había solicitud, comentario, incapacidad médica o aviso previo.\n\n2. Contacta al empleado por escrito antes de decidir: "Hola, necesito entender qué pasó con tus ausencias de estos días. Por favor responde hoy antes de las __ para poder cerrar la situación correctamente."\n\n3. Si responde, escucha la causa y deja un acuerdo claro: qué pasó, qué necesita el negocio, qué espera el manager desde ahora y cuándo se revisa.\n\n4. Si no responde, documenta el intento de contacto y prepara una conversación o comunicación formal. Evita hacerlo en caliente.\n\n5. Antes de despedir, revisa el contrato, las reglas internas y la ley laboral local. Si estás en Suiza o hay riesgo, confirma con un asesor laboral antes de tomar la decisión.\n\n6. En Manager Pro guarda el soporte: Historial, solicitudes, reportes de Presencias, notas del perfil y documentos. Desactiva el empleado solo cuando la decisión ya sea oficial.\n\nFrase para hablarlo: "Loane, necesito entender qué pasó. Cuando no vienes y no avisas, el equipo queda descubierto y el servicio se afecta. Quiero escuchar tu explicación, pero también necesito dejar claro qué puede pasar si esto se repite."`;
+    answer='Esta pregunta necesita consultar la IA principal porque combina RH, contrato y posible riesgo legal. Intenta de nuevo en unos segundos. Si sigue fallando, revisa la conexión de la función de IA en Supabase.';
   }else if(/tarde|retard|late|ritardo|versp[aä]t|p[uü]nkt|puntual|conversaci[oó]n|conversat|hablar|parler|talk|sprechen|disciplina|disciplin|conducta|comport/.test(q)){
     category='daily_ops';
     answer=assistantPeopleCoachingAnswer(ctx);
@@ -3184,7 +3184,7 @@ async function sendManagerAssistant(){
       result=localAssistantAnswer(question,ctx);
     }
     const fallback=localAssistantAnswer(question,ctx);
-    const answer=result?.error&&fallback.category!=='feature_request'?fallback.answer:(result?.answer||fallback.answer);
+    const answer=result?.error?fallback.answer:(result?.answer||fallback.answer);
     assistantAddMessage('bot',answer);
     if(result?.shouldSaveSignal){
       try{await sbSaveAssistantSignal({question,answer,category:result.category||'feature_request',page:currentPage,metadata:{context:ctx}});toast(a.saved,'#10b981');}
