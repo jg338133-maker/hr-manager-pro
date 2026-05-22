@@ -82,6 +82,7 @@ async function callAnthropic(apiKey: string, model: string, system: string, user
     },
     body: JSON.stringify(body),
   });
+  if (!aiRes.ok && enableWebSearch) return callAnthropic(apiKey, model, system, user, false);
   if (!aiRes.ok) throw new Error(`Anthropic request failed: ${await aiRes.text()}`);
   const payload = await aiRes.json();
   return (payload?.content || [])
