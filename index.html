@@ -66,13 +66,13 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
 .sb-resto-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
 .sb-resto-name{font-size:13px;font-weight:700}
 .sb-resto-plan{font-size:10px;color:var(--orange);font-weight:600;margin-top:1px}
-.sb-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.sb-nav{flex:1;min-height:0;padding:10px 8px 22px;overflow-y:auto}
 .sb-section{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:12px 10px 5px}
 .sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r3);cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:2px;transition:all .15s;border-left:2px solid transparent}
 .sb-item:hover{background:var(--s3);color:var(--text)}
 .sb-item.active{background:var(--brand-light);color:var(--brand);border-left-color:var(--brand)}
 .sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;display:none}
-.sb-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
 .sb-user-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
 .sb-user-name{font-size:13px;font-weight:600}
 .sb-user-role{font-size:10px;color:var(--text2);margin-top:1px}
@@ -445,6 +445,30 @@ body.manager-theme .kpi,
 body.manager-theme .emp-row,
 body.manager-theme .login-card{box-shadow:0 10px 30px rgba(25,36,60,.06)}
 body.manager-theme .card{border-color:#dfe5f0}
+body.manager-theme #pg-hub{width:min(100%,1480px);margin:0 auto}
+.hub-hero{position:relative;overflow:hidden;border:0;border-radius:24px;padding:28px;background:linear-gradient(135deg,#13234a 0%,#184c61 62%,#d99623 140%);color:#fff;box-shadow:0 24px 60px rgba(25,36,60,.16)}
+.hub-hero::after{content:'';position:absolute;right:-70px;bottom:-105px;width:310px;height:310px;border-radius:90px;background:rgba(255,255,255,.11);transform:rotate(-15deg)}
+.hub-hero h2{position:relative;margin:4px 0 8px;font-size:clamp(28px,4vw,52px);line-height:1.02;letter-spacing:0;color:#fff}
+.hub-hero p{position:relative;max-width:680px;color:rgba(255,255,255,.82);font-size:16px;line-height:1.5;margin:0}
+.hub-kicker{position:relative;text-transform:uppercase;letter-spacing:.9px;font-weight:900;font-size:11px;color:#8fe5db}
+.hub-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}
+.hub-card{position:relative;overflow:hidden;border:1px solid #dbe4f1;background:#fff;border-radius:20px;padding:18px;min-height:210px;box-shadow:0 18px 46px rgba(25,36,60,.08);display:flex;flex-direction:column;gap:12px}
+.hub-card::after{content:'';position:absolute;right:-36px;top:-42px;width:130px;height:130px;border-radius:42px;background:var(--hub-soft,#eef4ff);transform:rotate(18deg)}
+.hub-card.active{border-color:rgba(37,99,235,.28);box-shadow:0 24px 58px rgba(37,99,235,.13)}
+.hub-card.soon{opacity:.9}
+.hub-icon{position:relative;width:48px;height:48px;border-radius:16px;background:var(--hub-soft,#eef4ff);display:grid;place-items:center;color:var(--hub-color,var(--brand));z-index:1}
+.hub-icon svg{width:25px;height:25px}
+.hub-card h3{position:relative;margin:2px 0 0;font-size:22px;z-index:1}
+.hub-card p{position:relative;margin:0;color:#5b6982;font-size:13px;line-height:1.45;z-index:1}
+.hub-meta{position:relative;display:flex;flex-wrap:wrap;gap:6px;z-index:1}
+.hub-pill{border-radius:999px;padding:6px 9px;background:#f3f6fb;color:#53617a;font-size:11px;font-weight:800}
+.hub-actions{position:relative;margin-top:auto;z-index:1;display:flex;gap:8px;align-items:center}
+.hub-status{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--hub-color,var(--brand))}
+.hub-side{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:14px}
+.hub-panel{border:1px solid #dbe4f1;background:#fff;border-radius:20px;padding:18px;box-shadow:0 16px 38px rgba(25,36,60,.06)}
+.hub-timeline{display:grid;gap:9px;margin-top:12px}
+.hub-line{display:flex;gap:10px;align-items:flex-start;padding:11px;border-radius:14px;background:#f7f9fd;border:1px solid #e2e8f4}
+.hub-line-dot{width:10px;height:10px;border-radius:99px;background:var(--brand);margin-top:5px;flex-shrink:0}
 body.manager-theme #pg-dashboard{width:min(100%,1680px);margin:0 auto}
 body.manager-theme #dash-hero{position:relative;overflow:hidden;min-height:138px;padding:22px 24px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;color:#f8fbff;border:0!important;background:linear-gradient(135deg,#172554 0%,#1e2f62 48%,#155e75 100%)!important;box-shadow:0 18px 44px rgba(24,35,80,.24)}
 body.manager-theme #dash-hero::before{content:'';position:absolute;right:-86px;bottom:-112px;width:360px;height:230px;border-radius:34px;background:linear-gradient(135deg,rgba(52,104,255,.32),rgba(22,168,114,.2));transform:rotate(-13deg)}
@@ -515,6 +539,10 @@ body.manager-theme #pg-employees .emp-row:hover{border-color:#b9c7df;background:
 body.manager-theme .assistant-msg.bot{background:#fff}
 body.manager-theme .assistant-chip{background:#f4f6fb}
 @media(max-width:640px){
+  body.manager-theme #main{padding:12px}
+  .hub-hero{padding:22px;border-radius:20px}
+  .hub-grid,.hub-side{grid-template-columns:1fr}
+  .hub-card{min-height:190px}
   body.manager-theme #dash-hero{display:block;min-height:auto;padding:20px}
   body.manager-theme .dash-title{font-size:25px}
   body.manager-theme .dash-status-card{min-width:0;margin-top:18px}
@@ -784,7 +812,11 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   </div>
   <div class="sb-nav">
     <div class="sb-section">Principal</div>
-    <div class="sb-item active" onclick="nav('dashboard',this)">
+    <div class="sb-item active" onclick="nav('hub',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
+      <span>Áreas</span>
+    </div>
+    <div class="sb-item" onclick="nav('dashboard',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
       <span>Dashboard</span>
     </div>
@@ -871,7 +903,11 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 <!-- PAGES -->
 <div id="main" style="display:none">
 
-<div class="page active" id="pg-dashboard">
+<div class="page active" id="pg-hub">
+  <div id="hub-content"></div>
+</div>
+
+<div class="page" id="pg-dashboard">
   <div id="dash-hero" class="card" style="margin-bottom:12px;background:linear-gradient(135deg,#0d1228,#111835);border-color:#1e2548"></div>
   <div class="kpi-grid" id="kpi-grid"></div>
   <div id="dash-live"></div>
@@ -1369,6 +1405,20 @@ const UI={
   de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Personalverwaltung · Freiburg CH'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
   it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione personale'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
 };
+Object.assign(UI.fr.pages,{hub:'Domaines'});
+Object.assign(UI.es.pages,{hub:'Áreas'});
+Object.assign(UI.en.pages,{hub:'Areas'});
+Object.assign(UI.de.pages,{hub:'Bereiche'});
+Object.assign(UI.it.pages,{hub:'Aree'});
+
+const AREA_UI={
+  es:{eyebrow:'Manager Pro como plataforma',title:'¿Qué área quieres gestionar hoy?',sub:'Empieza por Personal y ve sumando ventas, inventario, documentos e insights cuando el negocio lo necesite.',open:'Abrir',soon:'Próximamente',next:'Siguiente módulo',active:'Activo ahora',today:'Hoy en Personal',roadmap:'Camino del producto',settings:'Configuración',settingsDesc:'Idioma, colores, horarios de apertura, tolerancias, accesos y datos del negocio.',openSettings:'Abrir ajustes',team:'Personal',teamDesc:'Empleados, horarios, fichajes, pausas, solicitudes, documentos, salarios y reportes.',sales:'Ventas',salesDesc:'Ventas por producto o servicio, caja diaria, métodos de pago y cierres.',inventory:'Inventario',inventoryDesc:'Stock, proveedores, compras y consumo conectado a ventas.',documents:'Documentos',documentsDesc:'Contratos, permisos, vencimientos y expediente de cada trabajador.',tasks:'Tareas',tasksDesc:'Rutinas, responsables, pendientes y seguimiento operativo.',insights:'IA e insights',insightsDesc:'Preguntas al negocio, señales de mejora y ayuda para tomar decisiones.',employees:'Empleados',pending:'Solicitudes pendientes',alerts:'Alertas abiertas',p1:'Personal listo: controlar equipo y cerrar el mes.',p2:'Ventas por items: registrar productos y servicios.',p3:'Inventario: conectar ventas con stock y compras.',p4:'Insights: entender qué pasa sin hablar lenguaje administrativo.',openTeam:'Entrar a Personal'},
+  en:{eyebrow:'Manager Pro as a platform',title:'Which area do you want to manage today?',sub:'Start with People and add sales, inventory, documents and insights when the business needs them.',open:'Open',soon:'Coming soon',next:'Next module',active:'Active now',today:'Today in People',roadmap:'Product path',settings:'Settings',settingsDesc:'Language, colors, opening hours, tolerances, access and business data.',openSettings:'Open settings',team:'People',teamDesc:'Employees, schedules, punches, breaks, requests, documents, payroll and reports.',sales:'Sales',salesDesc:'Sales by product or service, daily cash, payment methods and closing.',inventory:'Inventory',inventoryDesc:'Stock, suppliers, purchases and consumption connected to sales.',documents:'Documents',documentsDesc:'Contracts, permits, expiry dates and each employee file.',tasks:'Tasks',tasksDesc:'Routines, owners, pending work and operational follow-up.',insights:'AI and insights',insightsDesc:'Ask questions about the business, improvement signals and decision support.',employees:'Employees',pending:'Pending requests',alerts:'Open alerts',p1:'People ready: control the team and close the month.',p2:'Sales by items: register products and services.',p3:'Inventory: connect sales with stock and purchases.',p4:'Insights: understand what is happening without admin jargon.',openTeam:'Open People'},
+  fr:{eyebrow:'Manager Pro comme plateforme',title:'Quel domaine voulez-vous gérer aujourd’hui ?',sub:'Commencez par le personnel puis ajoutez ventes, inventaire, documents et insights quand le commerce en a besoin.',open:'Ouvrir',soon:'Bientôt',next:'Module suivant',active:'Actif maintenant',today:'Aujourd’hui côté personnel',roadmap:'Chemin du produit',settings:'Paramètres',settingsDesc:'Langue, couleurs, horaires d’ouverture, tolérances, accès et données du commerce.',openSettings:'Ouvrir les paramètres',team:'Personnel',teamDesc:'Employés, horaires, pointages, pauses, demandes, documents, salaires et rapports.',sales:'Ventes',salesDesc:'Ventes par produit ou service, caisse quotidienne, moyens de paiement et clôtures.',inventory:'Inventaire',inventoryDesc:'Stock, fournisseurs, achats et consommation connectée aux ventes.',documents:'Documents',documentsDesc:'Contrats, permis, échéances et dossier de chaque employé.',tasks:'Tâches',tasksDesc:'Routines, responsables, tâches en attente et suivi opérationnel.',insights:'IA et insights',insightsDesc:'Questions sur le commerce, signaux d’amélioration et aide à la décision.',employees:'Employés',pending:'Demandes en attente',alerts:'Alertes ouvertes',p1:'Personnel prêt: suivre l’équipe et clôturer le mois.',p2:'Ventes par items: enregistrer produits et services.',p3:'Inventaire: connecter ventes, stock et achats.',p4:'Insights: comprendre sans jargon administratif.',openTeam:'Entrer dans Personnel'},
+  de:{eyebrow:'Manager Pro als Plattform',title:'Welchen Bereich möchten Sie heute verwalten?',sub:'Starten Sie mit Personal und ergänzen Sie Verkauf, Inventar, Dokumente und Einblicke, wenn der Betrieb sie braucht.',open:'Öffnen',soon:'Demnächst',next:'Nächstes Modul',active:'Jetzt aktiv',today:'Heute im Personal',roadmap:'Produktweg',settings:'Einstellungen',settingsDesc:'Sprache, Farben, Öffnungszeiten, Toleranzen, Zugänge und Betriebsdaten.',openSettings:'Einstellungen öffnen',team:'Personal',teamDesc:'Mitarbeiter, Pläne, Buchungen, Pausen, Anfragen, Dokumente, Löhne und Berichte.',sales:'Verkauf',salesDesc:'Verkäufe nach Produkt oder Service, Tageskasse, Zahlungsarten und Abschlüsse.',inventory:'Inventar',inventoryDesc:'Lager, Lieferanten, Einkäufe und Verbrauch mit Verkauf verbunden.',documents:'Dokumente',documentsDesc:'Verträge, Bewilligungen, Fristen und Mitarbeiterakten.',tasks:'Aufgaben',tasksDesc:'Routinen, Verantwortliche, offene Aufgaben und operativer Überblick.',insights:'KI und Einblicke',insightsDesc:'Fragen zum Betrieb, Verbesserungssignale und Entscheidungshilfe.',employees:'Mitarbeiter',pending:'Offene Anfragen',alerts:'Offene Warnungen',p1:'Personal bereit: Team steuern und Monat abschließen.',p2:'Verkäufe nach Artikeln: Produkte und Services erfassen.',p3:'Inventar: Verkauf mit Lager und Einkauf verbinden.',p4:'Einblicke: verstehen, was passiert, ohne Verwaltungsjargon.',openTeam:'Personal öffnen'},
+  it:{eyebrow:'Manager Pro come piattaforma',title:'Quale area vuoi gestire oggi?',sub:'Inizia dal personale e aggiungi vendite, inventario, documenti e insight quando il business ne ha bisogno.',open:'Apri',soon:'Prossimamente',next:'Prossimo modulo',active:'Attivo ora',today:'Oggi nel personale',roadmap:'Percorso prodotto',settings:'Impostazioni',settingsDesc:'Lingua, colori, orari di apertura, tolleranze, accessi e dati del business.',openSettings:'Apri impostazioni',team:'Personale',teamDesc:'Dipendenti, turni, timbrature, pause, richieste, documenti, stipendi e report.',sales:'Vendite',salesDesc:'Vendite per prodotto o servizio, cassa giornaliera, metodi di pagamento e chiusure.',inventory:'Inventario',inventoryDesc:'Stock, fornitori, acquisti e consumo collegato alle vendite.',documents:'Documenti',documentsDesc:'Contratti, permessi, scadenze e fascicolo di ogni dipendente.',tasks:'Attività',tasksDesc:'Routine, responsabili, pendenti e controllo operativo.',insights:'IA e insight',insightsDesc:'Domande sul business, segnali di miglioramento e aiuto decisionale.',employees:'Dipendenti',pending:'Richieste in attesa',alerts:'Avvisi aperti',p1:'Personale pronto: controllare il team e chiudere il mese.',p2:'Vendite per item: registrare prodotti e servizi.',p3:'Inventario: collegare vendite, stock e acquisti.',p4:'Insight: capire cosa succede senza gergo amministrativo.',openTeam:'Apri Personale'}
+};
+const areaTx=()=>({...AREA_UI.es,...(AREA_UI[lang]||{})});
 const T=()=>UI[lang]||UI.fr;
 const TL=section=>({...UI.fr[section],...(T()[section]||{})});
 const DASH_TEXT={
@@ -2009,7 +2059,7 @@ function applyUITexts(){
   renderLoginLangBar();
   document.querySelectorAll('.sb-section').forEach((el,i)=>{const vals=[t.nav.principal,t.nav.planning,t.nav.finance,t.nav.config,t.nav.master];if(vals[i])el.textContent=vals[i];});
   const setNav=(page,text)=>{const el=document.querySelector(`[onclick="nav('${page}',this)"] span`);if(el)el.textContent=text;};
-  setNav('dashboard',t.pages.dashboard);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
+  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
   const mt=document.querySelector('[onclick="nav(\'master\',this)"] span');if(mt)mt.textContent=t.pages.master;
   document.getElementById('page-title').textContent=t.pages[currentPage]||currentPage;
   const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].textContent=t.login.manager;if(tabs[1])tabs[1].textContent=t.login.employee;if(tabs[2])tabs[2].textContent=t.login.restaurant;
@@ -2211,7 +2261,7 @@ async function selectPinRestaurant(id){
 function loginDemo(){
   DB=demoDB();lang=DB.settings.lang||'es';
   currentUser={role:'restaurant_admin',name:'Admin Demo',email:'demo@manager-pro.app',restaurant_id:'demo-restaurant',demo:true};
-  currentPage='dashboard';
+  currentPage='hub';
   showManagerUI();
   toast('✅ Demo aislado: no toca tus datos reales');
 }
@@ -2235,6 +2285,7 @@ async function loginManager(){
     if(!profile)profile=await withTimeout(loadProfile(data.user),10000,'Profile timeout');
     if(!profile)profile=await ensureProfile(data.user,'restaurant_admin',REST_ID);
     currentUser={role:profile.role||'restaurant_admin',name:profile.name||data.user.email?.split('@')[0]||email.split('@')[0],email:data.user.email,restaurant_id:profile.restaurant_id,profile};
+    currentPage='hub';
     if(currentUser.restaurant_id)setRestaurantId(currentUser.restaurant_id);
     if(currentUser.role==='super_admin'){
       showManagerUI();
@@ -2351,12 +2402,13 @@ function logout(){
   setAppHistoryState('landing','replace');
 }
 
-function setAppHistoryState(view,mode='push'){
+function setAppHistoryState(view,mode='push',page=null){
   if(!history?.pushState||!history?.replaceState)return;
   const state={...(history.state||{}),hrmView:view};
+  if(page)state.hrmPage=page;
   try{
     if(mode==='replace')history.replaceState(state,'',location.href);
-    else if(history.state?.hrmView!==view)history.pushState(state,'',location.href);
+    else if(history.state?.hrmView!==view||history.state?.hrmPage!==state.hrmPage)history.pushState(state,'',location.href);
   }catch(e){console.warn('History state skipped',e);}
 }
 
@@ -2375,6 +2427,10 @@ function showPublicLandingFromHistory(){
 
 window.addEventListener('popstate',ev=>{
   if(ev.state?.hrmView==='landing')showPublicLandingFromHistory();
+  if(ev.state?.hrmView==='app'&&currentUser){
+    const page=ev.state?.hrmPage||'hub';
+    goPage(page,'silent');
+  }
 });
 
 function applyEmployeeAccessLink(){
@@ -2391,7 +2447,7 @@ function applyEmployeeAccessLink(){
 }
 
 function showManagerUI(){
-  setAppHistoryState('app');
+  setAppHistoryState('app','push',currentPage||'hub');
   document.body.classList.add('manager-theme');
   document.body.classList.remove('employee-theme');
   document.getElementById('login-screen').style.display='none';
@@ -2403,13 +2459,14 @@ function showManagerUI(){
   document.getElementById('sb-ur').textContent=roleLabel();
   document.getElementById('master-nav').style.display=currentUser.role==='super_admin'?'block':'none';
   applyBrand();applyUITexts();applyPermissionsUI();renderAll();
+  goPage(currentPage||'hub','replace');
   if(currentUser.role==='super_admin')renderMaster();
   startAutoRefresh();
   maybeStartTour('manager');
 }
 
 function showEmpUI(emp){
-  setAppHistoryState('app');
+  setAppHistoryState('app','push','employee');
   document.body.classList.remove('manager-theme');
   document.body.classList.add('employee-theme');
   document.getElementById('login-screen').style.display='none';
@@ -3457,12 +3514,12 @@ async function sendManagerAssistant(){
 }
 
 // ═══════ NAV ═══════
-let currentPage='dashboard';
+let currentPage='hub';
 
 function toggleSB(){const s=document.getElementById('sidebar'),o=document.getElementById('sb-overlay');const open=s.classList.toggle('open');o.style.display=open?'block':'none';}
 function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').style.display='none';}
 
-function nav(page,el){
+function nav(page,el,historyMode='push'){
   if(!canPage(page)){
     const perm={payroll:'view_payroll',reports:'view_reports',settings:'edit_settings',master:'master'}[page]||'master';
     requirePerm(perm);
@@ -3475,13 +3532,15 @@ function nav(page,el){
   el.classList.add('active');
   document.getElementById('page-title').textContent=T().pages[page]||page;
   currentPage=page;renderPage(page);
+  if(historyMode!=='silent')setAppHistoryState('app',historyMode,page);
 }
-function goPage(page){
+function goPage(page,historyMode='push'){
   const item=[...document.querySelectorAll('.sb-item')].find(x=>(x.getAttribute('onclick')||'').includes(`'${page}'`));
-  nav(page,item||document.querySelector('.sb-item'));
+  nav(page,item||document.querySelector('.sb-item'),historyMode);
 }
 function renderPage(p){
-  if(!canPage(p)){goPage('dashboard');return;}
+  if(!canPage(p)){goPage('hub');return;}
+  if(p==='hub')renderHub();
   if(p==='dashboard')renderDash();
   if(p==='attendance')renderAtt();
   if(p==='employees')renderEmps();
@@ -3494,7 +3553,76 @@ function renderPage(p){
   if(p==='master')renderMaster();
   applyPermissionsUI();
 }
-function renderAll(){renderDash();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
+function renderAll(){renderHub();renderDash();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
+
+function hubIcon(type){
+  const icons={
+    team:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/>',
+    sales:'<path d="M6 2v20"/><path d="M18 6H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H6"/>',
+    inventory:'<path d="M21 16V8a2 2 0 0 0-1-1.73L13 2.27a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>',
+    documents:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
+    tasks:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+    insights:'<path d="M12 2a7 7 0 0 0-4 12.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26A7 7 0 0 0 12 2z"/><path d="M9 22h6"/>',
+    settings:'<path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-.6 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 .6-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 .6 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.22.35.42.7.6 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-.6 1z"/>'
+  };
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icons[type]||icons.team}</svg>`;
+}
+function hubCardHTML(card){
+  const tx=areaTx(),style=`--hub-color:${card.color};--hub-soft:${card.soft}`;
+  return `<div class="hub-card ${card.active?'active':'soon'}" style="${style}">
+    <div class="hub-icon">${hubIcon(card.icon)}</div>
+    <div class="hub-status">${esc(card.active?tx.active:tx.soon)}</div>
+    <h3>${esc(card.title)}</h3>
+    <p>${esc(card.desc)}</p>
+    <div class="hub-meta">${card.meta.map(x=>`<span class="hub-pill">${esc(x)}</span>`).join('')}</div>
+    <div class="hub-actions">
+      ${card.active?`<button class="btn btn-primary" onclick="${card.action}">${esc(card.button||tx.open)}</button>`:`<button class="btn btn-ghost" onclick="toast(${jsArg(tx.next)},'#2563eb')">${esc(tx.next)}</button>`}
+    </div>
+  </div>`;
+}
+function renderHub(){
+  const el=document.getElementById('hub-content');if(!el)return;
+  const tx=areaTx(),active=DB.employees.filter(e=>e.status==='active'),pending=(DB.absences||[]).filter(a=>!a.approved).length;
+  const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
+  const cards=[
+    {icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,action:"goPage('dashboard')",button:tx.openTeam},
+    {icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1'},
+    {icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df'},
+    {icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:['Expedientes','Vencimientos','IA'],color:'#7c3aed',soft:'#f3edff'},
+    {icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:['Rutinas','Responsables','Pendientes'],color:'#0891b2',soft:'#e6f8fc'},
+    {icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:['IA','Reportes','Señales'],color:'#be123c',soft:'#fff1f2'}
+  ];
+  el.innerHTML=`<section class="hub-hero">
+    <div class="hub-kicker">${esc(tx.eyebrow)}</div>
+    <h2>${esc(tx.title)}</h2>
+    <p>${esc(tx.sub)}</p>
+  </section>
+  <section class="hub-grid">${cards.map(hubCardHTML).join('')}</section>
+  <section class="hub-side">
+    <div class="hub-panel">
+      <div class="card-header" style="margin:0">${esc(tx.today)}</div>
+      <div class="kpi-grid mt12" style="grid-template-columns:repeat(3,1fr);gap:10px">
+        <div class="kpi"><div class="kpi-val" style="color:var(--brand)">${active.length}</div><div class="kpi-sub">${esc(tx.employees)}</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${pending}</div><div class="kpi-sub">${esc(tx.pending)}</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:var(--red)">${smart}</div><div class="kpi-sub">${esc(tx.alerts)}</div></div>
+      </div>
+      ${canPage('settings')?`<div class="hub-line" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div class="hub-icon" style="width:42px;height:42px;color:var(--brand);background:var(--brand-light);box-shadow:none">${hubIcon('settings')}</div>
+        <div style="flex:1;min-width:0">
+          <div class="fs14 fw8">${esc(tx.settings)}</div>
+          <div class="fs12 muted mt4">${esc(tx.settingsDesc)}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="goPage('settings')">${esc(tx.openSettings)}</button>
+      </div>`:''}
+    </div>
+    <div class="hub-panel">
+      <div class="card-header" style="margin:0">${esc(tx.roadmap)}</div>
+      <div class="hub-timeline">
+        ${[tx.p1,tx.p2,tx.p3,tx.p4].map((p,i)=>`<div class="hub-line"><div class="hub-line-dot" style="background:${['var(--brand)','var(--green)','var(--orange)','var(--purple)'][i]}"></div><div class="fs12 fw7">${esc(p)}</div></div>`).join('')}
+      </div>
+    </div>
+  </section>`;
+}
 
 function tickEmpPortal(){
   const el=document.getElementById('emp-clock');
