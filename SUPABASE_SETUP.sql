@@ -49,6 +49,67 @@ create table if not exists public.restaurant_invites (
   created_at timestamptz default now()
 );
 
+-- Sales module / ventas y caja.
+-- Products/services are generic so this can work for restaurants, shops, services or small offices.
+create table if not exists public.sales_products (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.restaurants(id) on delete cascade,
+  name text not null,
+  category text default '',
+  type text not null default 'product' check (type in ('product','service','ingredient','bundle')),
+  price numeric(12,2) not null default 0,
+  sku text default '',
+  unit text default 'unit',
+  track_stock boolean not null default false,
+  stock numeric(12,2) not null default 0,
+  min_stock numeric(12,2) not null default 0,
+  active boolean not null default true,
+  created_at timestamptz default now()
+);
+
+alter table public.sales_products
+add column if not exists sku text default '',
+add column if not exists unit text default 'unit',
+add column if not exists track_stock boolean not null default false,
+add column if not exists stock numeric(12,2) not null default 0,
+add column if not exists min_stock numeric(12,2) not null default 0;
+
+do $$
+declare
+  v_constraint text;
+begin
+  select conname
+  into v_constraint
+  from pg_constraint
+  where conrelid = 'public.sales_products'::regclass
+    and contype = 'c'
+    and pg_get_constraintdef(oid) like '%type%'
+  limit 1;
+
+  if v_constraint is not null then
+    execute format('alter table public.sales_products drop constraint %I', v_constraint);
+  end if;
+
+  alter table public.sales_products
+  add constraint sales_products_type_check
+  check (type in ('product','service','ingredient','bundle'));
+end $$;
+
+create table if not exists public.sales (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.restaurants(id) on delete cascade,
+  product_id uuid references public.sales_products(id) on delete set null,
+  product_name text not null default '',
+  category text default '',
+  quantity numeric(12,2) not null default 1,
+  unit_price numeric(12,2) not null default 0,
+  total numeric(12,2) not null default 0,
+  payment_method text not null default 'cash',
+  note text default '',
+  sold_at timestamptz default now(),
+  created_at timestamptz default now()
+);
+
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   email text unique not null,
@@ -91,6 +152,8 @@ alter table public.shifts enable row level security;
 alter table public.employee_documents enable row level security;
 alter table public.manager_assistant_signals enable row level security;
 alter table public.restaurant_invites enable row level security;
+alter table public.sales_products enable row level security;
+alter table public.sales enable row level security;
 
 create or replace function public.is_super_admin()
 returns boolean
@@ -214,6 +277,27 @@ with check (restaurant_id = public.current_restaurant_id() or public.is_super_ad
 
 create index if not exists manager_assistant_signals_restaurant_idx
 on public.manager_assistant_signals (restaurant_id, created_at desc);
+
+drop policy if exists "sales products scoped all" on public.sales_products;
+create policy "sales products scoped all"
+on public.sales_products for all
+using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
+with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
+
+drop policy if exists "sales scoped all" on public.sales;
+create policy "sales scoped all"
+on public.sales for all
+using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
+with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
+
+create index if not exists sales_products_restaurant_idx
+on public.sales_products (restaurant_id, active, created_at desc);
+
+create index if not exists sales_products_sku_idx
+on public.sales_products (restaurant_id, sku);
+
+create index if not exists sales_restaurant_sold_idx
+on public.sales (restaurant_id, sold_at desc);
 
 drop policy if exists "restaurant invites scoped owner" on public.restaurant_invites;
 create policy "restaurant invites scoped owner"
@@ -771,6 +855,8 @@ begin
   delete from public.absences where restaurant_id = p_restaurant_id;
   delete from public.shifts where restaurant_id = p_restaurant_id;
   delete from public.employee_documents where restaurant_id = p_restaurant_id;
+  delete from public.sales where restaurant_id = p_restaurant_id;
+  delete from public.sales_products where restaurant_id = p_restaurant_id;
   delete from public.employees where restaurant_id = p_restaurant_id;
   update public.profiles set restaurant_id = null where restaurant_id = p_restaurant_id;
   delete from public.restaurants where id = p_restaurant_id;

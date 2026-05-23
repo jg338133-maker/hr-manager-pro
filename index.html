@@ -141,6 +141,8 @@ body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--bg);color:v
 .fg select option{background:var(--s2)}
 input[type=date],input[type=time]{color-scheme:dark}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.check-row{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:13px;font-weight:800}
+.check-row input{width:16px;height:16px;accent-color:var(--brand)}
 
 /* TOGGLE */
 .tgl-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
@@ -469,6 +471,32 @@ body.manager-theme #pg-hub{width:min(100%,1480px);margin:0 auto}
 .hub-timeline{display:grid;gap:9px;margin-top:12px}
 .hub-line{display:flex;gap:10px;align-items:flex-start;padding:11px;border-radius:14px;background:#f7f9fd;border:1px solid #e2e8f4}
 .hub-line-dot{width:10px;height:10px;border-radius:99px;background:var(--brand);margin-top:5px;flex-shrink:0}
+.sales-hero{position:relative;overflow:hidden;border:0;border-radius:24px;padding:24px;background:linear-gradient(135deg,#123026 0%,#166534 58%,#f59e0b 140%);color:#fff;box-shadow:0 20px 54px rgba(22,101,52,.16);margin-bottom:14px}
+.sales-hero::after{content:'';position:absolute;right:-70px;top:-78px;width:240px;height:240px;border-radius:80px;background:rgba(255,255,255,.13);transform:rotate(20deg)}
+.sales-hero h2{position:relative;font-size:clamp(28px,4vw,46px);line-height:1.03;margin:6px 0;color:#fff}
+.sales-hero p{position:relative;color:rgba(255,255,255,.82);max-width:720px;margin:0}
+.sales-area-panel{display:grid;grid-template-columns:1.1fr repeat(3,minmax(0,.9fr));gap:12px;margin-bottom:14px}
+.sales-area-card{min-height:118px;border:1px solid #dbe4f1;border-radius:20px;background:#fff;padding:16px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 16px 38px rgba(25,36,60,.06);cursor:pointer;transition:.18s ease}
+.sales-area-card:hover{transform:translateY(-2px);box-shadow:0 20px 42px rgba(25,36,60,.1);border-color:#b8c9e6}
+.sales-area-card.primary{background:linear-gradient(135deg,#f7fbff,#eef5ff);border-color:#bfd0ef}
+.sales-area-icon{width:38px;height:38px;border-radius:14px;background:#eef4ff;color:#2563eb;display:grid;place-items:center;font-weight:900;margin-bottom:10px}
+.sales-area-card:nth-child(2) .sales-area-icon{background:#ecfdf5;color:#16a34a}
+.sales-area-card:nth-child(3) .sales-area-icon{background:#fff7ed;color:#f59e0b}
+.sales-area-card:nth-child(4) .sales-area-icon{background:#eefcff;color:#0891b2}
+.sales-area-title{font-weight:900;font-size:15px;color:var(--text)}
+.sales-area-desc{font-size:12px;color:var(--text2);line-height:1.35;margin-top:4px}
+.sales-area-meta{font-size:11px;font-weight:800;color:#2563eb;margin-top:10px}
+.sales-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+.sales-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.sales-kpi{background:#fff;border:1px solid #dbe4f1;border-radius:18px;padding:15px;box-shadow:0 14px 34px rgba(25,36,60,.06)}
+.sales-kpi .num{font-size:24px;font-weight:900;line-height:1;color:var(--brand)}
+.sales-panel{background:#fff;border:1px solid #dbe4f1;border-radius:20px;padding:18px;box-shadow:0 16px 38px rgba(25,36,60,.06);margin-bottom:14px}
+.sales-product{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #e2e8f4;border-radius:16px;background:#f8fafc;margin-bottom:8px}
+.sales-product-dot{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#fff;background:linear-gradient(135deg,#16a34a,#0ea5c6);flex-shrink:0}
+.sales-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #e8edf5}
+.sales-row:last-child{border-bottom:0}
+.sales-method{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;padding:5px 8px;border-radius:999px;background:#eef4ff;color:#2563eb}
+.sales-empty{padding:24px;text-align:center;color:var(--text2);border:1px dashed #cbd5e1;border-radius:18px;background:#f8fafc}
 body.manager-theme #pg-dashboard{width:min(100%,1680px);margin:0 auto}
 body.manager-theme #dash-hero{position:relative;overflow:hidden;min-height:138px;padding:22px 24px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;color:#f8fbff;border:0!important;background:linear-gradient(135deg,#172554 0%,#1e2f62 48%,#155e75 100%)!important;box-shadow:0 18px 44px rgba(24,35,80,.24)}
 body.manager-theme #dash-hero::before{content:'';position:absolute;right:-86px;bottom:-112px;width:360px;height:230px;border-radius:34px;background:linear-gradient(135deg,rgba(52,104,255,.32),rgba(22,168,114,.2));transform:rotate(-13deg)}
@@ -541,7 +569,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 @media(max-width:640px){
   body.manager-theme #main{padding:12px}
   .hub-hero{padding:22px;border-radius:20px}
-  .hub-grid,.hub-side{grid-template-columns:1fr}
+  .hub-grid,.hub-side,.sales-grid,.sales-kpis,.sales-area-panel{grid-template-columns:1fr}
   .hub-card{min-height:190px}
   body.manager-theme #dash-hero{display:block;min-height:auto;padding:20px}
   body.manager-theme .dash-title{font-size:25px}
@@ -811,48 +839,56 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
     </div>
   </div>
   <div class="sb-nav">
-    <div class="sb-section">Principal</div>
-    <div class="sb-item active" onclick="nav('hub',this)">
+    <div class="sb-section" data-sidebar-section="main">Principal</div>
+    <div class="sb-item active" data-sidebar-area="main" onclick="nav('hub',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
       <span>Áreas</span>
     </div>
-    <div class="sb-item" onclick="nav('dashboard',this)">
+    <div class="sb-section" data-sidebar-section="people">Personal</div>
+    <div class="sb-item" data-sidebar-area="people" onclick="nav('dashboard',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
       <span>Dashboard</span>
     </div>
-    <div class="sb-item" onclick="nav('attendance',this)">
+    <div class="sb-item" data-sidebar-area="people" onclick="nav('attendance',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       <span>Présences</span>
       <span class="sb-badge" id="sb-badge">0</span>
     </div>
-    <div class="sb-item" onclick="nav('employees',this)">
+    <div class="sb-item" data-sidebar-area="people" onclick="nav('employees',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span>Employés</span>
     </div>
-    <div class="sb-section">Planification</div>
-    <div class="sb-item" onclick="nav('shifts',this)">
+    <div class="sb-item" data-sidebar-area="people" onclick="nav('shifts',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span>Horaires</span>
     </div>
-    <div class="sb-item" onclick="nav('vacations',this)">
+    <div class="sb-item" data-sidebar-area="people" onclick="nav('vacations',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M5 20V8.5L12 3l7 5.5V20M9 20v-5h6v5"/></svg>
       <span>Congés</span>
     </div>
-    <div class="sb-section">Finance</div>
-    <div class="sb-item" onclick="nav('payroll',this)">
+    <div class="sb-item" data-sidebar-area="people" onclick="nav('payroll',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       <span>Salaires</span>
     </div>
-    <div class="sb-item" onclick="nav('reports',this)">
+    <div class="sb-item" data-sidebar-area="people" onclick="nav('reports',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       <span>Rapports</span>
     </div>
-    <div class="sb-item" onclick="nav('history',this)">
+    <div class="sb-item" data-sidebar-area="people" onclick="nav('history',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
       <span>Historique</span>
     </div>
-    <div class="sb-section">Configuration</div>
-    <div class="sb-item" onclick="nav('settings',this)">
+    <div class="sb-section" data-sidebar-section="sales">Ventas</div>
+    <div class="sb-item" data-sidebar-area="sales" onclick="nav('sales',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2v20"/><path d="M18 6H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H6"/></svg>
+      <span>Ventas</span>
+    </div>
+    <div class="sb-item" data-sidebar-area="sales" onclick="nav('salesProducts',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+      <span>Productos</span>
+    </div>
+    <div class="sb-section" data-sidebar-section="config">Configuration</div>
+    <div class="sb-item" data-sidebar-area="config" onclick="nav('settings',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       <span>Paramètres</span>
     </div>
@@ -916,6 +952,14 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
     <button class="btn btn-primary" id="dash-scan-btn" onclick="openScanner()">📷 Scanner QR</button>
     <button class="btn btn-ghost" id="dash-add-emp-btn" onclick="openEmpModal(null)">+ Employé</button>
   </div>
+</div>
+
+<div class="page" id="pg-sales">
+  <div id="sales-content"></div>
+</div>
+
+<div class="page" id="pg-salesProducts">
+  <div id="sales-products-content"></div>
 </div>
 
 <div class="page" id="pg-attendance">
@@ -1319,6 +1363,53 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 <!-- QR Action -->
 <div class="ov" id="qr-modal"><div class="modal" id="qr-content"></div></div>
 
+<!-- Sales Entry -->
+<div class="ov" id="sale-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="sale-modal-title">Nueva venta</div>
+  <div class="fg"><label id="sale-product-label">Producto o servicio</label><select id="sale-product" onchange="syncSaleProductPrice()"></select></div>
+  <div class="frow">
+    <div class="fg"><label id="sale-qty-label">Cantidad</label><input type="number" id="sale-qty" min="1" value="1" step="1" oninput="updateSaleTotal()"></div>
+    <div class="fg"><label id="sale-price-label">Precio</label><input type="number" id="sale-price" min="0" value="0" step="0.05" oninput="updateSaleTotal()"></div>
+  </div>
+  <div class="fg"><label id="sale-method-label">Método de pago</label><select id="sale-method"><option value="cash">Cash</option><option value="card">Card</option><option value="twint">TWINT</option><option value="transfer">Transfer</option></select></div>
+  <div class="fg"><label id="sale-note-label">Nota</label><input id="sale-note" placeholder="-"></div>
+  <div class="card" style="margin-bottom:0"><div class="flex-b"><span class="muted" id="sale-total-label">Total</span><span class="fw8 fs20" id="sale-total">CHF 0.00</span></div></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" id="sale-cancel-btn" onclick="closeModal('sale-modal')">Cancelar</button>
+    <button class="btn btn-primary" id="sale-save-btn" onclick="saveSale()">Guardar venta</button>
+  </div>
+</div>
+</div>
+
+<!-- Product Entry -->
+<div class="ov" id="product-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="product-modal-title">Nuevo producto</div>
+  <div class="fg"><label id="product-name-label">Nombre</label><input id="product-name" placeholder="Menu del día"></div>
+  <div class="frow">
+    <div class="fg"><label id="product-category-label">Categoría</label><input id="product-category" placeholder="Comida, servicio..."></div>
+    <div class="fg"><label id="product-price-label">Precio</label><input type="number" id="product-price" min="0" step="0.05" value="0"></div>
+  </div>
+  <div class="fg"><label id="product-type-label">Tipo</label><select id="product-type" onchange="toggleProductInventoryFields()"><option value="product">Producto</option><option value="service">Servicio</option><option value="ingredient">Insumo</option><option value="bundle">Combo</option></select></div>
+  <div class="frow">
+    <div class="fg"><label id="product-sku-label">SKU / Código</label><input id="product-sku" placeholder="CAF-001"></div>
+    <div class="fg"><label id="product-unit-label">Unidad</label><select id="product-unit"><option value="unit">Unidad</option><option value="kg">kg</option><option value="g">g</option><option value="l">L</option><option value="ml">ml</option><option value="hour">Hora</option></select></div>
+  </div>
+  <label class="check-row" style="margin-bottom:12px"><input type="checkbox" id="product-track-stock" onchange="toggleProductInventoryFields()"> <span id="product-track-label">Controlar inventario</span></label>
+  <div class="frow" id="product-stock-row">
+    <div class="fg"><label id="product-stock-label">Stock actual</label><input type="number" id="product-stock" min="0" step="0.01" value="0"></div>
+    <div class="fg"><label id="product-min-stock-label">Stock mínimo</label><input type="number" id="product-min-stock" min="0" step="0.01" value="0"></div>
+  </div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" id="product-cancel-btn" onclick="closeModal('product-modal')">Cancelar</button>
+    <button class="btn btn-primary" id="product-save-btn" onclick="saveProduct()">Guardar</button>
+  </div>
+</div>
+</div>
+
 <!-- Manager Assistant -->
 <div class="ov" id="assistant-modal">
   <div class="modal">
@@ -1405,11 +1496,11 @@ const UI={
   de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Personalverwaltung · Freiburg CH'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
   it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione personale'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
 };
-Object.assign(UI.fr.pages,{hub:'Domaines'});
-Object.assign(UI.es.pages,{hub:'Áreas'});
-Object.assign(UI.en.pages,{hub:'Areas'});
-Object.assign(UI.de.pages,{hub:'Bereiche'});
-Object.assign(UI.it.pages,{hub:'Aree'});
+Object.assign(UI.fr.pages,{hub:'Domaines',sales:'Ventes',salesProducts:'Produits'});
+Object.assign(UI.es.pages,{hub:'Áreas',sales:'Ventas',salesProducts:'Productos'});
+Object.assign(UI.en.pages,{hub:'Areas',sales:'Sales',salesProducts:'Products'});
+Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkte'});
+Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti'});
 
 const AREA_UI={
   es:{eyebrow:'Manager Pro como plataforma',title:'¿Qué área quieres gestionar hoy?',sub:'Empieza por Personal y ve sumando ventas, inventario, documentos e insights cuando el negocio lo necesite.',open:'Abrir',soon:'Próximamente',next:'Siguiente módulo',active:'Activo ahora',today:'Hoy en Personal',roadmap:'Camino del producto',settings:'Configuración',settingsDesc:'Idioma, colores, horarios de apertura, tolerancias, accesos y datos del negocio.',openSettings:'Abrir ajustes',team:'Personal',teamDesc:'Empleados, horarios, fichajes, pausas, solicitudes, documentos, salarios y reportes.',sales:'Ventas',salesDesc:'Ventas por producto o servicio, caja diaria, métodos de pago y cierres.',inventory:'Inventario',inventoryDesc:'Stock, proveedores, compras y consumo conectado a ventas.',documents:'Documentos',documentsDesc:'Contratos, permisos, vencimientos y expediente de cada trabajador.',tasks:'Tareas',tasksDesc:'Rutinas, responsables, pendientes y seguimiento operativo.',insights:'IA e insights',insightsDesc:'Preguntas al negocio, señales de mejora y ayuda para tomar decisiones.',employees:'Empleados',pending:'Solicitudes pendientes',alerts:'Alertas abiertas',p1:'Personal listo: controlar equipo y cerrar el mes.',p2:'Ventas por items: registrar productos y servicios.',p3:'Inventario: conectar ventas con stock y compras.',p4:'Insights: entender qué pasa sin hablar lenguaje administrativo.',openTeam:'Entrar a Personal'},
@@ -1419,6 +1510,14 @@ const AREA_UI={
   it:{eyebrow:'Manager Pro come piattaforma',title:'Quale area vuoi gestire oggi?',sub:'Inizia dal personale e aggiungi vendite, inventario, documenti e insight quando il business ne ha bisogno.',open:'Apri',soon:'Prossimamente',next:'Prossimo modulo',active:'Attivo ora',today:'Oggi nel personale',roadmap:'Percorso prodotto',settings:'Impostazioni',settingsDesc:'Lingua, colori, orari di apertura, tolleranze, accessi e dati del business.',openSettings:'Apri impostazioni',team:'Personale',teamDesc:'Dipendenti, turni, timbrature, pause, richieste, documenti, stipendi e report.',sales:'Vendite',salesDesc:'Vendite per prodotto o servizio, cassa giornaliera, metodi di pagamento e chiusure.',inventory:'Inventario',inventoryDesc:'Stock, fornitori, acquisti e consumo collegato alle vendite.',documents:'Documenti',documentsDesc:'Contratti, permessi, scadenze e fascicolo di ogni dipendente.',tasks:'Attività',tasksDesc:'Routine, responsabili, pendenti e controllo operativo.',insights:'IA e insight',insightsDesc:'Domande sul business, segnali di miglioramento e aiuto decisionale.',employees:'Dipendenti',pending:'Richieste in attesa',alerts:'Avvisi aperti',p1:'Personale pronto: controllare il team e chiudere il mese.',p2:'Vendite per item: registrare prodotti e servizi.',p3:'Inventario: collegare vendite, stock e acquisti.',p4:'Insight: capire cosa succede senza gergo amministrativo.',openTeam:'Apri Personale'}
 };
 const areaTx=()=>({...AREA_UI.es,...(AREA_UI[lang]||{})});
+const SALES_UI={
+  es:{title:'Ventas y caja',sub:'Registra ventas por producto o servicio. Así después podremos sacar insights y conectar inventario.',today:'Hoy',revenue:'Ingresos',sales:'Ventas',ticket:'Ticket prom.',products:'Productos',newSale:'Nueva venta',newProduct:'Nuevo producto',catalog:'Catálogo',activity:'Actividad del día',empty:'Aún no hay ventas registradas hoy.',product:'Producto o servicio',qty:'Cantidad',price:'Precio',method:'Método de pago',note:'Nota',total:'Total',saveSale:'Guardar venta',cancel:'Cancelar',productName:'Nombre',category:'Categoría',type:'Tipo',saveProduct:'Guardar',cash:'Efectivo',card:'Tarjeta',twint:'TWINT',transfer:'Transferencia',productType:'Producto',serviceType:'Servicio',ingredientType:'Insumo',bundleType:'Combo/preparado',sku:'SKU / Código',unit:'Unidad',unitUnit:'Unidad',unitHour:'Hora',trackStock:'Controlar inventario',stock:'Stock actual',minStock:'Stock mínimo',lowStock:'Stock bajo',saved:'Venta guardada',productSaved:'Producto guardado',missingProduct:'Crea primero un producto o servicio.',topProduct:'Más vendido',byMethod:'Por método de pago',areaTitle:'Panel de ventas',areaDesc:'Elige qué necesitas hacer en esta área.',goSummary:'Ver resumen',goSummaryDesc:'Ingresos, ticket promedio y actividad del día.',goRegister:'Registrar venta',goRegisterDesc:'Añade una venta rápida por producto o servicio.',goCatalog:'Gestionar catálogo',goCatalogDesc:'Productos, servicios y precios base.',goClose:'Caja e insights',goCloseDesc:'Métodos de pago, más vendido y señales para decidir.',openSection:'Abrir'},
+  en:{title:'Sales and cash',sub:'Register sales by product or service. Later we can generate insights and connect inventory.',today:'Today',revenue:'Revenue',sales:'Sales',ticket:'Avg. ticket',products:'Products',newSale:'New sale',newProduct:'New product',catalog:'Catalog',activity:'Day activity',empty:'No sales registered today yet.',product:'Product or service',qty:'Quantity',price:'Price',method:'Payment method',note:'Note',total:'Total',saveSale:'Save sale',cancel:'Cancel',productName:'Name',category:'Category',type:'Type',saveProduct:'Save',cash:'Cash',card:'Card',twint:'TWINT',transfer:'Transfer',productType:'Product',serviceType:'Service',ingredientType:'Ingredient/input',bundleType:'Bundle/prepared',sku:'SKU / Code',unit:'Unit',unitUnit:'Unit',unitHour:'Hour',trackStock:'Track inventory',stock:'Current stock',minStock:'Minimum stock',lowStock:'Low stock',saved:'Sale saved',productSaved:'Product saved',missingProduct:'Create a product or service first.',topProduct:'Top seller',byMethod:'By payment method',areaTitle:'Sales panel',areaDesc:'Choose what you need to do in this area.',goSummary:'View summary',goSummaryDesc:'Revenue, average ticket and daily activity.',goRegister:'Register sale',goRegisterDesc:'Add a quick sale by product or service.',goCatalog:'Manage catalog',goCatalogDesc:'Products, services and base prices.',goClose:'Cash and insights',goCloseDesc:'Payment methods, top seller and decision signals.',openSection:'Open'},
+  fr:{title:'Ventes et caisse',sub:'Enregistrez les ventes par produit ou service. Ensuite nous pourrons créer des insights et connecter l’inventaire.',today:'Aujourd’hui',revenue:'Revenus',sales:'Ventes',ticket:'Ticket moyen',products:'Produits',newSale:'Nouvelle vente',newProduct:'Nouveau produit',catalog:'Catalogue',activity:'Activité du jour',empty:'Aucune vente enregistrée aujourd’hui.',product:'Produit ou service',qty:'Quantité',price:'Prix',method:'Moyen de paiement',note:'Note',total:'Total',saveSale:'Enregistrer vente',cancel:'Annuler',productName:'Nom',category:'Catégorie',type:'Type',saveProduct:'Enregistrer',cash:'Espèces',card:'Carte',twint:'TWINT',transfer:'Virement',productType:'Produit',serviceType:'Service',ingredientType:'Ingrédient/intrant',bundleType:'Combo/préparé',sku:'SKU / Code',unit:'Unité',unitUnit:'Unité',unitHour:'Heure',trackStock:'Suivre inventaire',stock:'Stock actuel',minStock:'Stock minimum',lowStock:'Stock bas',saved:'Vente enregistrée',productSaved:'Produit enregistré',missingProduct:'Créez d’abord un produit ou service.',topProduct:'Meilleure vente',byMethod:'Par moyen de paiement',areaTitle:'Panel des ventes',areaDesc:'Choisissez ce que vous voulez faire dans ce domaine.',goSummary:'Voir résumé',goSummaryDesc:'Revenus, ticket moyen et activité du jour.',goRegister:'Enregistrer vente',goRegisterDesc:'Ajouter une vente rapide par produit ou service.',goCatalog:'Gérer catalogue',goCatalogDesc:'Produits, services et prix de base.',goClose:'Caisse et insights',goCloseDesc:'Moyens de paiement, meilleure vente et signaux de décision.',openSection:'Ouvrir'},
+  de:{title:'Verkauf und Kasse',sub:'Erfassen Sie Verkäufe nach Produkt oder Service. Später entstehen daraus Einblicke und Inventar-Verbindungen.',today:'Heute',revenue:'Umsatz',sales:'Verkäufe',ticket:'Ø Bon',products:'Produkte',newSale:'Neuer Verkauf',newProduct:'Neues Produkt',catalog:'Katalog',activity:'Tagesaktivität',empty:'Heute sind noch keine Verkäufe erfasst.',product:'Produkt oder Service',qty:'Menge',price:'Preis',method:'Zahlungsart',note:'Notiz',total:'Total',saveSale:'Verkauf speichern',cancel:'Abbrechen',productName:'Name',category:'Kategorie',type:'Typ',saveProduct:'Speichern',cash:'Bar',card:'Karte',twint:'TWINT',transfer:'Überweisung',productType:'Produkt',serviceType:'Service',ingredientType:'Zutat/Input',bundleType:'Bundle/zubereitet',sku:'SKU / Code',unit:'Einheit',unitUnit:'Einheit',unitHour:'Stunde',trackStock:'Inventar verfolgen',stock:'Aktueller Bestand',minStock:'Mindestbestand',lowStock:'Niedriger Bestand',saved:'Verkauf gespeichert',productSaved:'Produkt gespeichert',missingProduct:'Erstellen Sie zuerst ein Produkt oder einen Service.',topProduct:'Top-Verkauf',byMethod:'Nach Zahlungsart',areaTitle:'Verkaufsbereich',areaDesc:'Wählen Sie, was Sie in diesem Bereich tun möchten.',goSummary:'Übersicht ansehen',goSummaryDesc:'Umsatz, Durchschnittsbon und Tagesaktivität.',goRegister:'Verkauf erfassen',goRegisterDesc:'Schnellen Verkauf nach Produkt oder Service hinzufügen.',goCatalog:'Katalog verwalten',goCatalogDesc:'Produkte, Services und Basispreise.',goClose:'Kasse und Einblicke',goCloseDesc:'Zahlungsarten, Top-Verkauf und Entscheidungssignale.',openSection:'Öffnen'},
+  it:{title:'Vendite e cassa',sub:'Registra vendite per prodotto o servizio. Poi potremo generare insight e collegare inventario.',today:'Oggi',revenue:'Incassi',sales:'Vendite',ticket:'Scontrino medio',products:'Prodotti',newSale:'Nuova vendita',newProduct:'Nuovo prodotto',catalog:'Catalogo',activity:'Attività del giorno',empty:'Nessuna vendita registrata oggi.',product:'Prodotto o servizio',qty:'Quantità',price:'Prezzo',method:'Metodo di pagamento',note:'Nota',total:'Totale',saveSale:'Salva vendita',cancel:'Annulla',productName:'Nome',category:'Categoria',type:'Tipo',saveProduct:'Salva',cash:'Contanti',card:'Carta',twint:'TWINT',transfer:'Bonifico',productType:'Prodotto',serviceType:'Servizio',ingredientType:'Ingrediente/input',bundleType:'Combo/preparato',sku:'SKU / Codice',unit:'Unità',unitUnit:'Unità',unitHour:'Ora',trackStock:'Controlla inventario',stock:'Stock attuale',minStock:'Stock minimo',lowStock:'Stock basso',saved:'Vendita salvata',productSaved:'Prodotto salvato',missingProduct:'Crea prima un prodotto o servizio.',topProduct:'Più venduto',byMethod:'Per metodo di pagamento',areaTitle:'Pannello vendite',areaDesc:'Scegli cosa vuoi fare in questa area.',goSummary:'Vedi riepilogo',goSummaryDesc:'Incassi, scontrino medio e attività del giorno.',goRegister:'Registra vendita',goRegisterDesc:'Aggiungi una vendita rapida per prodotto o servizio.',goCatalog:'Gestisci catalogo',goCatalogDesc:'Prodotti, servizi e prezzi base.',goClose:'Cassa e insight',goCloseDesc:'Metodi di pagamento, più venduto e segnali decisionali.',openSection:'Apri'}
+};
+const salesTx=()=>({...SALES_UI.es,...(SALES_UI[lang]||{})});
 const T=()=>UI[lang]||UI.fr;
 const TL=section=>({...UI.fr[section],...(T()[section]||{})});
 const DASH_TEXT={
@@ -1516,7 +1615,7 @@ const ATW=()=>ATT_WORDS[lang]||ATT_WORDS.fr;
 
 // ═══════ DB ═══════
 let DB={
-  employees:[],history:[],absences:[],shifts:{},documents:[],reviewedAlerts:{},audit:[],monthClosures:{},
+  employees:[],history:[],absences:[],shifts:{},documents:[],salesProducts:[],sales:[],reviewedAlerts:{},audit:[],monthClosures:{},
   settings:{company:'Mon Business',emoji:'MP',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],signals:[],stats:{}};
@@ -1692,7 +1791,17 @@ function demoDB(){
   const shifts={};
   employees.forEach(emp=>{for(let i=0;i<5;i++){const d=new Date(getMonday(today).getTime()+i*86400000),ds=fmt(d),sch=empDaySchedule(emp,d),first=sch.blocks[0];shifts[`${emp.id}_${ds}`]=sch?.enabled&&first?{type:'morning',in:first.start,out:first.end,blocks:sch.blocks,notes:'Demo'}:{type:'off',in:null,out:null,notes:'Demo'};}});
   const documents=[{id:'demo-doc-1',empId:'demo-emp-1',type:'contract',name:'Contrat de travail',fileName:'contrat-demo.pdf',mimeType:'application/pdf',size:245000,data:'',notes:'Ejemplo de expediente',expiresAt:'',createdAt:new Date().toISOString()}];
-  return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,documents,settings:{company:'Demo Business',emoji:'MP',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
+  const salesProducts=[
+    {id:'demo-prod-1',name:'Menu del día',category:'Comida',type:'bundle',price:24,sku:'MENU-001',unit:'unit',trackStock:false,stock:0,minStock:0,active:true,createdAt:new Date().toISOString()},
+    {id:'demo-prod-2',name:'Café',category:'Bebidas',type:'product',price:4.5,sku:'CAF-001',unit:'unit',trackStock:true,stock:42,minStock:12,active:true,createdAt:new Date().toISOString()},
+    {id:'demo-prod-3',name:'Servicio catering',category:'Servicio',type:'service',price:180,sku:'SERV-001',unit:'hour',trackStock:false,stock:0,minStock:0,active:true,createdAt:new Date().toISOString()}
+  ];
+  const sales=[
+    {id:'demo-sale-1',productId:'demo-prod-1',productName:'Menu del día',category:'Comida',qty:8,unitPrice:24,total:192,method:'card',note:'Almuerzo',ts:localDateTimeISO(day(0),'12:45')},
+    {id:'demo-sale-2',productId:'demo-prod-2',productName:'Café',category:'Bebidas',qty:16,unitPrice:4.5,total:72,method:'cash',note:'',ts:localDateTimeISO(day(0),'10:30')},
+    {id:'demo-sale-3',productId:'demo-prod-1',productName:'Menu del día',category:'Comida',qty:5,unitPrice:24,total:120,method:'twint',note:'',ts:localDateTimeISO(day(1),'13:10')}
+  ];
+  return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,documents,salesProducts,sales,settings:{company:'Demo Business',emoji:'MP',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
 }
 
 function setRestaurantId(id){
@@ -1742,6 +1851,18 @@ async function loadSB(){
     }catch(docErr){
       console.warn('Employee documents not available yet:',docErr);
       DB.documents=DB.documents||[];
+    }
+    try{
+      const [sp,sa]=await Promise.all([
+        sb.from('sales_products').select('*').eq('restaurant_id',REST_ID).order('created_at',{ascending:false}),
+        sb.from('sales').select('*').eq('restaurant_id',REST_ID).order('sold_at',{ascending:false}).limit(500)
+      ]);
+      if(!sp.error)DB.salesProducts=(sp.data||[]).map(salesProductFromSB);
+      if(!sa.error)DB.sales=(sa.data||[]).map(saleFromSB);
+    }catch(salesErr){
+      console.warn('Sales tables not available yet:',salesErr);
+      DB.salesProducts=DB.salesProducts||[];
+      DB.sales=DB.sales||[];
     }
     saveLocal();return true;
   }catch(e){console.warn('SB error:',e);return false;}
@@ -1808,6 +1929,10 @@ async function sbSaveShift(key,sh){
   if(res.error)throw res.error;
 }
 async function sbSaveSettings(s){if(isDemo())return;await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours()}).eq('id',REST_ID);}
+function salesProductFromSB(x){return{id:x.id,name:x.name||'',category:x.category||'',type:x.type||'product',price:Number(x.price)||0,sku:x.sku||'',unit:x.unit||'unit',trackStock:!!x.track_stock,stock:Number(x.stock)||0,minStock:Number(x.min_stock)||0,active:x.active!==false,createdAt:x.created_at||new Date().toISOString()};}
+function saleFromSB(x){return{id:x.id,productId:x.product_id,productName:x.product_name||'',category:x.category||'',qty:Number(x.quantity)||0,unitPrice:Number(x.unit_price)||0,total:Number(x.total)||0,method:x.payment_method||'cash',note:x.note||'',ts:x.sold_at||x.created_at||new Date().toISOString()};}
+async function sbSaveSalesProduct(p){if(isDemo())return;const {error}=await sb.from('sales_products').upsert({id:p.id,restaurant_id:REST_ID,name:p.name,category:p.category||'',type:p.type||'product',price:p.price||0,sku:p.sku||'',unit:p.unit||'unit',track_stock:!!p.trackStock,stock:p.stock||0,min_stock:p.minStock||0,active:p.active!==false});if(error)console.warn('Sales product save failed',error);}
+async function sbSaveSale(s){if(isDemo())return;const {error}=await sb.from('sales').upsert({id:s.id,restaurant_id:REST_ID,product_id:s.productId||null,product_name:s.productName||'',category:s.category||'',quantity:s.qty||0,unit_price:s.unitPrice||0,total:s.total||0,payment_method:s.method||'cash',note:s.note||'',sold_at:s.ts||new Date().toISOString()});if(error)console.warn('Sale save failed',error);}
 async function sbUpdateAbsApproved(id,approved){if(isDemo())return;await sb.from('absences').update({approved}).eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDelAbs(id){if(isDemo())return;await sb.from('absences').delete().eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDeleteAll(){
@@ -1817,6 +1942,8 @@ async function sbDeleteAll(){
     sb.from('absences').delete().eq('restaurant_id',REST_ID),
     sb.from('shifts').delete().eq('restaurant_id',REST_ID),
     sb.from('employee_documents').delete().eq('restaurant_id',REST_ID),
+    sb.from('sales').delete().eq('restaurant_id',REST_ID),
+    sb.from('sales_products').delete().eq('restaurant_id',REST_ID),
     sb.from('employees').delete().eq('restaurant_id',REST_ID)
   ]);
 }
@@ -1903,6 +2030,7 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'
 const jsArg=v=>esc(JSON.stringify(String(v??'')));
 const clean=v=>String(v??'').replace(/[<>]/g,'').trim();
 const csvCell=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+const money=v=>`${DB.settings?.currency||'CHF'} ${(Number(v)||0).toFixed(2)}`;
 const initials=n=>(n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
 const iconIn=()=>`<svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>`;
 const iconOut=()=>`<svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/></svg>`;
@@ -2057,9 +2185,9 @@ function renderEmployeeLangBar(){
 function applyUITexts(){
   const t=T();
   renderLoginLangBar();
-  document.querySelectorAll('.sb-section').forEach((el,i)=>{const vals=[t.nav.principal,t.nav.planning,t.nav.finance,t.nav.config,t.nav.master];if(vals[i])el.textContent=vals[i];});
+  document.querySelectorAll('.sb-section').forEach((el,i)=>{const vals=[t.nav.principal,areaTx().team,areaTx().sales,t.nav.config,t.nav.master];if(vals[i])el.textContent=vals[i];});
   const setNav=(page,text)=>{const el=document.querySelector(`[onclick="nav('${page}',this)"] span`);if(el)el.textContent=text;};
-  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
+  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('sales',t.pages.sales);setNav('salesProducts',t.pages.salesProducts);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
   const mt=document.querySelector('[onclick="nav(\'master\',this)"] span');if(mt)mt.textContent=t.pages.master;
   document.getElementById('page-title').textContent=t.pages[currentPage]||currentPage;
   const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].textContent=t.login.manager;if(tabs[1])tabs[1].textContent=t.login.employee;if(tabs[2])tabs[2].textContent=t.login.restaurant;
@@ -2149,6 +2277,7 @@ function applyUITexts(){
   if(masterCardHeaders[2])masterCardHeaders[2].querySelector('span').textContent='Radar de mejora';
   if(masterCardHeaders[3])masterCardHeaders[3].textContent=master.maintenance;
   const maintBtns=document.querySelectorAll('#pg-master > .card:last-child .btn');if(maintBtns[0])maintBtns[0].textContent=master.github;if(maintBtns[1])maintBtns[1].textContent=master.site;if(maintBtns[2])maintBtns[2].textContent=master.supabase;if(maintBtns[3])maintBtns[3].textContent=master.backupJson;
+  updateSalesModalTexts();
   updateAssistantTexts();
 }
 function updateAssistantTexts(){
@@ -2171,6 +2300,16 @@ function setEmployeeLang(l){
   else{applyUITexts();renderPage(currentPage);}
 }
 
+function updateSalesModalTexts(){
+  const tx=salesTx(),set=(id,text)=>{const el=document.getElementById(id);if(el)el.textContent=text;};
+  set('sale-modal-title',tx.newSale);set('sale-product-label',tx.product);set('sale-qty-label',tx.qty);set('sale-price-label',tx.price);set('sale-method-label',tx.method);set('sale-note-label',tx.note);set('sale-total-label',tx.total);set('sale-cancel-btn',tx.cancel);set('sale-save-btn',tx.saveSale);
+  set('product-modal-title',tx.newProduct);set('product-name-label',tx.productName);set('product-category-label',tx.category);set('product-price-label',tx.price);set('product-type-label',tx.type);set('product-cancel-btn',tx.cancel);set('product-save-btn',tx.saveProduct);
+  set('product-sku-label',tx.sku);set('product-unit-label',tx.unit);set('product-track-label',tx.trackStock);set('product-stock-label',tx.stock);set('product-min-stock-label',tx.minStock);
+  const st=document.getElementById('product-type');if(st){st.options[0].textContent=tx.productType;st.options[1].textContent=tx.serviceType;st.options[2].textContent=tx.ingredientType;st.options[3].textContent=tx.bundleType;}
+  const su=document.getElementById('product-unit');if(su){su.options[0].textContent=tx.unitUnit;su.options[5].textContent=tx.unitHour;}
+  const sm=document.getElementById('sale-method');if(sm){sm.options[0].textContent=tx.cash;sm.options[1].textContent=tx.card;sm.options[2].textContent=tx.twint;sm.options[3].textContent=tx.transfer;}
+}
+
 function applyPermissionsUI(){
   const visible=(sel,show)=>document.querySelectorAll(sel).forEach(el=>el.style.display=show?'':'none');
   visible('#pg-payroll',can('view_payroll'));
@@ -2186,6 +2325,25 @@ function applyPermissionsUI(){
   if(currentPage==='reports'&&!can('view_reports'))goPage('dashboard');
   if(currentPage==='settings'&&!can('edit_settings'))goPage('dashboard');
   if(currentPage==='master'&&!can('master'))goPage('dashboard');
+  updateSidebarScope();
+}
+function updateSidebarScope(){
+  const salesPages=['sales','salesProducts'];
+  const configPages=['settings','master'];
+  const peoplePages=['dashboard','attendance','employees','shifts','vacations','payroll','reports','history'];
+  let scope='all';
+  if(salesPages.includes(currentPage))scope='sales';
+  else if(peoplePages.includes(currentPage))scope='people';
+  else if(configPages.includes(currentPage))scope='config';
+  const showAreas=scope==='all'?['main','people','sales','config','master']:scope==='sales'?['main','sales']:scope==='people'?['main','people']:['main','config','master'];
+  document.querySelectorAll('[data-sidebar-section]').forEach(el=>{
+    const key=el.dataset.sidebarSection;
+    el.style.display=showAreas.includes(key)&&(!(key==='master')||can('master'))?'':'none';
+  });
+  document.querySelectorAll('[data-sidebar-area]').forEach(el=>{
+    const key=el.dataset.sidebarArea;
+    el.style.display=showAreas.includes(key)&&(!(key==='config')||can('edit_settings'))?'':'none';
+  });
 }
 
 // ═══════ AUTH ═══════
@@ -3542,6 +3700,8 @@ function renderPage(p){
   if(!canPage(p)){goPage('hub');return;}
   if(p==='hub')renderHub();
   if(p==='dashboard')renderDash();
+  if(p==='sales')renderSales();
+  if(p==='salesProducts')renderSalesProducts();
   if(p==='attendance')renderAtt();
   if(p==='employees')renderEmps();
   if(p==='shifts')renderShifts();
@@ -3553,7 +3713,7 @@ function renderPage(p){
   if(p==='master')renderMaster();
   applyPermissionsUI();
 }
-function renderAll(){renderHub();renderDash();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
+function renderAll(){renderHub();renderDash();renderSales();renderSalesProducts();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
 
 function hubIcon(type){
   const icons={
@@ -3586,7 +3746,7 @@ function renderHub(){
   const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
   const cards=[
     {icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,action:"goPage('dashboard')",button:tx.openTeam},
-    {icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1'},
+    {icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1',active:true,action:"goPage('sales')",button:tx.open},
     {icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df'},
     {icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:['Expedientes','Vencimientos','IA'],color:'#7c3aed',soft:'#f3edff'},
     {icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:['Rutinas','Responsables','Pendientes'],color:'#0891b2',soft:'#e6f8fc'},
@@ -3622,6 +3782,125 @@ function renderHub(){
       </div>
     </div>
   </section>`;
+}
+
+function salesToday(){
+  return (DB.sales||[]).filter(s=>sameDay(s.ts,new Date()));
+}
+function salesMethodLabel(method){
+  const tx=salesTx();
+  return {cash:tx.cash,card:tx.card,twint:tx.twint,transfer:tx.transfer}[method]||method||tx.cash;
+}
+function salesProductTypeLabel(type){
+  const tx=salesTx();
+  return {product:tx.productType,service:tx.serviceType,ingredient:tx.ingredientType,bundle:tx.bundleType}[type]||tx.productType;
+}
+function salesSummary(list=salesToday()){
+  const total=list.reduce((a,s)=>a+(Number(s.total)||0),0),qty=list.reduce((a,s)=>a+(Number(s.qty)||0),0);
+  const byMethod={};const byProduct={};
+  list.forEach(s=>{byMethod[s.method||'cash']=(byMethod[s.method||'cash']||0)+(Number(s.total)||0);byProduct[s.productName||'?']=(byProduct[s.productName||'?']||0)+(Number(s.qty)||0);});
+  const top=Object.entries(byProduct).sort((a,b)=>b[1]-a[1])[0];
+  return{total,count:list.length,qty,ticket:list.length?total/list.length:0,byMethod,top};
+}
+function renderSales(){
+  const el=document.getElementById('sales-content');if(!el)return;
+  DB.salesProducts=DB.salesProducts||[];DB.sales=DB.sales||[];
+  const tx=salesTx(),today=salesToday(),sum=salesSummary(today),products=DB.salesProducts.filter(p=>p.active!==false);
+  const methodHTML=Object.keys(sum.byMethod).length?Object.entries(sum.byMethod).map(([m,v])=>`<div class="sales-row"><div><div class="fw8 fs13">${esc(salesMethodLabel(m))}</div><div class="fs11 muted">${esc(tx.byMethod)}</div></div><div class="fw8">${esc(money(v))}</div></div>`).join(''):`<div class="sales-empty">${esc(tx.empty)}</div>`;
+  el.innerHTML=`<section class="sales-hero">
+    <div class="hub-kicker">${esc(tx.today)}</div>
+    <h2>${esc(tx.title)}</h2>
+    <p>${esc(tx.sub)}</p>
+  </section>
+  <section class="sales-kpis" id="sales-summary">
+    <div class="sales-kpi"><div class="num" style="color:var(--green)">${esc(money(sum.total))}</div><div class="kpi-sub">${esc(tx.revenue)}</div></div>
+    <div class="sales-kpi"><div class="num">${sum.count}</div><div class="kpi-sub">${esc(tx.sales)}</div></div>
+    <div class="sales-kpi"><div class="num" style="color:var(--orange)">${esc(money(sum.ticket))}</div><div class="kpi-sub">${esc(tx.ticket)}</div></div>
+    <div class="sales-kpi"><div class="num" style="color:var(--cyan)">${products.length}</div><div class="kpi-sub">${esc(tx.products)}</div></div>
+  </section>
+  <section class="sales-grid">
+    <div>
+      <div class="sales-panel">
+        <div class="flex-b mb12"><div class="card-header" style="margin:0">${esc(tx.activity)}</div><button class="btn btn-primary btn-sm" onclick="openSaleModal()">${esc(tx.newSale)}</button></div>
+        ${today.length?today.map(s=>`<div class="sales-row"><div><div class="fw8 fs13">${esc(s.productName)}</div><div class="fs11 muted">${fmtTime(s.ts)} · ${Number(s.qty)||0} × ${esc(money(s.unitPrice))} · <span class="sales-method">${esc(salesMethodLabel(s.method))}</span></div>${s.note?`<div class="fs11 muted mt4">${esc(s.note)}</div>`:''}</div><div class="fw8" style="color:var(--green)">${esc(money(s.total))}</div></div>`).join(''):`<div class="sales-empty">${esc(tx.empty)}</div>`}
+      </div>
+      <div class="sales-panel" id="sales-insights">
+        <div class="card-header" style="margin:0 0 12px">${esc(tx.byMethod)}</div>
+        ${methodHTML}
+      </div>
+    </div>
+    <div>
+      <div class="sales-panel">
+        <div class="card-header" style="margin:0 0 12px">${esc(tx.topProduct)}</div>
+        <div class="fw8 fs20">${esc(sum.top?.[0]||'-')}</div>
+        <div class="fs12 muted mt4">${sum.top?`${sum.top[1]} ${esc(tx.sales).toLowerCase()}`:esc(tx.empty)}</div>
+      </div>
+      <div class="sales-panel">
+        <div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.catalog)}</div><div class="fs12 muted">${products.length} ${esc(tx.products).toLowerCase()}</div></div><button class="btn btn-ghost btn-sm" onclick="goPage('salesProducts')">${esc(tx.openSection)}</button></div>
+        <div class="sales-empty">${esc(tx.goCatalogDesc)}</div>
+      </div>
+    </div>
+  </section>`;
+}
+function renderSalesProducts(){
+  const el=document.getElementById('sales-products-content');if(!el)return;
+  DB.salesProducts=DB.salesProducts||[];
+  const tx=salesTx(),products=DB.salesProducts.filter(p=>p.active!==false);
+  el.innerHTML=`<section class="sales-hero">
+    <div class="hub-kicker">${esc(tx.catalog)}</div>
+    <h2>${esc(tx.goCatalog)}</h2>
+    <p>${esc(tx.goCatalogDesc)}</p>
+  </section>
+  <section class="sales-panel">
+    <div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.catalog)}</div><div class="fs12 muted">${esc(tx.product)}, ${esc(tx.price)}, ${esc(tx.category)}</div></div><button class="btn btn-primary btn-sm" onclick="openProductModal()">${esc(tx.newProduct)}</button></div>
+    ${products.length?products.map(p=>`<div class="sales-product"><div class="sales-product-dot">${esc((p.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(p.name)}</div><div class="fs11 muted">${esc(p.category||'-')} · ${esc(salesProductTypeLabel(p.type))}${p.sku?` · ${esc(p.sku)}`:''}</div>${p.trackStock?`<div class="fs11 ${Number(p.stock)<=Number(p.minStock)?'red':'muted'} mt4">${esc(tx.stock)}: ${Number(p.stock)||0} ${esc(p.unit||tx.unitUnit)} · ${esc(tx.minStock)}: ${Number(p.minStock)||0}</div>`:''}</div><div class="fw8">${esc(money(p.price))}</div></div>`).join(''):`<div class="sales-empty">${esc(tx.missingProduct)}</div>`}
+  </section>`;
+}
+function openSaleModal(){
+  const tx=salesTx(),products=(DB.salesProducts||[]).filter(p=>p.active!==false);
+  if(!products.length){toast(tx.missingProduct,'#f59e0b');openProductModal();return;}
+  updateSalesModalTexts();
+  document.getElementById('sale-product').innerHTML=products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} · ${esc(money(p.price))}</option>`).join('');
+  document.getElementById('sale-qty').value=1;
+  document.getElementById('sale-method').value='cash';
+  document.getElementById('sale-note').value='';
+  syncSaleProductPrice();
+  openModal('sale-modal');
+}
+function syncSaleProductPrice(){
+  const id=document.getElementById('sale-product')?.value,p=(DB.salesProducts||[]).find(x=>x.id===id);
+  if(p)document.getElementById('sale-price').value=Number(p.price||0).toFixed(2);
+  updateSaleTotal();
+}
+function updateSaleTotal(){
+  const qty=Number(document.getElementById('sale-qty')?.value)||0,price=Number(document.getElementById('sale-price')?.value)||0;
+  const el=document.getElementById('sale-total');if(el)el.textContent=money(qty*price);
+}
+function saveSale(){
+  const tx=salesTx(),id=document.getElementById('sale-product').value,p=(DB.salesProducts||[]).find(x=>x.id===id);
+  if(!p){toast(tx.missingProduct,'#ef4444');return;}
+  const qty=Math.max(1,Number(document.getElementById('sale-qty').value)||1),unitPrice=Math.max(0,Number(document.getElementById('sale-price').value)||0);
+  const sale={id:uid(),productId:p.id,productName:p.name,category:p.category||'',qty,unitPrice,total:qty*unitPrice,method:document.getElementById('sale-method').value||'cash',note:clean(document.getElementById('sale-note').value),ts:new Date().toISOString()};
+  DB.sales=[sale,...(DB.sales||[])];saveLocal();closeModal('sale-modal');renderSales();renderHub();toast(tx.saved);sbSaveSale(sale).catch(console.error);
+}
+function openProductModal(){
+  const tx=salesTx();updateSalesModalTexts();
+  document.getElementById('product-name').value='';document.getElementById('product-category').value='';document.getElementById('product-price').value='0';document.getElementById('product-type').value='product';document.getElementById('product-sku').value='';document.getElementById('product-unit').value='unit';document.getElementById('product-track-stock').checked=false;document.getElementById('product-stock').value='0';document.getElementById('product-min-stock').value='0';toggleProductInventoryFields();
+  openModal('product-modal');
+}
+function toggleProductInventoryFields(){
+  const type=document.getElementById('product-type')?.value;
+  const track=document.getElementById('product-track-stock');
+  const row=document.getElementById('product-stock-row');
+  if(type==='service'&&track)track.checked=false;
+  if(row)row.style.display=track?.checked?'grid':'none';
+}
+function saveProduct(){
+  const tx=salesTx(),name=clean(document.getElementById('product-name').value);
+  if(!name){toast(tx.productName,'#ef4444');return;}
+  const type=document.getElementById('product-type').value||'product',track=!!document.getElementById('product-track-stock').checked&&type!=='service';
+  const product={id:uid(),name,category:clean(document.getElementById('product-category').value),type,price:Math.max(0,Number(document.getElementById('product-price').value)||0),sku:clean(document.getElementById('product-sku').value),unit:document.getElementById('product-unit').value||'unit',trackStock:track,stock:track?Math.max(0,Number(document.getElementById('product-stock').value)||0):0,minStock:track?Math.max(0,Number(document.getElementById('product-min-stock').value)||0):0,active:true,createdAt:new Date().toISOString()};
+  DB.salesProducts=[product,...(DB.salesProducts||[])];saveLocal();closeModal('product-modal');renderSales();renderSalesProducts();renderHub();toast(tx.productSaved);sbSaveSalesProduct(product).catch(console.error);
 }
 
 function tickEmpPortal(){
