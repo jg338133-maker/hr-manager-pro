@@ -63,6 +63,7 @@ create table if not exists public.sales_products (
   track_stock boolean not null default false,
   stock numeric(12,2) not null default 0,
   min_stock numeric(12,2) not null default 0,
+  recipe jsonb not null default '[]'::jsonb,
   active boolean not null default true,
   created_at timestamptz default now()
 );
@@ -72,7 +73,8 @@ add column if not exists sku text default '',
 add column if not exists unit text default 'unit',
 add column if not exists track_stock boolean not null default false,
 add column if not exists stock numeric(12,2) not null default 0,
-add column if not exists min_stock numeric(12,2) not null default 0;
+add column if not exists min_stock numeric(12,2) not null default 0,
+add column if not exists recipe jsonb not null default '[]'::jsonb;
 
 do $$
 declare
@@ -101,12 +103,42 @@ create table if not exists public.sales (
   product_id uuid references public.sales_products(id) on delete set null,
   product_name text not null default '',
   category text default '',
+  employee_id uuid references public.employees(id) on delete set null,
+  employee_name text default '',
   quantity numeric(12,2) not null default 1,
   unit_price numeric(12,2) not null default 0,
   total numeric(12,2) not null default 0,
   payment_method text not null default 'cash',
   note text default '',
   sold_at timestamptz default now(),
+  created_at timestamptz default now()
+);
+
+alter table public.sales
+add column if not exists employee_id uuid references public.employees(id) on delete set null,
+add column if not exists employee_name text default '';
+
+create table if not exists public.inventory_suppliers (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.restaurants(id) on delete cascade,
+  name text not null,
+  phone text default '',
+  email text default '',
+  notes text default '',
+  created_at timestamptz default now()
+);
+
+create table if not exists public.inventory_purchases (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.restaurants(id) on delete cascade,
+  product_id uuid references public.sales_products(id) on delete set null,
+  product_name text not null default '',
+  supplier_id uuid references public.inventory_suppliers(id) on delete set null,
+  supplier_name text default '',
+  quantity numeric(12,2) not null default 0,
+  total_cost numeric(12,2) not null default 0,
+  note text default '',
+  purchased_at timestamptz default now(),
   created_at timestamptz default now()
 );
 
@@ -154,6 +186,8 @@ alter table public.manager_assistant_signals enable row level security;
 alter table public.restaurant_invites enable row level security;
 alter table public.sales_products enable row level security;
 alter table public.sales enable row level security;
+alter table public.inventory_suppliers enable row level security;
+alter table public.inventory_purchases enable row level security;
 
 create or replace function public.is_super_admin()
 returns boolean
@@ -290,6 +324,18 @@ on public.sales for all
 using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
 with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
 
+drop policy if exists "inventory suppliers scoped all" on public.inventory_suppliers;
+create policy "inventory suppliers scoped all"
+on public.inventory_suppliers for all
+using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
+with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
+
+drop policy if exists "inventory purchases scoped all" on public.inventory_purchases;
+create policy "inventory purchases scoped all"
+on public.inventory_purchases for all
+using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
+with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
+
 create index if not exists sales_products_restaurant_idx
 on public.sales_products (restaurant_id, active, created_at desc);
 
@@ -298,6 +344,15 @@ on public.sales_products (restaurant_id, sku);
 
 create index if not exists sales_restaurant_sold_idx
 on public.sales (restaurant_id, sold_at desc);
+
+create index if not exists inventory_suppliers_restaurant_idx
+on public.inventory_suppliers (restaurant_id, created_at desc);
+
+create index if not exists inventory_purchases_restaurant_idx
+on public.inventory_purchases (restaurant_id, purchased_at desc);
+
+create index if not exists inventory_purchases_product_idx
+on public.inventory_purchases (product_id, purchased_at desc);
 
 drop policy if exists "restaurant invites scoped owner" on public.restaurant_invites;
 create policy "restaurant invites scoped owner"
@@ -506,6 +561,7 @@ alter table public.restaurants add column if not exists brand_color text default
 alter table public.restaurants add column if not exists brand_color2 text default '#7c3aed';
 alter table public.restaurants add column if not exists status text default 'active';
 alter table public.restaurants add column if not exists opening_hours jsonb default '{}'::jsonb;
+alter table public.restaurants add column if not exists sales_panel_widgets jsonb default null;
 alter table public.shifts add column if not exists blocks jsonb default '[]'::jsonb;
 update public.employees set pin = '0000' where pin is null or pin = '';
 update public.restaurants set emoji = '🍽️' where emoji is null or emoji = '';
@@ -855,6 +911,8 @@ begin
   delete from public.absences where restaurant_id = p_restaurant_id;
   delete from public.shifts where restaurant_id = p_restaurant_id;
   delete from public.employee_documents where restaurant_id = p_restaurant_id;
+  delete from public.inventory_purchases where restaurant_id = p_restaurant_id;
+  delete from public.inventory_suppliers where restaurant_id = p_restaurant_id;
   delete from public.sales where restaurant_id = p_restaurant_id;
   delete from public.sales_products where restaurant_id = p_restaurant_id;
   delete from public.employees where restaurant_id = p_restaurant_id;

@@ -143,6 +143,9 @@ input[type=date],input[type=time]{color-scheme:dark}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .check-row{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:13px;font-weight:800}
 .check-row input{width:16px;height:16px;accent-color:var(--brand)}
+.recipe-box{display:none;margin:6px 0 18px;padding:12px;border:1px solid var(--border);border-radius:var(--r2);background:var(--s3)}
+.recipe-row{display:grid;grid-template-columns:1fr 140px 34px;gap:8px;align-items:end;margin-top:8px}
+.recipe-row .btn{height:42px;padding:0;border-radius:12px}
 
 /* TOGGLE */
 .tgl-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
@@ -488,8 +491,12 @@ body.manager-theme #pg-hub{width:min(100%,1480px);margin:0 auto}
 .sales-area-meta{font-size:11px;font-weight:800;color:#2563eb;margin-top:10px}
 .sales-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
 .sales-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.sales-kpis-secondary{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
 .sales-kpi{background:#fff;border:1px solid #dbe4f1;border-radius:18px;padding:15px;box-shadow:0 14px 34px rgba(25,36,60,.06)}
+.sales-kpi-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.sales-kpi-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:17px;font-weight:900}
 .sales-kpi .num{font-size:24px;font-weight:900;line-height:1;color:var(--brand)}
+.sales-kpi .kpi-sub{font-size:12px;color:#64748b;font-weight:800;margin-top:5px}
 .sales-panel{background:#fff;border:1px solid #dbe4f1;border-radius:20px;padding:18px;box-shadow:0 16px 38px rgba(25,36,60,.06);margin-bottom:14px}
 .sales-product{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #e2e8f4;border-radius:16px;background:#f8fafc;margin-bottom:8px}
 .sales-product-dot{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-weight:900;color:#fff;background:linear-gradient(135deg,#16a34a,#0ea5c6);flex-shrink:0}
@@ -497,6 +504,62 @@ body.manager-theme #pg-hub{width:min(100%,1480px);margin:0 auto}
 .sales-row:last-child{border-bottom:0}
 .sales-method{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;padding:5px 8px;border-radius:999px;background:#eef4ff;color:#2563eb}
 .sales-empty{padding:24px;text-align:center;color:var(--text2);border:1px dashed #cbd5e1;border-radius:18px;background:#f8fafc}
+.sales-period-tabs{display:inline-flex;gap:4px;background:#fff;border:1px solid #dbe4f1;border-radius:14px;padding:4px;margin:0 0 14px;box-shadow:0 10px 26px rgba(25,36,60,.05)}
+.sales-period-tab{border:0;background:transparent;border-radius:10px;padding:8px 14px;color:#64748b;font:800 13px inherit;cursor:pointer}
+.sales-period-tab.active{background:#0f172a;color:#fff}
+.sales-kpi.compact .num{font-size:28px}
+.sales-kpi-trend{display:inline-flex;align-items:center;gap:4px;margin-top:10px;border-radius:8px;padding:5px 8px;background:#ecfdf5;color:#059669;font-size:11px;font-weight:900}
+.sales-kpi-trend.warn{background:#fff1f2;color:#dc2626}
+.sales-kpi-trend.neutral{background:#f1f5f9;color:#64748b}
+.sales-widget-grid{display:grid;grid-template-columns:1.15fr .95fr;gap:14px}
+.sales-widget-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.sales-report-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:14px}
+.sales-report-card{background:#fff;border:1px solid #dbe4f1;border-radius:20px;padding:18px;box-shadow:0 16px 38px rgba(25,36,60,.06);display:flex;flex-direction:column;gap:10px;min-height:180px}
+.sales-report-icon{width:44px;height:44px;border-radius:15px;background:#eff6ff;color:#2563eb;display:grid;place-items:center;font-size:20px;font-weight:900}
+.sales-report-card h3{margin:0;font-size:18px;color:var(--text)}
+.sales-report-card p{margin:0;color:#64748b;font-size:13px;line-height:1.45}
+.sales-report-actions{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+.sales-preview-table{width:100%;border-collapse:collapse;font-size:13px}
+.sales-preview-table th,.sales-preview-table td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}
+.sales-preview-table th{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:#64748b;background:#f8fafc}
+.sales-preview-table td.num,.sales-preview-table th.num{text-align:right;font-weight:800}
+.sales-panel-title{font-size:17px;font-weight:950;color:var(--text);margin:0}
+.sales-panel-sub{font-size:12px;color:#8a96ad;margin-top:3px}
+.sales-bar-list{display:grid;gap:12px}
+.sales-bar-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px}
+.sales-rank{width:26px;height:26px;border-radius:9px;background:#eef4ff;color:#2563eb;display:grid;place-items:center;font-size:12px;font-weight:950}
+.sales-rank.gold{background:#fef3c7;color:#92400e}
+.sales-bar-label{min-width:0}
+.sales-bar-name{font-size:13px;font-weight:900;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sales-bar-sub{font-size:11px;color:#64748b;margin-top:2px}
+.sales-bar-track{height:8px;border-radius:99px;background:#edf2f8;margin-top:8px;overflow:hidden}
+.sales-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#2563eb,#60a5fa)}
+.sales-bar-value{font-size:13px;font-weight:950;color:var(--text);text-align:right}
+.sales-donut-wrap{display:flex;align-items:center;gap:18px}
+.sales-donut{width:132px;height:132px;border-radius:999px;background:conic-gradient(#2563eb 0 45%,#059669 45% 80%,#7c3aed 80% 95%,#94a3b8 95% 100%);position:relative;display:grid;place-items:center;flex-shrink:0}
+.sales-donut::after{content:'';position:absolute;inset:28px;border-radius:999px;background:#fff}
+.sales-donut-center{position:relative;z-index:1;text-align:center;font-weight:950;color:var(--text);font-size:16px}
+.sales-donut-center span{display:block;color:#64748b;font-size:11px;font-weight:800}
+.sales-legend{display:grid;gap:10px;flex:1}
+.sales-legend-row{display:grid;grid-template-columns:auto 1fr auto;gap:9px;align-items:center;font-size:13px;color:var(--text)}
+.sales-legend-dot{width:10px;height:10px;border-radius:4px}
+.sales-hour-chart{height:142px;display:flex;align-items:flex-end;gap:7px;padding:8px 0 0}
+.sales-hour-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0}
+.sales-hour-bar{width:100%;max-width:22px;border-radius:8px 8px 0 0;background:#dbeafe;min-height:8px}
+.sales-hour-bar.peak{background:#2563eb}
+.sales-hour-label{font-size:10px;color:#8a96ad;font-weight:800}
+.sales-stock-panel{border-left:4px solid #ef4444;background:linear-gradient(90deg,#fff1f2,#fff 56%)}
+.sales-stock-item{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid #fee2e2}
+.sales-stock-item:last-child{border-bottom:0}
+.sales-stock-icon{width:36px;height:36px;border-radius:12px;background:#f1f5f9;display:grid;place-items:center}
+.sales-stock-badge{margin-left:auto;border-radius:999px;padding:5px 9px;background:#fecaca;color:#991b1b;font-size:10px;font-weight:950;text-transform:uppercase}
+.sales-stock-badge.low{background:#fed7aa;color:#9a3412}
+.sales-config-cta{display:flex;align-items:center;gap:14px;border:1px dashed #bfdbfe;background:linear-gradient(135deg,#eff6ff,#fff);border-radius:20px;padding:18px;min-height:150px}
+.sales-config-cta .ico{width:48px;height:48px;border-radius:16px;background:#fff;display:grid;place-items:center;color:#7c3aed;box-shadow:0 10px 28px rgba(25,36,60,.08)}
+.sales-config-options{display:grid;gap:12px}
+.sales-config-group{border:1px solid #dbe4f1;border-radius:16px;background:#fff;padding:12px}
+.sales-config-row{display:flex;align-items:center;gap:12px;border:1px solid #dbe4f1;border-radius:14px;background:#eff6ff;padding:12px;margin-top:8px}
+.sales-config-row input{width:18px;height:18px;accent-color:#2563eb}
 body.manager-theme #pg-dashboard{width:min(100%,1680px);margin:0 auto}
 body.manager-theme #dash-hero{position:relative;overflow:hidden;min-height:138px;padding:22px 24px;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;color:#f8fbff;border:0!important;background:linear-gradient(135deg,#172554 0%,#1e2f62 48%,#155e75 100%)!important;box-shadow:0 18px 44px rgba(24,35,80,.24)}
 body.manager-theme #dash-hero::before{content:'';position:absolute;right:-86px;bottom:-112px;width:360px;height:230px;border-radius:34px;background:linear-gradient(135deg,rgba(52,104,255,.32),rgba(22,168,114,.2));transform:rotate(-13deg)}
@@ -887,6 +950,27 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
       <span>Productos</span>
     </div>
+    <div class="sb-item" data-sidebar-area="sales" onclick="nav('salesReports',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Reportes ventas</span>
+    </div>
+    <div class="sb-section" data-sidebar-section="inventory">Inventario</div>
+    <div class="sb-item" data-sidebar-area="inventory" onclick="nav('inventory',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
+      <span>Panel inventario</span>
+    </div>
+    <div class="sb-item" data-sidebar-area="inventory" onclick="nav('inventoryStock',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/><path d="M8 6v12"/></svg>
+      <span>Stock</span>
+    </div>
+    <div class="sb-item" data-sidebar-area="inventory" onclick="nav('inventoryPurchases',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.6 13.4a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+      <span>Compras</span>
+    </div>
+    <div class="sb-item" data-sidebar-area="inventory" onclick="nav('inventorySuppliers',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1M9 13h1M9 17h1"/></svg>
+      <span>Proveedores</span>
+    </div>
     <div class="sb-section" data-sidebar-section="config">Configuration</div>
     <div class="sb-item" data-sidebar-area="config" onclick="nav('settings',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -960,6 +1044,26 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 
 <div class="page" id="pg-salesProducts">
   <div id="sales-products-content"></div>
+</div>
+
+<div class="page" id="pg-salesReports">
+  <div id="sales-reports-content"></div>
+</div>
+
+<div class="page" id="pg-inventory">
+  <div id="inventory-content"></div>
+</div>
+
+<div class="page" id="pg-inventoryStock">
+  <div id="inventory-stock-content"></div>
+</div>
+
+<div class="page" id="pg-inventoryPurchases">
+  <div id="inventory-purchases-content"></div>
+</div>
+
+<div class="page" id="pg-inventorySuppliers">
+  <div id="inventory-suppliers-content"></div>
 </div>
 
 <div class="page" id="pg-attendance">
@@ -1374,11 +1478,26 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
     <div class="fg"><label id="sale-price-label">Precio</label><input type="number" id="sale-price" min="0" value="0" step="0.05" oninput="updateSaleTotal()"></div>
   </div>
   <div class="fg"><label id="sale-method-label">Método de pago</label><select id="sale-method"><option value="cash">Cash</option><option value="card">Card</option><option value="twint">TWINT</option><option value="transfer">Transfer</option></select></div>
+  <div class="fg"><label id="sale-employee-label">Empleado responsable</label><select id="sale-employee"></select></div>
   <div class="fg"><label id="sale-note-label">Nota</label><input id="sale-note" placeholder="-"></div>
   <div class="card" style="margin-bottom:0"><div class="flex-b"><span class="muted" id="sale-total-label">Total</span><span class="fw8 fs20" id="sale-total">CHF 0.00</span></div></div>
   <div class="modal-actions">
     <button class="btn btn-ghost" id="sale-cancel-btn" onclick="closeModal('sale-modal')">Cancelar</button>
     <button class="btn btn-primary" id="sale-save-btn" onclick="saveSale()">Guardar venta</button>
+  </div>
+</div>
+</div>
+
+<!-- Sales Panel Config -->
+<div class="ov" id="sales-config-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="sales-config-title">Configurar panel</div>
+  <div class="muted fs12 mb12" id="sales-config-help">Elige los indicadores que quieres ver en Ventas.</div>
+  <div id="sales-config-options"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" id="sales-config-cancel" onclick="closeModal('sales-config-modal')">Cancelar</button>
+    <button class="btn btn-primary" id="sales-config-save" onclick="saveSalesPanelConfig()">Guardar</button>
   </div>
 </div>
 </div>
@@ -1396,16 +1515,63 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   <div class="fg"><label id="product-type-label">Tipo</label><select id="product-type" onchange="toggleProductInventoryFields()"><option value="product">Producto</option><option value="service">Servicio</option><option value="ingredient">Insumo</option><option value="bundle">Combo</option></select></div>
   <div class="frow">
     <div class="fg"><label id="product-sku-label">SKU / Código</label><input id="product-sku" placeholder="CAF-001"></div>
-    <div class="fg"><label id="product-unit-label">Unidad</label><select id="product-unit"><option value="unit">Unidad</option><option value="kg">kg</option><option value="g">g</option><option value="l">L</option><option value="ml">ml</option><option value="hour">Hora</option></select></div>
+    <div class="fg"><label id="product-unit-label">Unidad</label><select id="product-unit"><option value="unit">Unidad</option><option value="kg">kg</option><option value="g">g</option><option value="l">L</option><option value="ml">ml</option><option value="portion">Porción</option><option value="pack">Paquete</option><option value="box">Caja</option><option value="bottle">Botella</option><option value="hour">Hora</option></select></div>
   </div>
   <label class="check-row" style="margin-bottom:12px"><input type="checkbox" id="product-track-stock" onchange="toggleProductInventoryFields()"> <span id="product-track-label">Controlar inventario</span></label>
   <div class="frow" id="product-stock-row">
     <div class="fg"><label id="product-stock-label">Stock actual</label><input type="number" id="product-stock" min="0" step="0.01" value="0"></div>
     <div class="fg"><label id="product-min-stock-label">Stock mínimo</label><input type="number" id="product-min-stock" min="0" step="0.01" value="0"></div>
   </div>
+  <div class="recipe-box" id="product-recipe-box">
+    <div class="flex-b">
+      <div>
+        <div class="fw8 fs13" id="product-recipe-title">Consumo por venta</div>
+        <div class="fs11 muted" id="product-recipe-help">Ingredientes que se descuentan cuando se vende este preparado.</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="product-recipe-add" onclick="addRecipeRow()">+ Insumo</button>
+    </div>
+    <div id="product-recipe-rows"></div>
+  </div>
   <div class="modal-actions">
     <button class="btn btn-ghost" id="product-cancel-btn" onclick="closeModal('product-modal')">Cancelar</button>
     <button class="btn btn-primary" id="product-save-btn" onclick="saveProduct()">Guardar</button>
+  </div>
+</div>
+</div>
+
+<!-- Inventory Purchase -->
+<div class="ov" id="purchase-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="purchase-modal-title">Nueva compra</div>
+  <div class="fg"><label id="purchase-product-label">Insumo o producto</label><select id="purchase-product"></select></div>
+  <div class="fg"><label id="purchase-supplier-label">Proveedor</label><select id="purchase-supplier"></select></div>
+  <div class="frow">
+    <div class="fg"><label id="purchase-qty-label">Cantidad</label><input type="number" id="purchase-qty" min="0" step="0.01" value="1"></div>
+    <div class="fg"><label id="purchase-cost-label">Costo total</label><input type="number" id="purchase-cost" min="0" step="0.05" value="0"></div>
+  </div>
+  <div class="fg"><label id="purchase-note-label">Nota</label><input id="purchase-note" placeholder="-"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" id="purchase-cancel-btn" onclick="closeModal('purchase-modal')">Cancelar</button>
+    <button class="btn btn-primary" id="purchase-save-btn" onclick="savePurchase()">Guardar compra</button>
+  </div>
+</div>
+</div>
+
+<!-- Supplier Entry -->
+<div class="ov" id="supplier-modal">
+<div class="modal">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="supplier-modal-title">Nuevo proveedor</div>
+  <div class="fg"><label id="supplier-name-label">Nombre</label><input id="supplier-name" placeholder="Proveedor"></div>
+  <div class="frow">
+    <div class="fg"><label id="supplier-phone-label">Teléfono</label><input id="supplier-phone" placeholder="+41"></div>
+    <div class="fg"><label id="supplier-email-label">Email</label><input id="supplier-email" placeholder="proveedor@email.com"></div>
+  </div>
+  <div class="fg"><label id="supplier-note-label">Nota</label><input id="supplier-note" placeholder="-"></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" id="supplier-cancel-btn" onclick="closeModal('supplier-modal')">Cancelar</button>
+    <button class="btn btn-primary" id="supplier-save-btn" onclick="saveSupplier()">Guardar proveedor</button>
   </div>
 </div>
 </div>
@@ -1496,11 +1662,11 @@ const UI={
   de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Personalverwaltung · Freiburg CH'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
   it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione personale'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
 };
-Object.assign(UI.fr.pages,{hub:'Domaines',sales:'Ventes',salesProducts:'Produits'});
-Object.assign(UI.es.pages,{hub:'Áreas',sales:'Ventas',salesProducts:'Productos'});
-Object.assign(UI.en.pages,{hub:'Areas',sales:'Sales',salesProducts:'Products'});
-Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkte'});
-Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti'});
+Object.assign(UI.fr.pages,{hub:'Domaines',sales:'Ventes',salesProducts:'Produits',salesReports:'Rapports ventes',inventory:'Inventaire',inventoryStock:'Stock',inventoryPurchases:'Achats',inventorySuppliers:'Fournisseurs'});
+Object.assign(UI.es.pages,{hub:'Áreas',sales:'Ventas',salesProducts:'Productos',salesReports:'Reportes ventas',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Compras',inventorySuppliers:'Proveedores'});
+Object.assign(UI.en.pages,{hub:'Areas',sales:'Sales',salesProducts:'Products',salesReports:'Sales reports',inventory:'Inventory',inventoryStock:'Stock',inventoryPurchases:'Purchases',inventorySuppliers:'Suppliers'});
+Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkte',salesReports:'Verkaufsberichte',inventory:'Inventar',inventoryStock:'Lager',inventoryPurchases:'Einkäufe',inventorySuppliers:'Lieferanten'});
+Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti',salesReports:'Report vendite',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Acquisti',inventorySuppliers:'Fornitori'});
 
 const AREA_UI={
   es:{eyebrow:'Manager Pro como plataforma',title:'¿Qué área quieres gestionar hoy?',sub:'Empieza por Personal y ve sumando ventas, inventario, documentos e insights cuando el negocio lo necesite.',open:'Abrir',soon:'Próximamente',next:'Siguiente módulo',active:'Activo ahora',today:'Hoy en Personal',roadmap:'Camino del producto',settings:'Configuración',settingsDesc:'Idioma, colores, horarios de apertura, tolerancias, accesos y datos del negocio.',openSettings:'Abrir ajustes',team:'Personal',teamDesc:'Empleados, horarios, fichajes, pausas, solicitudes, documentos, salarios y reportes.',sales:'Ventas',salesDesc:'Ventas por producto o servicio, caja diaria, métodos de pago y cierres.',inventory:'Inventario',inventoryDesc:'Stock, proveedores, compras y consumo conectado a ventas.',documents:'Documentos',documentsDesc:'Contratos, permisos, vencimientos y expediente de cada trabajador.',tasks:'Tareas',tasksDesc:'Rutinas, responsables, pendientes y seguimiento operativo.',insights:'IA e insights',insightsDesc:'Preguntas al negocio, señales de mejora y ayuda para tomar decisiones.',employees:'Empleados',pending:'Solicitudes pendientes',alerts:'Alertas abiertas',p1:'Personal listo: controlar equipo y cerrar el mes.',p2:'Ventas por items: registrar productos y servicios.',p3:'Inventario: conectar ventas con stock y compras.',p4:'Insights: entender qué pasa sin hablar lenguaje administrativo.',openTeam:'Entrar a Personal'},
@@ -1511,13 +1677,19 @@ const AREA_UI={
 };
 const areaTx=()=>({...AREA_UI.es,...(AREA_UI[lang]||{})});
 const SALES_UI={
-  es:{title:'Ventas y caja',sub:'Registra ventas por producto o servicio. Así después podremos sacar insights y conectar inventario.',today:'Hoy',revenue:'Ingresos',sales:'Ventas',ticket:'Ticket prom.',products:'Productos',newSale:'Nueva venta',newProduct:'Nuevo producto',catalog:'Catálogo',activity:'Actividad del día',empty:'Aún no hay ventas registradas hoy.',product:'Producto o servicio',qty:'Cantidad',price:'Precio',method:'Método de pago',note:'Nota',total:'Total',saveSale:'Guardar venta',cancel:'Cancelar',productName:'Nombre',category:'Categoría',type:'Tipo',saveProduct:'Guardar',cash:'Efectivo',card:'Tarjeta',twint:'TWINT',transfer:'Transferencia',productType:'Producto',serviceType:'Servicio',ingredientType:'Insumo',bundleType:'Combo/preparado',sku:'SKU / Código',unit:'Unidad',unitUnit:'Unidad',unitHour:'Hora',trackStock:'Controlar inventario',stock:'Stock actual',minStock:'Stock mínimo',lowStock:'Stock bajo',saved:'Venta guardada',productSaved:'Producto guardado',missingProduct:'Crea primero un producto o servicio.',topProduct:'Más vendido',byMethod:'Por método de pago',areaTitle:'Panel de ventas',areaDesc:'Elige qué necesitas hacer en esta área.',goSummary:'Ver resumen',goSummaryDesc:'Ingresos, ticket promedio y actividad del día.',goRegister:'Registrar venta',goRegisterDesc:'Añade una venta rápida por producto o servicio.',goCatalog:'Gestionar catálogo',goCatalogDesc:'Productos, servicios y precios base.',goClose:'Caja e insights',goCloseDesc:'Métodos de pago, más vendido y señales para decidir.',openSection:'Abrir'},
-  en:{title:'Sales and cash',sub:'Register sales by product or service. Later we can generate insights and connect inventory.',today:'Today',revenue:'Revenue',sales:'Sales',ticket:'Avg. ticket',products:'Products',newSale:'New sale',newProduct:'New product',catalog:'Catalog',activity:'Day activity',empty:'No sales registered today yet.',product:'Product or service',qty:'Quantity',price:'Price',method:'Payment method',note:'Note',total:'Total',saveSale:'Save sale',cancel:'Cancel',productName:'Name',category:'Category',type:'Type',saveProduct:'Save',cash:'Cash',card:'Card',twint:'TWINT',transfer:'Transfer',productType:'Product',serviceType:'Service',ingredientType:'Ingredient/input',bundleType:'Bundle/prepared',sku:'SKU / Code',unit:'Unit',unitUnit:'Unit',unitHour:'Hour',trackStock:'Track inventory',stock:'Current stock',minStock:'Minimum stock',lowStock:'Low stock',saved:'Sale saved',productSaved:'Product saved',missingProduct:'Create a product or service first.',topProduct:'Top seller',byMethod:'By payment method',areaTitle:'Sales panel',areaDesc:'Choose what you need to do in this area.',goSummary:'View summary',goSummaryDesc:'Revenue, average ticket and daily activity.',goRegister:'Register sale',goRegisterDesc:'Add a quick sale by product or service.',goCatalog:'Manage catalog',goCatalogDesc:'Products, services and base prices.',goClose:'Cash and insights',goCloseDesc:'Payment methods, top seller and decision signals.',openSection:'Open'},
-  fr:{title:'Ventes et caisse',sub:'Enregistrez les ventes par produit ou service. Ensuite nous pourrons créer des insights et connecter l’inventaire.',today:'Aujourd’hui',revenue:'Revenus',sales:'Ventes',ticket:'Ticket moyen',products:'Produits',newSale:'Nouvelle vente',newProduct:'Nouveau produit',catalog:'Catalogue',activity:'Activité du jour',empty:'Aucune vente enregistrée aujourd’hui.',product:'Produit ou service',qty:'Quantité',price:'Prix',method:'Moyen de paiement',note:'Note',total:'Total',saveSale:'Enregistrer vente',cancel:'Annuler',productName:'Nom',category:'Catégorie',type:'Type',saveProduct:'Enregistrer',cash:'Espèces',card:'Carte',twint:'TWINT',transfer:'Virement',productType:'Produit',serviceType:'Service',ingredientType:'Ingrédient/intrant',bundleType:'Combo/préparé',sku:'SKU / Code',unit:'Unité',unitUnit:'Unité',unitHour:'Heure',trackStock:'Suivre inventaire',stock:'Stock actuel',minStock:'Stock minimum',lowStock:'Stock bas',saved:'Vente enregistrée',productSaved:'Produit enregistré',missingProduct:'Créez d’abord un produit ou service.',topProduct:'Meilleure vente',byMethod:'Par moyen de paiement',areaTitle:'Panel des ventes',areaDesc:'Choisissez ce que vous voulez faire dans ce domaine.',goSummary:'Voir résumé',goSummaryDesc:'Revenus, ticket moyen et activité du jour.',goRegister:'Enregistrer vente',goRegisterDesc:'Ajouter une vente rapide par produit ou service.',goCatalog:'Gérer catalogue',goCatalogDesc:'Produits, services et prix de base.',goClose:'Caisse et insights',goCloseDesc:'Moyens de paiement, meilleure vente et signaux de décision.',openSection:'Ouvrir'},
-  de:{title:'Verkauf und Kasse',sub:'Erfassen Sie Verkäufe nach Produkt oder Service. Später entstehen daraus Einblicke und Inventar-Verbindungen.',today:'Heute',revenue:'Umsatz',sales:'Verkäufe',ticket:'Ø Bon',products:'Produkte',newSale:'Neuer Verkauf',newProduct:'Neues Produkt',catalog:'Katalog',activity:'Tagesaktivität',empty:'Heute sind noch keine Verkäufe erfasst.',product:'Produkt oder Service',qty:'Menge',price:'Preis',method:'Zahlungsart',note:'Notiz',total:'Total',saveSale:'Verkauf speichern',cancel:'Abbrechen',productName:'Name',category:'Kategorie',type:'Typ',saveProduct:'Speichern',cash:'Bar',card:'Karte',twint:'TWINT',transfer:'Überweisung',productType:'Produkt',serviceType:'Service',ingredientType:'Zutat/Input',bundleType:'Bundle/zubereitet',sku:'SKU / Code',unit:'Einheit',unitUnit:'Einheit',unitHour:'Stunde',trackStock:'Inventar verfolgen',stock:'Aktueller Bestand',minStock:'Mindestbestand',lowStock:'Niedriger Bestand',saved:'Verkauf gespeichert',productSaved:'Produkt gespeichert',missingProduct:'Erstellen Sie zuerst ein Produkt oder einen Service.',topProduct:'Top-Verkauf',byMethod:'Nach Zahlungsart',areaTitle:'Verkaufsbereich',areaDesc:'Wählen Sie, was Sie in diesem Bereich tun möchten.',goSummary:'Übersicht ansehen',goSummaryDesc:'Umsatz, Durchschnittsbon und Tagesaktivität.',goRegister:'Verkauf erfassen',goRegisterDesc:'Schnellen Verkauf nach Produkt oder Service hinzufügen.',goCatalog:'Katalog verwalten',goCatalogDesc:'Produkte, Services und Basispreise.',goClose:'Kasse und Einblicke',goCloseDesc:'Zahlungsarten, Top-Verkauf und Entscheidungssignale.',openSection:'Öffnen'},
-  it:{title:'Vendite e cassa',sub:'Registra vendite per prodotto o servizio. Poi potremo generare insight e collegare inventario.',today:'Oggi',revenue:'Incassi',sales:'Vendite',ticket:'Scontrino medio',products:'Prodotti',newSale:'Nuova vendita',newProduct:'Nuovo prodotto',catalog:'Catalogo',activity:'Attività del giorno',empty:'Nessuna vendita registrata oggi.',product:'Prodotto o servizio',qty:'Quantità',price:'Prezzo',method:'Metodo di pagamento',note:'Nota',total:'Totale',saveSale:'Salva vendita',cancel:'Annulla',productName:'Nome',category:'Categoria',type:'Tipo',saveProduct:'Salva',cash:'Contanti',card:'Carta',twint:'TWINT',transfer:'Bonifico',productType:'Prodotto',serviceType:'Servizio',ingredientType:'Ingrediente/input',bundleType:'Combo/preparato',sku:'SKU / Codice',unit:'Unità',unitUnit:'Unità',unitHour:'Ora',trackStock:'Controlla inventario',stock:'Stock attuale',minStock:'Stock minimo',lowStock:'Stock basso',saved:'Vendita salvata',productSaved:'Prodotto salvato',missingProduct:'Crea prima un prodotto o servizio.',topProduct:'Più venduto',byMethod:'Per metodo di pagamento',areaTitle:'Pannello vendite',areaDesc:'Scegli cosa vuoi fare in questa area.',goSummary:'Vedi riepilogo',goSummaryDesc:'Incassi, scontrino medio e attività del giorno.',goRegister:'Registra vendita',goRegisterDesc:'Aggiungi una vendita rapida per prodotto o servizio.',goCatalog:'Gestisci catalogo',goCatalogDesc:'Prodotti, servizi e prezzi base.',goClose:'Cassa e insight',goCloseDesc:'Metodi di pagamento, più venduto e segnali decisionali.',openSection:'Apri'}
+  es:{title:'Ventas y caja',sub:'Registra ventas por producto o servicio. Así después podremos sacar insights y conectar inventario.',today:'Hoy',revenue:'Ingresos',sales:'Ventas',ticket:'Ticket prom.',products:'Productos',newSale:'Nueva venta',newProduct:'Nuevo producto',catalog:'Catálogo',activity:'Actividad del día',empty:'Aún no hay ventas registradas hoy.',product:'Producto o servicio',qty:'Cantidad',price:'Precio',method:'Método de pago',note:'Nota',total:'Total',saveSale:'Guardar venta',cancel:'Cancelar',productName:'Nombre',category:'Categoría',type:'Tipo',saveProduct:'Guardar',cash:'Efectivo',card:'Tarjeta',twint:'TWINT',transfer:'Transferencia',productType:'Producto',serviceType:'Servicio',ingredientType:'Insumo',bundleType:'Combo/preparado',sku:'SKU / Código',unit:'Unidad',unitUnit:'Unidad',unitHour:'Hora',unitPortion:'Porción',unitPack:'Paquete',unitBox:'Caja',unitBottle:'Botella',trackStock:'Controlar inventario',stock:'Stock actual',minStock:'Stock mínimo',lowStock:'Stock bajo',recipeTitle:'Consumo por venta',recipeHelp:'Cada insumo usa su propia unidad: kg, g, L, ml, unidades, cajas o paquetes.',addIngredient:'+ Insumo',ingredient:'Insumo',consumption:'Consumo',noIngredients:'Crea insumos primero para armar esta preparación.',saved:'Venta guardada',productSaved:'Producto guardado',missingProduct:'Crea primero un producto o servicio.',topProduct:'Más vendido',byMethod:'Por método de pago',areaTitle:'Panel de ventas',areaDesc:'Elige qué necesitas hacer en esta área.',goSummary:'Ver resumen',goSummaryDesc:'Ingresos, ticket promedio y actividad del día.',goRegister:'Registrar venta',goRegisterDesc:'Añade una venta rápida por producto o servicio.',goCatalog:'Gestionar catálogo',goCatalogDesc:'Productos, servicios y precios base.',goClose:'Caja e insights',goCloseDesc:'Métodos de pago, más vendido y señales para decidir.',openSection:'Abrir'},
+  en:{title:'Sales and cash',sub:'Register sales by product or service. Later we can generate insights and connect inventory.',today:'Today',revenue:'Revenue',sales:'Sales',ticket:'Avg. ticket',products:'Products',newSale:'New sale',newProduct:'New product',catalog:'Catalog',activity:'Day activity',empty:'No sales registered today yet.',product:'Product or service',qty:'Quantity',price:'Price',method:'Payment method',note:'Note',total:'Total',saveSale:'Save sale',cancel:'Cancel',productName:'Name',category:'Category',type:'Type',saveProduct:'Save',cash:'Cash',card:'Card',twint:'TWINT',transfer:'Transfer',productType:'Product',serviceType:'Service',ingredientType:'Ingredient/input',bundleType:'Bundle/prepared',sku:'SKU / Code',unit:'Unit',unitUnit:'Unit',unitHour:'Hour',unitPortion:'Portion',unitPack:'Pack',unitBox:'Box',unitBottle:'Bottle',trackStock:'Track inventory',stock:'Current stock',minStock:'Minimum stock',lowStock:'Low stock',recipeTitle:'Consumption per sale',recipeHelp:'Each input uses its own unit: kg, g, L, ml, units, boxes or packs.',addIngredient:'+ Input',ingredient:'Input',consumption:'Consumption',noIngredients:'Create ingredients first to build this preparation.',saved:'Sale saved',productSaved:'Product saved',missingProduct:'Create a product or service first.',topProduct:'Top seller',byMethod:'By payment method',areaTitle:'Sales panel',areaDesc:'Choose what you need to do in this area.',goSummary:'View summary',goSummaryDesc:'Revenue, average ticket and daily activity.',goRegister:'Register sale',goRegisterDesc:'Add a quick sale by product or service.',goCatalog:'Manage catalog',goCatalogDesc:'Products, services and base prices.',goClose:'Cash and insights',goCloseDesc:'Payment methods, top seller and decision signals.',openSection:'Open'},
+  fr:{title:'Ventes et caisse',sub:'Enregistrez les ventes par produit ou service. Ensuite nous pourrons créer des insights et connecter l’inventaire.',today:'Aujourd’hui',revenue:'Revenus',sales:'Ventes',ticket:'Ticket moyen',products:'Produits',newSale:'Nouvelle vente',newProduct:'Nouveau produit',catalog:'Catalogue',activity:'Activité du jour',empty:'Aucune vente enregistrée aujourd’hui.',product:'Produit ou service',qty:'Quantité',price:'Prix',method:'Moyen de paiement',note:'Note',total:'Total',saveSale:'Enregistrer vente',cancel:'Annuler',productName:'Nom',category:'Catégorie',type:'Type',saveProduct:'Enregistrer',cash:'Espèces',card:'Carte',twint:'TWINT',transfer:'Virement',productType:'Produit',serviceType:'Service',ingredientType:'Ingrédient/intrant',bundleType:'Combo/préparé',sku:'SKU / Code',unit:'Unité',unitUnit:'Unité',unitHour:'Heure',unitPortion:'Portion',unitPack:'Paquet',unitBox:'Caisse',unitBottle:'Bouteille',trackStock:'Suivre inventaire',stock:'Stock actuel',minStock:'Stock minimum',lowStock:'Stock bas',recipeTitle:'Consommation par vente',recipeHelp:'Chaque intrant utilise sa propre unité: kg, g, L, ml, unités, caisses ou paquets.',addIngredient:'+ Intrant',ingredient:'Intrant',consumption:'Consommation',noIngredients:'Créez d’abord des ingrédients pour composer cette préparation.',saved:'Vente enregistrée',productSaved:'Produit enregistré',missingProduct:'Créez d’abord un produit ou service.',topProduct:'Meilleure vente',byMethod:'Par moyen de paiement',areaTitle:'Panel des ventes',areaDesc:'Choisissez ce que vous voulez faire dans ce domaine.',goSummary:'Voir résumé',goSummaryDesc:'Revenus, ticket moyen et activité du jour.',goRegister:'Enregistrer vente',goRegisterDesc:'Ajouter une vente rapide par produit ou service.',goCatalog:'Gérer catalogue',goCatalogDesc:'Produits, services et prix de base.',goClose:'Caisse et insights',goCloseDesc:'Moyens de paiement, meilleure vente et signaux de décision.',openSection:'Ouvrir'},
+  de:{title:'Verkauf und Kasse',sub:'Erfassen Sie Verkäufe nach Produkt oder Service. Später entstehen daraus Einblicke und Inventar-Verbindungen.',today:'Heute',revenue:'Umsatz',sales:'Verkäufe',ticket:'Ø Bon',products:'Produkte',newSale:'Neuer Verkauf',newProduct:'Neues Produkt',catalog:'Katalog',activity:'Tagesaktivität',empty:'Heute sind noch keine Verkäufe erfasst.',product:'Produkt oder Service',qty:'Menge',price:'Preis',method:'Zahlungsart',note:'Notiz',total:'Total',saveSale:'Verkauf speichern',cancel:'Abbrechen',productName:'Name',category:'Kategorie',type:'Typ',saveProduct:'Speichern',cash:'Bar',card:'Karte',twint:'TWINT',transfer:'Überweisung',productType:'Produkt',serviceType:'Service',ingredientType:'Zutat/Input',bundleType:'Bundle/zubereitet',sku:'SKU / Code',unit:'Einheit',unitUnit:'Einheit',unitHour:'Stunde',unitPortion:'Portion',unitPack:'Paket',unitBox:'Kiste',unitBottle:'Flasche',trackStock:'Inventar verfolgen',stock:'Aktueller Bestand',minStock:'Mindestbestand',lowStock:'Niedriger Bestand',recipeTitle:'Verbrauch pro Verkauf',recipeHelp:'Jeder Input nutzt seine eigene Einheit: kg, g, L, ml, Einheiten, Kisten oder Pakete.',addIngredient:'+ Input',ingredient:'Input',consumption:'Verbrauch',noIngredients:'Erstellen Sie zuerst Zutaten für diese Zubereitung.',saved:'Verkauf gespeichert',productSaved:'Produkt gespeichert',missingProduct:'Erstellen Sie zuerst ein Produkt oder einen Service.',topProduct:'Top-Verkauf',byMethod:'Nach Zahlungsart',areaTitle:'Verkaufsbereich',areaDesc:'Wählen Sie, was Sie in diesem Bereich tun möchten.',goSummary:'Übersicht ansehen',goSummaryDesc:'Umsatz, Durchschnittsbon und Tagesaktivität.',goRegister:'Verkauf erfassen',goRegisterDesc:'Schnellen Verkauf nach Produkt oder Service hinzufügen.',goCatalog:'Katalog verwalten',goCatalogDesc:'Produkte, Services und Basispreise.',goClose:'Kasse und Einblicke',goCloseDesc:'Zahlungsarten, Top-Verkauf und Entscheidungssignale.',openSection:'Öffnen'},
+  it:{title:'Vendite e cassa',sub:'Registra vendite per prodotto o servizio. Poi potremo generare insight e collegare inventario.',today:'Oggi',revenue:'Incassi',sales:'Vendite',ticket:'Scontrino medio',products:'Prodotti',newSale:'Nuova vendita',newProduct:'Nuovo prodotto',catalog:'Catalogo',activity:'Attività del giorno',empty:'Nessuna vendita registrata oggi.',product:'Prodotto o servizio',qty:'Quantità',price:'Prezzo',method:'Metodo di pagamento',note:'Nota',total:'Totale',saveSale:'Salva vendita',cancel:'Annulla',productName:'Nome',category:'Categoria',type:'Tipo',saveProduct:'Salva',cash:'Contanti',card:'Carta',twint:'TWINT',transfer:'Bonifico',productType:'Prodotto',serviceType:'Servizio',ingredientType:'Ingrediente/input',bundleType:'Combo/preparato',sku:'SKU / Codice',unit:'Unità',unitUnit:'Unità',unitHour:'Ora',unitPortion:'Porzione',unitPack:'Pacco',unitBox:'Scatola',unitBottle:'Bottiglia',trackStock:'Controlla inventario',stock:'Stock attuale',minStock:'Stock minimo',lowStock:'Stock basso',recipeTitle:'Consumo per vendita',recipeHelp:'Ogni ingrediente usa la propria unità: kg, g, L, ml, unità, scatole o pacchi.',addIngredient:'+ Ingrediente',ingredient:'Ingrediente',consumption:'Consumo',noIngredients:'Crea prima gli ingredienti per comporre questa preparazione.',saved:'Vendita salvata',productSaved:'Prodotto salvato',missingProduct:'Crea prima un prodotto o servizio.',topProduct:'Più venduto',byMethod:'Per metodo di pagamento',areaTitle:'Pannello vendite',areaDesc:'Scegli cosa vuoi fare in questa area.',goSummary:'Vedi riepilogo',goSummaryDesc:'Incassi, scontrino medio e attività del giorno.',goRegister:'Registra vendita',goRegisterDesc:'Aggiungi una vendita rapida per prodotto o servizio.',goCatalog:'Gestisci catalogo',goCatalogDesc:'Prodotti, servizi e prezzi base.',goClose:'Cassa e insight',goCloseDesc:'Metodi di pagamento, più venduto e segnali decisionali.',openSection:'Apri'}
 };
 const salesTx=()=>({...SALES_UI.es,...(SALES_UI[lang]||{})});
+const editLabel=()=>({es:'Editar',en:'Edit',fr:'Modifier',de:'Bearbeiten',it:'Modifica'}[lang]||'Editar');
+const INVENTORY_UI={
+  es:{title:'Inventario',sub:'Controla stock, compras y proveedores. Para restaurantes, una venta puede descontar insumos.',stock:'Stock',purchases:'Compras',suppliers:'Proveedores',low:'Bajo stock',items:'Items con stock',value:'Valor estimado',newPurchase:'Nueva compra',newSupplier:'Nuevo proveedor',product:'Producto o insumo',supplier:'Proveedor',qty:'Cantidad',cost:'Costo total',note:'Nota',savePurchase:'Guardar compra',saveSupplier:'Guardar proveedor',cancel:'Cancelar',current:'Stock actual',min:'Stock mínimo',unit:'Unidad',recipe:'Receta / consumo',noStock:'Aún no hay productos con inventario activo.',noPurchases:'Aún no hay compras registradas.',noSuppliers:'Aún no hay proveedores.',savedPurchase:'Compra guardada y stock actualizado',savedSupplier:'Proveedor guardado',needProduct:'Crea o activa inventario en un producto primero.',needSupplier:'Crea un proveedor primero.',auto:'Descuento por venta',manual:'Ajuste manual'},
+  en:{title:'Inventory',sub:'Control stock, purchases and suppliers. For restaurants, a sale can deduct ingredients.',stock:'Stock',purchases:'Purchases',suppliers:'Suppliers',low:'Low stock',items:'Stock items',value:'Estimated value',newPurchase:'New purchase',newSupplier:'New supplier',product:'Product or input',supplier:'Supplier',qty:'Quantity',cost:'Total cost',note:'Note',savePurchase:'Save purchase',saveSupplier:'Save supplier',cancel:'Cancel',current:'Current stock',min:'Minimum stock',unit:'Unit',recipe:'Recipe / consumption',noStock:'No products with inventory enabled yet.',noPurchases:'No purchases registered yet.',noSuppliers:'No suppliers yet.',savedPurchase:'Purchase saved and stock updated',savedSupplier:'Supplier saved',needProduct:'Create or enable inventory on a product first.',needSupplier:'Create a supplier first.',auto:'Sale deduction',manual:'Manual adjustment'}
+};
+const inventoryTx=()=>({...INVENTORY_UI.es,...(INVENTORY_UI[lang]||{})});
 const T=()=>UI[lang]||UI.fr;
 const TL=section=>({...UI.fr[section],...(T()[section]||{})});
 const DASH_TEXT={
@@ -1566,7 +1738,7 @@ Object.assign(UI.en.login,{kicker:'Staff control',copy:'Track clock-ins, breaks,
 Object.assign(UI.de.login,{kicker:'Personalsteuerung',copy:'Buchungen, Pausen, Anfragen und Monatsberichte verfolgen, ohne den Service aus dem Blick zu verlieren.',proof1:'Schnelle Buchung',proof2:'Manager-Hilfe',proof3:'Mitarbeiterausweise',managerNote:'Anmelden, um Team, Warnungen und Berichte in Echtzeit zu verfolgen.',employeeNote:'Mitarbeiterzugang mit E-Mail und PIN zum Buchen, Korrekturen anfragen oder Stunden prüfen.',registerNote:'Restaurantbereich erstellen und Team einladen.'});
 Object.assign(UI.it.login,{kicker:'Controllo del personale',copy:'Segui entrate, pause, richieste e report mensili senza perdere il ritmo del servizio.',proof1:'Timbratura rapida',proof2:'Aiuto manager',proof3:'Badge dipendenti',managerNote:'Accedi per seguire team, avvisi e report in tempo reale.',employeeNote:'Accesso dipendente con email e PIN per timbrare, chiedere correzioni o vedere le ore.',registerNote:'Crea lo spazio del tuo ristorante e invita il team.'});
 Object.assign(UI.fr.login,{manager:'Manager',employee:'Employé',restaurant:'Créer compte',signin:'Connexion',langLabel:'Voir en',nav1:'Personnel',nav2:'Planification',nav3:'Rapports',nav4:'IA',eyebrow:'Manager Pro pour petits commerces',landingTitle:'Une aide simple<br><span class="login-title-accent">pour le quotidien de votre business</span>',landingSub:'Commencez par l’équipe: horaires, pointages, demandes et documents. Ajoutez ensuite ventes, achats, caisse et inventaire quand votre commerce en a besoin.',open:'Connexion',demoTop:'Essai gratuit',ctaDemo:'Essayer la démo',ctaSession:'Connexion',storyKicker:'L’idée',storyTitle:'Une app sérieuse, mais facile à adopter.',storyText:'Manager Pro commence par vous aider à organiser votre équipe. Peu à peu, il peut accompagner d’autres zones du business sans devenir lourd ni intimidant.',point1Title:'Aujourd’hui',point1Text:'Pointages, horaires, pauses, demandes, rapports et aide IA.',point2Title:'Bientôt',point2Text:'Ventes, achats, documents, caisse, inventaire et comptabilité.',point3Title:'Objectif',point3Text:'Aider le propriétaire à comprendre son business sans jargon administratif.',moduleTitle:'Domaines du business',moduleSub:'Nous sommes focalisés sur les RH; ces modules dessinent le chemin vers un ERP simple.',current:'Aujourd’hui',upcoming:'Bientôt',mod1:'Personnel',mod1Desc:'Pointages, horaires, pauses et demandes.',mod2:'Rapports',mod2Desc:'Excel, PDF, salaires estimés et heures supplémentaires.',mod3:'Assistant IA',mod3Desc:'Aide le manager à décider et mieux communiquer.',mod4:'Ventes et caisse',mod4Desc:'Suivi quotidien des revenus, services et clôtures.',mod5:'Achats et inventaire',mod5Desc:'Achats, stock et fournisseurs sous contrôle.',mod6:'Comptabilité',mod6Desc:'Vue simple des coûts et résultats.'});
-Object.assign(UI.es.login,{manager:'Manager',employee:'Empleado',restaurant:'Crear cuenta',signin:'Iniciar sesión',langLabel:'Ver en',nav1:'Personal',nav2:'Planificación',nav3:'Reportes',nav4:'IA',eyebrow:'Manager Pro para pequeños negocios',landingTitle:'Una ayuda simple<br><span class="login-title-accent">para llevar el día a día de tu negocio</span>',landingSub:'Empieza con tu equipo: horarios, fichajes, solicitudes y documentos. Luego suma ventas, compras, caja e inventario cuando tu negocio lo necesite.',open:'Iniciar sesión',demoTop:'Pruébalo gratis',ctaDemo:'Probar demo',ctaSession:'Iniciar sesión',storyKicker:'La idea',storyTitle:'Una app seria, pero fácil de adoptar.',storyText:'Manager Pro empieza ayudándote a ordenar tu equipo. Poco a poco puede acompañarte en otras áreas del negocio, sin hacerlo pesado ni intimidante.',point1Title:'Hoy',point1Text:'Fichajes, horarios, pausas, solicitudes, reportes e IA de apoyo.',point2Title:'Próximamente',point2Text:'Ventas, compras, documentos, caja, inventario y contabilidad.',point3Title:'Objetivo',point3Text:'Que el dueño entienda su negocio sin hablar lenguaje administrativo.',moduleTitle:'Áreas del negocio',moduleSub:'Ahora estamos enfocados en RR. HH.; estos módulos marcan el camino hacia un sistema simple para pequeños negocios.',current:'Hoy',upcoming:'Próximamente',mod1:'Personal',mod1Desc:'Fichajes, horarios, pausas y solicitudes.',mod2:'Reportes',mod2Desc:'Excel, PDF, salarios estimados y horas extra.',mod3:'Asistente IA',mod3Desc:'Ayuda al manager a decidir y comunicarse mejor.',mod4:'Ventas y caja',mod4Desc:'Control diario de ingresos, turnos y cierres.',mod5:'Compras e inventario',mod5Desc:'Seguimiento de compras, stock y proveedores.',mod6:'Contabilidad',mod6Desc:'Resumen simple para entender costos y resultados.'});
+Object.assign(UI.es.login,{manager:'Manager',employee:'Empleado',restaurant:'Crear cuenta',signin:'Iniciar sesión',langLabel:'Ver en',nav1:'Personal',nav2:'Planificación',nav3:'Reportes',nav4:'IA',eyebrow:'Manager Pro para pequeños negocios',landingTitle:'Una ayuda simple<br><span class="login-title-accent">para llevar el día a día de tu negocio</span>',landingSub:'Empieza con tu equipo: horarios, fichajes, solicitudes y documentos. Luego suma ventas, compras, caja e inventario cuando tu negocio lo necesite.',open:'Iniciar sesión',demoTop:'Pruébalo gratis',ctaDemo:'Probar demo',ctaSession:'Iniciar sesión',storyKicker:'La idea',storyTitle:'Una app integral, pero fácil de adoptar.',storyText:'Manager Pro empieza ayudándote a ordenar tu equipo. Poco a poco puede acompañarte en otras áreas del negocio, sin hacerlo pesado ni intimidante.',point1Title:'Hoy',point1Text:'Fichajes, horarios, pausas, solicitudes, reportes e IA de apoyo.',point2Title:'Próximamente',point2Text:'Ventas, compras, documentos, caja, inventario y contabilidad.',point3Title:'Objetivo',point3Text:'Que el dueño entienda su negocio sin hablar lenguaje administrativo.',moduleTitle:'Áreas del negocio',moduleSub:'Ahora estamos enfocados en RR. HH.; estos módulos marcan el camino hacia un sistema simple para pequeños negocios.',current:'Hoy',upcoming:'Próximamente',mod1:'Personal',mod1Desc:'Fichajes, horarios, pausas y solicitudes.',mod2:'Reportes',mod2Desc:'Excel, PDF, salarios estimados y horas extra.',mod3:'Asistente IA',mod3Desc:'Ayuda al manager a decidir y comunicarse mejor.',mod4:'Ventas y caja',mod4Desc:'Control diario de ingresos, turnos y cierres.',mod5:'Compras e inventario',mod5Desc:'Seguimiento de compras, stock y proveedores.',mod6:'Contabilidad',mod6Desc:'Resumen simple para entender costos y resultados.'});
 Object.assign(UI.en.login,{manager:'Manager',employee:'Employee',restaurant:'Sign up',signin:'Log in',langLabel:'View in',nav1:'People',nav2:'Planning',nav3:'Reports',nav4:'AI',eyebrow:'Manager Pro for small businesses',landingTitle:'A simple helper<br><span class="login-title-accent">for the day-to-day of your business</span>',landingSub:'Start with your team: schedules, clock-ins, requests and documents. Add sales, purchases, cash and inventory when your business needs them.',open:'Log in',demoTop:'Try it free',ctaDemo:'Try demo',ctaSession:'Log in',storyKicker:'The idea',storyTitle:'A serious app that feels easy to adopt.',storyText:'Manager Pro starts by helping you organize your team. Step by step, it can support other business areas without becoming heavy or intimidating.',point1Title:'Today',point1Text:'Clock-ins, schedules, breaks, requests, reports and AI support.',point2Title:'Coming soon',point2Text:'Sales, purchases, documents, cash, inventory and accounting.',point3Title:'Goal',point3Text:'Help owners understand their business without admin jargon.',moduleTitle:'Business areas',moduleSub:'We are focused on HR now; these modules show the path toward a simple system for small businesses.',current:'Today',upcoming:'Coming soon',mod1:'People',mod1Desc:'Clock-ins, schedules, breaks and requests.',mod2:'Reports',mod2Desc:'Excel, PDF, estimated payroll and extra hours.',mod3:'AI assistant',mod3Desc:'Helps managers decide and communicate better.',mod4:'Sales and cash',mod4Desc:'Daily control of revenue, shifts and closing.',mod5:'Purchases and inventory',mod5Desc:'Track purchases, stock and suppliers.',mod6:'Accounting',mod6Desc:'Simple view of costs and results.'});
 Object.assign(UI.de.login,{manager:'Manager',employee:'Mitarbeiter',restaurant:'Konto erstellen',signin:'Einloggen',langLabel:'Sprache',nav1:'Personal',nav2:'Planung',nav3:'Berichte',nav4:'KI',eyebrow:'Manager Pro für kleine Betriebe',landingTitle:'Eine einfache Hilfe<br><span class="login-title-accent">für den Alltag Ihres Betriebs</span>',landingSub:'Beginnen Sie mit dem Team: Pläne, Buchungen, Anfragen und Dokumente. Später kommen Verkauf, Einkauf, Kasse und Inventar dazu, wenn Ihr Betrieb es braucht.',open:'Einloggen',demoTop:'Gratis testen',ctaDemo:'Demo testen',ctaSession:'Einloggen',storyKicker:'Die Idee',storyTitle:'Eine seriöse App, die leicht anzunehmen ist.',storyText:'Manager Pro hilft zuerst, Ihr Team zu organisieren. Schritt für Schritt kann es weitere Bereiche begleiten, ohne schwer oder einschüchternd zu werden.',point1Title:'Heute',point1Text:'Buchungen, Pläne, Pausen, Anfragen, Berichte und KI-Hilfe.',point2Title:'Demnächst',point2Text:'Verkauf, Einkauf, Dokumente, Kasse, Inventar und Buchhaltung.',point3Title:'Ziel',point3Text:'Inhaber verstehen ihr Geschäft ohne Verwaltungsjargon.',moduleTitle:'Geschäftsbereiche',moduleSub:'Aktuell fokussieren wir HR; diese Module zeigen den Weg zu einem einfachen System für kleine Betriebe.',current:'Heute',upcoming:'Demnächst',mod1:'Personal',mod1Desc:'Buchungen, Pläne, Pausen und Anfragen.',mod2:'Berichte',mod2Desc:'Excel, PDF, geschätzte Löhne und Überstunden.',mod3:'KI-Assistent',mod3Desc:'Hilft Managern beim Entscheiden und Kommunizieren.',mod4:'Verkauf und Kasse',mod4Desc:'Tägliche Kontrolle von Umsatz, Schichten und Abschluss.',mod5:'Einkauf und Inventar',mod5Desc:'Einkäufe, Lager und Lieferanten verfolgen.',mod6:'Buchhaltung',mod6Desc:'Einfache Sicht auf Kosten und Ergebnisse.'});
 Object.assign(UI.it.login,{manager:'Manager',employee:'Dipendente',restaurant:'Crea account',signin:'Accedi',langLabel:'Vedi in',nav1:'Personale',nav2:'Pianificazione',nav3:'Report',nav4:'IA',eyebrow:'Manager Pro per piccoli business',landingTitle:'Un aiuto semplice<br><span class="login-title-accent">per il quotidiano del tuo business</span>',landingSub:'Inizia dal team: orari, timbrature, richieste e documenti. Poi aggiungi vendite, acquisti, cassa e inventario quando il business ne ha bisogno.',open:'Accedi',demoTop:'Provalo gratis',ctaDemo:'Prova demo',ctaSession:'Accedi',storyKicker:'L’idea',storyTitle:'Un’app seria, ma facile da adottare.',storyText:'Manager Pro inizia aiutandoti a organizzare il team. Poco a poco può accompagnare altre aree del business, senza diventare pesante o intimidatorio.',point1Title:'Oggi',point1Text:'Timbrature, orari, pause, richieste, report e supporto IA.',point2Title:'Prossimamente',point2Text:'Vendite, acquisti, documenti, cassa, inventario e contabilità.',point3Title:'Obiettivo',point3Text:'Aiutare il titolare a capire il business senza gergo amministrativo.',moduleTitle:'Aree del business',moduleSub:'Ora siamo concentrati sulle risorse umane; questi moduli indicano il percorso verso un sistema semplice per piccoli business.',current:'Oggi',upcoming:'Prossimamente',mod1:'Personale',mod1Desc:'Timbrature, orari, pause e richieste.',mod2:'Report',mod2Desc:'Excel, PDF, salari stimati e ore extra.',mod3:'Assistente IA',mod3Desc:'Aiuta il manager a decidere e comunicare meglio.',mod4:'Vendite e cassa',mod4Desc:'Controllo quotidiano di ricavi, turni e chiusure.',mod5:'Acquisti e inventario',mod5Desc:'Acquisti, stock e fornitori sotto controllo.',mod6:'Contabilità',mod6Desc:'Vista semplice di costi e risultati.'});
@@ -1615,7 +1787,7 @@ const ATW=()=>ATT_WORDS[lang]||ATT_WORDS.fr;
 
 // ═══════ DB ═══════
 let DB={
-  employees:[],history:[],absences:[],shifts:{},documents:[],salesProducts:[],sales:[],reviewedAlerts:{},audit:[],monthClosures:{},
+  employees:[],history:[],absences:[],shifts:{},documents:[],salesProducts:[],sales:[],inventoryPurchases:[],suppliers:[],salesPanelWidgets:null,reviewedAlerts:{},audit:[],monthClosures:{},
   settings:{company:'Mon Business',emoji:'MP',currency:'CHF',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],signals:[],stats:{}};
@@ -1792,16 +1964,27 @@ function demoDB(){
   employees.forEach(emp=>{for(let i=0;i<5;i++){const d=new Date(getMonday(today).getTime()+i*86400000),ds=fmt(d),sch=empDaySchedule(emp,d),first=sch.blocks[0];shifts[`${emp.id}_${ds}`]=sch?.enabled&&first?{type:'morning',in:first.start,out:first.end,blocks:sch.blocks,notes:'Demo'}:{type:'off',in:null,out:null,notes:'Demo'};}});
   const documents=[{id:'demo-doc-1',empId:'demo-emp-1',type:'contract',name:'Contrat de travail',fileName:'contrat-demo.pdf',mimeType:'application/pdf',size:245000,data:'',notes:'Ejemplo de expediente',expiresAt:'',createdAt:new Date().toISOString()}];
   const salesProducts=[
-    {id:'demo-prod-1',name:'Menu del día',category:'Comida',type:'bundle',price:24,sku:'MENU-001',unit:'unit',trackStock:false,stock:0,minStock:0,active:true,createdAt:new Date().toISOString()},
-    {id:'demo-prod-2',name:'Café',category:'Bebidas',type:'product',price:4.5,sku:'CAF-001',unit:'unit',trackStock:true,stock:42,minStock:12,active:true,createdAt:new Date().toISOString()},
-    {id:'demo-prod-3',name:'Servicio catering',category:'Servicio',type:'service',price:180,sku:'SERV-001',unit:'hour',trackStock:false,stock:0,minStock:0,active:true,createdAt:new Date().toISOString()}
+    {id:'demo-prod-1',name:'Pizza margarita',category:'Pizza',type:'bundle',price:18,sku:'PIZ-MAR',unit:'unit',trackStock:false,stock:0,minStock:0,recipe:[{productId:'demo-ing-1',qty:.28},{productId:'demo-ing-2',qty:.12},{productId:'demo-ing-3',qty:.08}],active:true,createdAt:new Date().toISOString()},
+    {id:'demo-prod-2',name:'Café',category:'Bebidas',type:'product',price:4.5,sku:'CAF-001',unit:'unit',trackStock:true,stock:42,minStock:12,recipe:[],active:true,createdAt:new Date().toISOString()},
+    {id:'demo-prod-3',name:'Servicio catering',category:'Servicio',type:'service',price:180,sku:'SERV-001',unit:'hour',trackStock:false,stock:0,minStock:0,recipe:[],active:true,createdAt:new Date().toISOString()},
+    {id:'demo-ing-1',name:'Harina',category:'Insumo cocina',type:'ingredient',price:0,sku:'ING-HAR',unit:'kg',trackStock:true,stock:18,minStock:6,recipe:[],active:true,createdAt:new Date().toISOString()},
+    {id:'demo-ing-2',name:'Mozzarella',category:'Insumo cocina',type:'ingredient',price:0,sku:'ING-MOZ',unit:'kg',trackStock:true,stock:4.8,minStock:3,recipe:[],active:true,createdAt:new Date().toISOString()},
+    {id:'demo-ing-3',name:'Salsa tomate',category:'Insumo cocina',type:'ingredient',price:0,sku:'ING-TOM',unit:'kg',trackStock:true,stock:3.2,minStock:2.5,recipe:[],active:true,createdAt:new Date().toISOString()}
+  ];
+  const suppliers=[
+    {id:'demo-sup-1',name:'Molino local',phone:'+41 26 111 22 33',email:'pedidos@molino.local',notes:'Harina semanal',createdAt:new Date().toISOString()},
+    {id:'demo-sup-2',name:'Lácteos Fribourg',phone:'+41 26 444 55 66',email:'ventas@lacteos.local',notes:'Mozzarella y quesos',createdAt:new Date().toISOString()}
+  ];
+  const inventoryPurchases=[
+    {id:'demo-pur-1',productId:'demo-ing-1',productName:'Harina',supplierId:'demo-sup-1',supplierName:'Molino local',qty:25,cost:48,note:'Compra demo',ts:localDateTimeISO(day(2),'09:15')},
+    {id:'demo-pur-2',productId:'demo-ing-2',productName:'Mozzarella',supplierId:'demo-sup-2',supplierName:'Lácteos Fribourg',qty:8,cost:92,note:'Compra demo',ts:localDateTimeISO(day(1),'10:20')}
   ];
   const sales=[
-    {id:'demo-sale-1',productId:'demo-prod-1',productName:'Menu del día',category:'Comida',qty:8,unitPrice:24,total:192,method:'card',note:'Almuerzo',ts:localDateTimeISO(day(0),'12:45')},
-    {id:'demo-sale-2',productId:'demo-prod-2',productName:'Café',category:'Bebidas',qty:16,unitPrice:4.5,total:72,method:'cash',note:'',ts:localDateTimeISO(day(0),'10:30')},
-    {id:'demo-sale-3',productId:'demo-prod-1',productName:'Menu del día',category:'Comida',qty:5,unitPrice:24,total:120,method:'twint',note:'',ts:localDateTimeISO(day(1),'13:10')}
+    {id:'demo-sale-1',productId:'demo-prod-1',productName:'Pizza margarita',category:'Pizza',qty:8,unitPrice:18,total:144,method:'card',employeeId:'demo-emp-1',employeeName:'Sofia Martin',note:'Almuerzo',ts:localDateTimeISO(day(0),'12:45')},
+    {id:'demo-sale-2',productId:'demo-prod-2',productName:'Café',category:'Bebidas',qty:16,unitPrice:4.5,total:72,method:'cash',employeeId:'demo-emp-2',employeeName:'Luca Rossi',note:'',ts:localDateTimeISO(day(0),'10:30')},
+    {id:'demo-sale-3',productId:'demo-prod-1',productName:'Pizza margarita',category:'Pizza',qty:5,unitPrice:18,total:90,method:'twint',employeeId:'demo-emp-1',employeeName:'Sofia Martin',note:'',ts:localDateTimeISO(day(1),'13:10')}
   ];
-  return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,documents,salesProducts,sales,settings:{company:'Demo Business',emoji:'MP',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
+  return {employees,history,absences:[{id:'demo-a1',empId:'demo-emp-3',type:'vacation',start:day(2),end:day(2),approved:true,notes:'Vacances demo'}],shifts,documents,salesProducts,sales,inventoryPurchases,suppliers,salesPanelWidgets:null,settings:{company:'Demo Business',emoji:'MP',currency:'CHF',lateTol:10,maxHours:45,lang:'es',brandColor:'#4f6ef7',brandColor2:'#7c3aed',status:'active',openingHours:defOpeningHours()}};
 }
 
 function setRestaurantId(id){
@@ -1843,7 +2026,7 @@ async function loadSB(){
     if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp,note:x.note||''}));
     if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     if(sh.data){DB.shifts={};sh.data.forEach(x=>{const blocks=normalizeBlocks({blocks:x.blocks,start:x.start_time,end:x.end_time},'restaurant');DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,blocks,notes:x.notes||''};});}
-    if(r.data){DB.settings={company:r.data.name||'Mon Business',emoji:r.data.emoji||'MP',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active',openingHours:r.data.opening_hours||defOpeningHours()};lang=DB.settings.lang;}
+    if(r.data){DB.settings={company:r.data.name||'Mon Business',emoji:r.data.emoji||'MP',currency:r.data.currency||'CHF',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active',openingHours:r.data.opening_hours||defOpeningHours()};DB.salesPanelWidgets=Array.isArray(r.data.sales_panel_widgets)?r.data.sales_panel_widgets:DB.salesPanelWidgets;lang=DB.settings.lang;}
     try{
       const docs=await sb.from('employee_documents').select('*').eq('restaurant_id',REST_ID).order('created_at',{ascending:false});
       if(!docs.error)DB.documents=(docs.data||[]).map(docFromSBRow);
@@ -1853,16 +2036,22 @@ async function loadSB(){
       DB.documents=DB.documents||[];
     }
     try{
-      const [sp,sa]=await Promise.all([
+      const [sp,sa,su,pu]=await Promise.all([
         sb.from('sales_products').select('*').eq('restaurant_id',REST_ID).order('created_at',{ascending:false}),
-        sb.from('sales').select('*').eq('restaurant_id',REST_ID).order('sold_at',{ascending:false}).limit(500)
+        sb.from('sales').select('*').eq('restaurant_id',REST_ID).order('sold_at',{ascending:false}).limit(500),
+        sb.from('inventory_suppliers').select('*').eq('restaurant_id',REST_ID).order('created_at',{ascending:false}),
+        sb.from('inventory_purchases').select('*').eq('restaurant_id',REST_ID).order('purchased_at',{ascending:false}).limit(500)
       ]);
       if(!sp.error)DB.salesProducts=(sp.data||[]).map(salesProductFromSB);
       if(!sa.error)DB.sales=(sa.data||[]).map(saleFromSB);
+      if(!su.error)DB.suppliers=(su.data||[]).map(supplierFromSB);
+      if(!pu.error)DB.inventoryPurchases=(pu.data||[]).map(purchaseFromSB);
     }catch(salesErr){
       console.warn('Sales tables not available yet:',salesErr);
       DB.salesProducts=DB.salesProducts||[];
       DB.sales=DB.sales||[];
+      DB.suppliers=DB.suppliers||[];
+      DB.inventoryPurchases=DB.inventoryPurchases||[];
     }
     saveLocal();return true;
   }catch(e){console.warn('SB error:',e);return false;}
@@ -1928,11 +2117,15 @@ async function sbSaveShift(key,sh){
   }
   if(res.error)throw res.error;
 }
-async function sbSaveSettings(s){if(isDemo())return;await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours()}).eq('id',REST_ID);}
-function salesProductFromSB(x){return{id:x.id,name:x.name||'',category:x.category||'',type:x.type||'product',price:Number(x.price)||0,sku:x.sku||'',unit:x.unit||'unit',trackStock:!!x.track_stock,stock:Number(x.stock)||0,minStock:Number(x.min_stock)||0,active:x.active!==false,createdAt:x.created_at||new Date().toISOString()};}
-function saleFromSB(x){return{id:x.id,productId:x.product_id,productName:x.product_name||'',category:x.category||'',qty:Number(x.quantity)||0,unitPrice:Number(x.unit_price)||0,total:Number(x.total)||0,method:x.payment_method||'cash',note:x.note||'',ts:x.sold_at||x.created_at||new Date().toISOString()};}
-async function sbSaveSalesProduct(p){if(isDemo())return;const {error}=await sb.from('sales_products').upsert({id:p.id,restaurant_id:REST_ID,name:p.name,category:p.category||'',type:p.type||'product',price:p.price||0,sku:p.sku||'',unit:p.unit||'unit',track_stock:!!p.trackStock,stock:p.stock||0,min_stock:p.minStock||0,active:p.active!==false});if(error)console.warn('Sales product save failed',error);}
-async function sbSaveSale(s){if(isDemo())return;const {error}=await sb.from('sales').upsert({id:s.id,restaurant_id:REST_ID,product_id:s.productId||null,product_name:s.productName||'',category:s.category||'',quantity:s.qty||0,unit_price:s.unitPrice||0,total:s.total||0,payment_method:s.method||'cash',note:s.note||'',sold_at:s.ts||new Date().toISOString()});if(error)console.warn('Sale save failed',error);}
+async function sbSaveSettings(s){if(isDemo())return;await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours(),sales_panel_widgets:DB.salesPanelWidgets||null}).eq('id',REST_ID);}
+function salesProductFromSB(x){return{id:x.id,name:x.name||'',category:x.category||'',type:x.type||'product',price:Number(x.price)||0,sku:x.sku||'',unit:x.unit||'unit',trackStock:!!x.track_stock,stock:Number(x.stock)||0,minStock:Number(x.min_stock)||0,recipe:x.recipe||[],active:x.active!==false,createdAt:x.created_at||new Date().toISOString()};}
+function saleFromSB(x){return{id:x.id,productId:x.product_id,productName:x.product_name||'',category:x.category||'',qty:Number(x.quantity)||0,unitPrice:Number(x.unit_price)||0,total:Number(x.total)||0,method:x.payment_method||'cash',employeeId:x.employee_id||'',employeeName:x.employee_name||'',note:x.note||'',ts:x.sold_at||x.created_at||new Date().toISOString()};}
+function supplierFromSB(x){return{id:x.id,name:x.name||'',phone:x.phone||'',email:x.email||'',notes:x.notes||'',createdAt:x.created_at||new Date().toISOString()};}
+function purchaseFromSB(x){return{id:x.id,productId:x.product_id||'',productName:x.product_name||'',supplierId:x.supplier_id||'',supplierName:x.supplier_name||'',qty:Number(x.quantity)||0,cost:Number(x.total_cost)||0,note:x.note||'',ts:x.purchased_at||x.created_at||new Date().toISOString()};}
+async function sbSaveSalesProduct(p){if(isDemo())return;const {error}=await sb.from('sales_products').upsert({id:p.id,restaurant_id:REST_ID,name:p.name,category:p.category||'',type:p.type||'product',price:p.price||0,sku:p.sku||'',unit:p.unit||'unit',track_stock:!!p.trackStock,stock:p.stock||0,min_stock:p.minStock||0,recipe:p.recipe||[],active:p.active!==false});if(error)console.warn('Sales product save failed',error);}
+async function sbSaveSale(s){if(isDemo())return;const {error}=await sb.from('sales').upsert({id:s.id,restaurant_id:REST_ID,product_id:s.productId||null,product_name:s.productName||'',category:s.category||'',quantity:s.qty||0,unit_price:s.unitPrice||0,total:s.total||0,payment_method:s.method||'cash',employee_id:s.employeeId||null,employee_name:s.employeeName||'',note:s.note||'',sold_at:s.ts||new Date().toISOString()});if(error)console.warn('Sale save failed',error);}
+async function sbSaveSupplier(s){if(isDemo())return;const {error}=await sb.from('inventory_suppliers').upsert({id:s.id,restaurant_id:REST_ID,name:s.name||'',phone:s.phone||'',email:s.email||'',notes:s.notes||''});if(error)console.warn('Supplier save failed',error);}
+async function sbSavePurchase(p){if(isDemo())return;const {error}=await sb.from('inventory_purchases').upsert({id:p.id,restaurant_id:REST_ID,product_id:p.productId||null,product_name:p.productName||'',supplier_id:p.supplierId||null,supplier_name:p.supplierName||'',quantity:p.qty||0,total_cost:p.cost||0,note:p.note||'',purchased_at:p.ts||new Date().toISOString()});if(error)console.warn('Purchase save failed',error);}
 async function sbUpdateAbsApproved(id,approved){if(isDemo())return;await sb.from('absences').update({approved}).eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDelAbs(id){if(isDemo())return;await sb.from('absences').delete().eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDeleteAll(){
@@ -1942,6 +2135,8 @@ async function sbDeleteAll(){
     sb.from('absences').delete().eq('restaurant_id',REST_ID),
     sb.from('shifts').delete().eq('restaurant_id',REST_ID),
     sb.from('employee_documents').delete().eq('restaurant_id',REST_ID),
+    sb.from('inventory_purchases').delete().eq('restaurant_id',REST_ID),
+    sb.from('inventory_suppliers').delete().eq('restaurant_id',REST_ID),
     sb.from('sales').delete().eq('restaurant_id',REST_ID),
     sb.from('sales_products').delete().eq('restaurant_id',REST_ID),
     sb.from('employees').delete().eq('restaurant_id',REST_ID)
@@ -2031,6 +2226,7 @@ const jsArg=v=>esc(JSON.stringify(String(v??'')));
 const clean=v=>String(v??'').replace(/[<>]/g,'').trim();
 const csvCell=v=>`"${String(v??'').replace(/"/g,'""')}"`;
 const money=v=>`${DB.settings?.currency||'CHF'} ${(Number(v)||0).toFixed(2)}`;
+const round1=v=>Math.round((Number(v)||0)*10)/10;
 const initials=n=>(n||'?').split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
 const iconIn=()=>`<svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>`;
 const iconOut=()=>`<svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/></svg>`;
@@ -2185,9 +2381,10 @@ function renderEmployeeLangBar(){
 function applyUITexts(){
   const t=T();
   renderLoginLangBar();
-  document.querySelectorAll('.sb-section').forEach((el,i)=>{const vals=[t.nav.principal,areaTx().team,areaTx().sales,t.nav.config,t.nav.master];if(vals[i])el.textContent=vals[i];});
+  const sectionLabels={main:t.nav.principal,people:areaTx().team,sales:areaTx().sales,inventory:areaTx().inventory,config:t.nav.config,master:t.nav.master};
+  document.querySelectorAll('.sb-section[data-sidebar-section]').forEach(el=>{el.textContent=sectionLabels[el.dataset.sidebarSection]||el.textContent;});
   const setNav=(page,text)=>{const el=document.querySelector(`[onclick="nav('${page}',this)"] span`);if(el)el.textContent=text;};
-  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('sales',t.pages.sales);setNav('salesProducts',t.pages.salesProducts);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
+  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('sales',t.pages.sales);setNav('salesProducts',t.pages.salesProducts);setNav('salesReports',t.pages.salesReports);setNav('inventory',t.pages.inventory);setNav('inventoryStock',t.pages.inventoryStock);setNav('inventoryPurchases',t.pages.inventoryPurchases);setNav('inventorySuppliers',t.pages.inventorySuppliers);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
   const mt=document.querySelector('[onclick="nav(\'master\',this)"] span');if(mt)mt.textContent=t.pages.master;
   document.getElementById('page-title').textContent=t.pages[currentPage]||currentPage;
   const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].textContent=t.login.manager;if(tabs[1])tabs[1].textContent=t.login.employee;if(tabs[2])tabs[2].textContent=t.login.restaurant;
@@ -2302,11 +2499,12 @@ function setEmployeeLang(l){
 
 function updateSalesModalTexts(){
   const tx=salesTx(),set=(id,text)=>{const el=document.getElementById(id);if(el)el.textContent=text;};
-  set('sale-modal-title',tx.newSale);set('sale-product-label',tx.product);set('sale-qty-label',tx.qty);set('sale-price-label',tx.price);set('sale-method-label',tx.method);set('sale-note-label',tx.note);set('sale-total-label',tx.total);set('sale-cancel-btn',tx.cancel);set('sale-save-btn',tx.saveSale);
+  set('sale-modal-title',tx.newSale);set('sale-product-label',tx.product);set('sale-qty-label',tx.qty);set('sale-price-label',tx.price);set('sale-method-label',tx.method);set('sale-employee-label',salesWidgetText().responsible);set('sale-note-label',tx.note);set('sale-total-label',tx.total);set('sale-cancel-btn',tx.cancel);set('sale-save-btn',tx.saveSale);
   set('product-modal-title',tx.newProduct);set('product-name-label',tx.productName);set('product-category-label',tx.category);set('product-price-label',tx.price);set('product-type-label',tx.type);set('product-cancel-btn',tx.cancel);set('product-save-btn',tx.saveProduct);
   set('product-sku-label',tx.sku);set('product-unit-label',tx.unit);set('product-track-label',tx.trackStock);set('product-stock-label',tx.stock);set('product-min-stock-label',tx.minStock);
-  const st=document.getElementById('product-type');if(st){st.options[0].textContent=tx.productType;st.options[1].textContent=tx.serviceType;st.options[2].textContent=tx.ingredientType;st.options[3].textContent=tx.bundleType;}
-  const su=document.getElementById('product-unit');if(su){su.options[0].textContent=tx.unitUnit;su.options[5].textContent=tx.unitHour;}
+  set('product-recipe-title',tx.recipeTitle);set('product-recipe-help',tx.recipeHelp);set('product-recipe-add',tx.addIngredient);
+  const st=document.getElementById('product-type');if(st){[...st.options].forEach(o=>{o.textContent={product:tx.productType,service:tx.serviceType,ingredient:tx.ingredientType,bundle:tx.bundleType}[o.value]||o.textContent;});}
+  const su=document.getElementById('product-unit');if(su)su.innerHTML=salesUnitOptions(su.value||'unit');
   const sm=document.getElementById('sale-method');if(sm){sm.options[0].textContent=tx.cash;sm.options[1].textContent=tx.card;sm.options[2].textContent=tx.twint;sm.options[3].textContent=tx.transfer;}
 }
 
@@ -2328,22 +2526,38 @@ function applyPermissionsUI(){
   updateSidebarScope();
 }
 function updateSidebarScope(){
-  const salesPages=['sales','salesProducts'];
+  const salesPages=['sales','salesProducts','salesReports'];
+  const inventoryPages=['inventory','inventoryStock','inventoryPurchases','inventorySuppliers'];
   const configPages=['settings','master'];
   const peoplePages=['dashboard','attendance','employees','shifts','vacations','payroll','reports','history'];
+  const hubPage=currentPage==='hub';
   let scope='all';
   if(salesPages.includes(currentPage))scope='sales';
+  else if(inventoryPages.includes(currentPage))scope='inventory';
   else if(peoplePages.includes(currentPage))scope='people';
   else if(configPages.includes(currentPage))scope='config';
-  const showAreas=scope==='all'?['main','people','sales','config','master']:scope==='sales'?['main','sales']:scope==='people'?['main','people']:['main','config','master'];
+  const showAreas=scope==='all'?['main','people','sales','inventory','config','master']:scope==='sales'?['main','sales']:scope==='inventory'?['main','inventory']:scope==='people'?['main','people']:['main','config','master'];
   document.querySelectorAll('[data-sidebar-section]').forEach(el=>{
     const key=el.dataset.sidebarSection;
     el.style.display=showAreas.includes(key)&&(!(key==='master')||can('master'))?'':'none';
   });
   document.querySelectorAll('[data-sidebar-area]').forEach(el=>{
     const key=el.dataset.sidebarArea;
-    el.style.display=showAreas.includes(key)&&(!(key==='config')||can('edit_settings'))?'':'none';
+    let show=showAreas.includes(key)&&(!(key==='config')||can('edit_settings'));
+    if(hubPage){
+      const action=el.getAttribute('onclick')||'';
+      show=show&&(
+        key==='main'||
+        (key==='people'&&action.includes("dashboard"))||
+        (key==='sales'&&action.includes("sales',"))||
+        (key==='inventory'&&action.includes("inventory',"))||
+        key==='config'
+      );
+    }
+    el.style.display=show?'':'none';
   });
+  const dashLabel=document.querySelector(`[onclick="nav('dashboard',this)"] span`);
+  if(dashLabel)dashLabel.textContent=hubPage?areaTx().team:T().pages.dashboard;
 }
 
 // ═══════ AUTH ═══════
@@ -3702,6 +3916,11 @@ function renderPage(p){
   if(p==='dashboard')renderDash();
   if(p==='sales')renderSales();
   if(p==='salesProducts')renderSalesProducts();
+  if(p==='salesReports')renderSalesReports();
+  if(p==='inventory')renderInventory();
+  if(p==='inventoryStock')renderInventoryStock();
+  if(p==='inventoryPurchases')renderInventoryPurchases();
+  if(p==='inventorySuppliers')renderInventorySuppliers();
   if(p==='attendance')renderAtt();
   if(p==='employees')renderEmps();
   if(p==='shifts')renderShifts();
@@ -3713,7 +3932,7 @@ function renderPage(p){
   if(p==='master')renderMaster();
   applyPermissionsUI();
 }
-function renderAll(){renderHub();renderDash();renderSales();renderSalesProducts();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
+function renderAll(){renderHub();renderDash();renderSales();renderSalesProducts();renderSalesReports();renderInventory();renderInventoryStock();renderInventoryPurchases();renderInventorySuppliers();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
 
 function hubIcon(type){
   const icons={
@@ -3747,7 +3966,7 @@ function renderHub(){
   const cards=[
     {icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,action:"goPage('dashboard')",button:tx.openTeam},
     {icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1',active:true,action:"goPage('sales')",button:tx.open},
-    {icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df'},
+    {icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df',active:true,action:"goPage('inventory')",button:tx.open},
     {icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:['Expedientes','Vencimientos','IA'],color:'#7c3aed',soft:'#f3edff'},
     {icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:['Rutinas','Responsables','Pendientes'],color:'#0891b2',soft:'#e6f8fc'},
     {icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:['IA','Reportes','Señales'],color:'#be123c',soft:'#fff1f2'}
@@ -3791,9 +4010,226 @@ function salesMethodLabel(method){
   const tx=salesTx();
   return {cash:tx.cash,card:tx.card,twint:tx.twint,transfer:tx.transfer}[method]||method||tx.cash;
 }
+function salesUnitOptions(selected='unit'){
+  const tx=salesTx();
+  const units=[
+    ['unit',tx.unitUnit],
+    ['kg','kg'],
+    ['g','g'],
+    ['l','L'],
+    ['ml','ml'],
+    ['portion',tx.unitPortion||'Porción'],
+    ['pack',tx.unitPack||'Paquete'],
+    ['box',tx.unitBox||'Caja'],
+    ['bottle',tx.unitBottle||'Botella'],
+    ['hour',tx.unitHour]
+  ];
+  return units.map(([value,label])=>`<option value="${value}" ${value===selected?'selected':''}>${esc(label)}</option>`).join('');
+}
+function salesUnitLabel(value){
+  const tx=salesTx();
+  return {unit:tx.unitUnit,kg:'kg',g:'g',l:'L',ml:'ml',portion:tx.unitPortion||'Porción',pack:tx.unitPack||'Paquete',box:tx.unitBox||'Caja',bottle:tx.unitBottle||'Botella',hour:tx.unitHour}[value]||value||tx.unitUnit;
+}
 function salesProductTypeLabel(type){
   const tx=salesTx();
   return {product:tx.productType,service:tx.serviceType,ingredient:tx.ingredientType,bundle:tx.bundleType}[type]||tx.productType;
+}
+function sellableProducts(){return (DB.salesProducts||[]).filter(p=>p.active!==false&&p.type!=='ingredient');}
+function stockItems(){return (DB.salesProducts||[]).filter(p=>p.active!==false&&p.trackStock);}
+function lowStockItems(){return stockItems().filter(p=>Number(p.stock)<=Number(p.minStock));}
+function productById(id){return (DB.salesProducts||[]).find(p=>p.id===id);}
+function recipeText(p){
+  const tx=inventoryTx(),recipe=p?.recipe||[];
+  if(!recipe.length)return '';
+  return `${tx.recipe}: `+recipe.map(r=>{
+    const ing=productById(r.productId);
+    return `${Number(r.qty)||0} ${salesUnitLabel(ing?.unit)} ${ing?.name||r.productId}`;
+  }).join(' · ');
+}
+function applySaleStock(product,qty){
+  const touched=[];
+  if(product.trackStock){
+    product.stock=Math.max(0,(Number(product.stock)||0)-qty);
+    touched.push(product);
+  }
+  (product.recipe||[]).forEach(r=>{
+    const ing=productById(r.productId);
+    if(ing?.trackStock){
+      ing.stock=Math.max(0,(Number(ing.stock)||0)-(Number(r.qty)||0)*qty);
+      touched.push(ing);
+    }
+  });
+  return [...new Map(touched.map(p=>[p.id,p])).values()];
+}
+let productRecipeDraft=[];
+let editingProductId=null;
+function recipeIngredients(){
+  return (DB.salesProducts||[]).filter(p=>p.active!==false&&p.type==='ingredient');
+}
+function recipeIngredientOptions(selected=''){
+  const ingredients=recipeIngredients();
+  return ingredients.map(p=>`<option value="${esc(p.id)}" ${p.id===selected?'selected':''}>${esc(p.name)} · ${esc(salesUnitLabel(p.unit))}</option>`).join('');
+}
+function renderRecipeRows(){
+  const el=document.getElementById('product-recipe-rows');if(!el)return;
+  const tx=salesTx(),ingredients=recipeIngredients();
+  if(!ingredients.length){
+    el.innerHTML=`<div class="sales-empty" style="margin-top:10px;padding:14px">${esc(tx.noIngredients)}</div>`;
+    return;
+  }
+  if(!productRecipeDraft.length)productRecipeDraft=[{productId:ingredients[0].id,qty:0}];
+  el.innerHTML=productRecipeDraft.map((r,i)=>{
+    const ing=productById(r.productId)||ingredients[0];
+    return `<div class="recipe-row">
+      <div class="fg" style="margin:0"><label>${esc(tx.ingredient)}</label><select onchange="updateRecipeProduct(${i},this.value)">${recipeIngredientOptions(r.productId)}</select></div>
+      <div class="fg" style="margin:0"><label>${esc(tx.consumption)}${ing?.unit?` (${esc(salesUnitLabel(ing.unit))})`:''}</label><input type="number" min="0" step="0.001" value="${Number(r.qty)||0}" oninput="updateRecipeQty(${i},this.value)"></div>
+      <button class="btn btn-ghost" type="button" onclick="removeRecipeRow(${i})">×</button>
+    </div>`;
+  }).join('');
+}
+function updateRecipeProduct(i,value){
+  if(!productRecipeDraft[i])return;
+  productRecipeDraft[i].productId=value;
+  renderRecipeRows();
+}
+function updateRecipeQty(i,value){
+  if(!productRecipeDraft[i])return;
+  productRecipeDraft[i].qty=Number(value)||0;
+}
+function addRecipeRow(){
+  const first=recipeIngredients()[0];
+  if(!first){renderRecipeRows();return;}
+  productRecipeDraft.push({productId:first.id,qty:0});
+  renderRecipeRows();
+}
+function removeRecipeRow(i){
+  productRecipeDraft.splice(i,1);
+  renderRecipeRows();
+}
+function collectProductRecipe(){
+  return productRecipeDraft
+    .filter(r=>r.productId&&Number(r.qty)>0)
+    .map(r=>({productId:r.productId,qty:Number(r.qty)}));
+}
+const defaultSalesWidgets=['revenueToday','salesCount','avgTicket','topProducts','paymentMethods','inventoryImpact'];
+function salesWidgetText(){
+  return {
+    es:{config:'Configurar panel',help:'Elige los indicadores que quieres ver en Ventas.',save:'Guardar',cancel:'Cancelar',cash:'Caja',products:'Productos',inventory:'Inventario',team:'Equipo',analysis:'Análisis',revenueToday:'Ventas del día',revenueMonth:'Ventas del mes',salesCount:'N° de ventas',avgTicket:'Ticket promedio',productsSold:'Productos vendidos',hourPeak:'Hora pico',topProducts:'Top productos/servicios',paymentMethods:'Métodos de pago',categorySales:'Ventas por categoría',inventoryImpact:'Stock afectado',employeeSales:'Ventas por empleado',hourSales:'Ventas por hora',margin:'Margen estimado',unassigned:'Sin asignar',responsible:'Empleado responsable',periodToday:'Hoy',periodWeek:'Esta semana',periodMonth:'Este mes',periodCustom:'Personalizado',critical:'Crítico',low:'Bajo',replenish:'Reponer',missingIndicators:'¿Te faltan indicadores?',activateNeeded:'Activa los que necesite tu negocio.',vsYesterday:'vs ayer'},
+    en:{config:'Configure panel',help:'Choose the indicators you want to see in Sales.',save:'Save',cancel:'Cancel',cash:'Cash',products:'Products',inventory:'Inventory',team:'Team',analysis:'Analysis',revenueToday:'Today sales',revenueMonth:'Month sales',salesCount:'Number of sales',avgTicket:'Average ticket',productsSold:'Products sold',hourPeak:'Peak hour',topProducts:'Top products/services',paymentMethods:'Payment methods',categorySales:'Sales by category',inventoryImpact:'Stock affected',employeeSales:'Sales by employee',hourSales:'Sales by hour',margin:'Estimated margin',unassigned:'Unassigned',responsible:'Responsible employee',periodToday:'Today',periodWeek:'This week',periodMonth:'This month',periodCustom:'Custom',critical:'Critical',low:'Low',replenish:'Replenish',missingIndicators:'Missing indicators?',activateNeeded:'Activate what your business needs.',vsYesterday:'vs yesterday'},
+    fr:{config:'Configurer le panel',help:'Choisissez les indicateurs à afficher dans Ventes.',save:'Enregistrer',cancel:'Annuler',cash:'Caisse',products:'Produits',inventory:'Inventaire',team:'Équipe',analysis:'Analyse',revenueToday:'Ventes du jour',revenueMonth:'Ventes du mois',salesCount:'Nombre de ventes',avgTicket:'Ticket moyen',productsSold:'Produits vendus',hourPeak:'Heure de pointe',topProducts:'Top produits/services',paymentMethods:'Moyens de paiement',categorySales:'Ventes par catégorie',inventoryImpact:'Stock impacté',employeeSales:'Ventes par employé',hourSales:'Ventes par heure',margin:'Marge estimée',unassigned:'Non assigné',responsible:'Employé responsable',periodToday:'Aujourd’hui',periodWeek:'Cette semaine',periodMonth:'Ce mois',periodCustom:'Personnalisé',critical:'Critique',low:'Bas',replenish:'Réapprovisionner',missingIndicators:'Il manque des indicateurs ?',activateNeeded:'Activez ceux utiles à votre activité.',vsYesterday:'vs hier'},
+    de:{config:'Panel konfigurieren',help:'Wählen Sie die Kennzahlen für Verkauf.',save:'Speichern',cancel:'Abbrechen',cash:'Kasse',products:'Produkte',inventory:'Inventar',team:'Team',analysis:'Analyse',revenueToday:'Tagesumsatz',revenueMonth:'Monatsumsatz',salesCount:'Anzahl Verkäufe',avgTicket:'Durchschnittsbon',productsSold:'Verkaufte Produkte',hourPeak:'Spitzenzeit',topProducts:'Top Produkte/Services',paymentMethods:'Zahlungsarten',categorySales:'Verkäufe nach Kategorie',inventoryImpact:'Betroffener Bestand',employeeSales:'Verkäufe pro Mitarbeiter',hourSales:'Verkäufe pro Stunde',margin:'Geschätzte Marge',unassigned:'Nicht zugewiesen',responsible:'Verantwortlicher Mitarbeiter',periodToday:'Heute',periodWeek:'Diese Woche',periodMonth:'Dieser Monat',periodCustom:'Benutzerdefiniert',critical:'Kritisch',low:'Niedrig',replenish:'Auffüllen',missingIndicators:'Fehlen Kennzahlen?',activateNeeded:'Aktivieren Sie, was Ihr Geschäft braucht.',vsYesterday:'vs gestern'},
+    it:{config:'Configura pannello',help:'Scegli gli indicatori da vedere in Vendite.',save:'Salva',cancel:'Annulla',cash:'Cassa',products:'Prodotti',inventory:'Inventario',team:'Team',analysis:'Analisi',revenueToday:'Vendite del giorno',revenueMonth:'Vendite del mese',salesCount:'Numero vendite',avgTicket:'Scontrino medio',productsSold:'Prodotti venduti',hourPeak:'Ora di punta',topProducts:'Top prodotti/servizi',paymentMethods:'Metodi di pagamento',categorySales:'Vendite per categoria',inventoryImpact:'Stock impattato',employeeSales:'Vendite per dipendente',hourSales:'Vendite per ora',margin:'Margine stimato',unassigned:'Non assegnato',responsible:'Dipendente responsabile',periodToday:'Oggi',periodWeek:'Questa settimana',periodMonth:'Questo mese',periodCustom:'Personalizzato',critical:'Critico',low:'Basso',replenish:'Rifornire',missingIndicators:'Mancano indicatori?',activateNeeded:'Attiva quelli utili al tuo business.',vsYesterday:'vs ieri'}
+  }[lang]||{
+    config:'Configurar panel',help:'Elige los indicadores que quieres ver en Ventas.',save:'Guardar',cancel:'Cancelar',cash:'Caja',products:'Productos',inventory:'Inventario',team:'Equipo',analysis:'Análisis',revenueToday:'Ventas del día',revenueMonth:'Ventas del mes',salesCount:'N° de ventas',avgTicket:'Ticket promedio',productsSold:'Productos vendidos',hourPeak:'Hora pico',topProducts:'Top productos/servicios',paymentMethods:'Métodos de pago',categorySales:'Ventas por categoría',inventoryImpact:'Stock afectado',employeeSales:'Ventas por empleado',hourSales:'Ventas por hora',margin:'Margen estimado',unassigned:'Sin asignar',responsible:'Empleado responsable',periodToday:'Hoy',periodWeek:'Esta semana',periodMonth:'Este mes',periodCustom:'Personalizado',critical:'Crítico',low:'Bajo',replenish:'Reponer',missingIndicators:'¿Te faltan indicadores?',activateNeeded:'Activa los que necesite tu negocio.',vsYesterday:'vs ayer'
+  };
+}
+function salesWidgetDefs(){
+  const w=salesWidgetText();
+  return [
+    {key:'revenueToday',group:w.cash,label:w.revenueToday},
+    {key:'revenueMonth',group:w.cash,label:w.revenueMonth},
+    {key:'salesCount',group:w.cash,label:w.salesCount},
+    {key:'avgTicket',group:w.cash,label:w.avgTicket},
+    {key:'paymentMethods',group:w.cash,label:w.paymentMethods},
+    {key:'topProducts',group:w.products,label:w.topProducts},
+    {key:'productsSold',group:w.products,label:w.productsSold},
+    {key:'categorySales',group:w.products,label:w.categorySales},
+    {key:'inventoryImpact',group:w.inventory,label:w.inventoryImpact},
+    {key:'employeeSales',group:w.team,label:w.employeeSales},
+    {key:'hourSales',group:w.analysis,label:w.hourSales},
+    {key:'hourPeak',group:w.analysis,label:w.hourPeak},
+    {key:'margin',group:w.analysis,label:w.margin}
+  ];
+}
+function salesReportText(){
+  return {
+    es:{reports:'Reportes de ventas',priorityHelp:'Ordenado por importancia: caja primero, luego productos, pagos, inventario y equipo.',moreIndicators:'Indicadores adicionales',moreIndicatorsSub:'Actívalos si tu negocio necesita una lectura más profunda.',excel:'Excel',preview:'Vista previa',generate:'Generar',dailyClose:'Cierre diario de caja',dailyCloseDesc:'Ingresos, número de ventas, ticket promedio y medios de pago.',monthlySales:'Reporte mensual de ventas',monthlySalesDesc:'Resumen del mes con detalle de transacciones.',byProduct:'Reporte por producto',byProductDesc:'Qué se vendió, cuántas unidades y cuánto generó.',byPayment:'Reporte por método de pago',byPaymentDesc:'Efectivo, tarjeta, transferencia y otros.',byEmployee:'Reporte por empleado',byEmployeeDesc:'Ventas asociadas a cada responsable.',inventory:'Reporte de inventario afectado',inventoryDesc:'Consumo de insumos conectado a ventas.',detail:'Detalle de ventas',date:'Fecha',product:'Producto',qty:'Cantidad',unitPrice:'Precio unit.',total:'Total',method:'Método',employee:'Empleado',category:'Categoría',summary:'Resumen',period:'Periodo',noData:'No hay ventas para este periodo.'},
+    en:{reports:'Sales reports',priorityHelp:'Organized by importance: cash first, then products, payments, inventory and team.',moreIndicators:'Additional indicators',moreIndicatorsSub:'Enable them when your business needs a deeper read.',excel:'Excel',preview:'Preview',generate:'Generate',dailyClose:'Daily cash close',dailyCloseDesc:'Revenue, number of sales, average ticket and payment methods.',monthlySales:'Monthly sales report',monthlySalesDesc:'Month summary with transaction detail.',byProduct:'Product report',byProductDesc:'What sold, units sold and revenue.',byPayment:'Payment method report',byPaymentDesc:'Cash, card, transfer and others.',byEmployee:'Employee report',byEmployeeDesc:'Sales linked to each responsible person.',inventory:'Inventory affected report',inventoryDesc:'Input consumption connected to sales.',detail:'Sales detail',date:'Date',product:'Product',qty:'Qty',unitPrice:'Unit price',total:'Total',method:'Method',employee:'Employee',category:'Category',summary:'Summary',period:'Period',noData:'No sales for this period.'},
+    fr:{reports:'Rapports ventes',priorityHelp:'Classé par importance: caisse, puis produits, paiements, inventaire et équipe.',moreIndicators:'Indicateurs additionnels',moreIndicatorsSub:'Activez-les si votre activité demande une lecture plus profonde.',excel:'Excel',preview:'Aperçu',generate:'Générer',dailyClose:'Clôture de caisse',dailyCloseDesc:'Revenus, nombre de ventes, ticket moyen et moyens de paiement.',monthlySales:'Rapport mensuel des ventes',monthlySalesDesc:'Résumé du mois avec détail des transactions.',byProduct:'Rapport par produit',byProductDesc:'Ce qui a été vendu, quantités et revenus.',byPayment:'Rapport par moyen de paiement',byPaymentDesc:'Espèces, carte, virement et autres.',byEmployee:'Rapport par employé',byEmployeeDesc:'Ventes associées à chaque responsable.',inventory:'Rapport inventaire impacté',inventoryDesc:'Consommation d’intrants liée aux ventes.',detail:'Détail des ventes',date:'Date',product:'Produit',qty:'Quantité',unitPrice:'Prix unit.',total:'Total',method:'Moyen',employee:'Employé',category:'Catégorie',summary:'Résumé',period:'Période',noData:'Aucune vente pour cette période.'},
+    de:{reports:'Verkaufsberichte',priorityHelp:'Nach Wichtigkeit sortiert: Kasse zuerst, dann Produkte, Zahlungen, Inventar und Team.',moreIndicators:'Zusätzliche Kennzahlen',moreIndicatorsSub:'Aktivieren, wenn der Betrieb mehr Tiefe braucht.',excel:'Excel',preview:'Vorschau',generate:'Erstellen',dailyClose:'Tagesabschluss Kasse',dailyCloseDesc:'Umsatz, Anzahl Verkäufe, Durchschnittsbon und Zahlungsarten.',monthlySales:'Monatlicher Verkaufsbericht',monthlySalesDesc:'Monatsübersicht mit Transaktionsdetails.',byProduct:'Bericht nach Produkt',byProductDesc:'Was verkauft wurde, Menge und Umsatz.',byPayment:'Bericht nach Zahlungsart',byPaymentDesc:'Bar, Karte, Überweisung und andere.',byEmployee:'Bericht nach Mitarbeiter',byEmployeeDesc:'Verkäufe je verantwortlicher Person.',inventory:'Bericht betroffener Bestand',inventoryDesc:'Verbrauch von Inputs aus Verkäufen.',detail:'Verkaufsdetails',date:'Datum',product:'Produkt',qty:'Menge',unitPrice:'Einzelpreis',total:'Total',method:'Art',employee:'Mitarbeiter',category:'Kategorie',summary:'Zusammenfassung',period:'Zeitraum',noData:'Keine Verkäufe in diesem Zeitraum.'},
+    it:{reports:'Report vendite',priorityHelp:'Ordinato per importanza: cassa prima, poi prodotti, pagamenti, inventario e team.',moreIndicators:'Indicatori aggiuntivi',moreIndicatorsSub:'Attivali quando il business ha bisogno di più dettaglio.',excel:'Excel',preview:'Anteprima',generate:'Genera',dailyClose:'Chiusura giornaliera cassa',dailyCloseDesc:'Incassi, numero vendite, scontrino medio e metodi di pagamento.',monthlySales:'Report mensile vendite',monthlySalesDesc:'Riepilogo del mese con dettaglio transazioni.',byProduct:'Report per prodotto',byProductDesc:'Cosa è stato venduto, quantità e incassi.',byPayment:'Report per metodo di pagamento',byPaymentDesc:'Contanti, carta, bonifico e altri.',byEmployee:'Report per dipendente',byEmployeeDesc:'Vendite associate a ogni responsabile.',inventory:'Report inventario impattato',inventoryDesc:'Consumo di ingredienti collegato alle vendite.',detail:'Dettaglio vendite',date:'Data',product:'Prodotto',qty:'Quantità',unitPrice:'Prezzo unit.',total:'Totale',method:'Metodo',employee:'Dipendente',category:'Categoria',summary:'Riepilogo',period:'Periodo',noData:'Nessuna vendita per questo periodo.'}
+  }[lang]||{};
+}
+function activeSalesWidgets(){
+  if(!Array.isArray(DB.salesPanelWidgets)||!DB.salesPanelWidgets.length)DB.salesPanelWidgets=[...defaultSalesWidgets];
+  return DB.salesPanelWidgets;
+}
+function saleMonthList(){
+  const d=new Date(),y=d.getFullYear(),m=d.getMonth();
+  return (DB.sales||[]).filter(s=>{const x=new Date(s.ts);return x.getFullYear()===y&&x.getMonth()===m;});
+}
+function groupSales(list,keyFn,valueFn=s=>Number(s.total)||0){
+  const out={};list.forEach(s=>{const k=keyFn(s)||'-';out[k]=(out[k]||0)+valueFn(s);});
+  return Object.entries(out).sort((a,b)=>b[1]-a[1]);
+}
+function inventoryImpact(list){
+  const out={};
+  list.forEach(s=>{
+    const p=productById(s.productId);
+    (p?.recipe||[]).forEach(r=>{
+      const ing=productById(r.productId);
+      const key=ing?.name||r.productId;
+      out[key]=out[key]||{qty:0,unit:salesUnitLabel(ing?.unit)};
+      out[key].qty+=(Number(r.qty)||0)*(Number(s.qty)||0);
+    });
+  });
+  return Object.entries(out).sort((a,b)=>b[1].qty-a[1].qty);
+}
+function salesWidgetVisual(key){
+  return {
+    revenueToday:{icon:'$',bg:'#eff6ff',color:'#2563eb'},
+    revenueMonth:{icon:'M',bg:'#f5f3ff',color:'#7c3aed'},
+    salesCount:{icon:'#',bg:'#ecfdf5',color:'#059669'},
+    avgTicket:{icon:'T',bg:'#fff7ed',color:'#d97706'},
+    productsSold:{icon:'P',bg:'#eefcff',color:'#0891b2'},
+    inventoryImpact:{icon:'!',bg:'#fff1f2',color:'#dc2626'},
+    hourPeak:{icon:'H',bg:'#fdf2f8',color:'#db2777'},
+    margin:{icon:'%',bg:'#fdf2f8',color:'#db2777'}
+  }[key]||{icon:'+',bg:'#f1f5f9',color:'#64748b'};
+}
+function salesKpiHTML(key,label,value){
+  const v=salesWidgetVisual(key);
+  return `<div class="sales-kpi"><div class="sales-kpi-top"><div class="sales-kpi-icon" style="background:${v.bg};color:${v.color}">${esc(v.icon)}</div></div><div class="num" style="color:${v.color}">${esc(value)}</div><div class="kpi-sub">${esc(label)}</div></div>`;
+}
+function salesWidgetCard(key,list,sum){
+  const tx=salesTx(),w=salesWidgetText(),month=saleMonthList();
+  if(key==='revenueToday')return salesKpiHTML(key,w.revenueToday,money(sum.total));
+  if(key==='revenueMonth')return salesKpiHTML(key,w.revenueMonth,money(month.reduce((a,s)=>a+(Number(s.total)||0),0)));
+  if(key==='salesCount')return salesKpiHTML(key,w.salesCount,sum.count);
+  if(key==='avgTicket')return salesKpiHTML(key,w.avgTicket,money(sum.ticket));
+  if(key==='productsSold')return salesKpiHTML(key,w.productsSold,sum.qty);
+  if(key==='hourPeak')return salesKpiHTML(key,w.hourPeak,salesHourPeak(list).label);
+  if(key==='margin')return salesKpiHTML(key,w.margin,'-');
+  return '';
+}
+function salesListWidget(title,rows,empty){
+  return `<div class="sales-panel"><div class="card-header" style="margin:0 0 12px">${esc(title)}</div>${rows.length?rows.map(r=>`<div class="sales-row"><div><div class="fw8 fs13">${esc(r.label)}</div><div class="fs11 muted">${esc(r.sub||'')}</div></div><div class="fw8">${esc(r.value)}</div></div>`).join(''):`<div class="sales-empty">${esc(empty)}</div>`}</div>`;
+}
+function salesDashboardWidgets(list,sum){
+  const tx=salesTx(),w=salesWidgetText(),active=activeSalesWidgets();
+  const panels=[];
+  if(active.includes('paymentMethods'))panels.push(salesListWidget(w.paymentMethods,groupSales(list,s=>salesMethodLabel(s.method)).map(([label,total])=>({label,sub:w.cash,value:money(total)})),tx.empty));
+  if(active.includes('topProducts'))panels.push(salesListWidget(w.topProducts,groupSales(list,s=>s.productName,s=>Number(s.qty)||0).map(([label,qty])=>({label,sub:tx.sales,value:String(qty)})),tx.empty));
+  if(active.includes('categorySales'))panels.push(salesListWidget(w.categorySales,groupSales(list,s=>s.category||'-').map(([label,total])=>({label,sub:tx.revenue,value:money(total)})),tx.empty));
+  if(active.includes('employeeSales'))panels.push(salesListWidget(w.employeeSales,groupSales(list,s=>s.employeeName||w.unassigned).map(([label,total])=>({label,sub:tx.revenue,value:money(total)})),tx.empty));
+  if(active.includes('inventoryImpact'))panels.push(salesListWidget(w.inventoryImpact,inventoryImpact(list).map(([label,v])=>({label,sub:w.inventory,value:`${round1(v.qty)} ${v.unit}`})),tx.empty));
+  if(active.includes('hourSales'))panels.push(salesListWidget(w.hourSales,groupSales(list,s=>`${new Date(s.ts).getHours()}:00`).map(([label,total])=>({label,sub:tx.revenue,value:money(total)})),tx.empty));
+  return panels.join('');
+}
+function openSalesPanelConfig(){
+  const w=salesWidgetText(),active=activeSalesWidgets(),defs=salesWidgetDefs();
+  document.getElementById('sales-config-title').textContent=w.config;
+  document.getElementById('sales-config-help').textContent=w.help;
+  document.getElementById('sales-config-cancel').textContent=w.cancel;
+  document.getElementById('sales-config-save').textContent=w.save;
+  const groups=[...new Set(defs.map(d=>d.group))];
+  document.getElementById('sales-config-options').innerHTML=groups.map(g=>`<div class="sales-config-group"><div class="flex-b"><div class="fw9 fs13" style="text-transform:uppercase;letter-spacing:.7px;color:#5b6982">${esc(g)}</div><div class="fs11 muted">${defs.filter(d=>d.group===g&&active.includes(d.key)).length} activos</div></div>${defs.filter(d=>d.group===g).map(d=>`<label class="sales-config-row"><input type="checkbox" value="${esc(d.key)}" ${active.includes(d.key)?'checked':''}> <span class="fw8">${esc(d.label)}</span></label>`).join('')}</div>`).join('');
+  openModal('sales-config-modal');
+}
+function saveSalesPanelConfig(){
+  DB.salesPanelWidgets=[...document.querySelectorAll('#sales-config-options input:checked')].map(i=>i.value);
+  if(!DB.salesPanelWidgets.length)DB.salesPanelWidgets=[...defaultSalesWidgets];
+  saveLocal();closeModal('sales-config-modal');renderSales();toast(salesWidgetText().save);sbSaveSettings(DB.settings).catch(console.error);
 }
 function salesSummary(list=salesToday()){
   const total=list.reduce((a,s)=>a+(Number(s.total)||0),0),qty=list.reduce((a,s)=>a+(Number(s.qty)||0),0);
@@ -3802,65 +4238,232 @@ function salesSummary(list=salesToday()){
   const top=Object.entries(byProduct).sort((a,b)=>b[1]-a[1])[0];
   return{total,count:list.length,qty,ticket:list.length?total/list.length:0,byMethod,top};
 }
+function setSalesPeriod(p){DB.salesPeriod=p;saveLocal();renderSales();}
+function salesPeriod(){return DB.salesPeriod||'today';}
+function startOfDay(d){const x=new Date(d);x.setHours(0,0,0,0);return x;}
+function salesByPeriod(period=salesPeriod()){
+  const now=new Date(),today=startOfDay(now),month=now.getMonth(),year=now.getFullYear();
+  const weekStart=new Date(today);weekStart.setDate(today.getDate()-6);
+  return (DB.sales||[]).filter(s=>{
+    const d=new Date(s.ts);
+    if(period==='today')return startOfDay(d).getTime()===today.getTime();
+    if(period==='week')return d>=weekStart&&d<=now;
+    return d.getMonth()===month&&d.getFullYear()===year;
+  });
+}
+function salesPeriodTabs(){
+  const w=salesWidgetText(),p=salesPeriod();
+  return `<div class="sales-period-tabs">
+    ${[['today',w.periodToday],['week',w.periodWeek],['month',w.periodMonth],['custom',w.periodCustom]].map(([k,l])=>`<button class="sales-period-tab ${p===k?'active':''}" onclick="setSalesPeriod('${k}')">${esc(l)}</button>`).join('')}
+  </div>`;
+}
+function salesHourPeak(list){
+  const rows=groupSales(list,s=>String(new Date(s.ts).getHours()),s=>Number(s.total)||0);
+  if(!rows.length)return{hour:null,label:'-'};
+  const hour=Number(rows[0][0]);
+  return{hour,label:`${String(hour).padStart(2,'0')}:00`};
+}
+function salesStockAffected(){
+  return stockItems().filter(p=>Number(p.stock)<=Number(p.minStock||0));
+}
+function salesKpiRich(key,label,value,sub='',trend=''){
+  const v=salesWidgetVisual(key);
+  return `<div class="sales-kpi compact"><div class="sales-kpi-top"><div class="sales-kpi-icon" style="background:${v.bg};color:${v.color}">${esc(v.icon)}</div><span class="muted">...</span></div><div class="num" style="color:${v.color}">${esc(value)}</div><div class="kpi-sub">${esc(label)}</div>${trend?`<span class="sales-kpi-trend ${sub==='warn'?'warn':sub==='neutral'?'neutral':''}">${esc(trend)}</span>`:''}</div>`;
+}
+function salesBarPanel(title,sub,rows,empty){
+  const max=Math.max(...rows.map(r=>Number(r.raw)||0),1);
+  return `<div class="sales-panel"><div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(title)}</h3><div class="sales-panel-sub">${esc(sub||'')}</div></div></div>${rows.length?`<div class="sales-bar-list">${rows.map((r,i)=>`<div class="sales-bar-row"><div class="sales-rank ${i===0?'gold':''}">${i+1}</div><div class="sales-bar-label"><div class="sales-bar-name">${esc(r.label)}</div><div class="sales-bar-sub">${esc(r.sub||'')}</div><div class="sales-bar-track"><div class="sales-bar-fill" style="width:${Math.max(8,Math.round((Number(r.raw)||0)/max*100))}%"></div></div></div><div class="sales-bar-value">${esc(r.value)}</div></div>`).join('')}</div>`:`<div class="sales-empty">${esc(empty)}</div>`}</div>`;
+}
+function salesPaymentPanel(list){
+  const tx=salesTx(),w=salesWidgetText(),rows=groupSales(list,s=>salesMethodLabel(s.method));
+  const total=rows.reduce((a,r)=>a+r[1],0)||1,colors=['#2563eb','#059669','#7c3aed','#94a3b8'];
+  let start=0;
+  const gradient=rows.length?`conic-gradient(${rows.map(([_,val],i)=>{const pct=val/total*100,end=start+pct,part=`${colors[i%colors.length]} ${start}% ${end}%`;start=end;return part;}).join(',')})`:'conic-gradient(#e2e8f0 0 100%)';
+  return `<div class="sales-panel"><div class="mb12"><h3 class="sales-panel-title">${esc(w.paymentMethods)}</h3><div class="sales-panel-sub">${esc(w.periodWeek)}</div></div>${rows.length?`<div class="sales-donut-wrap"><div class="sales-donut" style="background:${gradient}"><div class="sales-donut-center"><span>Total</span>${esc(money(total))}</div></div><div class="sales-legend">${rows.map(([label,val],i)=>`<div class="sales-legend-row"><span class="sales-legend-dot" style="background:${colors[i%colors.length]}"></span><span>${esc(label)}</span><b>${Math.round(val/total*100)}%</b></div>`).join('')}</div></div>`:`<div class="sales-empty">${esc(tx.empty)}</div>`}</div>`;
+}
+function salesHourPanel(list){
+  const tx=salesTx(),w=salesWidgetText(),hours=Array.from({length:12},(_,i)=>7+i);
+  const by={};list.forEach(s=>{const h=new Date(s.ts).getHours();by[h]=(by[h]||0)+(Number(s.total)||0);});
+  const max=Math.max(...hours.map(h=>by[h]||0),1),peak=salesHourPeak(list).hour;
+  return `<div class="sales-panel"><div class="mb12"><h3 class="sales-panel-title">${esc(w.hourSales)}</h3><div class="sales-panel-sub">${esc(w.periodToday)}</div></div><div class="sales-hour-chart">${hours.map(h=>`<div class="sales-hour-col"><div class="sales-hour-bar ${h===peak?'peak':''}" style="height:${Math.max(8,Math.round((by[h]||0)/max*100))}%"></div><div class="sales-hour-label">${h>12?h-12:h}${h>=12?'p':'a'}</div></div>`).join('')}</div></div>`;
+}
+function salesCategoryPanel(list){
+  const tx=salesTx(),w=salesWidgetText();
+  const rows=groupSales(list,s=>s.category||'-').slice(0,5).map(([label,total])=>({label,sub:w.products,raw:total,value:money(total)}));
+  return salesBarPanel(w.categorySales,w.periodWeek,rows,tx.empty);
+}
+function salesTopPanel(list){
+  const tx=salesTx(),w=salesWidgetText();
+  const rows=groupSales(list,s=>s.productName,s=>Number(s.total)||0).slice(0,6).map(([label,total])=>({label,sub:w.products,raw:total,value:money(total)}));
+  return salesBarPanel(w.topProducts,w.periodWeek,rows,tx.empty);
+}
+function salesEmployeePanel(list){
+  const tx=salesTx(),w=salesWidgetText();
+  const rows=groupSales(list,s=>s.employeeName||w.unassigned).slice(0,5).map(([label,total])=>({label,sub:w.team,raw:total,value:money(total)}));
+  return salesBarPanel(w.employeeSales,w.periodWeek,rows,tx.empty);
+}
+function salesStockPanel(){
+  const tx=salesTx(),w=salesWidgetText(),rows=salesStockAffected().slice(0,4);
+  return `<div class="sales-panel sales-stock-panel"><div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(w.inventoryImpact)}</h3><div class="sales-panel-sub">${esc(tx.products)}</div></div><button class="btn btn-ghost btn-sm" onclick="goPage('inventoryStock')">${esc(w.replenish)} →</button></div>${rows.length?rows.map(p=>`<div class="sales-stock-item"><div class="sales-stock-icon">${p.type==='ingredient'?'□':'◈'}</div><div><div class="fw8 fs13">${esc(p.name)}</div><div class="fs11 muted">${Number(p.stock)||0} ${esc(salesUnitLabel(p.unit))}</div></div><span class="sales-stock-badge ${Number(p.stock)>0?'low':''}">${esc(Number(p.stock)>0?w.low:w.critical)}</span></div>`).join(''):`<div class="sales-empty">${esc(tx.empty)}</div>`}</div>`;
+}
 function renderSales(){
   const el=document.getElementById('sales-content');if(!el)return;
   DB.salesProducts=DB.salesProducts||[];DB.sales=DB.sales||[];
-  const tx=salesTx(),today=salesToday(),sum=salesSummary(today),products=DB.salesProducts.filter(p=>p.active!==false);
-  const methodHTML=Object.keys(sum.byMethod).length?Object.entries(sum.byMethod).map(([m,v])=>`<div class="sales-row"><div><div class="fw8 fs13">${esc(salesMethodLabel(m))}</div><div class="fs11 muted">${esc(tx.byMethod)}</div></div><div class="fw8">${esc(money(v))}</div></div>`).join(''):`<div class="sales-empty">${esc(tx.empty)}</div>`;
+  const tx=salesTx(),w=salesWidgetText(),period=salesPeriod(),list=salesByPeriod(period),today=salesToday(),month=saleMonthList(),sum=salesSummary(list),todaySum=salesSummary(today),monthSum=salesSummary(month),products=sellableProducts(),active=activeSalesWidgets(),stock=salesStockAffected(),peak=salesHourPeak(list);
+  const allKpis=[
+    ['revenueToday',w.revenueToday,money(todaySum.total),'',`▲ ${w.vsYesterday}`],
+    ['revenueMonth',w.revenueMonth,money(monthSum.total),'',w.periodMonth],
+    ['salesCount',w.salesCount,String(sum.count),'neutral',period==='today'?w.periodToday:w.periodWeek],
+    ['avgTicket',w.avgTicket,money(sum.ticket),'',`▲ ${w.vsYesterday}`],
+    ['productsSold',w.productsSold,String(sum.qty),'',w.products],
+    ['inventoryImpact',w.inventoryImpact,String(stock.length),stock.length?'warn':'neutral',stock.length?`${w.critical}/${w.low}`:tx.empty],
+    ['hourPeak',w.hourPeak,peak.label,'neutral',peak.hour===null?tx.empty:''],
+    ['margin',w.margin,'-','neutral',w.analysis]
+  ];
+  const primaryOrder=['revenueToday','salesCount','avgTicket','inventoryImpact'];
+  const kpis=primaryOrder.map(key=>allKpis.find(k=>k[0]===key)).filter(Boolean);
+  const secondaryKpis=allKpis.filter(([key])=>active.includes(key)&&!primaryOrder.includes(key));
+  const panels=[
+    active.includes('topProducts')?salesTopPanel(list):'',
+    active.includes('paymentMethods')?salesPaymentPanel(list):'',
+    active.includes('hourSales')?salesHourPanel(list):'',
+    active.includes('categorySales')?salesCategoryPanel(list):'',
+    active.includes('inventoryImpact')?salesStockPanel():'',
+    active.includes('employeeSales')?salesEmployeePanel(list):''
+  ].filter(Boolean);
   el.innerHTML=`<section class="sales-hero">
     <div class="hub-kicker">${esc(tx.today)}</div>
     <h2>${esc(tx.title)}</h2>
     <p>${esc(tx.sub)}</p>
   </section>
+  ${salesPeriodTabs()}
   <section class="sales-kpis" id="sales-summary">
-    <div class="sales-kpi"><div class="num" style="color:var(--green)">${esc(money(sum.total))}</div><div class="kpi-sub">${esc(tx.revenue)}</div></div>
-    <div class="sales-kpi"><div class="num">${sum.count}</div><div class="kpi-sub">${esc(tx.sales)}</div></div>
-    <div class="sales-kpi"><div class="num" style="color:var(--orange)">${esc(money(sum.ticket))}</div><div class="kpi-sub">${esc(tx.ticket)}</div></div>
-    <div class="sales-kpi"><div class="num" style="color:var(--cyan)">${products.length}</div><div class="kpi-sub">${esc(tx.products)}</div></div>
+    ${kpis.map(k=>salesKpiRich(...k)).join('')}
   </section>
+  <section class="sales-panel">
+    <div class="flex-b">
+      <div>
+        <div class="card-header" style="margin:0">${esc(tx.areaTitle)}</div>
+        <div class="fs12 muted">${esc(salesReportText().priorityHelp)}</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="goPage('salesReports')">${esc(salesReportText().reports)}</button>
+        <button class="btn btn-ghost btn-sm" onclick="openSalesPanelConfig()">${esc(salesWidgetText().config)}</button>
+      </div>
+    </div>
+  </section>
+  ${secondaryKpis.length?`<section class="sales-panel"><div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(salesReportText().moreIndicators)}</h3><div class="sales-panel-sub">${esc(salesReportText().moreIndicatorsSub)}</div></div></div><div class="sales-kpis sales-kpis-secondary">${secondaryKpis.map(k=>salesKpiRich(...k)).join('')}</div></section>`:''}
   <section class="sales-grid">
     <div>
       <div class="sales-panel">
         <div class="flex-b mb12"><div class="card-header" style="margin:0">${esc(tx.activity)}</div><button class="btn btn-primary btn-sm" onclick="openSaleModal()">${esc(tx.newSale)}</button></div>
-        ${today.length?today.map(s=>`<div class="sales-row"><div><div class="fw8 fs13">${esc(s.productName)}</div><div class="fs11 muted">${fmtTime(s.ts)} · ${Number(s.qty)||0} × ${esc(money(s.unitPrice))} · <span class="sales-method">${esc(salesMethodLabel(s.method))}</span></div>${s.note?`<div class="fs11 muted mt4">${esc(s.note)}</div>`:''}</div><div class="fw8" style="color:var(--green)">${esc(money(s.total))}</div></div>`).join(''):`<div class="sales-empty">${esc(tx.empty)}</div>`}
-      </div>
-      <div class="sales-panel" id="sales-insights">
-        <div class="card-header" style="margin:0 0 12px">${esc(tx.byMethod)}</div>
-        ${methodHTML}
+        ${today.length?today.map(s=>`<div class="sales-row"><div><div class="fw8 fs13">${esc(s.productName)}</div><div class="fs11 muted">${fmtTime(s.ts)} · ${Number(s.qty)||0} × ${esc(money(s.unitPrice))} · <span class="sales-method">${esc(salesMethodLabel(s.method))}</span>${s.employeeName?` · ${esc(s.employeeName)}`:''}</div>${s.note?`<div class="fs11 muted mt4">${esc(s.note)}</div>`:''}</div><div class="fw8" style="color:var(--green)">${esc(money(s.total))}</div></div>`).join(''):`<div class="sales-empty">${esc(tx.empty)}</div>`}
       </div>
     </div>
     <div>
-      <div class="sales-panel">
-        <div class="card-header" style="margin:0 0 12px">${esc(tx.topProduct)}</div>
-        <div class="fw8 fs20">${esc(sum.top?.[0]||'-')}</div>
-        <div class="fs12 muted mt4">${sum.top?`${sum.top[1]} ${esc(tx.sales).toLowerCase()}`:esc(tx.empty)}</div>
-      </div>
       <div class="sales-panel">
         <div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.catalog)}</div><div class="fs12 muted">${products.length} ${esc(tx.products).toLowerCase()}</div></div><button class="btn btn-ghost btn-sm" onclick="goPage('salesProducts')">${esc(tx.openSection)}</button></div>
         <div class="sales-empty">${esc(tx.goCatalogDesc)}</div>
       </div>
     </div>
   </section>`;
+  el.insertAdjacentHTML('beforeend',`<section class="sales-widget-grid">${panels.slice(0,2).join('')}</section><section class="sales-widget-grid three">${panels.slice(2,5).join('')}</section><section class="sales-widget-grid">${panels.slice(5).join('')}<div class="sales-config-cta"><div class="ico">⚙</div><div><div class="fw9 fs16">${esc(w.missingIndicators)}</div><div class="fs13 muted mt4">${esc(w.activateNeeded)}</div></div><button class="btn btn-ghost btn-sm" onclick="openSalesPanelConfig()">${esc(w.config)}</button></div></section>`);
 }
 function renderSalesProducts(){
   const el=document.getElementById('sales-products-content');if(!el)return;
   DB.salesProducts=DB.salesProducts||[];
-  const tx=salesTx(),products=DB.salesProducts.filter(p=>p.active!==false);
+  const tx=salesTx(),products=sellableProducts();
   el.innerHTML=`<section class="sales-hero">
     <div class="hub-kicker">${esc(tx.catalog)}</div>
     <h2>${esc(tx.goCatalog)}</h2>
     <p>${esc(tx.goCatalogDesc)}</p>
   </section>
   <section class="sales-panel">
-    <div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.catalog)}</div><div class="fs12 muted">${esc(tx.product)}, ${esc(tx.price)}, ${esc(tx.category)}</div></div><button class="btn btn-primary btn-sm" onclick="openProductModal()">${esc(tx.newProduct)}</button></div>
-    ${products.length?products.map(p=>`<div class="sales-product"><div class="sales-product-dot">${esc((p.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(p.name)}</div><div class="fs11 muted">${esc(p.category||'-')} · ${esc(salesProductTypeLabel(p.type))}${p.sku?` · ${esc(p.sku)}`:''}</div>${p.trackStock?`<div class="fs11 ${Number(p.stock)<=Number(p.minStock)?'red':'muted'} mt4">${esc(tx.stock)}: ${Number(p.stock)||0} ${esc(p.unit||tx.unitUnit)} · ${esc(tx.minStock)}: ${Number(p.minStock)||0}</div>`:''}</div><div class="fw8">${esc(money(p.price))}</div></div>`).join(''):`<div class="sales-empty">${esc(tx.missingProduct)}</div>`}
+    <div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.catalog)}</div><div class="fs12 muted">${esc(tx.product)}, ${esc(tx.price)}, ${esc(tx.category)}</div></div><button class="btn btn-primary btn-sm" onclick="openProductModal('sales')">${esc(tx.newProduct)}</button></div>
+    ${products.length?products.map(p=>`<div class="sales-product"><div class="sales-product-dot">${esc((p.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(p.name)}</div><div class="fs11 muted">${esc(p.category||'-')} · ${esc(salesProductTypeLabel(p.type))}${p.sku?` · ${esc(p.sku)}`:''}</div>${p.trackStock?`<div class="fs11 ${Number(p.stock)<=Number(p.minStock)?'red':'muted'} mt4">${esc(tx.stock)}: ${Number(p.stock)||0} ${esc(salesUnitLabel(p.unit))} · ${esc(tx.minStock)}: ${Number(p.minStock)||0}</div>`:''}${recipeText(p)?`<div class="fs11 muted mt4">${esc(recipeText(p))}</div>`:''}</div><div style="display:flex;align-items:center;gap:8px"><div class="fw8">${esc(money(p.price))}</div><button class="btn btn-ghost btn-sm" onclick="openProductModal('sales','${p.id}')">${esc(editLabel())}</button></div></div>`).join(''):`<div class="sales-empty">${esc(tx.missingProduct)}</div>`}
   </section>`;
 }
+function salesReportRows(type,list){
+  const w=salesWidgetText();
+  if(type==='product')return groupSales(list,s=>s.productName,s=>Number(s.total)||0).map(([label,total])=>{
+    const qty=list.filter(s=>s.productName===label).reduce((a,s)=>a+(Number(s.qty)||0),0);
+    const cat=(list.find(s=>s.productName===label)?.category)||'-';
+    return {label,sub:cat,qty,total};
+  });
+  if(type==='payment')return groupSales(list,s=>salesMethodLabel(s.method)).map(([label,total])=>({label,sub:w.cash,qty:list.filter(s=>salesMethodLabel(s.method)===label).length,total}));
+  if(type==='employee')return groupSales(list,s=>s.employeeName||w.unassigned).map(([label,total])=>({label,sub:w.team,qty:list.filter(s=>(s.employeeName||w.unassigned)===label).length,total}));
+  if(type==='inventory')return inventoryImpact(list).map(([label,v])=>({label,sub:v.unit,qty:round1(v.qty),total:''}));
+  return list.map(s=>({label:s.productName,sub:`${fmtDate(s.ts)} ${fmtTime(s.ts)} · ${salesMethodLabel(s.method)}`,qty:Number(s.qty)||0,total:Number(s.total)||0,raw:s}));
+}
+function salesReportCard(type,title,desc,icon){
+  const rt=salesReportText();
+  return `<div class="sales-report-card"><div class="sales-report-icon">${esc(icon)}</div><h3>${esc(title)}</h3><p>${esc(desc)}</p><div class="sales-report-actions"><button class="btn btn-primary btn-sm" onclick="exportSalesExcel('${type}')">${esc(rt.excel)}</button><button class="btn btn-ghost btn-sm" onclick="previewSalesReport('${type}')">${esc(rt.preview)}</button></div></div>`;
+}
+function renderSalesReports(){
+  const el=document.getElementById('sales-reports-content');if(!el)return;
+  const tx=salesTx(),rt=salesReportText(),list=salesByPeriod(salesPeriod()),sum=salesSummary(list);
+  el.innerHTML=`<section class="sales-hero">
+    <div class="hub-kicker">${esc(rt.reports)}</div>
+    <h2>${esc(rt.reports)}</h2>
+    <p>${esc(rt.priorityHelp)}</p>
+  </section>
+  ${salesPeriodTabs()}
+  <section class="sales-kpis">
+    ${salesKpiRich('revenueToday',tx.revenue,money(sum.total),'','')}
+    ${salesKpiRich('salesCount',rt.detail,String(sum.count),'neutral','')}
+    ${salesKpiRich('avgTicket',tx.ticket,money(sum.ticket),'','')}
+    ${salesKpiRich('productsSold',salesWidgetText().productsSold,String(sum.qty),'neutral','')}
+  </section>
+  <section class="sales-report-grid">
+    ${salesReportCard('daily',rt.dailyClose,rt.dailyCloseDesc,'$')}
+    ${salesReportCard('monthly',rt.monthlySales,rt.monthlySalesDesc,'M')}
+    ${salesReportCard('product',rt.byProduct,rt.byProductDesc,'P')}
+    ${salesReportCard('payment',rt.byPayment,rt.byPaymentDesc,'#')}
+    ${salesReportCard('employee',rt.byEmployee,rt.byEmployeeDesc,'E')}
+    ${salesReportCard('inventory',rt.inventory,rt.inventoryDesc,'I')}
+  </section>
+  <section class="sales-panel" id="sales-report-preview"></section>`;
+  previewSalesReport('daily');
+}
+function previewSalesReport(type='daily'){
+  const box=document.getElementById('sales-report-preview');if(!box)return;
+  const rt=salesReportText(),period=salesReportPeriod(type),list=salesByPeriod(period),rows=salesReportRows(type,list).slice(0,12);
+  const title={daily:rt.dailyClose,monthly:rt.monthlySales,product:rt.byProduct,payment:rt.byPayment,employee:rt.byEmployee,inventory:rt.inventory}[type]||rt.dailyClose;
+  box.innerHTML=`<div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(title)}</h3><div class="sales-panel-sub">${esc(rt.period)} · ${esc(salesReportPeriodLabel(period))}</div></div><button class="btn btn-primary btn-sm" onclick="exportSalesExcel('${type}')">${esc(rt.excel)}</button></div>
+  ${rows.length?`<table class="sales-preview-table"><thead><tr><th>${esc(type==='inventory'?rt.product:rt.product)}</th><th>${esc(type==='daily'||type==='monthly'?rt.category:rt.summary)}</th><th class="num">${esc(rt.qty)}</th><th class="num">${esc(rt.total)}</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(r.sub||'-')}</td><td class="num">${esc(r.qty)}</td><td class="num">${typeof r.total==='number'?esc(money(r.total)):esc(r.total||'-')}</td></tr>`).join('')}</tbody></table>`:`<div class="sales-empty">${esc(rt.noData)}</div>`}`;
+}
+function salesExcelTable(title,headers,rows){
+  return `<h2>${xlsCell(title)}</h2><table><tr>${headers.map(h=>`<th>${xlsCell(h)}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${xlsCell(c)}</td>`).join('')}</tr>`).join('')}</table>`;
+}
+function salesReportPeriod(type='daily'){
+  return type==='monthly'?'month':salesPeriod();
+}
+function salesReportPeriodLabel(period){
+  const wt=salesWidgetText(),key=`period${period[0].toUpperCase()+period.slice(1)}`;
+  return wt[key]||period;
+}
+function exportSalesExcel(type='daily'){
+  const rt=salesReportText(),tx=salesTx(),w=salesWidgetText(),period=salesReportPeriod(type),list=salesByPeriod(period),sum=salesSummary(list),periodLabel=salesReportPeriodLabel(period);
+  const header=`<h1>${xlsCell(rt.reports)} · ${xlsCell(type)}</h1><div class="muted">${xlsCell(DB.settings?.company||'Manager Pro')} · ${xlsCell(rt.period)}: ${xlsCell(periodLabel)} · ${xlsCell(fmtDate(new Date()))}</div>`;
+  const summary=salesExcelTable(rt.summary,[tx.revenue,rt.detail,tx.ticket,salesWidgetText().productsSold],[[money(sum.total),sum.count,money(sum.ticket),sum.qty]]);
+  const detailRows=list.map(s=>[fmtDate(s.ts),fmtTime(s.ts),s.productName||'',s.category||'',Number(s.qty)||0,money(s.unitPrice),money(s.total),salesMethodLabel(s.method),s.employeeName||w.unassigned,s.note||'']);
+  let body=header+summary;
+  if(['daily','monthly'].includes(type))body+=salesExcelTable(rt.detail,[rt.date,'Hora',rt.product,rt.category,rt.qty,rt.unitPrice,rt.total,rt.method,rt.employee,tx.note],detailRows);
+  if(type==='product')body+=salesExcelTable(rt.byProduct,[rt.product,rt.category,rt.qty,rt.total],salesReportRows('product',list).map(r=>[r.label,r.sub,r.qty,money(r.total)]));
+  if(type==='payment')body+=salesExcelTable(rt.byPayment,[rt.method,'N°',rt.total,'%'],salesReportRows('payment',list).map(r=>[r.label,r.qty,money(r.total),sum.total?`${Math.round(r.total/sum.total*100)}%`:'0%']));
+  if(type==='employee')body+=salesExcelTable(rt.byEmployee,[rt.employee,'N°',rt.total],salesReportRows('employee',list).map(r=>[r.label,r.qty,money(r.total)]));
+  if(type==='inventory')body+=salesExcelTable(rt.inventory,[rt.product,'Unidad',rt.qty],salesReportRows('inventory',list).map(r=>[r.label,r.sub,r.qty]));
+  const cleanPeriod=String(periodLabel).replace(/\s+/g,'_').replace(/[^\w-]/g,'');
+  xlsDownload(body,`ventas_${type}_${cleanPeriod||'periodo'}.xls`);
+}
 function openSaleModal(){
-  const tx=salesTx(),products=(DB.salesProducts||[]).filter(p=>p.active!==false);
-  if(!products.length){toast(tx.missingProduct,'#f59e0b');openProductModal();return;}
+  const tx=salesTx(),products=sellableProducts();
+  if(!products.length){toast(tx.missingProduct,'#f59e0b');openProductModal('sales');return;}
   updateSalesModalTexts();
   document.getElementById('sale-product').innerHTML=products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} · ${esc(money(p.price))}</option>`).join('');
+  const employees=(DB.employees||[]).filter(e=>e.status==='active');
+  const w=salesWidgetText();
+  document.getElementById('sale-employee').innerHTML=`<option value="">${esc(w.unassigned)}</option>`+employees.map(e=>`<option value="${esc(e.id)}">${esc(fullName(e))}</option>`).join('');
   document.getElementById('sale-qty').value=1;
   document.getElementById('sale-method').value='cash';
   document.getElementById('sale-note').value='';
@@ -3880,27 +4483,137 @@ function saveSale(){
   const tx=salesTx(),id=document.getElementById('sale-product').value,p=(DB.salesProducts||[]).find(x=>x.id===id);
   if(!p){toast(tx.missingProduct,'#ef4444');return;}
   const qty=Math.max(1,Number(document.getElementById('sale-qty').value)||1),unitPrice=Math.max(0,Number(document.getElementById('sale-price').value)||0);
-  const sale={id:uid(),productId:p.id,productName:p.name,category:p.category||'',qty,unitPrice,total:qty*unitPrice,method:document.getElementById('sale-method').value||'cash',note:clean(document.getElementById('sale-note').value),ts:new Date().toISOString()};
-  DB.sales=[sale,...(DB.sales||[])];saveLocal();closeModal('sale-modal');renderSales();renderHub();toast(tx.saved);sbSaveSale(sale).catch(console.error);
+  const empId=document.getElementById('sale-employee')?.value||'',emp=(DB.employees||[]).find(e=>e.id===empId);
+  const sale={id:uid(),productId:p.id,productName:p.name,category:p.category||'',qty,unitPrice,total:qty*unitPrice,method:document.getElementById('sale-method').value||'cash',employeeId:emp?.id||'',employeeName:emp?fullName(emp):'',note:clean(document.getElementById('sale-note').value),ts:new Date().toISOString()};
+  const touched=applySaleStock(p,qty);
+  DB.sales=[sale,...(DB.sales||[])];saveLocal();closeModal('sale-modal');renderSales();renderInventory();renderInventoryStock();renderHub();toast(tx.saved);sbSaveSale(sale).catch(console.error);touched.forEach(x=>sbSaveSalesProduct(x).catch(console.error));
 }
-function openProductModal(){
+function productTypeOptions(scope,currentType){
   const tx=salesTx();updateSalesModalTexts();
-  document.getElementById('product-name').value='';document.getElementById('product-category').value='';document.getElementById('product-price').value='0';document.getElementById('product-type').value='product';document.getElementById('product-sku').value='';document.getElementById('product-unit').value='unit';document.getElementById('product-track-stock').checked=false;document.getElementById('product-stock').value='0';document.getElementById('product-min-stock').value='0';toggleProductInventoryFields();
+  const values=scope==='sales'?['product','service','bundle']:['ingredient','product','bundle','service'];
+  if(currentType&&!values.includes(currentType))values.push(currentType);
+  return values.map(v=>`<option value="${v}">${esc({product:tx.productType,service:tx.serviceType,ingredient:tx.ingredientType,bundle:tx.bundleType}[v]||v)}</option>`).join('');
+}
+function openProductModal(scope='sales',id=null){
+  const tx=salesTx();updateSalesModalTexts();
+  editingProductId=id;
+  const existing=id?productById(id):null;
+  productRecipeDraft=existing?.recipe?JSON.parse(JSON.stringify(existing.recipe)):[];
+  const type=document.getElementById('product-type');
+  if(type){
+    type.innerHTML=productTypeOptions(scope,existing?.type);
+  }
+  document.getElementById('product-modal-title').textContent=existing?`${tx.newProduct} · Editar`:tx.newProduct;
+  document.getElementById('product-name').value=existing?.name||'';document.getElementById('product-category').value=existing?.category||'';document.getElementById('product-price').value=existing?Number(existing.price||0):'0';document.getElementById('product-type').value=existing?.type||(scope==='inventory'?'ingredient':'product');document.getElementById('product-sku').value=existing?.sku||'';document.getElementById('product-unit').value=existing?.unit||(scope==='inventory'?'kg':'unit');document.getElementById('product-track-stock').checked=existing?!!existing.trackStock:scope==='inventory';document.getElementById('product-stock').value=existing?Number(existing.stock||0):'0';document.getElementById('product-min-stock').value=existing?Number(existing.minStock||0):'0';toggleProductInventoryFields();
   openModal('product-modal');
 }
 function toggleProductInventoryFields(){
   const type=document.getElementById('product-type')?.value;
   const track=document.getElementById('product-track-stock');
   const row=document.getElementById('product-stock-row');
+  const recipe=document.getElementById('product-recipe-box');
+  if(type==='ingredient'&&track)track.checked=true;
   if(type==='service'&&track)track.checked=false;
   if(row)row.style.display=track?.checked?'grid':'none';
+  if(recipe)recipe.style.display=type==='bundle'?'block':'none';
+  if(type==='bundle')renderRecipeRows();
 }
 function saveProduct(){
   const tx=salesTx(),name=clean(document.getElementById('product-name').value);
   if(!name){toast(tx.productName,'#ef4444');return;}
   const type=document.getElementById('product-type').value||'product',track=!!document.getElementById('product-track-stock').checked&&type!=='service';
-  const product={id:uid(),name,category:clean(document.getElementById('product-category').value),type,price:Math.max(0,Number(document.getElementById('product-price').value)||0),sku:clean(document.getElementById('product-sku').value),unit:document.getElementById('product-unit').value||'unit',trackStock:track,stock:track?Math.max(0,Number(document.getElementById('product-stock').value)||0):0,minStock:track?Math.max(0,Number(document.getElementById('product-min-stock').value)||0):0,active:true,createdAt:new Date().toISOString()};
-  DB.salesProducts=[product,...(DB.salesProducts||[])];saveLocal();closeModal('product-modal');renderSales();renderSalesProducts();renderHub();toast(tx.productSaved);sbSaveSalesProduct(product).catch(console.error);
+  const existing=editingProductId?productById(editingProductId):null;
+  const product={id:existing?.id||uid(),name,category:clean(document.getElementById('product-category').value),type,price:Math.max(0,Number(document.getElementById('product-price').value)||0),sku:clean(document.getElementById('product-sku').value),unit:document.getElementById('product-unit').value||'unit',trackStock:track,stock:track?Math.max(0,Number(document.getElementById('product-stock').value)||0):0,minStock:track?Math.max(0,Number(document.getElementById('product-min-stock').value)||0):0,recipe:type==='bundle'?collectProductRecipe():[],active:true,createdAt:existing?.createdAt||new Date().toISOString()};
+  if(existing)Object.assign(existing,product);else DB.salesProducts=[product,...(DB.salesProducts||[])];
+  editingProductId=null;saveLocal();closeModal('product-modal');renderSales();renderSalesProducts();renderInventory();renderInventoryStock();renderHub();toast(tx.productSaved);sbSaveSalesProduct(existing||product).catch(console.error);
+}
+
+function inventoryValue(){
+  return stockItems().reduce((a,p)=>a+(Number(p.stock)||0)*(Number(p.price)||0),0);
+}
+function renderInventory(){
+  const el=document.getElementById('inventory-content');if(!el)return;
+  const tx=inventoryTx(),items=stockItems(),low=lowStockItems(),purchases=DB.inventoryPurchases||[],suppliers=DB.suppliers||[];
+  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#78350f 0%,#b45309 55%,#14b8a6 145%)">
+    <div class="hub-kicker">${esc(tx.title)}</div>
+    <h2>${esc(tx.title)}</h2>
+    <p>${esc(tx.sub)}</p>
+  </section>
+  <section class="sales-kpis">
+    <div class="sales-kpi"><div class="num" style="color:var(--orange)">${items.length}</div><div class="kpi-sub">${esc(tx.items)}</div></div>
+    <div class="sales-kpi"><div class="num" style="color:var(--red)">${low.length}</div><div class="kpi-sub">${esc(tx.low)}</div></div>
+    <div class="sales-kpi"><div class="num" style="color:var(--green)">${purchases.length}</div><div class="kpi-sub">${esc(tx.purchases)}</div></div>
+    <div class="sales-kpi"><div class="num" style="color:var(--cyan)">${suppliers.length}</div><div class="kpi-sub">${esc(tx.suppliers)}</div></div>
+  </section>
+  <section class="sales-area-panel">
+    <div class="sales-area-card primary" onclick="goPage('inventoryStock')"><div><div class="sales-area-icon">${hubIcon('inventory')}</div><div class="sales-area-title">${esc(tx.stock)}</div><div class="sales-area-desc">${esc(tx.items)} · ${esc(tx.low)} ${low.length}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
+    <div class="sales-area-card" onclick="goPage('inventoryPurchases')"><div><div class="sales-area-icon">+</div><div class="sales-area-title">${esc(tx.purchases)}</div><div class="sales-area-desc">${esc(tx.newPurchase)}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
+    <div class="sales-area-card" onclick="goPage('inventorySuppliers')"><div><div class="sales-area-icon">P</div><div class="sales-area-title">${esc(tx.suppliers)}</div><div class="sales-area-desc">${esc(tx.newSupplier)}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
+  </section>
+  <section class="sales-grid">
+    <div class="sales-panel"><div class="card-header" style="margin:0 0 12px">${esc(tx.low)}</div>${low.length?low.map(stockItemHTML).join(''):`<div class="sales-empty">${esc(tx.noStock)}</div>`}</div>
+    <div class="sales-panel"><div class="card-header" style="margin:0 0 12px">${esc(tx.purchases)}</div>${purchases.length?purchases.slice(0,5).map(purchaseHTML).join(''):`<div class="sales-empty">${esc(tx.noPurchases)}</div>`}</div>
+  </section>`;
+}
+function stockItemHTML(p){
+  const tx=inventoryTx(),pct=Number(p.minStock)>0?Math.min(100,Math.round((Number(p.stock)||0)/(Number(p.minStock)||1)*100)):100;
+  return `<div class="sales-product"><div class="sales-product-dot" style="background:linear-gradient(135deg,#d97706,#14b8a6)">${esc((p.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(p.name)}</div><div class="fs11 muted">${esc(p.sku||'-')} · ${esc(salesProductTypeLabel(p.type))}</div><div class="prog"><div class="prog-fill" style="width:${pct}%;background:${Number(p.stock)<=Number(p.minStock)?'var(--red)':'var(--green)'}"></div></div><div class="fs11 ${Number(p.stock)<=Number(p.minStock)?'red':'muted'} mt4">${esc(tx.current)}: ${Number(p.stock)||0} ${esc(salesUnitLabel(p.unit))} · ${esc(tx.min)}: ${Number(p.minStock)||0}</div>${recipeText(p)?`<div class="fs11 muted mt4">${esc(recipeText(p))}</div>`:''}</div><div style="display:flex;gap:6px;align-items:center"><button class="btn btn-ghost btn-sm" onclick="openProductModal('inventory','${p.id}')">${esc(editLabel())}</button><button class="btn btn-ghost btn-sm" onclick="adjustStock('${p.id}',-1)">-</button><button class="btn btn-ghost btn-sm" onclick="adjustStock('${p.id}',1)">+</button></div></div>`;
+}
+function purchaseHTML(p){
+  return `<div class="sales-row"><div><div class="fw8 fs13">${esc(p.productName)}</div><div class="fs11 muted">${fmtDate(p.ts)} · ${Number(p.qty)||0} · ${esc(p.supplierName||'-')}</div>${p.note?`<div class="fs11 muted mt4">${esc(p.note)}</div>`:''}</div><div class="fw8">${esc(money(p.cost))}</div></div>`;
+}
+function supplierHTML(s){
+  return `<div class="sales-product"><div class="sales-product-dot" style="background:linear-gradient(135deg,#0ea5c6,#2563eb)">${esc((s.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(s.name)}</div><div class="fs11 muted">${esc(s.phone||'-')} · ${esc(s.email||'-')}</div>${s.notes?`<div class="fs11 muted mt4">${esc(s.notes)}</div>`:''}</div></div>`;
+}
+function renderInventoryStock(){
+  const el=document.getElementById('inventory-stock-content');if(!el)return;
+  const tx=inventoryTx(),items=stockItems();
+  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#78350f,#d97706)"><div class="hub-kicker">${esc(tx.stock)}</div><h2>${esc(tx.stock)}</h2><p>${esc(tx.sub)}</p></section>
+  <section class="sales-panel"><div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.stock)}</div><div class="fs12 muted">${items.length} ${esc(tx.items).toLowerCase()}</div></div><button class="btn btn-primary btn-sm" onclick="openProductModal('inventory')">${esc(salesTx().addIngredient||salesTx().newProduct)}</button></div>${items.length?items.map(stockItemHTML).join(''):`<div class="sales-empty">${esc(tx.noStock)}</div>`}</section>`;
+}
+function renderInventoryPurchases(){
+  const el=document.getElementById('inventory-purchases-content');if(!el)return;
+  const tx=inventoryTx(),purchases=DB.inventoryPurchases||[];
+  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#7c2d12,#ea580c)"><div class="hub-kicker">${esc(tx.purchases)}</div><h2>${esc(tx.purchases)}</h2><p>${esc(tx.sub)}</p></section>
+  <section class="sales-panel"><div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.purchases)}</div><div class="fs12 muted">${esc(tx.newPurchase)}</div></div><button class="btn btn-primary btn-sm" onclick="openPurchaseModal()">${esc(tx.newPurchase)}</button></div>${purchases.length?purchases.map(purchaseHTML).join(''):`<div class="sales-empty">${esc(tx.noPurchases)}</div>`}</section>`;
+}
+function renderInventorySuppliers(){
+  const el=document.getElementById('inventory-suppliers-content');if(!el)return;
+  const tx=inventoryTx(),suppliers=DB.suppliers||[];
+  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#164e63,#0891b2)"><div class="hub-kicker">${esc(tx.suppliers)}</div><h2>${esc(tx.suppliers)}</h2><p>${esc(tx.sub)}</p></section>
+  <section class="sales-panel"><div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.suppliers)}</div><div class="fs12 muted">${esc(tx.newSupplier)}</div></div><button class="btn btn-primary btn-sm" onclick="openSupplierModal()">${esc(tx.newSupplier)}</button></div>${suppliers.length?suppliers.map(supplierHTML).join(''):`<div class="sales-empty">${esc(tx.noSuppliers)}</div>`}</section>`;
+}
+function adjustStock(id,delta){
+  const p=productById(id);if(!p)return;
+  p.stock=Math.max(0,(Number(p.stock)||0)+delta);
+  saveLocal();renderInventory();renderInventoryStock();renderSalesProducts();sbSaveSalesProduct(p).catch(console.error);
+}
+function openPurchaseModal(){
+  const tx=inventoryTx(),items=stockItems(),suppliers=DB.suppliers||[];
+  if(!items.length){toast(tx.needProduct,'#ef4444');return;}
+  if(!suppliers.length){toast(tx.needSupplier,'#ef4444');openSupplierModal();return;}
+  document.getElementById('purchase-product').innerHTML=items.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} · ${Number(p.stock)||0} ${esc(salesUnitLabel(p.unit))}</option>`).join('');
+  document.getElementById('purchase-supplier').innerHTML=suppliers.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  document.getElementById('purchase-qty').value=1;document.getElementById('purchase-cost').value=0;document.getElementById('purchase-note').value='';
+  openModal('purchase-modal');
+}
+function savePurchase(){
+  const tx=inventoryTx(),pid=document.getElementById('purchase-product').value,sid=document.getElementById('purchase-supplier').value,p=productById(pid),s=(DB.suppliers||[]).find(x=>x.id===sid);
+  if(!p||!s)return;
+  const qty=Math.max(0,Number(document.getElementById('purchase-qty').value)||0),cost=Math.max(0,Number(document.getElementById('purchase-cost').value)||0);
+  p.stock=(Number(p.stock)||0)+qty;
+  const pur={id:uid(),productId:p.id,productName:p.name,supplierId:s.id,supplierName:s.name,qty,cost,note:clean(document.getElementById('purchase-note').value),ts:new Date().toISOString()};
+  DB.inventoryPurchases=[pur,...(DB.inventoryPurchases||[])];saveLocal();closeModal('purchase-modal');renderInventory();renderInventoryStock();renderInventoryPurchases();toast(tx.savedPurchase);sbSaveSalesProduct(p).catch(console.error);sbSavePurchase(pur).catch(console.error);
+}
+function openSupplierModal(){
+  document.getElementById('supplier-name').value='';document.getElementById('supplier-phone').value='';document.getElementById('supplier-email').value='';document.getElementById('supplier-note').value='';
+  openModal('supplier-modal');
+}
+function saveSupplier(){
+  const tx=inventoryTx(),name=clean(document.getElementById('supplier-name').value);
+  if(!name){toast(tx.supplier,'#ef4444');return;}
+  const supplier={id:uid(),name,phone:clean(document.getElementById('supplier-phone').value),email:clean(document.getElementById('supplier-email').value),notes:clean(document.getElementById('supplier-note').value),createdAt:new Date().toISOString()};
+  DB.suppliers=[supplier,...(DB.suppliers||[])];saveLocal();closeModal('supplier-modal');renderInventory();renderInventorySuppliers();toast(tx.savedSupplier);sbSaveSupplier(supplier).catch(console.error);
 }
 
 function tickEmpPortal(){
