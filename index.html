@@ -800,12 +800,12 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
     <div class="login-tabs">
       <button class="login-tab active" onclick="setLoginTab('manager',this)">👔 Manager</button>
       <button class="login-tab" onclick="setLoginTab('employee',this)">👤 Employé</button>
-      <button class="login-tab" onclick="setLoginTab('register',this)">➕ Restaurant</button>
+      <button class="login-tab" onclick="setLoginTab('register',this)">➕ Negocio</button>
     </div>
     <div class="login-mode-note" id="login-mode-note">Connectez-vous pour suivre votre équipe en temps réel.</div>
     <!-- Manager -->
     <div id="login-manager">
-      <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="manager@restaurant.ch"></div>
+      <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="manager@business.ch"></div>
       <div class="fg"><label>Mot de passe</label><div style="display:flex;gap:8px"><input type="password" id="login-password" placeholder="••••••••"><button type="button" class="btn btn-ghost btn-sm" onclick="togglePassword('login-password',this)" style="width:46px;padding:0">👁</button></div></div>
       <button class="btn btn-ghost" onclick="recoverPassword()" style="margin-bottom:12px;padding:9px 12px;font-size:12px">Mot de passe oublié ?</button>
       <button class="btn btn-primary" onclick="loginManager()" style="margin-bottom:12px">
@@ -841,14 +841,14 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
       </div>
       <div id="pin-error" style="text-align:center;color:var(--red);font-size:12px;min-height:18px"></div>
     </div>
-    <!-- Restaurant Register -->
+    <!-- Business Register -->
     <div id="login-register" style="display:none">
-      <div class="fg"><label>Nom du restaurant</label><input id="reg-rest-name" placeholder="Restaurant Bellevue"></div>
-      <div class="fg"><label>Email administrateur</label><input type="email" id="reg-email" placeholder="admin@restaurant.ch"></div>
+      <div class="fg"><label>Nom du commerce</label><input id="reg-rest-name" placeholder="Bellevue Studio"></div>
+      <div class="fg"><label>Email administrateur</label><input type="email" id="reg-email" placeholder="admin@manager-pro.app"></div>
       <div class="fg"><label>Mot de passe</label><div style="display:flex;gap:8px"><input type="password" id="reg-password" placeholder="Minimum 6 caractères"><button type="button" class="btn btn-ghost btn-sm" onclick="togglePassword('reg-password',this)" style="width:46px;padding:0">👁</button></div></div>
       <div class="fg"><label>Répéter le mot de passe</label><div style="display:flex;gap:8px"><input type="password" id="reg-password2" placeholder="Répéter le mot de passe"><button type="button" class="btn btn-ghost btn-sm" onclick="togglePassword('reg-password2',this)" style="width:46px;padding:0">👁</button></div></div>
       <button class="btn btn-primary" onclick="registerRestaurant()" style="margin-bottom:10px">Créer compte admin</button>
-      <div style="font-size:11px;color:var(--text2);line-height:1.5">Crée le restaurant et lie cet utilisateur comme administrateur. Si Supabase demande confirmation email, confirmez avant de vous connecter.</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.5">Crée l’espace du commerce et lie cet utilisateur comme administrateur. Si Supabase demande confirmation email, confirmez avant de vous connecter.</div>
     </div>
   </div>
   </div>
@@ -971,6 +971,10 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1M9 13h1M9 17h1"/></svg>
       <span>Proveedores</span>
     </div>
+    <div class="sb-item" data-sidebar-area="inventory" onclick="nav('inventoryReports',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Reportes inventario</span>
+    </div>
     <div class="sb-section" data-sidebar-section="config">Configuration</div>
     <div class="sb-item" data-sidebar-area="config" onclick="nav('settings',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1003,7 +1007,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
     <button class="top-btn" id="refresh-btn" onclick="manualRefresh()" title="Actualizar datos">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a9 9 0 0 1 14.8-3.4L23 10"/><path d="M20.5 15a9 9 0 0 1-14.8 3.4L1 14"/></svg>
     </button>
-    <button class="top-btn" onclick="startTour('manager',true)" title="Tour">
+    <button class="top-btn" onclick="startContextTour()" title="Tour">
       ?
     </button>
     <button class="top-btn" id="top-ai-btn" onclick="openManagerAssistant()" title="Asistente IA">
@@ -1064,6 +1068,10 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 
 <div class="page" id="pg-inventorySuppliers">
   <div id="inventory-suppliers-content"></div>
+</div>
+
+<div class="page" id="pg-inventoryReports">
+  <div id="inventory-reports-content"></div>
 </div>
 
 <div class="page" id="pg-attendance">
@@ -1174,10 +1182,10 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   <div class="card">
     <div class="card-header">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20M5 20V8.5L12 3l7 5.5V20M9 20v-5h6v5"/></svg>
-      Votre restaurant
+      Votre commerce
     </div>
-    <div class="fg"><label>Nom du restaurant</label><input id="cfg-company" oninput="saveCfg('company',this.value)"></div>
-    <div class="fg"><label>Emoji du restaurant</label>
+    <div class="fg"><label>Nom du commerce</label><input id="cfg-company" oninput="saveCfg('company',this.value)"></div>
+    <div class="fg"><label>Emoji du commerce</label>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
         <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🍽️')">🍽️</span>
         <span style="font-size:26px;cursor:pointer" onclick="setEmoji('🍕')">🍕</span>
@@ -1271,7 +1279,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   <div class="kpi-grid" id="master-kpi"></div>
   <div class="card">
     <div class="card-header" style="justify-content:space-between">
-      <span>Restaurantes gestionados</span>
+      <span id="master-managed-title">Negocios gestionados</span>
       <span class="chip chip-blue" id="master-active-chip"></span>
     </div>
     <div id="master-restaurants"></div>
@@ -1519,8 +1527,12 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   </div>
   <label class="check-row" style="margin-bottom:12px"><input type="checkbox" id="product-track-stock" onchange="toggleProductInventoryFields()"> <span id="product-track-label">Controlar inventario</span></label>
   <div class="frow" id="product-stock-row">
-    <div class="fg"><label id="product-stock-label">Stock actual</label><input type="number" id="product-stock" min="0" step="0.01" value="0"></div>
+    <div class="fg"><label id="product-stock-label">Stock actual</label><input type="number" id="product-stock" min="0" step="0.01" value="0" oninput="syncProductStockValue()"></div>
     <div class="fg"><label id="product-min-stock-label">Stock mínimo</label><input type="number" id="product-min-stock" min="0" step="0.01" value="0"></div>
+  </div>
+  <div class="frow" id="product-cost-row">
+    <div class="fg"><label id="product-avg-cost-label">Costo promedio</label><input type="number" id="product-avg-cost" min="0" step="0.0001" value="0" oninput="syncProductStockValue()"></div>
+    <div class="fg"><label id="product-stock-value-label">Valor inventario</label><input type="number" id="product-stock-value" min="0" step="0.01" value="0" disabled></div>
   </div>
   <div class="recipe-box" id="product-recipe-box">
     <div class="flex-b">
@@ -1588,6 +1600,8 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
     <button class="assistant-chip" data-assistant-chip="fix" onclick="askAssistantPresetKey('qFix')">Corregir fichaje</button>
     <button class="assistant-chip" data-assistant-chip="missing" onclick="askAssistantPresetKey('qMissing')">Datos faltantes</button>
     <button class="assistant-chip" data-assistant-chip="people" onclick="askAssistantPresetKey('qPeople')">Conversación difícil</button>
+    <button class="assistant-chip" data-assistant-chip="sales" onclick="askAssistantPresetKey('qSales')">Ventas</button>
+    <button class="assistant-chip" data-assistant-chip="inventory" onclick="askAssistantPresetKey('qInventory')">Inventario</button>
   </div>
   <div class="assistant-log" id="assistant-log"></div>
   <div class="fg"><textarea id="assistant-question" rows="3" placeholder="Escribe tu pregunta..."></textarea></div>
@@ -1656,17 +1670,17 @@ const LOADING_UI={
 let lang='fr';
 const L=()=>LANGS[lang]||LANGS.fr;
 const UI={
-  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Restaurant',email:'Email',employeeEmail:'Email personnel',password:'Mot de passe',confirmPassword:'Répéter le mot de passe',passwordMismatch:'Les mots de passe ne correspondent pas',pinPrompt:'Entrez votre code PIN à 4 chiffres',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du restaurant',adminEmail:'Email administrateur',createAdmin:'Créer compte admin',sub:'Gestion du personnel'},dash:{active:'Employés actifs',present:'Présents / Prévus',absent:'Absents',vacation:'En vacances',live:'Présents en ce moment',alerts:'Alertes du jour',allGood:'Tout est en ordre',missing:'Entrée non pointée',late:'Arrivé en retard',scan:'Scanner QR',addEmp:'+ Employé'},emp:{search:'Rechercher un employé...',all:'Tous',active:'Actifs',inactive:'Inactifs',new:'Nouvel employé',edit:'Modifier',none:'Aucun employé',noResult:'Aucun résultat',addFirst:'Ajoutez votre premier employé',in:'Entrée',out:'Sortie'},att:{today:'Pointages du jour',scheduled:'Programmés aujourd’hui',manual:'Manuel',present:'Présents',absent:'Absents',none:'Personne de prévu',manualTitle:'Pointage manuel',employee:'Employé',date:'Date',reason:'Motif',save:'Enregistrer',cancel:'Annuler'},shift:{title:'Planification',morning:'Matin',afternoon:'Après-midi',evening:'Soir',night:'Nuit',rest:'Repos',off:'Libre',none:'Aucun employé actif',scheduleSaved:'Horaire enregistré'},vac:{pending:'En attente',approved:'Approuvés',balance:'Soldes',new:'+ Nouvelle absence',title:'Nouvelle absence',none:'Aucune demande',noneApproved:'Aucun congé approuvé',nonePending:'Aucune demande en attente',remaining:'restants',used:'jours utilisés'}},
-  es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Restaurante',email:'Email',employeeEmail:'Email personal',password:'Contraseña',confirmPassword:'Repetir contraseña',passwordMismatch:'Las contraseñas no coinciden',pinPrompt:'Ingresa tu PIN de 4 cifras',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del restaurante',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin',sub:'Gestión de personal'},dash:{active:'Empleados activos',present:'Presentes / Previstos',absent:'Ausentes',vacation:'De vacaciones',live:'Presentes ahora',alerts:'Alertas del día',allGood:'Todo está en orden',missing:'Entrada no registrada',late:'Llegó tarde',scan:'Escanear QR',addEmp:'+ Empleado'},emp:{search:'Buscar empleado...',all:'Todos',active:'Activos',inactive:'Inactivos',new:'Nuevo empleado',edit:'Modificar',none:'Sin empleados',noResult:'Sin resultados',addFirst:'Agrega tu primer empleado',in:'Entrada',out:'Salida'}},
-  en:{pages:{dashboard:'Dashboard',attendance:'Attendance',employees:'Employees',shifts:'Shifts',vacations:'Leave',payroll:'Payroll',reports:'Reports',history:'History',settings:'Settings',master:'Master Admin'},nav:{principal:'Main',planning:'Planning',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employee',restaurant:'Restaurant',email:'Email',password:'Password',signin:'Sign in',forgot:'Forgot password?',demo:'Demo access (no account)',restName:'Restaurant name',adminEmail:'Admin email',createAdmin:'Create admin account',sub:'Staff management'},dash:{active:'Active employees',present:'Present / Scheduled',absent:'Absent',vacation:'On vacation',live:'Present now',alerts:'Daily alerts',allGood:'Everything is fine',missing:'Clock-in missing',late:'Arrived late',scan:'Scan QR',addEmp:'+ Employee'},emp:{search:'Search employee...',all:'All',active:'Active',inactive:'Inactive',new:'New employee',edit:'Edit',none:'No employees',noResult:'No results',addFirst:'Add your first employee',in:'Clock in',out:'Clock out'}},
-  de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Restaurant',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Restaurantname',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Personalverwaltung · Freiburg CH'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
-  it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Ristorante',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome ristorante',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione personale'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
+  fr:{pages:{dashboard:'Dashboard',attendance:'Présences',employees:'Employés',shifts:'Horaires',vacations:'Congés',payroll:'Salaires',reports:'Rapports',history:'Historique',settings:'Paramètres',master:'Master Admin'},nav:{principal:'Principal',planning:'Planification',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employé',restaurant:'Créer compte',email:'Email',employeeEmail:'Email personnel',password:'Mot de passe',confirmPassword:'Répéter le mot de passe',passwordMismatch:'Les mots de passe ne correspondent pas',pinPrompt:'Entrez votre code PIN à 4 chiffres',signin:'Se connecter',forgot:'Mot de passe oublié ?',demo:'Accès démo (sans compte)',restName:'Nom du commerce',adminEmail:'Email administrateur',createAdmin:'Créer compte admin',sub:'Gestion simple du business'},dash:{active:'Employés actifs',present:'Présents / Prévus',absent:'Absents',vacation:'En vacances',live:'Présents en ce moment',alerts:'Alertes du jour',allGood:'Tout est en ordre',missing:'Entrée non pointée',late:'Arrivé en retard',scan:'Scanner QR',addEmp:'+ Employé'},emp:{search:'Rechercher un employé...',all:'Tous',active:'Actifs',inactive:'Inactifs',new:'Nouvel employé',edit:'Modifier',none:'Aucun employé',noResult:'Aucun résultat',addFirst:'Ajoutez votre premier employé',in:'Entrée',out:'Sortie'},att:{today:'Pointages du jour',scheduled:'Programmés aujourd’hui',manual:'Manuel',present:'Présents',absent:'Absents',none:'Personne de prévu',manualTitle:'Pointage manuel',employee:'Employé',date:'Date',reason:'Motif',save:'Enregistrer',cancel:'Annuler'},shift:{title:'Planification',morning:'Matin',afternoon:'Après-midi',evening:'Soir',night:'Nuit',rest:'Repos',off:'Libre',none:'Aucun employé actif',scheduleSaved:'Horaire enregistré'},vac:{pending:'En attente',approved:'Approuvés',balance:'Soldes',new:'+ Nouvelle absence',title:'Nouvelle absence',none:'Aucune demande',noneApproved:'Aucun congé approuvé',nonePending:'Aucune demande en attente',remaining:'restants',used:'jours utilisés'}},
+  es:{pages:{dashboard:'Panel',attendance:'Presencias',employees:'Empleados',shifts:'Horarios',vacations:'Ausencias',payroll:'Salarios',reports:'Reportes',history:'Historial',settings:'Ajustes',master:'Master Admin'},nav:{principal:'Principal',planning:'Planificación',finance:'Finanzas',config:'Configuración',master:'Master'},login:{manager:'Manager',employee:'Empleado',restaurant:'Crear cuenta',email:'Email',employeeEmail:'Email personal',password:'Contraseña',confirmPassword:'Repetir contraseña',passwordMismatch:'Las contraseñas no coinciden',pinPrompt:'Ingresa tu PIN de 4 cifras',signin:'Iniciar sesión',forgot:'¿Olvidaste la contraseña?',demo:'Acceso demo (sin cuenta)',restName:'Nombre del negocio',adminEmail:'Email administrador',createAdmin:'Crear cuenta admin',sub:'Gestión simple del negocio'},dash:{active:'Empleados activos',present:'Presentes / Previstos',absent:'Ausentes',vacation:'De vacaciones',live:'Presentes ahora',alerts:'Alertas del día',allGood:'Todo está en orden',missing:'Entrada no registrada',late:'Llegó tarde',scan:'Escanear QR',addEmp:'+ Empleado'},emp:{search:'Buscar empleado...',all:'Todos',active:'Activos',inactive:'Inactivos',new:'Nuevo empleado',edit:'Modificar',none:'Sin empleados',noResult:'Sin resultados',addFirst:'Agrega tu primer empleado',in:'Entrada',out:'Salida'}},
+  en:{pages:{dashboard:'Dashboard',attendance:'Attendance',employees:'Employees',shifts:'Shifts',vacations:'Leave',payroll:'Payroll',reports:'Reports',history:'History',settings:'Settings',master:'Master Admin'},nav:{principal:'Main',planning:'Planning',finance:'Finance',config:'Configuration',master:'Master'},login:{manager:'Manager',employee:'Employee',restaurant:'Create account',email:'Email',password:'Password',signin:'Sign in',forgot:'Forgot password?',demo:'Demo access (no account)',restName:'Business name',adminEmail:'Admin email',createAdmin:'Create admin account',sub:'Simple business management'},dash:{active:'Active employees',present:'Present / Scheduled',absent:'Absent',vacation:'On vacation',live:'Present now',alerts:'Daily alerts',allGood:'Everything is fine',missing:'Clock-in missing',late:'Arrived late',scan:'Scan QR',addEmp:'+ Employee'},emp:{search:'Search employee...',all:'All',active:'Active',inactive:'Inactive',new:'New employee',edit:'Edit',none:'No employees',noResult:'No results',addFirst:'Add your first employee',in:'Clock in',out:'Clock out'}},
+  de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Konto erstellen',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Name des Betriebs',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Einfache Betriebsverwaltung'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
+  it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Crea account',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome attività',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione semplice del business'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
 };
-Object.assign(UI.fr.pages,{hub:'Domaines',sales:'Ventes',salesProducts:'Produits',salesReports:'Rapports ventes',inventory:'Inventaire',inventoryStock:'Stock',inventoryPurchases:'Achats',inventorySuppliers:'Fournisseurs'});
-Object.assign(UI.es.pages,{hub:'Áreas',sales:'Ventas',salesProducts:'Productos',salesReports:'Reportes ventas',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Compras',inventorySuppliers:'Proveedores'});
-Object.assign(UI.en.pages,{hub:'Areas',sales:'Sales',salesProducts:'Products',salesReports:'Sales reports',inventory:'Inventory',inventoryStock:'Stock',inventoryPurchases:'Purchases',inventorySuppliers:'Suppliers'});
-Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkte',salesReports:'Verkaufsberichte',inventory:'Inventar',inventoryStock:'Lager',inventoryPurchases:'Einkäufe',inventorySuppliers:'Lieferanten'});
-Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti',salesReports:'Report vendite',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Acquisti',inventorySuppliers:'Fornitori'});
+Object.assign(UI.fr.pages,{hub:'Domaines',sales:'Ventes',salesProducts:'Produits',salesReports:'Rapports ventes',inventory:'Inventaire',inventoryStock:'Stock',inventoryPurchases:'Achats',inventorySuppliers:'Fournisseurs',inventoryReports:'Rapports inventaire'});
+Object.assign(UI.es.pages,{hub:'Áreas',sales:'Ventas',salesProducts:'Productos',salesReports:'Reportes ventas',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Compras',inventorySuppliers:'Proveedores',inventoryReports:'Reportes inventario'});
+Object.assign(UI.en.pages,{hub:'Areas',sales:'Sales',salesProducts:'Products',salesReports:'Sales reports',inventory:'Inventory',inventoryStock:'Stock',inventoryPurchases:'Purchases',inventorySuppliers:'Suppliers',inventoryReports:'Inventory reports'});
+Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkte',salesReports:'Verkaufsberichte',inventory:'Inventar',inventoryStock:'Lager',inventoryPurchases:'Einkäufe',inventorySuppliers:'Lieferanten',inventoryReports:'Inventarberichte'});
+Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti',salesReports:'Report vendite',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Acquisti',inventorySuppliers:'Fornitori',inventoryReports:'Report inventario'});
 
 const AREA_UI={
   es:{eyebrow:'Manager Pro como plataforma',title:'¿Qué área quieres gestionar hoy?',sub:'Empieza por Personal y ve sumando ventas, inventario, documentos e insights cuando el negocio lo necesite.',open:'Abrir',soon:'Próximamente',next:'Siguiente módulo',active:'Activo ahora',today:'Hoy en Personal',roadmap:'Camino del producto',settings:'Configuración',settingsDesc:'Idioma, colores, horarios de apertura, tolerancias, accesos y datos del negocio.',openSettings:'Abrir ajustes',team:'Personal',teamDesc:'Empleados, horarios, fichajes, pausas, solicitudes, documentos, salarios y reportes.',sales:'Ventas',salesDesc:'Ventas por producto o servicio, caja diaria, métodos de pago y cierres.',inventory:'Inventario',inventoryDesc:'Stock, proveedores, compras y consumo conectado a ventas.',documents:'Documentos',documentsDesc:'Contratos, permisos, vencimientos y expediente de cada trabajador.',tasks:'Tareas',tasksDesc:'Rutinas, responsables, pendientes y seguimiento operativo.',insights:'IA e insights',insightsDesc:'Preguntas al negocio, señales de mejora y ayuda para tomar decisiones.',employees:'Empleados',pending:'Solicitudes pendientes',alerts:'Alertas abiertas',p1:'Personal listo: controlar equipo y cerrar el mes.',p2:'Ventas por items: registrar productos y servicios.',p3:'Inventario: conectar ventas con stock y compras.',p4:'Insights: entender qué pasa sin hablar lenguaje administrativo.',openTeam:'Entrar a Personal'},
@@ -1684,10 +1698,18 @@ const SALES_UI={
   it:{title:'Vendite e cassa',sub:'Registra vendite per prodotto o servizio. Poi potremo generare insight e collegare inventario.',today:'Oggi',revenue:'Incassi',sales:'Vendite',ticket:'Scontrino medio',products:'Prodotti',newSale:'Nuova vendita',newProduct:'Nuovo prodotto',catalog:'Catalogo',activity:'Attività del giorno',empty:'Nessuna vendita registrata oggi.',product:'Prodotto o servizio',qty:'Quantità',price:'Prezzo',method:'Metodo di pagamento',note:'Nota',total:'Totale',saveSale:'Salva vendita',cancel:'Annulla',productName:'Nome',category:'Categoria',type:'Tipo',saveProduct:'Salva',cash:'Contanti',card:'Carta',twint:'TWINT',transfer:'Bonifico',productType:'Prodotto',serviceType:'Servizio',ingredientType:'Ingrediente/input',bundleType:'Combo/preparato',sku:'SKU / Codice',unit:'Unità',unitUnit:'Unità',unitHour:'Ora',unitPortion:'Porzione',unitPack:'Pacco',unitBox:'Scatola',unitBottle:'Bottiglia',trackStock:'Controlla inventario',stock:'Stock attuale',minStock:'Stock minimo',lowStock:'Stock basso',recipeTitle:'Consumo per vendita',recipeHelp:'Ogni ingrediente usa la propria unità: kg, g, L, ml, unità, scatole o pacchi.',addIngredient:'+ Ingrediente',ingredient:'Ingrediente',consumption:'Consumo',noIngredients:'Crea prima gli ingredienti per comporre questa preparazione.',saved:'Vendita salvata',productSaved:'Prodotto salvato',missingProduct:'Crea prima un prodotto o servizio.',topProduct:'Più venduto',byMethod:'Per metodo di pagamento',areaTitle:'Pannello vendite',areaDesc:'Scegli cosa vuoi fare in questa area.',goSummary:'Vedi riepilogo',goSummaryDesc:'Incassi, scontrino medio e attività del giorno.',goRegister:'Registra vendita',goRegisterDesc:'Aggiungi una vendita rapida per prodotto o servizio.',goCatalog:'Gestisci catalogo',goCatalogDesc:'Prodotti, servizi e prezzi base.',goClose:'Cassa e insight',goCloseDesc:'Metodi di pagamento, più venduto e segnali decisionali.',openSection:'Apri'}
 };
 const salesTx=()=>({...SALES_UI.es,...(SALES_UI[lang]||{})});
+Object.assign(SALES_UI.es,{avgCost:'Costo promedio',stockValue:'Valor inventario'});
+Object.assign(SALES_UI.en,{avgCost:'Average cost',stockValue:'Inventory value'});
+Object.assign(SALES_UI.fr,{avgCost:'Coût moyen',stockValue:'Valeur inventaire'});
+Object.assign(SALES_UI.de,{avgCost:'Durchschnittskosten',stockValue:'Lagerwert'});
+Object.assign(SALES_UI.it,{avgCost:'Costo medio',stockValue:'Valore inventario'});
 const editLabel=()=>({es:'Editar',en:'Edit',fr:'Modifier',de:'Bearbeiten',it:'Modifica'}[lang]||'Editar');
 const INVENTORY_UI={
-  es:{title:'Inventario',sub:'Controla stock, compras y proveedores. Para restaurantes, una venta puede descontar insumos.',stock:'Stock',purchases:'Compras',suppliers:'Proveedores',low:'Bajo stock',items:'Items con stock',value:'Valor estimado',newPurchase:'Nueva compra',newSupplier:'Nuevo proveedor',product:'Producto o insumo',supplier:'Proveedor',qty:'Cantidad',cost:'Costo total',note:'Nota',savePurchase:'Guardar compra',saveSupplier:'Guardar proveedor',cancel:'Cancelar',current:'Stock actual',min:'Stock mínimo',unit:'Unidad',recipe:'Receta / consumo',noStock:'Aún no hay productos con inventario activo.',noPurchases:'Aún no hay compras registradas.',noSuppliers:'Aún no hay proveedores.',savedPurchase:'Compra guardada y stock actualizado',savedSupplier:'Proveedor guardado',needProduct:'Crea o activa inventario en un producto primero.',needSupplier:'Crea un proveedor primero.',auto:'Descuento por venta',manual:'Ajuste manual'},
-  en:{title:'Inventory',sub:'Control stock, purchases and suppliers. For restaurants, a sale can deduct ingredients.',stock:'Stock',purchases:'Purchases',suppliers:'Suppliers',low:'Low stock',items:'Stock items',value:'Estimated value',newPurchase:'New purchase',newSupplier:'New supplier',product:'Product or input',supplier:'Supplier',qty:'Quantity',cost:'Total cost',note:'Note',savePurchase:'Save purchase',saveSupplier:'Save supplier',cancel:'Cancel',current:'Current stock',min:'Minimum stock',unit:'Unit',recipe:'Recipe / consumption',noStock:'No products with inventory enabled yet.',noPurchases:'No purchases registered yet.',noSuppliers:'No suppliers yet.',savedPurchase:'Purchase saved and stock updated',savedSupplier:'Supplier saved',needProduct:'Create or enable inventory on a product first.',needSupplier:'Create a supplier first.',auto:'Sale deduction',manual:'Manual adjustment'}
+  es:{title:'Inventario',sub:'Controla stock, compras, proveedores y consumo. Una venta puede descontar insumos y actualizar costos.',stock:'Stock',purchases:'Compras',suppliers:'Proveedores',reports:'Reportes inventario',reportsDesc:'Stock actual, bajo stock, compras, consumo por ventas y costo por producto final.',low:'Bajo stock',items:'Items con stock',value:'Valor estimado',newPurchase:'Nueva compra',newSupplier:'Nuevo proveedor',product:'Producto o insumo',supplier:'Proveedor',qty:'Cantidad',cost:'Costo total',unitCost:'Costo unit.',avgCost:'Costo prom.',stockValue:'Valor stock',costAfter:'Costo prom. nuevo',stockAfter:'Stock final',note:'Nota',savePurchase:'Guardar compra',saveSupplier:'Guardar proveedor',cancel:'Cancelar',current:'Stock actual',min:'Stock mínimo',unit:'Unidad',recipe:'Receta / consumo',noStock:'Aún no hay productos con inventario activo.',noPurchases:'Aún no hay compras registradas.',noSuppliers:'Aún no hay proveedores.',savedPurchase:'Compra guardada y stock actualizado',savedSupplier:'Proveedor guardado',needProduct:'Crea o activa inventario en un producto primero.',needSupplier:'Crea un proveedor primero.',auto:'Descuento por venta',manual:'Ajuste manual',currentStockReport:'Stock actual',lowStockReport:'Stock bajo',purchasesReport:'Compras del mes',consumptionReport:'Consumo por ventas',productCostReport:'Costo por producto final',preview:'Vista previa',exportExcel:'Exportar Excel',estimatedUnitCost:'Costo unit. estimado',estimatedMargin:'Margen estimado',noReportData:'Sin datos para este reporte.'},
+  en:{title:'Inventory',sub:'Control stock, purchases, suppliers and consumption. A sale can deduct inputs and update costs.',stock:'Stock',purchases:'Purchases',suppliers:'Suppliers',reports:'Inventory reports',reportsDesc:'Current stock, low stock, purchases, sales consumption and final product cost.',low:'Low stock',items:'Stock items',value:'Estimated value',newPurchase:'New purchase',newSupplier:'New supplier',product:'Product or input',supplier:'Supplier',qty:'Quantity',cost:'Total cost',unitCost:'Unit cost',avgCost:'Avg. cost',stockValue:'Stock value',costAfter:'New avg. cost',stockAfter:'Final stock',note:'Note',savePurchase:'Save purchase',saveSupplier:'Save supplier',cancel:'Cancel',current:'Current stock',min:'Minimum stock',unit:'Unit',recipe:'Recipe / consumption',noStock:'No products with inventory enabled yet.',noPurchases:'No purchases registered yet.',noSuppliers:'No suppliers yet.',savedPurchase:'Purchase saved and stock updated',savedSupplier:'Supplier saved',needProduct:'Create or enable inventory on a product first.',needSupplier:'Create a supplier first.',auto:'Sale deduction',manual:'Manual adjustment',currentStockReport:'Current stock',lowStockReport:'Low stock',purchasesReport:'Monthly purchases',consumptionReport:'Sales consumption',productCostReport:'Final product cost',preview:'Preview',exportExcel:'Export Excel',estimatedUnitCost:'Estimated unit cost',estimatedMargin:'Estimated margin',noReportData:'No data for this report.'},
+  fr:{title:'Inventaire',sub:'Suivez stock, achats, fournisseurs et consommation. Une vente peut déduire les intrants et actualiser les coûts.',stock:'Stock',purchases:'Achats',suppliers:'Fournisseurs',reports:'Rapports inventaire',reportsDesc:'Stock actuel, stock bas, achats, consommation par ventes et coût produit final.',low:'Stock bas',items:'Items en stock',value:'Valeur estimée',newPurchase:'Nouvel achat',newSupplier:'Nouveau fournisseur',product:'Produit ou intrant',supplier:'Fournisseur',qty:'Quantité',cost:'Coût total',unitCost:'Coût unit.',avgCost:'Coût moy.',stockValue:'Valeur stock',costAfter:'Nouveau coût moy.',stockAfter:'Stock final',note:'Note',savePurchase:'Enregistrer achat',saveSupplier:'Enregistrer fournisseur',cancel:'Annuler',current:'Stock actuel',min:'Stock minimum',unit:'Unité',recipe:'Recette / consommation',noStock:'Aucun produit avec inventaire actif.',noPurchases:'Aucun achat enregistré.',noSuppliers:'Aucun fournisseur.',savedPurchase:'Achat enregistré et stock mis à jour',savedSupplier:'Fournisseur enregistré',needProduct:'Créez ou activez l’inventaire sur un produit d’abord.',needSupplier:'Créez un fournisseur d’abord.',auto:'Déduction par vente',manual:'Ajustement manuel',currentStockReport:'Stock actuel',lowStockReport:'Stock bas',purchasesReport:'Achats du mois',consumptionReport:'Consommation ventes',productCostReport:'Coût produit final',preview:'Aperçu',exportExcel:'Exporter Excel',estimatedUnitCost:'Coût unit. estimé',estimatedMargin:'Marge estimée',noReportData:'Aucune donnée pour ce rapport.'},
+  de:{title:'Inventar',sub:'Bestand, Einkäufe, Lieferanten und Verbrauch steuern. Ein Verkauf kann Inputs abziehen und Kosten aktualisieren.',stock:'Bestand',purchases:'Einkäufe',suppliers:'Lieferanten',reports:'Inventarberichte',reportsDesc:'Aktueller Bestand, niedriger Bestand, Einkäufe, Verbrauch durch Verkäufe und Produktkosten.',low:'Niedriger Bestand',items:'Bestandsartikel',value:'Geschätzter Wert',newPurchase:'Neuer Einkauf',newSupplier:'Neuer Lieferant',product:'Produkt oder Input',supplier:'Lieferant',qty:'Menge',cost:'Gesamtkosten',unitCost:'Stückkosten',avgCost:'Ø Kosten',stockValue:'Bestandswert',costAfter:'Neue Ø Kosten',stockAfter:'Endbestand',note:'Notiz',savePurchase:'Einkauf speichern',saveSupplier:'Lieferant speichern',cancel:'Abbrechen',current:'Aktueller Bestand',min:'Mindestbestand',unit:'Einheit',recipe:'Rezept / Verbrauch',noStock:'Noch keine Produkte mit aktivem Inventar.',noPurchases:'Noch keine Einkäufe erfasst.',noSuppliers:'Noch keine Lieferanten.',savedPurchase:'Einkauf gespeichert und Bestand aktualisiert',savedSupplier:'Lieferant gespeichert',needProduct:'Erstellen oder aktivieren Sie zuerst Inventar bei einem Produkt.',needSupplier:'Erstellen Sie zuerst einen Lieferanten.',auto:'Abzug durch Verkauf',manual:'Manuelle Anpassung',currentStockReport:'Aktueller Bestand',lowStockReport:'Niedriger Bestand',purchasesReport:'Einkäufe Monat',consumptionReport:'Verbrauch Verkäufe',productCostReport:'Kosten Endprodukt',preview:'Vorschau',exportExcel:'Excel exportieren',estimatedUnitCost:'Geschätzte Stückkosten',estimatedMargin:'Geschätzte Marge',noReportData:'Keine Daten für diesen Bericht.'},
+  it:{title:'Inventario',sub:'Controlla stock, acquisti, fornitori e consumo. Una vendita può scalare ingredienti e aggiornare i costi.',stock:'Stock',purchases:'Acquisti',suppliers:'Fornitori',reports:'Report inventario',reportsDesc:'Stock attuale, stock basso, acquisti, consumo da vendite e costo prodotto finale.',low:'Stock basso',items:'Articoli a stock',value:'Valore stimato',newPurchase:'Nuovo acquisto',newSupplier:'Nuovo fornitore',product:'Prodotto o ingrediente',supplier:'Fornitore',qty:'Quantità',cost:'Costo totale',unitCost:'Costo unit.',avgCost:'Costo medio',stockValue:'Valore stock',costAfter:'Nuovo costo medio',stockAfter:'Stock finale',note:'Nota',savePurchase:'Salva acquisto',saveSupplier:'Salva fornitore',cancel:'Annulla',current:'Stock attuale',min:'Stock minimo',unit:'Unità',recipe:'Ricetta / consumo',noStock:'Nessun prodotto con inventario attivo.',noPurchases:'Nessun acquisto registrato.',noSuppliers:'Nessun fornitore.',savedPurchase:'Acquisto salvato e stock aggiornato',savedSupplier:'Fornitore salvato',needProduct:'Crea o attiva inventario su un prodotto prima.',needSupplier:'Crea prima un fornitore.',auto:'Scarico da vendita',manual:'Aggiustamento manuale',currentStockReport:'Stock attuale',lowStockReport:'Stock basso',purchasesReport:'Acquisti del mese',consumptionReport:'Consumo da vendite',productCostReport:'Costo prodotto finale',preview:'Anteprima',exportExcel:'Esporta Excel',estimatedUnitCost:'Costo unit. stimato',estimatedMargin:'Margine stimato',noReportData:'Nessun dato per questo report.'}
 };
 const inventoryTx=()=>({...INVENTORY_UI.es,...(INVENTORY_UI[lang]||{})});
 const T=()=>UI[lang]||UI.fr;
@@ -1708,6 +1730,16 @@ const ASSIST_TEXT={
   it:{title:'Assistente Manager Pro',sub:"Fai domande su timbrature, orari, assenze, contratti, report o situazioni con il team. Se manca qualcosa, lo salviamo come segnale di miglioramento.",hello:"Ciao. Posso aiutarti con l'app, ma anche a preparare conversazioni umane con i dipendenti quando una situazione è delicata.",closeMonth:'Chiudere mese',alerts:'Avvisi di oggi',fix:'Correggi timbratura',missing:'Dati mancanti',people:'Conversazione difficile',qClose:'Cosa devo controllare prima di chiudere il mese?',qAlerts:'Ci sono avvisi importanti oggi?',qFix:'Come correggo una timbratura vecchia?',qMissing:'Quali informazioni mancano nei dipendenti?',qPeople:'Come parlo con un dipendente che arriva spesso in ritardo?',placeholder:'Scrivi la tua domanda...',close:'Chiudi',ask:'Chiedi',thinking:'Sto pensando...',empty:'Scrivi una domanda',managerOnly:'Assistente disponibile per manager',local:'Risposta in modalità locale',saved:'Salvato come segnale di miglioramento',sqlMissing:'Assistente locale. Manca il SQL del radar.'}
 };
 const ATX=()=>ASSIST_TEXT[lang]||ASSIST_TEXT.fr;
+Object.assign(ASSIST_TEXT.es,{sub:'Pregunta sobre personal, ventas, inventario, documentos, reportes o decisiones del negocio. Si algo falta, lo guardamos como señal de mejora.',hello:'Hola. Puedo ayudarte a conectar lo que pasa en la app: equipo, ventas, inventario, costos, reportes y conversaciones humanas.',sales:'Ventas',inventory:'Inventario',qSales:'¿Qué está pasando con mis ventas este mes?',qInventory:'¿Qué debo revisar en inventario según ventas y compras?'});
+Object.assign(ASSIST_TEXT.en,{sub:'Ask about people, sales, inventory, documents, reports or business decisions. If something is missing, we save it as an improvement signal.',hello:'Hi. I can help connect what happens across the app: team, sales, inventory, costs, reports and human conversations.',sales:'Sales',inventory:'Inventory',qSales:'What is happening with my sales this month?',qInventory:'What should I review in inventory based on sales and purchases?'});
+Object.assign(ASSIST_TEXT.fr,{sub:'Posez une question sur équipe, ventes, inventaire, documents, rapports ou décisions du commerce. Si quelque chose manque, nous le gardons comme signal d’amélioration.',hello:"Bonjour. Je peux vous aider à relier ce qui se passe dans l’app: équipe, ventes, inventaire, coûts, rapports et conversations humaines.",sales:'Ventes',inventory:'Inventaire',qSales:'Que se passe-t-il avec mes ventes ce mois-ci ?',qInventory:'Que dois-je vérifier dans l’inventaire selon ventes et achats ?'});
+Object.assign(ASSIST_TEXT.de,{sub:'Fragen Sie zu Personal, Verkauf, Inventar, Dokumenten, Berichten oder Geschäftsentscheidungen. Wenn etwas fehlt, speichern wir es als Verbesserungssignal.',hello:'Hallo. Ich helfe, die Bereiche der App zu verbinden: Team, Verkauf, Inventar, Kosten, Berichte und menschliche Gespräche.',sales:'Verkauf',inventory:'Inventar',qSales:'Was passiert diesen Monat mit meinen Verkäufen?',qInventory:'Was sollte ich im Inventar anhand von Verkäufen und Einkäufen prüfen?'});
+Object.assign(ASSIST_TEXT.it,{sub:"Fai domande su personale, vendite, inventario, documenti, report o decisioni del business. Se manca qualcosa, lo salviamo come segnale di miglioramento.",hello:"Ciao. Posso aiutarti a collegare ciò che succede nell'app: team, vendite, inventario, costi, report e conversazioni umane.",sales:'Vendite',inventory:'Inventario',qSales:'Cosa sta succedendo con le mie vendite questo mese?',qInventory:'Cosa devo controllare in inventario secondo vendite e acquisti?'});
+Object.assign(ASSIST_TEXT.es,{sub:'Pregunta sobre personal, ventas, inventario, documentos, reportes o decisiones del negocio. Si algo falta, lo guardamos como señal de mejora.',hello:'Hola. Puedo ayudarte a conectar lo que pasa en la app: equipo, ventas, inventario, costos, reportes y conversaciones humanas.',sales:'Ventas',inventory:'Inventario',qSales:'¿Qué está pasando con mis ventas este mes?',qInventory:'¿Qué debo revisar en inventario según ventas y compras?'});
+Object.assign(ASSIST_TEXT.en,{sub:'Ask about people, sales, inventory, documents, reports or business decisions. If something is missing, we save it as an improvement signal.',hello:'Hi. I can help connect what happens across the app: team, sales, inventory, costs, reports and human conversations.',sales:'Sales',inventory:'Inventory',qSales:'What is happening with my sales this month?',qInventory:'What should I review in inventory based on sales and purchases?'});
+Object.assign(ASSIST_TEXT.fr,{sub:'Posez une question sur équipe, ventes, inventaire, documents, rapports ou décisions du commerce. Si quelque chose manque, nous le gardons comme signal d’amélioration.',hello:"Bonjour. Je peux vous aider à relier ce qui se passe dans l’app: équipe, ventes, inventaire, coûts, rapports et conversations humaines.",sales:'Ventes',inventory:'Inventaire',qSales:'Que se passe-t-il avec mes ventes ce mois-ci ?',qInventory:'Que dois-je vérifier dans l’inventaire selon ventes et achats ?'});
+Object.assign(ASSIST_TEXT.de,{sub:'Fragen Sie zu Personal, Verkauf, Inventar, Dokumenten, Berichten oder Geschäftsentscheidungen. Wenn etwas fehlt, speichern wir es als Verbesserungssignal.',hello:'Hallo. Ich helfe, die Bereiche der App zu verbinden: Team, Verkauf, Inventar, Kosten, Berichte und menschliche Gespräche.',sales:'Verkauf',inventory:'Inventar',qSales:'Was passiert diesen Monat mit meinen Verkäufen?',qInventory:'Was sollte ich im Inventar anhand von Verkäufen und Einkäufen prüfen?'});
+Object.assign(ASSIST_TEXT.it,{sub:"Fai domande su personale, vendite, inventario, documenti, report o decisioni del business. Se manca qualcosa, lo salviamo come segnale di miglioramento.",hello:"Ciao. Posso aiutarti a collegare ciò che succede nell'app: team, vendite, inventario, costi, report e conversazioni umane.",sales:'Vendite',inventory:'Inventario',qSales:'Cosa sta succedendo con le mie vendite questo mese?',qInventory:'Cosa devo controllare in inventario secondo vendite e acquisti?'});
 Object.assign(UI.es,{att:{today:'Fichajes del día',scheduled:'Programados hoy',manual:'Manual',present:'Presentes',absent:'Ausentes',none:'Nadie programado',manualTitle:'Fichaje manual',employee:'Empleado',date:'Fecha',reason:'Motivo',save:'Guardar',cancel:'Cancelar'},shift:{title:'Planificación',morning:'Mañana',afternoon:'Tarde',evening:'Noche',night:'Madrugada',rest:'Descanso',off:'Libre',none:'Sin empleados activos',scheduleSaved:'Horario guardado'},vac:{pending:'Pendientes',approved:'Aprobados',balance:'Saldos',new:'+ Nueva ausencia',title:'Nueva ausencia',none:'Sin solicitudes',noneApproved:'Ninguna ausencia aprobada',nonePending:'Ninguna solicitud pendiente',remaining:'restantes',used:'días usados'}});
 Object.assign(UI.en,{att:{today:'Today’s punches',scheduled:'Scheduled today',manual:'Manual',present:'Present',absent:'Absent',none:'Nobody scheduled',manualTitle:'Manual attendance',employee:'Employee',date:'Date',reason:'Reason',save:'Save',cancel:'Cancel'},shift:{title:'Planning',morning:'Morning',afternoon:'Afternoon',evening:'Evening',night:'Night',rest:'Rest',off:'Off',none:'No active employees',scheduleSaved:'Shift saved'},vac:{pending:'Pending',approved:'Approved',balance:'Balances',new:'+ New absence',title:'New absence',none:'No requests',noneApproved:'No approved leave',nonePending:'No pending requests',remaining:'remaining',used:'days used'}});
 Object.assign(UI.de,{att:{today:'Heutige Buchungen',scheduled:'Heute geplant',manual:'Manuell',present:'Anwesend',absent:'Abwesend',none:'Niemand geplant',manualTitle:'Manuelle Buchung',employee:'Mitarbeiter',date:'Datum',reason:'Grund',save:'Speichern',cancel:'Abbrechen'},shift:{title:'Planung',morning:'Morgen',afternoon:'Nachmittag',evening:'Abend',night:'Nacht',rest:'Ruhezeit',off:'Frei',none:'Keine aktiven Mitarbeiter',scheduleSaved:'Dienst gespeichert'},vac:{pending:'Ausstehend',approved:'Genehmigt',balance:'Salden',new:'+ Neue Abwesenheit',title:'Neue Abwesenheit',none:'Keine Anträge',noneApproved:'Keine genehmigten Abwesenheiten',nonePending:'Keine offenen Anträge',remaining:'übrig',used:'Tage genutzt'}});
@@ -1752,6 +1784,26 @@ Object.assign(UI.en.login,{chip1:'Restaurants',chip1Sub:'Shifts and breaks',chip
 Object.assign(UI.fr.login,{chip1:'Restaurants',chip1Sub:'Services et pauses',chip2:'Magasins',chip2Sub:'Équipe et caisse',chip3:'Petits hôtels',chip3Sub:'Horaires et demandes',chip4:'Services',chip4Sub:'Documents et rapports'});
 Object.assign(UI.de.login,{chip1:'Restaurants',chip1Sub:'Schichten und Pausen',chip2:'Läden',chip2Sub:'Team und Kasse',chip3:'Kleine Hotels',chip3Sub:'Pläne und Anfragen',chip4:'Services',chip4Sub:'Dokumente und Berichte'});
 Object.assign(UI.it.login,{chip1:'Ristoranti',chip1Sub:'Turni e pause',chip2:'Negozi',chip2Sub:'Team e cassa',chip3:'Piccoli hotel',chip3Sub:'Orari e richieste',chip4:'Servizi',chip4Sub:'Documenti e report'});
+Object.assign(UI.fr.login,{registerNote:'Créez l’espace de votre commerce et invitez votre équipe.',restName:'Nom du commerce'});
+Object.assign(UI.es.login,{registerNote:'Crea el espacio de tu negocio e invita a tu equipo.',restName:'Nombre del negocio'});
+Object.assign(UI.en.login,{registerNote:'Create your business workspace and invite your team.',restName:'Business name'});
+Object.assign(UI.de.login,{registerNote:'Betriebsbereich erstellen und Team einladen.',restName:'Name des Betriebs'});
+Object.assign(UI.it.login,{registerNote:'Crea lo spazio del tuo business e invita il team.',restName:'Nome attività'});
+Object.assign(UI.fr.settings,{restaurant:'Votre commerce',companyName:'Nom du commerce',emoji:'Emoji du commerce'});
+Object.assign(UI.es.settings,{restaurant:'Tu negocio',companyName:'Nombre del negocio',emoji:'Emoji del negocio'});
+Object.assign(UI.en.settings,{restaurant:'Your business',companyName:'Business name',emoji:'Business emoji'});
+Object.assign(UI.de.settings,{restaurant:'Ihr Betrieb',companyName:'Betriebsname',emoji:'Betriebs-Emoji'});
+Object.assign(UI.it.settings,{restaurant:'Il tuo business',companyName:'Nome attività',emoji:'Emoji attività'});
+Object.assign(UI.fr.master,{managed:'Commerces gérés',restaurants:'Commerces',noRestaurant:'aucun commerce',noneTitle:'Aucun commerce',noneText:'Créez le premier depuis l’inscription ou Supabase.',changed:'Commerce actif changé'});
+Object.assign(UI.es.master,{managed:'Negocios gestionados',restaurants:'Negocios',noRestaurant:'sin negocio',noneTitle:'No hay negocios',noneText:'Crea el primero desde registro o Supabase.',changed:'Negocio activo cambiado'});
+Object.assign(UI.en.master,{managed:'Managed businesses',restaurants:'Businesses',noRestaurant:'no business',noneTitle:'No businesses',noneText:'Create the first one from registration or Supabase.',changed:'Active business changed'});
+Object.assign(UI.de.master,{managed:'Verwaltete Betriebe',restaurants:'Betriebe',noRestaurant:'kein Betrieb',noneTitle:'Keine Betriebe',noneText:'Erstellen Sie den ersten über Registrierung oder Supabase.',changed:'Aktiver Betrieb geändert'});
+Object.assign(UI.it.master,{managed:'Business gestiti',restaurants:'Business',noRestaurant:'nessun business',noneTitle:'Nessun business',noneText:'Crea il primo dalla registrazione o da Supabase.',changed:'Business attivo cambiato'});
+Object.assign(UI.fr.login,{sub:'Gestion simple du business',registerNote:'Créez l’espace de votre commerce et invitez votre équipe.',restName:'Nom du commerce'});
+Object.assign(UI.es.login,{sub:'Gestión simple del negocio',registerNote:'Crea el espacio de tu negocio e invita a tu equipo.',restName:'Nombre del negocio'});
+Object.assign(UI.en.login,{sub:'Simple business management',registerNote:'Create your business workspace and invite your team.',restName:'Business name'});
+Object.assign(UI.de.login,{sub:'Einfache Betriebsverwaltung',registerNote:'Betriebsbereich erstellen und Team einladen.',restName:'Name des Betriebs'});
+Object.assign(UI.it.login,{sub:'Gestione semplice del business',registerNote:'Crea lo spazio del tuo business e invita il team.',restName:'Nome attività'});
 const EMP_UI={
   fr:{clockIn:"Pointer l'entrée",clockOut:'Pointer la sortie',breakStart:'Début pause',breakEnd:'Terminer pause',breakChoose:'Choisir la durée',breakActive:'En pause depuis',breakEndsAt:'À terminer à',breakEndedAt:'Devait terminer à',latePrompt:'Vous êtes arrivé en retard. Vous pouvez écrire le motif:',outOpenBreak:'Vous avez une pause ouverte. Si vous pointez la sortie maintenant, elle restera sans fermeture. Continuer?',outNoBreak:'Aucune pause enregistrée. Si vous pointez la sortie, le manager sera averti. Continuer?',clockInFirst:"Enregistrez d'abord l'entrée",breakAlready:'Pause déjà en cours',breakDone:'Pause terminée',logout:'Déconnexion',tour:'Voir le tour',today:"Aujourd'hui",week:'Cette semaine',vac:'Vacances',medical:'Incapacité / maladie',personal:'Personnel',monthHours:'Heures du mois',calendar:'Calendrier',absence:'Demander une absence',type:'Type',start:'Début',end:'Fin',note:'Note',send:'Envoyer la demande',todaySchedule:"Horaire d'aujourd'hui",expectedIn:'Entrée prévue',expectedOut:'Sortie prévue',off:'Jour non travaillé',todayPunches:"Pointages d'aujourd'hui",noneToday:"Aucun pointage aujourd'hui",in:'Entrée',out:'Sortie',badge:'Mon carnet',badgeOpen:'Cliquez pour ouvrir votre portail',badgeLink:'Cliquez ici pour ouvrir',pdf:'Télécharger PDF',card:'Télécharger mon carnet'},
   es:{clockIn:'Fichar entrada',clockOut:'Fichar salida',breakStart:'Iniciar pausa',breakEnd:'Terminar pausa',breakChoose:'Elegir duración',breakActive:'En pausa desde',breakEndsAt:'Debe terminar a las',breakEndedAt:'Debía terminar a las',latePrompt:'Llegaste tarde. Puedes escribir el motivo:',outOpenBreak:'Tienes una pausa abierta. Si fichas salida ahora, la pausa quedará sin cierre. ¿Continuar?',outNoBreak:'No tienes una pausa registrada. Si fichas salida, se avisará al manager. ¿Continuar?',clockInFirst:'Primero registra entrada',breakAlready:'Pausa ya en curso',breakDone:'Pausa terminada',logout:'Cerrar sesión',tour:'Ver tour',today:'Hoy',week:'Esta semana',vac:'Vacaciones',medical:'Incapacidad / enfermedad',personal:'Personal',monthHours:'Horas del mes',calendar:'Calendario',absence:'Solicitar ausencia',type:'Tipo',start:'Inicio',end:'Fin',note:'Nota',send:'Enviar solicitud',todaySchedule:'Horario de hoy',expectedIn:'Entrada prevista',expectedOut:'Salida prevista',off:'Día no trabajado',todayPunches:'Fichajes de hoy',noneToday:'Sin fichajes hoy',in:'Entrada',out:'Salida',badge:'Mi carnet',badgeOpen:'Haz click para abrir tu portal',badgeLink:'Haz click aquí para abrir',pdf:'Descargar PDF',card:'Descargar mi carnet'},
@@ -2118,14 +2170,14 @@ async function sbSaveShift(key,sh){
   if(res.error)throw res.error;
 }
 async function sbSaveSettings(s){if(isDemo())return;await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours(),sales_panel_widgets:DB.salesPanelWidgets||null}).eq('id',REST_ID);}
-function salesProductFromSB(x){return{id:x.id,name:x.name||'',category:x.category||'',type:x.type||'product',price:Number(x.price)||0,sku:x.sku||'',unit:x.unit||'unit',trackStock:!!x.track_stock,stock:Number(x.stock)||0,minStock:Number(x.min_stock)||0,recipe:x.recipe||[],active:x.active!==false,createdAt:x.created_at||new Date().toISOString()};}
-function saleFromSB(x){return{id:x.id,productId:x.product_id,productName:x.product_name||'',category:x.category||'',qty:Number(x.quantity)||0,unitPrice:Number(x.unit_price)||0,total:Number(x.total)||0,method:x.payment_method||'cash',employeeId:x.employee_id||'',employeeName:x.employee_name||'',note:x.note||'',ts:x.sold_at||x.created_at||new Date().toISOString()};}
+function salesProductFromSB(x){return{id:x.id,name:x.name||'',category:x.category||'',type:x.type||'product',price:Number(x.price)||0,sku:x.sku||'',unit:x.unit||'unit',trackStock:!!x.track_stock,stock:Number(x.stock)||0,minStock:Number(x.min_stock)||0,avgCost:Number(x.avg_cost)||0,stockValue:Number(x.stock_value)||0,recipe:x.recipe||[],active:x.active!==false,createdAt:x.created_at||new Date().toISOString()};}
+function saleFromSB(x){return{id:x.id,productId:x.product_id,productName:x.product_name||'',category:x.category||'',qty:Number(x.quantity)||0,unitPrice:Number(x.unit_price)||0,total:Number(x.total)||0,cost:Number(x.cost)||0,margin:Number(x.margin)||0,method:x.payment_method||'cash',employeeId:x.employee_id||'',employeeName:x.employee_name||'',note:x.note||'',ts:x.sold_at||x.created_at||new Date().toISOString()};}
 function supplierFromSB(x){return{id:x.id,name:x.name||'',phone:x.phone||'',email:x.email||'',notes:x.notes||'',createdAt:x.created_at||new Date().toISOString()};}
-function purchaseFromSB(x){return{id:x.id,productId:x.product_id||'',productName:x.product_name||'',supplierId:x.supplier_id||'',supplierName:x.supplier_name||'',qty:Number(x.quantity)||0,cost:Number(x.total_cost)||0,note:x.note||'',ts:x.purchased_at||x.created_at||new Date().toISOString()};}
-async function sbSaveSalesProduct(p){if(isDemo())return;const {error}=await sb.from('sales_products').upsert({id:p.id,restaurant_id:REST_ID,name:p.name,category:p.category||'',type:p.type||'product',price:p.price||0,sku:p.sku||'',unit:p.unit||'unit',track_stock:!!p.trackStock,stock:p.stock||0,min_stock:p.minStock||0,recipe:p.recipe||[],active:p.active!==false});if(error)console.warn('Sales product save failed',error);}
-async function sbSaveSale(s){if(isDemo())return;const {error}=await sb.from('sales').upsert({id:s.id,restaurant_id:REST_ID,product_id:s.productId||null,product_name:s.productName||'',category:s.category||'',quantity:s.qty||0,unit_price:s.unitPrice||0,total:s.total||0,payment_method:s.method||'cash',employee_id:s.employeeId||null,employee_name:s.employeeName||'',note:s.note||'',sold_at:s.ts||new Date().toISOString()});if(error)console.warn('Sale save failed',error);}
+function purchaseFromSB(x){return{id:x.id,productId:x.product_id||'',productName:x.product_name||'',supplierId:x.supplier_id||'',supplierName:x.supplier_name||'',qty:Number(x.quantity)||0,cost:Number(x.total_cost)||0,unitCost:Number(x.unit_cost)||0,avgCostAfter:Number(x.avg_cost_after)||0,stockAfter:Number(x.stock_after)||0,note:x.note||'',ts:x.purchased_at||x.created_at||new Date().toISOString()};}
+async function sbSaveSalesProduct(p){if(isDemo())return;const {error}=await sb.from('sales_products').upsert({id:p.id,restaurant_id:REST_ID,name:p.name,category:p.category||'',type:p.type||'product',price:p.price||0,sku:p.sku||'',unit:p.unit||'unit',track_stock:!!p.trackStock,stock:p.stock||0,min_stock:p.minStock||0,avg_cost:p.avgCost||0,stock_value:p.stockValue||0,recipe:p.recipe||[],active:p.active!==false});if(error)console.warn('Sales product save failed',error);}
+async function sbSaveSale(s){if(isDemo())return;const {error}=await sb.from('sales').upsert({id:s.id,restaurant_id:REST_ID,product_id:s.productId||null,product_name:s.productName||'',category:s.category||'',quantity:s.qty||0,unit_price:s.unitPrice||0,total:s.total||0,cost:s.cost||0,margin:s.margin||0,payment_method:s.method||'cash',employee_id:s.employeeId||null,employee_name:s.employeeName||'',note:s.note||'',sold_at:s.ts||new Date().toISOString()});if(error)console.warn('Sale save failed',error);}
 async function sbSaveSupplier(s){if(isDemo())return;const {error}=await sb.from('inventory_suppliers').upsert({id:s.id,restaurant_id:REST_ID,name:s.name||'',phone:s.phone||'',email:s.email||'',notes:s.notes||''});if(error)console.warn('Supplier save failed',error);}
-async function sbSavePurchase(p){if(isDemo())return;const {error}=await sb.from('inventory_purchases').upsert({id:p.id,restaurant_id:REST_ID,product_id:p.productId||null,product_name:p.productName||'',supplier_id:p.supplierId||null,supplier_name:p.supplierName||'',quantity:p.qty||0,total_cost:p.cost||0,note:p.note||'',purchased_at:p.ts||new Date().toISOString()});if(error)console.warn('Purchase save failed',error);}
+async function sbSavePurchase(p){if(isDemo())return;const {error}=await sb.from('inventory_purchases').upsert({id:p.id,restaurant_id:REST_ID,product_id:p.productId||null,product_name:p.productName||'',supplier_id:p.supplierId||null,supplier_name:p.supplierName||'',quantity:p.qty||0,total_cost:p.cost||0,unit_cost:p.unitCost||0,avg_cost_after:p.avgCostAfter||0,stock_after:p.stockAfter||0,note:p.note||'',purchased_at:p.ts||new Date().toISOString()});if(error)console.warn('Purchase save failed',error);}
 async function sbUpdateAbsApproved(id,approved){if(isDemo())return;await sb.from('absences').update({approved}).eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDelAbs(id){if(isDemo())return;await sb.from('absences').delete().eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDeleteAll(){
@@ -2274,7 +2326,7 @@ function applyBrand(){
   document.documentElement.style.setProperty('--brand2',c2);
   document.documentElement.style.setProperty('--brand-light',c+'22');
   document.getElementById('sb-rl').textContent=DB.settings.emoji||'🍽️';
-  document.getElementById('sb-rn').textContent=DB.settings.company||'Mon Restaurant';
+  document.getElementById('sb-rn').textContent=DB.settings.company||'Manager Pro';
   document.getElementById('login-logo')?.style&&(document.querySelector('.login-logo').style.background=`linear-gradient(135deg,${c},${c2})`);
 }
 
@@ -2383,8 +2435,9 @@ function applyUITexts(){
   renderLoginLangBar();
   const sectionLabels={main:t.nav.principal,people:areaTx().team,sales:areaTx().sales,inventory:areaTx().inventory,config:t.nav.config,master:t.nav.master};
   document.querySelectorAll('.sb-section[data-sidebar-section]').forEach(el=>{el.textContent=sectionLabels[el.dataset.sidebarSection]||el.textContent;});
+  const masterManagedTitle=document.getElementById('master-managed-title');if(masterManagedTitle)masterManagedTitle.textContent=t.master?.managed||masterManagedTitle.textContent;
   const setNav=(page,text)=>{const el=document.querySelector(`[onclick="nav('${page}',this)"] span`);if(el)el.textContent=text;};
-  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('sales',t.pages.sales);setNav('salesProducts',t.pages.salesProducts);setNav('salesReports',t.pages.salesReports);setNav('inventory',t.pages.inventory);setNav('inventoryStock',t.pages.inventoryStock);setNav('inventoryPurchases',t.pages.inventoryPurchases);setNav('inventorySuppliers',t.pages.inventorySuppliers);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
+  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('sales',t.pages.sales);setNav('salesProducts',t.pages.salesProducts);setNav('salesReports',t.pages.salesReports);setNav('inventory',t.pages.inventory);setNav('inventoryStock',t.pages.inventoryStock);setNav('inventoryPurchases',t.pages.inventoryPurchases);setNav('inventorySuppliers',t.pages.inventorySuppliers);setNav('inventoryReports',t.pages.inventoryReports);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
   const mt=document.querySelector('[onclick="nav(\'master\',this)"] span');if(mt)mt.textContent=t.pages.master;
   document.getElementById('page-title').textContent=t.pages[currentPage]||currentPage;
   const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].textContent=t.login.manager;if(tabs[1])tabs[1].textContent=t.login.employee;if(tabs[2])tabs[2].textContent=t.login.restaurant;
@@ -2502,6 +2555,7 @@ function updateSalesModalTexts(){
   set('sale-modal-title',tx.newSale);set('sale-product-label',tx.product);set('sale-qty-label',tx.qty);set('sale-price-label',tx.price);set('sale-method-label',tx.method);set('sale-employee-label',salesWidgetText().responsible);set('sale-note-label',tx.note);set('sale-total-label',tx.total);set('sale-cancel-btn',tx.cancel);set('sale-save-btn',tx.saveSale);
   set('product-modal-title',tx.newProduct);set('product-name-label',tx.productName);set('product-category-label',tx.category);set('product-price-label',tx.price);set('product-type-label',tx.type);set('product-cancel-btn',tx.cancel);set('product-save-btn',tx.saveProduct);
   set('product-sku-label',tx.sku);set('product-unit-label',tx.unit);set('product-track-label',tx.trackStock);set('product-stock-label',tx.stock);set('product-min-stock-label',tx.minStock);
+  set('product-avg-cost-label',tx.avgCost||'Costo promedio');set('product-stock-value-label',tx.stockValue||'Valor inventario');
   set('product-recipe-title',tx.recipeTitle);set('product-recipe-help',tx.recipeHelp);set('product-recipe-add',tx.addIngredient);
   const st=document.getElementById('product-type');if(st){[...st.options].forEach(o=>{o.textContent={product:tx.productType,service:tx.serviceType,ingredient:tx.ingredientType,bundle:tx.bundleType}[o.value]||o.textContent;});}
   const su=document.getElementById('product-unit');if(su)su.innerHTML=salesUnitOptions(su.value||'unit');
@@ -2527,7 +2581,7 @@ function applyPermissionsUI(){
 }
 function updateSidebarScope(){
   const salesPages=['sales','salesProducts','salesReports'];
-  const inventoryPages=['inventory','inventoryStock','inventoryPurchases','inventorySuppliers'];
+  const inventoryPages=['inventory','inventoryStock','inventoryPurchases','inventorySuppliers','inventoryReports'];
   const configPages=['settings','master'];
   const peoplePages=['dashboard','attendance','employees','shifts','vacations','payroll','reports','history'];
   const hubPage=currentPage==='hub';
@@ -2627,7 +2681,7 @@ async function selectPinRestaurant(id){
   const ok=await loadSB();
   applyBrand();
   if(!ok)toast('Impossible de charger ce restaurant','#ef4444');
-  if(DB.settings?.status==='frozen')toast('Restaurante congelado','#ef4444');
+  if(DB.settings?.status==='frozen')toast('Negocio congelado','#ef4444');
 }
 
 function loginDemo(){
@@ -2697,7 +2751,7 @@ async function registerRestaurant(){
   const pass=document.getElementById('reg-password').value;
   const pass2=document.getElementById('reg-password2').value;
   const token=inviteToken();
-  if((!token&&!restName)||!email||pass.length<6){toast('Restaurant, email et mot de passe requis','#ef4444');return;}
+  if((!token&&!restName)||!email||pass.length<6){toast('Negocio, email y contraseña requeridos','#ef4444');return;}
   if(pass!==pass2){toast((T().login?.passwordMismatch)||UI.fr.login.passwordMismatch,'#ef4444');return;}
   try{
     const {data,error}=await sb.auth.signUp({email,password:pass});
@@ -2834,7 +2888,7 @@ function showManagerUI(){
   goPage(currentPage||'hub','replace');
   if(currentUser.role==='super_admin')renderMaster();
   startAutoRefresh();
-  maybeStartTour('manager');
+  maybeStartTour('hub');
 }
 
 function showEmpUI(emp){
@@ -3196,7 +3250,7 @@ function buildBadgeCanvas(emp){
   return new Promise((resolve,reject)=>{
     const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
     canvas.width=640;canvas.height=960;
-    const restaurant=DB.settings?.company||'Mon Restaurant',accessUrl=employeeAccessUrl(emp),qrUrl=makeQRDataURL(accessUrl,270),brand=DB.settings?.brandColor||'#4f6ef7',brand2=DB.settings?.brandColor2||'#7c3aed';
+    const restaurant=DB.settings?.company||'Manager Pro',accessUrl=employeeAccessUrl(emp),qrUrl=makeQRDataURL(accessUrl,270),brand=DB.settings?.brandColor||'#4f6ef7',brand2=DB.settings?.brandColor2||'#7c3aed';
     Promise.all([loadCanvasImage(qrUrl),loadCanvasImage(emp.photo)]).then(([qrImg,photoImg])=>{
       const bg=ctx.createLinearGradient(0,0,0,960);
       bg.addColorStop(0,'#202a5a');bg.addColorStop(.45,'#111426');bg.addColorStop(1,'#07080f');
@@ -3267,14 +3321,14 @@ function roundRect(ctx,x,y,w,h,r,fill){
 }
 function sendBadgeEmail(emp){
   if(!emp?.email){toast('Ajoutez un email à cet employé','#f59e0b');return;}
-  const restaurant=DB.settings?.company||'Mon Restaurant';
+  const restaurant=DB.settings?.company||'Manager Pro';
   const subject=`Carnet Manager Pro - ${fullName(emp)}`;
   const body=[
     `Bonjour ${fullName(emp)},`,
     '',
     `Voici votre carnet Manager Pro.`,
     '',
-    `Restaurant: ${restaurant}`,
+    `Negocio: ${restaurant}`,
     `N° employé: ${emp.num||emp.id}`,
     `Poste: ${emp.position||'-'}`,
     `Email d'accès: ${emp.email}`,
@@ -3464,7 +3518,7 @@ async function handleQR(data){
     }catch(e){console.warn('Employee QR lookup error',e);}
   }
   if(!empId&&!emp){toast('QR non reconnu','#ef4444');return;}
-  if(!emp){toast('Employé non trouvé dans ce restaurant','#ef4444');return;}
+  if(!emp){toast('Empleado no encontrado en este negocio','#ef4444');return;}
   showQRAction(emp);
 }
 function showQRAction(emp){
@@ -3658,7 +3712,7 @@ function renderEmpView(emp){
     </div>
     <div style="font-size:24px;font-weight:800">${safeEmpName(emp)}</div>
     <div style="font-size:14px;color:var(--text2);margin-top:4px">${esc(emp.position)}</div>
-    <div style="font-size:12px;color:var(--text2);margin-top:3px">${esc(DB.settings?.company||'Mon Restaurant')}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:3px">${esc(DB.settings?.company||'Manager Pro')}</div>
     ${last?`<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border-radius:20px;padding:6px 14px;margin-top:12px;font-size:12px;font-weight:600">
       <div style="width:7px;height:7px;border-radius:50%;background:${sc}"></div>
       ${openBreak?`${et.breakActive} ${fmtTime(openBreak.ts)}`:`${last.type==='in'?et.in:et.out} · ${fmtTime(last.ts)}`}
@@ -3763,9 +3817,17 @@ function managerAssistantContext(){
     vacationLeft:r.vacLeft,
     openBreak:!!readActiveBreak(r.emp.id)
   })).slice(0,40);
+  const salesMonth=saleMonthList(),salesTodayList=salesByPeriod('today'),salesMonthSummary=salesSummary(salesMonth),salesTodaySummary=salesSummary(salesTodayList);
+  const salesTopProducts=groupSales(salesMonth,s=>s.productName,s=>Number(s.total)||0).slice(0,8).map(([name,total])=>({name,total:+total.toFixed(2),qty:salesMonth.filter(s=>s.productName===name).reduce((a,s)=>a+(Number(s.qty)||0),0)}));
+  const salesByPayment=groupSales(salesMonth,s=>salesMethodLabel(s.method)).map(([method,total])=>({method,total:+total.toFixed(2)}));
+  const salesByEmployee=groupSales(salesMonth,s=>s.employeeName||salesWidgetText().unassigned).slice(0,8).map(([name,total])=>({name,total:+total.toFixed(2),sales:salesMonth.filter(s=>(s.employeeName||salesWidgetText().unassigned)===name).length}));
+  const stock=stockItems(),lowStock=lowStockItems(),monthlyPurchases=inventoryMonthPurchases();
+  const consumed=inventoryImpact(salesMonth).slice(0,10).map(([name,v])=>({name,qty:+Number(v.qty||0).toFixed(3),unit:v.unit,cost:+Number(v.cost||0).toFixed(2)}));
+  const productCosts=sellableProducts().slice(0,25).map(p=>({name:p.name,type:p.type,price:Number(p.price)||0,estimatedUnitCost:+productUnitCost(p).toFixed(2),estimatedMargin:+((Number(p.price)||0)-productUnitCost(p)).toFixed(2),recipe:recipeText(p)}));
   return {
     app:'Manager Pro',
-    restaurant:DB.settings?.company||'Restaurant',
+    business:DB.settings?.company||'Business',
+    restaurant:DB.settings?.company||'Business',
     page:currentPage,
     role:currentUser?.role||'manager',
     lang,
@@ -3780,6 +3842,30 @@ function managerAssistantContext(){
       totalAbsences:monthRows.reduce((s,r)=>s+r.abs,0),
       totalLate:monthRows.reduce((s,r)=>s+r.late,0),
       estimatedPayroll:monthRows.reduce((s,r)=>s+r.pay,0).toFixed(2)
+    },
+    sales:{
+      todayRevenue:+salesTodaySummary.total.toFixed(2),
+      todaySales:salesTodaySummary.count,
+      monthRevenue:+salesMonthSummary.total.toFixed(2),
+      monthSales:salesMonthSummary.count,
+      avgTicket:+salesMonthSummary.ticket.toFixed(2),
+      topProducts:salesTopProducts,
+      byPayment:salesByPayment,
+      byEmployee:salesByEmployee
+    },
+    inventory:{
+      items:stock.length,
+      lowStock:lowStock.map(p=>({name:p.name,stock:Number(p.stock)||0,unit:salesUnitLabel(p.unit),minimum:Number(p.minStock)||0,avgCost:productAvgCost(p),stockValue:productStockValue(p)})).slice(0,20),
+      estimatedValue:+inventoryValue().toFixed(2),
+      purchasesThisMonth:monthlyPurchases.length,
+      purchaseValueThisMonth:+monthlyPurchases.reduce((a,p)=>a+(Number(p.cost)||0),0).toFixed(2),
+      consumedBySales:consumed,
+      productCosts
+    },
+    relationships:{
+      saleDeductsInventory:'Final sales can deduct stock directly or through recipe inputs.',
+      purchasesUpdateCost:'Purchases update stock and weighted average cost.',
+      reportsConnectAreas:'Sales, inventory, payroll and HR reports should be read together to understand business operations.'
     }
   };
 }
@@ -3806,7 +3892,15 @@ function localAssistantAnswer(question,ctx){
     answer=top.length?`La persona que más ha trabajado este mes es ${top[0].name}, con ${top[0].hours}h registradas en ${top[0].days} día(s). Top 3: ${top.slice(0,3).map((x,i)=>`${i+1}. ${x.name}: ${x.hours}h`).join(' · ')}.`:'Todavía no hay horas suficientes registradas este mes para calcular quién ha trabajado más.';
   }else if(/cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)/.test(q)){
     category='daily_ops';
-    answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.restaurant}.`;
+    answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.business||ctx.restaurant}.`;
+  }else if(/venta|ingreso|caja|ticket|producto.*vend|mas vendido|m[aá]s vendido|metodo.*pago|m[eé]todo.*pago/.test(q)){
+    category='reporting';
+    const s=ctx.sales||{},top=(s.topProducts||[])[0],payments=(s.byPayment||[]).slice(0,3).map(x=>`${x.method}: ${money(x.total)}`).join(' · ');
+    answer=`Resumen de ventas: hoy llevas ${money(s.todayRevenue||0)} en ${s.todaySales||0} venta(s). Este mes llevas ${money(s.monthRevenue||0)} en ${s.monthSales||0} venta(s), con ticket promedio de ${money(s.avgTicket||0)}. ${top?`Producto/servicio más fuerte: ${top.name} (${money(top.total)}). `:''}${payments?`Métodos de pago principales: ${payments}.`:''}`;
+  }else if(/stock|inventario|compra|proveedor|costo|margen|insumo|materia prima|receta|consumo/.test(q)){
+    category='reporting';
+    const inv=ctx.inventory||{},low=inv.lowStock||[],cons=(inv.consumedBySales||[]).slice(0,3).map(x=>`${x.name}: ${x.qty} ${x.unit}`).join(' · ');
+    answer=`Inventario: tienes ${inv.items||0} ítem(s) con control de stock y un valor estimado de ${money(inv.estimatedValue||0)}. Este mes registraste ${inv.purchasesThisMonth||0} compra(s) por ${money(inv.purchaseValueThisMonth||0)}. ${low.length?`Atención a bajo stock: ${low.slice(0,5).map(x=>`${x.name} (${x.stock} ${x.unit})`).join(', ')}. `:'No veo bajo stock en este resumen. '}${cons?`Consumo conectado a ventas: ${cons}.`:''}`;
   }else if(asksTermination){
     category='daily_ops';
     answer=isDemo()?`En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y, cuando aplica, con búsqueda web.\n\nPara investigarlo ahora puedes abrir Claude y pegar esta pregunta:\n"${question}"\n\nhttps://claude.ai/new`:`No pude conectar con Claude desde Manager Pro en este momento. Esta pregunta necesita la IA principal porque combina RH, contrato y posible riesgo legal.\n\nPuedes intentar de nuevo o abrir Claude y pegar esta pregunta:\n"${question}"\n\nhttps://claude.ai/new`;
@@ -3835,6 +3929,8 @@ function isAssistantDataQuestion(question){
   const q=String(question||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   return /(quien|persona|empleado|trabajador).*(mas).*(trabaj|hora)|top.*trabaj/.test(q)
     || /cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)/.test(q)
+    || /venta|ingreso|caja|ticket|producto.*vend|mas vendido|metodo.*pago/.test(q)
+    || /stock|inventario|compra|proveedor|costo|margen|insumo|materia prima|receta|consumo/.test(q)
     || /^(revisa|mostrar|muestra|ver|listar|lista|cuantas tengo|cuantos tengo).*(salario|nomina|pago|ausencia|retardo|pausa)/.test(q);
 }
 function withTimeout(promise,ms,message='Tiempo agotado'){
@@ -3921,6 +4017,7 @@ function renderPage(p){
   if(p==='inventoryStock')renderInventoryStock();
   if(p==='inventoryPurchases')renderInventoryPurchases();
   if(p==='inventorySuppliers')renderInventorySuppliers();
+  if(p==='inventoryReports')renderInventoryReports();
   if(p==='attendance')renderAtt();
   if(p==='employees')renderEmps();
   if(p==='shifts')renderShifts();
@@ -3932,7 +4029,7 @@ function renderPage(p){
   if(p==='master')renderMaster();
   applyPermissionsUI();
 }
-function renderAll(){renderHub();renderDash();renderSales();renderSalesProducts();renderSalesReports();renderInventory();renderInventoryStock();renderInventoryPurchases();renderInventorySuppliers();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
+function renderAll(){renderHub();renderDash();renderSales();renderSalesProducts();renderSalesReports();renderInventory();renderInventoryStock();renderInventoryPurchases();renderInventorySuppliers();renderInventoryReports();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
 
 function hubIcon(type){
   const icons={
@@ -4038,6 +4135,42 @@ function sellableProducts(){return (DB.salesProducts||[]).filter(p=>p.active!==f
 function stockItems(){return (DB.salesProducts||[]).filter(p=>p.active!==false&&p.trackStock);}
 function lowStockItems(){return stockItems().filter(p=>Number(p.stock)<=Number(p.minStock));}
 function productById(id){return (DB.salesProducts||[]).find(p=>p.id===id);}
+function roundMoneyValue(v){return Math.round((Number(v)||0)*100)/100;}
+function productAvgCost(p){return Number(p?.avgCost??p?.avg_cost)||0;}
+function productStockValue(p){
+  const stock=Number(p?.stock)||0,explicit=Number(p?.stockValue??p?.stock_value);
+  if(explicit>0||stock===0)return roundMoneyValue(explicit||0);
+  return roundMoneyValue(stock*productAvgCost(p));
+}
+function setProductStockCost(p,stock,avgCost,stockValue=null){
+  if(!p)return;
+  p.stock=Math.max(0,Number(stock)||0);
+  p.avgCost=Math.max(0,Number(avgCost)||0);
+  p.stockValue=roundMoneyValue(stockValue==null?p.stock*p.avgCost:Number(stockValue)||0);
+}
+function deductProductStockValue(p,qty){
+  if(!p)return p;
+  const beforeStock=Number(p.stock)||0,used=Math.min(beforeStock,Math.max(0,Number(qty)||0));
+  const nextStock=Math.max(0,beforeStock-used);
+  const nextValue=Math.max(0,productStockValue(p)-used*productAvgCost(p));
+  setProductStockCost(p,nextStock,productAvgCost(p),nextValue);
+  return p;
+}
+function recipeUnitCost(p){
+  return (p?.recipe||[]).reduce((sum,r)=>{
+    const ing=productById(r.productId);
+    return sum+(Number(r.qty)||0)*productAvgCost(ing);
+  },0);
+}
+function productUnitCost(p){
+  if(p?.type==='bundle'&&(p.recipe||[]).length)return recipeUnitCost(p);
+  return productAvgCost(p);
+}
+function saleCostValue(s){
+  const p=productById(s.productId);
+  return roundMoneyValue((Number(s.qty)||0)*(p?productUnitCost(p):Number(s.cost)||0));
+}
+function saleMarginValue(s){return roundMoneyValue((Number(s.total)||0)-saleCostValue(s));}
 function recipeText(p){
   const tx=inventoryTx(),recipe=p?.recipe||[];
   if(!recipe.length)return '';
@@ -4049,13 +4182,13 @@ function recipeText(p){
 function applySaleStock(product,qty){
   const touched=[];
   if(product.trackStock){
-    product.stock=Math.max(0,(Number(product.stock)||0)-qty);
+    deductProductStockValue(product,qty);
     touched.push(product);
   }
   (product.recipe||[]).forEach(r=>{
     const ing=productById(r.productId);
     if(ing?.trackStock){
-      ing.stock=Math.max(0,(Number(ing.stock)||0)-(Number(r.qty)||0)*qty);
+      deductProductStockValue(ing,(Number(r.qty)||0)*qty);
       touched.push(ing);
     }
   });
@@ -4169,8 +4302,10 @@ function inventoryImpact(list){
     (p?.recipe||[]).forEach(r=>{
       const ing=productById(r.productId);
       const key=ing?.name||r.productId;
-      out[key]=out[key]||{qty:0,unit:salesUnitLabel(ing?.unit)};
-      out[key].qty+=(Number(r.qty)||0)*(Number(s.qty)||0);
+      out[key]=out[key]||{qty:0,unit:salesUnitLabel(ing?.unit),cost:0};
+      const consumed=(Number(r.qty)||0)*(Number(s.qty)||0);
+      out[key].qty+=consumed;
+      out[key].cost+=consumed*productAvgCost(ing);
     });
   });
   return Object.entries(out).sort((a,b)=>b[1].qty-a[1].qty);
@@ -4484,7 +4619,8 @@ function saveSale(){
   if(!p){toast(tx.missingProduct,'#ef4444');return;}
   const qty=Math.max(1,Number(document.getElementById('sale-qty').value)||1),unitPrice=Math.max(0,Number(document.getElementById('sale-price').value)||0);
   const empId=document.getElementById('sale-employee')?.value||'',emp=(DB.employees||[]).find(e=>e.id===empId);
-  const sale={id:uid(),productId:p.id,productName:p.name,category:p.category||'',qty,unitPrice,total:qty*unitPrice,method:document.getElementById('sale-method').value||'cash',employeeId:emp?.id||'',employeeName:emp?fullName(emp):'',note:clean(document.getElementById('sale-note').value),ts:new Date().toISOString()};
+  const total=qty*unitPrice,cost=saleCostValue({productId:p.id,qty,total});
+  const sale={id:uid(),productId:p.id,productName:p.name,category:p.category||'',qty,unitPrice,total,cost,margin:roundMoneyValue(total-cost),method:document.getElementById('sale-method').value||'cash',employeeId:emp?.id||'',employeeName:emp?fullName(emp):'',note:clean(document.getElementById('sale-note').value),ts:new Date().toISOString()};
   const touched=applySaleStock(p,qty);
   DB.sales=[sale,...(DB.sales||[])];saveLocal();closeModal('sale-modal');renderSales();renderInventory();renderInventoryStock();renderHub();toast(tx.saved);sbSaveSale(sale).catch(console.error);touched.forEach(x=>sbSaveSalesProduct(x).catch(console.error));
 }
@@ -4504,32 +4640,42 @@ function openProductModal(scope='sales',id=null){
     type.innerHTML=productTypeOptions(scope,existing?.type);
   }
   document.getElementById('product-modal-title').textContent=existing?`${tx.newProduct} · Editar`:tx.newProduct;
-  document.getElementById('product-name').value=existing?.name||'';document.getElementById('product-category').value=existing?.category||'';document.getElementById('product-price').value=existing?Number(existing.price||0):'0';document.getElementById('product-type').value=existing?.type||(scope==='inventory'?'ingredient':'product');document.getElementById('product-sku').value=existing?.sku||'';document.getElementById('product-unit').value=existing?.unit||(scope==='inventory'?'kg':'unit');document.getElementById('product-track-stock').checked=existing?!!existing.trackStock:scope==='inventory';document.getElementById('product-stock').value=existing?Number(existing.stock||0):'0';document.getElementById('product-min-stock').value=existing?Number(existing.minStock||0):'0';toggleProductInventoryFields();
+  document.getElementById('product-name').value=existing?.name||'';document.getElementById('product-category').value=existing?.category||'';document.getElementById('product-price').value=existing?Number(existing.price||0):'0';document.getElementById('product-type').value=existing?.type||(scope==='inventory'?'ingredient':'product');document.getElementById('product-sku').value=existing?.sku||'';document.getElementById('product-unit').value=existing?.unit||(scope==='inventory'?'kg':'unit');document.getElementById('product-track-stock').checked=existing?!!existing.trackStock:scope==='inventory';document.getElementById('product-stock').value=existing?Number(existing.stock||0):'0';document.getElementById('product-min-stock').value=existing?Number(existing.minStock||0):'0';document.getElementById('product-avg-cost').value=existing?productAvgCost(existing):'0';document.getElementById('product-stock-value').value=existing?productStockValue(existing).toFixed(2):'0.00';toggleProductInventoryFields();
   openModal('product-modal');
+}
+function syncProductStockValue(){
+  const stock=Number(document.getElementById('product-stock')?.value)||0;
+  const avg=Number(document.getElementById('product-avg-cost')?.value)||0;
+  const out=document.getElementById('product-stock-value');
+  if(out)out.value=roundMoneyValue(stock*avg).toFixed(2);
 }
 function toggleProductInventoryFields(){
   const type=document.getElementById('product-type')?.value;
   const track=document.getElementById('product-track-stock');
   const row=document.getElementById('product-stock-row');
+  const costRow=document.getElementById('product-cost-row');
   const recipe=document.getElementById('product-recipe-box');
   if(type==='ingredient'&&track)track.checked=true;
   if(type==='service'&&track)track.checked=false;
   if(row)row.style.display=track?.checked?'grid':'none';
+  if(costRow)costRow.style.display=track?.checked?'grid':'none';
   if(recipe)recipe.style.display=type==='bundle'?'block':'none';
   if(type==='bundle')renderRecipeRows();
+  syncProductStockValue();
 }
 function saveProduct(){
   const tx=salesTx(),name=clean(document.getElementById('product-name').value);
   if(!name){toast(tx.productName,'#ef4444');return;}
   const type=document.getElementById('product-type').value||'product',track=!!document.getElementById('product-track-stock').checked&&type!=='service';
   const existing=editingProductId?productById(editingProductId):null;
-  const product={id:existing?.id||uid(),name,category:clean(document.getElementById('product-category').value),type,price:Math.max(0,Number(document.getElementById('product-price').value)||0),sku:clean(document.getElementById('product-sku').value),unit:document.getElementById('product-unit').value||'unit',trackStock:track,stock:track?Math.max(0,Number(document.getElementById('product-stock').value)||0):0,minStock:track?Math.max(0,Number(document.getElementById('product-min-stock').value)||0):0,recipe:type==='bundle'?collectProductRecipe():[],active:true,createdAt:existing?.createdAt||new Date().toISOString()};
+  const stock=track?Math.max(0,Number(document.getElementById('product-stock').value)||0):0,avgCost=track?Math.max(0,Number(document.getElementById('product-avg-cost').value)||0):0;
+  const product={id:existing?.id||uid(),name,category:clean(document.getElementById('product-category').value),type,price:Math.max(0,Number(document.getElementById('product-price').value)||0),sku:clean(document.getElementById('product-sku').value),unit:document.getElementById('product-unit').value||'unit',trackStock:track,stock,minStock:track?Math.max(0,Number(document.getElementById('product-min-stock').value)||0):0,avgCost,stockValue:track?roundMoneyValue(stock*avgCost):0,recipe:type==='bundle'?collectProductRecipe():[],active:true,createdAt:existing?.createdAt||new Date().toISOString()};
   if(existing)Object.assign(existing,product);else DB.salesProducts=[product,...(DB.salesProducts||[])];
   editingProductId=null;saveLocal();closeModal('product-modal');renderSales();renderSalesProducts();renderInventory();renderInventoryStock();renderHub();toast(tx.productSaved);sbSaveSalesProduct(existing||product).catch(console.error);
 }
 
 function inventoryValue(){
-  return stockItems().reduce((a,p)=>a+(Number(p.stock)||0)*(Number(p.price)||0),0);
+  return stockItems().reduce((a,p)=>a+productStockValue(p),0);
 }
 function renderInventory(){
   const el=document.getElementById('inventory-content');if(!el)return;
@@ -4543,12 +4689,13 @@ function renderInventory(){
     <div class="sales-kpi"><div class="num" style="color:var(--orange)">${items.length}</div><div class="kpi-sub">${esc(tx.items)}</div></div>
     <div class="sales-kpi"><div class="num" style="color:var(--red)">${low.length}</div><div class="kpi-sub">${esc(tx.low)}</div></div>
     <div class="sales-kpi"><div class="num" style="color:var(--green)">${purchases.length}</div><div class="kpi-sub">${esc(tx.purchases)}</div></div>
-    <div class="sales-kpi"><div class="num" style="color:var(--cyan)">${suppliers.length}</div><div class="kpi-sub">${esc(tx.suppliers)}</div></div>
+    <div class="sales-kpi"><div class="num" style="color:var(--cyan)">${esc(money(inventoryValue()))}</div><div class="kpi-sub">${esc(tx.value)}</div></div>
   </section>
   <section class="sales-area-panel">
     <div class="sales-area-card primary" onclick="goPage('inventoryStock')"><div><div class="sales-area-icon">${hubIcon('inventory')}</div><div class="sales-area-title">${esc(tx.stock)}</div><div class="sales-area-desc">${esc(tx.items)} · ${esc(tx.low)} ${low.length}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
     <div class="sales-area-card" onclick="goPage('inventoryPurchases')"><div><div class="sales-area-icon">+</div><div class="sales-area-title">${esc(tx.purchases)}</div><div class="sales-area-desc">${esc(tx.newPurchase)}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
     <div class="sales-area-card" onclick="goPage('inventorySuppliers')"><div><div class="sales-area-icon">P</div><div class="sales-area-title">${esc(tx.suppliers)}</div><div class="sales-area-desc">${esc(tx.newSupplier)}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
+    <div class="sales-area-card" onclick="goPage('inventoryReports')"><div><div class="sales-area-icon">R</div><div class="sales-area-title">${esc(tx.reports||'Reportes inventario')}</div><div class="sales-area-desc">${esc(tx.reportsDesc||'Stock, compras, consumo y costos')}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
   </section>
   <section class="sales-grid">
     <div class="sales-panel"><div class="card-header" style="margin:0 0 12px">${esc(tx.low)}</div>${low.length?low.map(stockItemHTML).join(''):`<div class="sales-empty">${esc(tx.noStock)}</div>`}</div>
@@ -4557,10 +4704,11 @@ function renderInventory(){
 }
 function stockItemHTML(p){
   const tx=inventoryTx(),pct=Number(p.minStock)>0?Math.min(100,Math.round((Number(p.stock)||0)/(Number(p.minStock)||1)*100)):100;
-  return `<div class="sales-product"><div class="sales-product-dot" style="background:linear-gradient(135deg,#d97706,#14b8a6)">${esc((p.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(p.name)}</div><div class="fs11 muted">${esc(p.sku||'-')} · ${esc(salesProductTypeLabel(p.type))}</div><div class="prog"><div class="prog-fill" style="width:${pct}%;background:${Number(p.stock)<=Number(p.minStock)?'var(--red)':'var(--green)'}"></div></div><div class="fs11 ${Number(p.stock)<=Number(p.minStock)?'red':'muted'} mt4">${esc(tx.current)}: ${Number(p.stock)||0} ${esc(salesUnitLabel(p.unit))} · ${esc(tx.min)}: ${Number(p.minStock)||0}</div>${recipeText(p)?`<div class="fs11 muted mt4">${esc(recipeText(p))}</div>`:''}</div><div style="display:flex;gap:6px;align-items:center"><button class="btn btn-ghost btn-sm" onclick="openProductModal('inventory','${p.id}')">${esc(editLabel())}</button><button class="btn btn-ghost btn-sm" onclick="adjustStock('${p.id}',-1)">-</button><button class="btn btn-ghost btn-sm" onclick="adjustStock('${p.id}',1)">+</button></div></div>`;
+  return `<div class="sales-product"><div class="sales-product-dot" style="background:linear-gradient(135deg,#d97706,#14b8a6)">${esc((p.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(p.name)}</div><div class="fs11 muted">${esc(p.sku||'-')} · ${esc(salesProductTypeLabel(p.type))}</div><div class="prog"><div class="prog-fill" style="width:${pct}%;background:${Number(p.stock)<=Number(p.minStock)?'var(--red)':'var(--green)'}"></div></div><div class="fs11 ${Number(p.stock)<=Number(p.minStock)?'red':'muted'} mt4">${esc(tx.current)}: ${Number(p.stock)||0} ${esc(salesUnitLabel(p.unit))} · ${esc(tx.min)}: ${Number(p.minStock)||0}</div><div class="fs11 muted mt4">${esc(tx.avgCost||'Costo prom.')}: ${esc(money(productAvgCost(p)))} · ${esc(tx.stockValue||'Valor')}: ${esc(money(productStockValue(p)))}</div>${recipeText(p)?`<div class="fs11 muted mt4">${esc(recipeText(p))}</div>`:''}</div><div style="display:flex;gap:6px;align-items:center"><button class="btn btn-ghost btn-sm" onclick="openProductModal('inventory','${p.id}')">${esc(editLabel())}</button><button class="btn btn-ghost btn-sm" onclick="adjustStock('${p.id}',-1)">-</button><button class="btn btn-ghost btn-sm" onclick="adjustStock('${p.id}',1)">+</button></div></div>`;
 }
 function purchaseHTML(p){
-  return `<div class="sales-row"><div><div class="fw8 fs13">${esc(p.productName)}</div><div class="fs11 muted">${fmtDate(p.ts)} · ${Number(p.qty)||0} · ${esc(p.supplierName||'-')}</div>${p.note?`<div class="fs11 muted mt4">${esc(p.note)}</div>`:''}</div><div class="fw8">${esc(money(p.cost))}</div></div>`;
+  const tx=inventoryTx();
+  return `<div class="sales-row"><div><div class="fw8 fs13">${esc(p.productName)}</div><div class="fs11 muted">${fmtDate(p.ts)} · ${Number(p.qty)||0} · ${esc(p.supplierName||'-')}</div><div class="fs11 muted mt4">${esc(tx.unitCost||'Costo unit.')}: ${esc(money(p.unitCost||((Number(p.cost)||0)/(Number(p.qty)||1))))} · ${esc(tx.costAfter||'Costo prom. nuevo')}: ${esc(money(p.avgCostAfter||0))}</div>${p.note?`<div class="fs11 muted mt4">${esc(p.note)}</div>`:''}</div><div class="fw8">${esc(money(p.cost))}</div></div>`;
 }
 function supplierHTML(s){
   return `<div class="sales-product"><div class="sales-product-dot" style="background:linear-gradient(135deg,#0ea5c6,#2563eb)">${esc((s.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(s.name)}</div><div class="fs11 muted">${esc(s.phone||'-')} · ${esc(s.email||'-')}</div>${s.notes?`<div class="fs11 muted mt4">${esc(s.notes)}</div>`:''}</div></div>`;
@@ -4585,7 +4733,7 @@ function renderInventorySuppliers(){
 }
 function adjustStock(id,delta){
   const p=productById(id);if(!p)return;
-  p.stock=Math.max(0,(Number(p.stock)||0)+delta);
+  setProductStockCost(p,(Number(p.stock)||0)+delta,productAvgCost(p));
   saveLocal();renderInventory();renderInventoryStock();renderSalesProducts();sbSaveSalesProduct(p).catch(console.error);
 }
 function openPurchaseModal(){
@@ -4601,8 +4749,9 @@ function savePurchase(){
   const tx=inventoryTx(),pid=document.getElementById('purchase-product').value,sid=document.getElementById('purchase-supplier').value,p=productById(pid),s=(DB.suppliers||[]).find(x=>x.id===sid);
   if(!p||!s)return;
   const qty=Math.max(0,Number(document.getElementById('purchase-qty').value)||0),cost=Math.max(0,Number(document.getElementById('purchase-cost').value)||0);
-  p.stock=(Number(p.stock)||0)+qty;
-  const pur={id:uid(),productId:p.id,productName:p.name,supplierId:s.id,supplierName:s.name,qty,cost,note:clean(document.getElementById('purchase-note').value),ts:new Date().toISOString()};
+  const beforeStock=Number(p.stock)||0,beforeValue=productStockValue(p),unitCost=qty?cost/qty:0,nextStock=beforeStock+qty,nextValue=beforeValue+cost,nextAvg=nextStock?nextValue/nextStock:0;
+  setProductStockCost(p,nextStock,nextAvg,nextValue);
+  const pur={id:uid(),productId:p.id,productName:p.name,supplierId:s.id,supplierName:s.name,qty,cost,unitCost,avgCostAfter:nextAvg,stockAfter:nextStock,note:clean(document.getElementById('purchase-note').value),ts:new Date().toISOString()};
   DB.inventoryPurchases=[pur,...(DB.inventoryPurchases||[])];saveLocal();closeModal('purchase-modal');renderInventory();renderInventoryStock();renderInventoryPurchases();toast(tx.savedPurchase);sbSaveSalesProduct(p).catch(console.error);sbSavePurchase(pur).catch(console.error);
 }
 function openSupplierModal(){
@@ -4614,6 +4763,69 @@ function saveSupplier(){
   if(!name){toast(tx.supplier,'#ef4444');return;}
   const supplier={id:uid(),name,phone:clean(document.getElementById('supplier-phone').value),email:clean(document.getElementById('supplier-email').value),notes:clean(document.getElementById('supplier-note').value),createdAt:new Date().toISOString()};
   DB.suppliers=[supplier,...(DB.suppliers||[])];saveLocal();closeModal('supplier-modal');renderInventory();renderInventorySuppliers();toast(tx.savedSupplier);sbSaveSupplier(supplier).catch(console.error);
+}
+function inventoryMonthPurchases(){
+  const now=new Date(),m=now.getMonth(),y=now.getFullYear();
+  return (DB.inventoryPurchases||[]).filter(p=>{const d=new Date(p.ts);return d.getMonth()===m&&d.getFullYear()===y;});
+}
+function inventoryReportDefs(){
+  const tx=inventoryTx();
+  return [
+    {type:'stock',title:tx.currentStockReport,desc:tx.current,icon:'S'},
+    {type:'low',title:tx.lowStockReport,desc:tx.low,icon:'!'},
+    {type:'purchases',title:tx.purchasesReport,desc:tx.purchases,icon:'+'},
+    {type:'consumption',title:tx.consumptionReport,desc:tx.auto,icon:'C'},
+    {type:'productCost',title:tx.productCostReport,desc:tx.recipe,icon:'M'}
+  ];
+}
+function inventoryReportRows(type){
+  const tx=inventoryTx(),rt=salesReportText(),sales=saleMonthList();
+  if(type==='low')return lowStockItems().map(p=>[p.name,p.category||'-',salesProductTypeLabel(p.type),Number(p.stock)||0,salesUnitLabel(p.unit),Number(p.minStock)||0,money(productAvgCost(p)),money(productStockValue(p))]);
+  if(type==='purchases')return inventoryMonthPurchases().map(p=>[fmtDate(p.ts),p.productName,p.supplierName||'-',Number(p.qty)||0,money(p.unitCost||((Number(p.cost)||0)/(Number(p.qty)||1))),money(p.cost),money(p.avgCostAfter||0),Number(p.stockAfter)||0,p.note||'']);
+  if(type==='consumption')return inventoryImpact(sales).map(([name,v])=>[name,round1(v.qty),v.unit,money(v.cost||0)]);
+  if(type==='productCost')return sellableProducts().map(p=>[p.name,salesProductTypeLabel(p.type),p.category||'-',money(Number(p.price)||0),money(productUnitCost(p)),money((Number(p.price)||0)-productUnitCost(p)),recipeText(p)||'-']);
+  return stockItems().map(p=>[p.name,p.category||'-',salesProductTypeLabel(p.type),Number(p.stock)||0,salesUnitLabel(p.unit),Number(p.minStock)||0,money(productAvgCost(p)),money(productStockValue(p))]);
+}
+function inventoryReportHeaders(type){
+  const tx=inventoryTx(),rt=salesReportText();
+  if(type==='purchases')return [rt.date,tx.product,tx.supplier,tx.qty,tx.unitCost,tx.cost,tx.costAfter,tx.stockAfter,tx.note];
+  if(type==='consumption')return [tx.product,tx.qty,tx.unit,tx.cost];
+  if(type==='productCost')return [tx.product,salesTx().type,salesTx().category,salesTx().price,tx.estimatedUnitCost,tx.estimatedMargin,tx.recipe];
+  return [tx.product,salesTx().category,salesTx().type,tx.current,tx.unit,tx.min,tx.avgCost,tx.stockValue];
+}
+function inventoryReportCard(def){
+  const tx=inventoryTx();
+  return `<div class="sales-report-card"><div class="sales-report-icon">${esc(def.icon)}</div><h3>${esc(def.title)}</h3><p>${esc(def.desc)}</p><div class="sales-report-actions"><button class="btn btn-primary btn-sm" onclick="exportInventoryExcel('${def.type}')">${esc(tx.exportExcel)}</button><button class="btn btn-ghost btn-sm" onclick="previewInventoryReport('${def.type}')">${esc(tx.preview)}</button></div></div>`;
+}
+function renderInventoryReports(){
+  const el=document.getElementById('inventory-reports-content');if(!el)return;
+  const tx=inventoryTx();
+  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#78350f 0%,#b45309 55%,#14b8a6 145%)">
+    <div class="hub-kicker">${esc(tx.reports)}</div>
+    <h2>${esc(tx.reports)}</h2>
+    <p>${esc(tx.reportsDesc)}</p>
+  </section>
+  <section class="sales-kpis">
+    ${salesKpiRich('productsSold',tx.items,String(stockItems().length),'neutral','')}
+    ${salesKpiRich('inventoryImpact',tx.low,String(lowStockItems().length),lowStockItems().length?'warn':'neutral','')}
+    ${salesKpiRich('revenueMonth',tx.value,money(inventoryValue()),'neutral','')}
+    ${salesKpiRich('salesCount',tx.purchases,String(inventoryMonthPurchases().length),'neutral','')}
+  </section>
+  <section class="sales-report-grid">${inventoryReportDefs().map(inventoryReportCard).join('')}</section>
+  <section class="sales-panel" id="inventory-report-preview"></section>`;
+  previewInventoryReport('stock');
+}
+function previewInventoryReport(type='stock'){
+  const box=document.getElementById('inventory-report-preview');if(!box)return;
+  const tx=inventoryTx(),def=inventoryReportDefs().find(d=>d.type===type)||inventoryReportDefs()[0],headers=inventoryReportHeaders(type),rows=inventoryReportRows(type).slice(0,18);
+  box.innerHTML=`<div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(def.title)}</h3><div class="sales-panel-sub">${esc(tx.reportsDesc)}</div></div><button class="btn btn-primary btn-sm" onclick="exportInventoryExcel('${type}')">${esc(tx.exportExcel)}</button></div>
+  ${rows.length?`<table class="sales-preview-table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`:`<div class="sales-empty">${esc(tx.noReportData)}</div>`}`;
+}
+function exportInventoryExcel(type='stock'){
+  const tx=inventoryTx(),def=inventoryReportDefs().find(d=>d.type===type)||inventoryReportDefs()[0];
+  const header=`<h1>${xlsCell(tx.reports)} · ${xlsCell(def.title)}</h1><div class="muted">${xlsCell(DB.settings?.company||'Manager Pro')} · ${xlsCell(fmtDate(new Date()))}</div>`;
+  const body=header+salesExcelTable(def.title,inventoryReportHeaders(type),inventoryReportRows(type));
+  xlsDownload(body,`inventario_${type}_${new Date().toISOString().slice(0,10)}.xls`);
 }
 
 function tickEmpPortal(){
@@ -4705,8 +4917,29 @@ window.addEventListener('pageshow',resumeEmpPortal);
 
 // ═══════ ONBOARDING TOUR ═══════
 let tourRole=null,tourStep=0;
-const TOUR_VERSION='2026-05-22-hr-complete-flow';
+const TOUR_VERSION='2026-05-24-area-tours';
 const TOUR={
+  hub:[
+    {key:'hubIntro',page:'hub',sel:'#pg-hub'},
+    {key:'hubPersonal',page:'hub',sel:'#pg-hub'},
+    {key:'hubSales',page:'hub',sel:'#pg-hub'},
+    {key:'hubInventory',page:'hub',sel:'#pg-hub'},
+    {key:'hubSettings',page:'hub',sel:'#pg-hub'}
+  ],
+  sales:[
+    {key:'salesIntro',page:'sales',sel:'#sales-content'},
+    {key:'salesRegister',page:'sales',sel:'#sales-content'},
+    {key:'salesProducts',page:'salesProducts',sel:'#sales-products-content'},
+    {key:'salesReports',page:'salesReports',sel:'#sales-reports-content'},
+    {key:'salesAssistant',sel:'#top-ai-btn'}
+  ],
+  inventory:[
+    {key:'inventoryIntro',page:'inventory',sel:'#inventory-content'},
+    {key:'inventoryStock',page:'inventoryStock',sel:'#inventory-stock-content'},
+    {key:'inventoryPurchases',page:'inventoryPurchases',sel:'#inventory-purchases-content'},
+    {key:'inventoryReports',page:'inventoryReports',sel:'#inventory-reports-content'},
+    {key:'inventoryConnection',page:'salesProducts',sel:'#sales-products-content'}
+  ],
   manager:[
     {key:'language',kind:'language',sel:null},
     {key:'workflow',page:'dashboard',sel:'#dash-hero'},
@@ -4742,6 +4975,7 @@ const TOUR={
     {key:'absence',sel:'#emp-tour-absence'}
   ]
 };
+TOUR.personal=TOUR.manager;
 const TOUR_TX={
   es:{buttons:{skip:'Saltar',back:'Atrás',next:'Siguiente',done:'Terminar'},manager:{language:['Elige idioma','Antes de empezar, escoge el idioma en el que quieres ver la app y este recorrido.'],workflow:['La dinámica del manager','La rutina es simple:\n1. Configuras empleados y horarios.\n2. Revisas fichajes cada día.\n3. Corriges excepciones.\n4. Cierras el mes con reportes.'],setupEmployee:['Primer día: crear empleados','Registra nombre, foto, cargo, contrato, salario, PIN y horario base. Esto alimenta planificación, reportes y portal del empleado.'],badge:['Entregar carnet','Desde el perfil del empleado generas su carnet PDF. El trabajador puede escanear el QR o hacer click para abrir su portal.'],dailyCheck:['Rutina diaria','Empieza aquí: mira activos, presentes, ausentes, vacaciones y personas esperadas. El objetivo es entender el día en pocos segundos.'],clocking:['Registrar entrada','La entrada puede venir por QR, portal del empleado o registro manual. El manager solo interviene cuando hay excepción.'],attendance:['Seguimiento de presencia','En Presencias ves quién llegó, quién salió y qué está pendiente durante el turno.'],breaks:['Pausas obligatorias','El empleado inicia pausa de 15, 30 o 60 minutos. Si sale sin pausa, la app avisa y deja trazabilidad para el manager.'],manualFix:['Corregir errores','Si alguien olvidó fichar o hay un error, registra o corrige el día manualmente sin perder el historial.'],alerts:['Alertas del día','Este bloque enseña dónde actuar: entradas no registradas, retrasos, salidas sin pausa o ausencias que requieren revisión.'],planning:['Planificación semanal','Aquí revisas los turnos por semana. Los horarios base vienen del empleado; los cambios puntuales se corrigen sin alterar el horario permanente.'],leave:['Ausencias','Aprueba vacaciones, incapacidades o ausencias personales y controla el saldo disponible.'],closeMonth:['Cierre mensual','Al final del mes genera el reporte: horas, pausas, ausencias, retrasos, comentarios y salario estimado.'],payroll:['Salarios','Aquí revisas pagos estimados según horas trabajadas, contrato, pausas y horas extra. Para salario mensual, el cálculo se interpreta distinto al pago por hora.'],settings:['Configuración del negocio','Define idioma, tolerancia de retraso, colores, horarios de apertura y datos del restaurante.'],refresh:['Datos actualizados','La app actualiza sola, pero este botón fuerza una actualización cuando quieras.'],menu:['Menú principal','Usa el menú lateral para moverte por la rutina: Dashboard, Presencias, Empleados, Planificación, Ausencias, Salarios y Reportes.']},employee:{languageEmployee:['Elige idioma','El trabajador puede escoger su idioma. Esto no cambia el idioma del restaurante.'],clock:['Fichar y pausas','Aquí registra entrada, salida y pausas obligatorias de 15 o 30 minutos.'],summary:['Resumen personal','El empleado ve sus horas del día, semana y vacaciones disponibles.'],month:['Horas del mes','Esta tarjeta ayuda a seguir el acumulado mensual sin preguntar al manager.'],absence:['Ausencias','Desde aquí puede pedir vacaciones, incapacidad o ausencias personales.']}},
   fr:{buttons:{skip:'Passer',back:'Retour',next:'Suivant',done:'Terminer'},manager:{language:['Choisir la langue','Avant de commencer, choisissez la langue de l’app et de ce tour.'],workflow:['La routine du manager','La routine est simple:\n1. Configurer employés et horaires.\n2. Suivre les pointages chaque jour.\n3. Corriger les exceptions.\n4. Clôturer le mois avec les rapports.'],setupEmployee:['Premier jour: créer les employés','Ajoutez nom, photo, poste, contrat, salaire, PIN et horaire de base. Cela alimente planning, rapports et portail employé.'],badge:['Remettre le badge','Depuis le profil employé, générez le badge PDF. L’employé scanne le QR ou clique pour ouvrir son portail.'],dailyCheck:['Routine quotidienne','Commencez ici: actifs, présents, absents, vacances et personnes prévues. Le but est de comprendre la journée en quelques secondes.'],clocking:['Enregistrer l’entrée','L’entrée peut venir du QR, du portail employé ou d’une saisie manuelle. Le manager intervient surtout en exception.'],attendance:['Suivi de présence','Dans Présences, voyez qui est entré, sorti et ce qui reste à contrôler pendant le service.'],breaks:['Pauses obligatoires','L’employé lance une pause de 15, 30 ou 60 minutes. S’il sort sans pause, l’app alerte et garde une trace.'],manualFix:['Corriger les erreurs','Si quelqu’un oublie de pointer ou s’il y a une erreur, corrigez la journée manuellement sans perdre l’historique.'],alerts:['Alertes du jour','Ce bloc montre où agir: entrées manquantes, retards, sorties sans pause ou absences à vérifier.'],planning:['Planning hebdomadaire','Consultez les shifts par semaine. Les horaires de base viennent de l’employé; les changements ponctuels ne modifient pas le permanent.'],leave:['Absences','Approuvez vacances, incapacités ou absences personnelles et suivez les soldes.'],closeMonth:['Clôture mensuelle','En fin de mois, générez le rapport: heures, pauses, absences, retards, commentaires et salaire estimé.'],payroll:['Salaires','Vérifiez les paiements estimés selon heures, contrat, pauses et heures supplémentaires. Le salaire mensuel se lit différemment du taux horaire.'],settings:['Configuration du commerce','Réglez langue, tolérance de retard, couleurs, heures d’ouverture et données du restaurant.'],refresh:['Données à jour','L’app se met à jour seule, mais ce bouton force une actualisation.'],menu:['Menu principal','Utilisez le menu pour suivre la routine: tableau, présences, employés, planning, absences, salaires et rapports.']},employee:{languageEmployee:['Choisir la langue','L’employé peut choisir sa langue. Cela ne change pas la langue du restaurant.'],clock:['Pointage et pauses','L’employé enregistre entrée, sortie et pauses obligatoires de 15 ou 30 minutes.'],summary:['Résumé personnel','L’employé voit ses heures du jour, de la semaine et ses vacances disponibles.'],month:['Heures du mois','Cette carte permet de suivre le cumul mensuel sans demander au manager.'],absence:['Absences','Depuis ici, il peut demander vacances, incapacité ou absence personnelle.']}},
@@ -4749,6 +4983,16 @@ const TOUR_TX={
   de:{buttons:{skip:'Überspringen',back:'Zurück',next:'Weiter',done:'Fertig'},manager:{language:['Sprache wählen','Wählen Sie zuerst die Sprache für die App und diese Einführung.'],workflow:['Manager-Routine','Die Routine ist einfach:\n1. Mitarbeiter und Pläne einrichten.\n2. Buchungen täglich prüfen.\n3. Ausnahmen korrigieren.\n4. Den Monat mit Berichten abschließen.'],setupEmployee:['Erster Tag: Mitarbeiter erstellen','Name, Foto, Rolle, Vertrag, Lohn, PIN und Grundplan erfassen. Das speist Planung, Berichte und Mitarbeiterportal.'],badge:['Ausweis übergeben','Im Mitarbeiterprofil den PDF-Ausweis erstellen. Mitarbeitende scannen den QR oder klicken, um ihr Portal zu öffnen.'],dailyCheck:['Tägliche Routine','Hier starten: aktiv, anwesend, abwesend, Ferien und geplante Personen. Ziel ist Klarheit in Sekunden.'],clocking:['Einstempeln erfassen','Buchungen kommen per QR, Mitarbeiterportal oder manuell. Der Manager greift vor allem bei Ausnahmen ein.'],attendance:['Anwesenheit verfolgen','In Anwesenheit sehen Sie, wer gekommen ist, wer gegangen ist und was während der Schicht offen bleibt.'],breaks:['Obligatorische Pausen','Mitarbeitende starten 15, 30 oder 60 Minuten Pause. Ohne Pause beim Ausstempeln erzeugt die App einen Hinweis.'],manualFix:['Fehler korrigieren','Wenn jemand eine Buchung vergisst oder ein Fehler entsteht, korrigieren Sie den Tag manuell ohne Historie zu verlieren.'],alerts:['Tageswarnungen','Dieser Bereich zeigt, wo Handeln nötig ist: fehlende Buchungen, Verspätungen, Ausgänge ohne Pause oder Abwesenheiten.'],planning:['Wochenplanung','Wochenpläne prüfen. Grundpläne kommen vom Mitarbeiterprofil; einzelne Änderungen verändern den Dauerplan nicht.'],leave:['Abwesenheiten','Ferien, Krankheit oder persönliche Abwesenheiten genehmigen und Salden verfolgen.'],closeMonth:['Monatsabschluss','Am Monatsende den Bericht erstellen: Stunden, Pausen, Abwesenheiten, Verspätungen, Kommentare und geschätzter Lohn.'],payroll:['Löhne','Geschätzte Zahlungen nach Arbeitszeit, Vertrag, Pausen und Überstunden prüfen. Monatslohn wird anders gelesen als Stundenlohn.'],settings:['Betrieb einrichten','Sprache, Verspätungstoleranz, Farben, Öffnungszeiten und Restaurantdaten anpassen.'],refresh:['Aktuelle Daten','Die App aktualisiert sich automatisch, dieser Button erzwingt eine Aktualisierung.'],menu:['Hauptmenü','Nutzen Sie das Menü für die Routine: Übersicht, Anwesenheit, Mitarbeiter, Planung, Abwesenheiten, Löhne und Berichte.']},employee:{languageEmployee:['Sprache wählen','Der Mitarbeiter kann seine Sprache wählen. Die Restaurantsprache bleibt unverändert.'],clock:['Buchungen und Pausen','Ein- und Ausstempeln sowie obligatorische Pausen von 15 oder 30 Minuten erfassen.'],summary:['Persönliche Übersicht','Der Mitarbeiter sieht Tagesstunden, Wochenstunden und verfügbare Ferien.'],month:['Monatsstunden','Diese Karte zeigt den Monatssaldo, ohne den Manager fragen zu müssen.'],absence:['Abwesenheiten','Hier kann Urlaub, Krankheit oder persönliche Abwesenheit beantragt werden.']}},
   it:{buttons:{skip:'Salta',back:'Indietro',next:'Avanti',done:'Fine'},manager:{language:['Scegli lingua','Prima di iniziare, scegli la lingua dell’app e di questo tour.'],workflow:['Routine del manager','La routine è semplice:\n1. Configuri dipendenti e orari.\n2. Controlli le timbrature ogni giorno.\n3. Correggi le eccezioni.\n4. Chiudi il mese con i report.'],setupEmployee:['Primo giorno: creare dipendenti','Aggiungi nome, foto, ruolo, contratto, salario, PIN e orario base. Questo alimenta pianificazione, report e portale dipendente.'],badge:['Consegnare il badge','Dal profilo dipendente generi il badge PDF. Il dipendente scansiona il QR o clicca per aprire il portale.'],dailyCheck:['Routine giornaliera','Inizia qui: attivi, presenti, assenti, vacanze e persone previste. L’obiettivo è capire la giornata in pochi secondi.'],clocking:['Registrare entrata','L’entrata può arrivare da QR, portale dipendente o inserimento manuale. Il manager interviene soprattutto nelle eccezioni.'],attendance:['Seguire le presenze','In Presenze vedi chi è entrato, chi è uscito e cosa resta da controllare durante il turno.'],breaks:['Pause obbligatorie','Il dipendente avvia una pausa da 15, 30 o 60 minuti. Se esce senza pausa, l’app avvisa e mantiene traccia.'],manualFix:['Correggere errori','Se qualcuno dimentica una timbratura o c’è un errore, correggi il giorno manualmente senza perdere lo storico.'],alerts:['Avvisi del giorno','Questo blocco mostra dove agire: entrate mancanti, ritardi, uscite senza pausa o assenze da verificare.'],planning:['Pianificazione settimanale','Controlli i turni settimanali. Gli orari base vengono dal profilo dipendente; le modifiche puntuali non cambiano quello permanente.'],leave:['Assenze','Approvi vacanze, malattie o assenze personali e controlli i saldi.'],closeMonth:['Chiusura mensile','A fine mese generi il report: ore, pause, assenze, ritardi, commenti e stipendio stimato.'],payroll:['Stipendi','Controlli pagamenti stimati secondo ore lavorate, contratto, pause e straordinari. Il salario mensile si legge diversamente dalla paga oraria.'],settings:['Configurazione attività','Regoli lingua, tolleranza ritardo, colori, orari di apertura e dati del ristorante.'],refresh:['Dati aggiornati','L’app si aggiorna da sola, ma questo pulsante forza l’aggiornamento.'],menu:['Menu principale','Usa il menu per seguire la routine: dashboard, presenze, dipendenti, pianificazione, assenze, stipendi e report.']},employee:{languageEmployee:['Scegli lingua','Il dipendente può scegliere la sua lingua. Questo non cambia la lingua del ristorante.'],clock:['Timbrature e pause','Registra entrata, uscita e pause obbligatorie da 15 o 30 minuti.'],summary:['Riepilogo personale','Il dipendente vede ore del giorno, della settimana e vacanze disponibili.'],month:['Ore del mese','Questa scheda aiuta a seguire il totale mensile senza chiedere al manager.'],absence:['Assenze','Da qui può richiedere vacanze, malattia o assenze personali.']}}
 };
+Object.assign(TOUR_TX.es.manager,{settings:['Configuración del negocio','Define idioma, tolerancia de retraso, colores, horarios de apertura y datos del negocio.']});
+Object.assign(TOUR_TX.fr.manager,{settings:['Configuration du commerce','Réglez langue, tolérance de retard, couleurs, heures d’ouverture et données du commerce.']});
+Object.assign(TOUR_TX.en.manager,{settings:['Business setup','Adjust language, late tolerance, colors, opening hours, and business data.']});
+Object.assign(TOUR_TX.de.manager,{settings:['Betrieb einrichten','Sprache, Verspätungstoleranz, Farben, Öffnungszeiten und Betriebsdaten anpassen.']});
+Object.assign(TOUR_TX.it.manager,{settings:['Configurazione attività','Regoli lingua, tolleranza ritardo, colori, orari di apertura e dati dell’attività.']});
+Object.assign(TOUR_TX.es.employee,{languageEmployee:['Elige idioma','El trabajador puede escoger su idioma. Esto no cambia el idioma general del negocio.']});
+Object.assign(TOUR_TX.fr.employee,{languageEmployee:['Choisir la langue','L’employé peut choisir sa langue. Cela ne change pas la langue générale du commerce.']});
+Object.assign(TOUR_TX.en.employee,{languageEmployee:['Choose language','The employee can choose their language. This does not change the business language.']});
+Object.assign(TOUR_TX.de.employee,{languageEmployee:['Sprache wählen','Der Mitarbeiter kann seine Sprache wählen. Die Betriebssprache bleibt unverändert.']});
+Object.assign(TOUR_TX.it.employee,{languageEmployee:['Scegli lingua','Il dipendente può scegliere la sua lingua. Questo non cambia la lingua generale dell’attività.']});
 Object.assign(TOUR_TX.es.manager,{
   documents:['Expediente del trabajador','En el perfil del empleado puedes guardar contrato, permiso, certificados y otros documentos. La lectura con IA ayuda a completar datos, pero siempre conviene revisar antes de guardar.'],
   reviewedAlerts:['Revisar y cerrar alertas','Cuando una alerta ya fue atendida, entra en Revisar y márcala como revisada. Así el dashboard deja de mostrar ruido y queda solo lo pendiente.'],
@@ -4799,7 +5043,13 @@ Object.assign(TOUR_TX.it.manager,{
   accessRoles:['Accessi e ruoli','Da qui puoi invitare altri manager, cambiare ruolo o rimuovere accessi. Un business può avere più manager senza dare tutto il controllo a tutti.'],
   assistant:['Assistente IA','Il pulsante IA aiuta a interpretare dati, preparare conversazioni difficili e rispondere a domande d’uso. Se manca una funzione, la salva come segnale di miglioramento.']
 });
-const tourTxt=(role,key)=>((TOUR_TX[lang]||TOUR_TX.es)[role]||{})[key]||TOUR_TX.es[role][key]||['',''];
+Object.assign(TOUR_TX.es,{hub:{hubIntro:['Centro de áreas','Este hub separa la app por áreas para que el negocio no se sienta pesado: Personal, Ventas, Inventario y próximos módulos.'],hubPersonal:['Personal','Aquí empieza el control diario del equipo: empleados, presencias, horarios, solicitudes, salarios, documentos y reportes.'],hubSales:['Ventas','Ventas registra productos o servicios finales, métodos de pago y cierres. Sirve para entender ingresos y qué se vende más.'],hubInventory:['Inventario','Inventario controla materias primas, stock, compras, proveedores, costos promedio y consumo generado por ventas.'],hubSettings:['Configuración','Ajustes vive como parte de la plataforma: idioma, colores, horarios, tolerancias, roles y datos del negocio.']},sales:{salesIntro:['Panel de ventas','Empieza por lo importante: ingresos, número de ventas, ticket promedio y señales de caja. Los indicadores se organizan de más importante a menos.'],salesRegister:['Registrar venta','Cada venta usa un producto o servicio final. Puedes asignar método de pago, empleado responsable y nota.'],salesProducts:['Productos finales','En Ventas van los productos o servicios que el negocio vende. Si un producto preparado tiene receta, conectará con inventario.'],salesReports:['Reportes de ventas','Exporta Excel de cierre diario, ventas mensuales, productos, métodos de pago, margen estimado e inventario afectado.'],salesAssistant:['IA conectada','El asistente puede relacionar ventas con inventario, personal, reportes y decisiones reales del negocio.']},inventory:{inventoryIntro:['Panel de inventario','Aquí ves stock, valor estimado, compras del mes, proveedores y alertas de bajo stock.'],inventoryStock:['Stock y costo promedio','Cada insumo puede tener costo inicial. Luego las compras actualizan el costo promedio ponderado automáticamente.'],inventoryPurchases:['Compras','Cuando compras 100 kg por CHF 300, el sistema calcula CHF 3/kg y lo mezcla con el stock existente para actualizar el costo real.'],inventoryReports:['Reportes de inventario','Reportes clave: stock actual, bajo stock, compras del mes, consumo por ventas y costo estimado por producto final.'],inventoryConnection:['Conexión con ventas','Una pizza o preparación puede descontar harina, queso o unidades del inventario y mostrar margen estimado con costo real.']}});
+Object.assign(TOUR_TX.en,{hub:{hubIntro:['Area hub','This hub separates the app into areas so the business does not feel heavy: People, Sales, Inventory and future modules.'],hubPersonal:['People','This is where daily team control starts: employees, attendance, schedules, requests, payroll, documents and reports.'],hubSales:['Sales','Sales records final products or services, payment methods and closing. It helps understand revenue and what sells most.'],hubInventory:['Inventory','Inventory controls raw materials, stock, purchases, suppliers, average costs and consumption generated by sales.'],hubSettings:['Settings','Settings belong to the platform: language, colors, opening hours, tolerances, roles and business data.']},sales:{salesIntro:['Sales dashboard','Start with what matters: revenue, number of sales, average ticket and cash signals. Indicators go from most to least important.'],salesRegister:['Register a sale','Each sale uses a final product or service. You can assign payment method, responsible employee and note.'],salesProducts:['Final products','Sales contains what the business sells. If a prepared item has a recipe, it connects to inventory.'],salesReports:['Sales reports','Export Excel for daily closing, monthly sales, products, payment methods, estimated margin and affected inventory.'],salesAssistant:['Connected AI','The assistant can connect sales with inventory, people, reports and real business decisions.']},inventory:{inventoryIntro:['Inventory dashboard','See stock, estimated value, monthly purchases, suppliers and low-stock alerts.'],inventoryStock:['Stock and average cost','Each input can have an initial cost. Purchases then update weighted average cost automatically.'],inventoryPurchases:['Purchases','When you buy 100 kg for CHF 300, the system calculates CHF 3/kg and mixes it with existing stock to update real cost.'],inventoryReports:['Inventory reports','Key reports: current stock, low stock, monthly purchases, sales consumption and estimated final-product cost.'],inventoryConnection:['Connection with sales','A pizza or prepared item can deduct flour, cheese or units from inventory and show estimated margin with real cost.']}});
+Object.assign(TOUR_TX.fr,{hub:{hubIntro:['Hub des domaines','Ce hub sépare l’app par domaines pour que le commerce ne devienne pas lourd: Personnel, Ventes, Inventaire et prochains modules.'],hubPersonal:['Personnel','Le contrôle quotidien de l’équipe commence ici: employés, présences, horaires, demandes, salaires, documents et rapports.'],hubSales:['Ventes','Ventes enregistre les produits ou services finaux, moyens de paiement et clôtures. Cela aide à comprendre les revenus et les meilleures ventes.'],hubInventory:['Inventaire','L’inventaire contrôle matières premières, stock, achats, fournisseurs, coûts moyens et consommation issue des ventes.'],hubSettings:['Paramètres','Les paramètres sont au niveau plateforme: langue, couleurs, horaires, tolérances, rôles et données du commerce.']},sales:{salesIntro:['Tableau des ventes','Commencez par l’essentiel: revenus, nombre de ventes, ticket moyen et signaux de caisse. Les indicateurs vont du plus important au moins important.'],salesRegister:['Enregistrer une vente','Chaque vente utilise un produit ou service final. Vous pouvez ajouter moyen de paiement, employé responsable et note.'],salesProducts:['Produits finaux','Dans Ventes, on garde ce que le commerce vend. Si une préparation a une recette, elle se connecte à l’inventaire.'],salesReports:['Rapports de ventes','Export Excel: clôture quotidienne, ventes mensuelles, produits, moyens de paiement, marge estimée et inventaire affecté.'],salesAssistant:['IA connectée','L’assistant relie ventes, inventaire, personnel, rapports et décisions réelles du commerce.']},inventory:{inventoryIntro:['Tableau inventaire','Voyez stock, valeur estimée, achats du mois, fournisseurs et alertes de stock bas.'],inventoryStock:['Stock et coût moyen','Chaque intrant peut avoir un coût initial. Ensuite les achats mettent à jour le coût moyen pondéré automatiquement.'],inventoryPurchases:['Achats','Si vous achetez 100 kg pour CHF 300, le système calcule CHF 3/kg et le mélange au stock existant pour actualiser le coût réel.'],inventoryReports:['Rapports inventaire','Rapports clés: stock actuel, stock bas, achats du mois, consommation par ventes et coût estimé par produit final.'],inventoryConnection:['Connexion aux ventes','Une pizza ou préparation peut déduire farine, fromage ou unités de l’inventaire et montrer la marge estimée avec coût réel.']}});
+Object.assign(TOUR_TX.de,{hub:{hubIntro:['Bereichs-Hub','Dieser Hub trennt die App in Bereiche, damit der Betrieb übersichtlich bleibt: Personal, Verkauf, Inventar und nächste Module.'],hubPersonal:['Personal','Hier beginnt die tägliche Teamsteuerung: Mitarbeiter, Anwesenheit, Pläne, Anfragen, Löhne, Dokumente und Berichte.'],hubSales:['Verkauf','Verkauf erfasst Endprodukte oder Services, Zahlungsarten und Abschlüsse. So versteht man Umsatz und Bestseller.'],hubInventory:['Inventar','Inventar steuert Rohstoffe, Lager, Einkäufe, Lieferanten, Durchschnittskosten und Verbrauch aus Verkäufen.'],hubSettings:['Einstellungen','Einstellungen gehören zur Plattform: Sprache, Farben, Öffnungszeiten, Toleranzen, Rollen und Betriebsdaten.']},sales:{salesIntro:['Verkaufsübersicht','Start mit dem Wichtigsten: Umsatz, Anzahl Verkäufe, Durchschnittsbon und Kassensignale. Indikatoren sind nach Relevanz geordnet.'],salesRegister:['Verkauf erfassen','Jeder Verkauf nutzt ein Endprodukt oder Service. Zahlungsart, verantwortlicher Mitarbeiter und Notiz sind möglich.'],salesProducts:['Endprodukte','Im Verkauf stehen Produkte oder Services, die der Betrieb verkauft. Rezepte verbinden sie mit Inventar.'],salesReports:['Verkaufsberichte','Excel-Export für Tagesabschluss, Monatsumsatz, Produkte, Zahlungsarten, geschätzte Marge und betroffenes Inventar.'],salesAssistant:['Vernetzte KI','Der Assistent verbindet Verkauf mit Inventar, Personal, Berichten und realen Geschäftsentscheidungen.']},inventory:{inventoryIntro:['Inventarübersicht','Sehen Sie Lager, geschätzten Wert, Monatseinkäufe, Lieferanten und Warnungen bei niedrigem Bestand.'],inventoryStock:['Lager und Durchschnittskosten','Jeder Input kann Startkosten haben. Einkäufe aktualisieren danach automatisch den gewichteten Durchschnitt.'],inventoryPurchases:['Einkäufe','Wenn Sie 100 kg für CHF 300 kaufen, berechnet das System CHF 3/kg und mischt es mit vorhandenem Bestand.'],inventoryReports:['Inventarberichte','Wichtige Berichte: aktueller Bestand, niedriger Bestand, Monatseinkäufe, Verbrauch durch Verkäufe und Kosten pro Endprodukt.'],inventoryConnection:['Verbindung mit Verkauf','Pizza oder Zubereitungen können Mehl, Käse oder Einheiten vom Inventar abziehen und geschätzte Marge zeigen.']}});
+Object.assign(TOUR_TX.it,{hub:{hubIntro:['Hub delle aree','Questo hub separa l’app per aree così il business resta leggero: Personale, Vendite, Inventario e prossimi moduli.'],hubPersonal:['Personale','Il controllo quotidiano del team parte qui: dipendenti, presenze, orari, richieste, stipendi, documenti e report.'],hubSales:['Vendite','Vendite registra prodotti o servizi finali, metodi di pagamento e chiusure. Aiuta a capire ricavi e cosa vende di più.'],hubInventory:['Inventario','Inventario controlla materie prime, stock, acquisti, fornitori, costi medi e consumo generato dalle vendite.'],hubSettings:['Impostazioni','Le impostazioni sono della piattaforma: lingua, colori, orari, tolleranze, ruoli e dati del business.']},sales:{salesIntro:['Dashboard vendite','Inizia da ciò che conta: ricavi, numero vendite, scontrino medio e segnali di cassa. Gli indicatori sono ordinati per importanza.'],salesRegister:['Registrare una vendita','Ogni vendita usa un prodotto o servizio finale. Puoi indicare pagamento, dipendente responsabile e nota.'],salesProducts:['Prodotti finali','In Vendite ci sono prodotti o servizi venduti. Se una preparazione ha ricetta, si collega all’inventario.'],salesReports:['Report vendite','Esporta Excel di chiusura giornaliera, vendite mensili, prodotti, pagamenti, margine stimato e inventario coinvolto.'],salesAssistant:['IA collegata','L’assistente collega vendite, inventario, personale, report e decisioni reali del business.']},inventory:{inventoryIntro:['Dashboard inventario','Vedi stock, valore stimato, acquisti del mese, fornitori e avvisi di stock basso.'],inventoryStock:['Stock e costo medio','Ogni ingrediente può avere costo iniziale. Poi gli acquisti aggiornano automaticamente il costo medio ponderato.'],inventoryPurchases:['Acquisti','Se compri 100 kg a CHF 300, il sistema calcola CHF 3/kg e lo combina con lo stock esistente.'],inventoryReports:['Report inventario','Report chiave: stock attuale, stock basso, acquisti del mese, consumo da vendite e costo per prodotto finale.'],inventoryConnection:['Connessione con vendite','Una pizza o preparazione può scalare farina, formaggio o unità dall’inventario e mostrare margine stimato.']}});
+['es','en','fr','de','it'].forEach(k=>{TOUR_TX[k].personal=TOUR_TX[k].manager;});
+const tourTxt=(role,key)=>((TOUR_TX[lang]||TOUR_TX.es)[role]||{})[key]||(TOUR_TX.es[role]||{})[key]||['',''];
 const tourButtons=()=>((TOUR_TX[lang]||TOUR_TX.es).buttons||TOUR_TX.es.buttons);
 function tourKey(role){
   const id=currentUser?.demo?'demo':role==='employee'?(currentUser?.emp?.id||currentUser?.email||'employee'):(currentUser?.profile?.id||currentUser?.email||currentUser?.restaurant_id||REST_ID||'restaurant');
@@ -4813,6 +5063,14 @@ function maybeStartTour(role){
   if(localStorage.getItem(tourKey(role)))return;
   setTimeout(()=>startTour(role,false),500);
 }
+function tourRoleForPage(){
+  if(currentUser?.role==='employee')return 'employee';
+  if(currentPage==='hub')return 'hub';
+  if(['sales','salesProducts','salesReports'].includes(currentPage))return 'sales';
+  if(['inventory','inventoryStock','inventoryPurchases','inventorySuppliers','inventoryReports'].includes(currentPage))return 'inventory';
+  return 'personal';
+}
+function startContextTour(){startTour(tourRoleForPage(),true);}
 function startTour(role,manual=false){
   if(!TOUR[role])return;
   if(!manual&&localStorage.getItem(tourKey(role)))return;
@@ -4893,8 +5151,8 @@ function renderDash(){
   document.getElementById('dash-hero').innerHTML=`
     <div class="dash-hero-content">
       <div class="dash-date">${now.toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
-      <div class="dash-title">${esc(DB.settings?.company||'Mon Restaurant')}</div>
-      <div class="dash-subtitle">Gestion du personnel</div>
+      <div class="dash-title">${esc(DB.settings?.company||'Manager Pro')}</div>
+      <div class="dash-subtitle">${esc(areaTx().team)} · ${esc(areaTx().sales)} · ${esc(areaTx().inventory)}</div>
     </div>
     <div class="dash-status-card">
       <div class="dash-status-kicker">${esc(dx.today)}</div>
@@ -5990,7 +6248,7 @@ function clearHist(){const tx=TL('hist');if(confirm(tx.confirmClear)){DB.history
 
 // ═══════ SETTINGS ═══════
 function renderSettings(){
-  document.getElementById('cfg-company').value=DB.settings?.company||'Mon Restaurant';
+  document.getElementById('cfg-company').value=DB.settings?.company||'Manager Pro';
   document.getElementById('cfg-late').value=DB.settings?.lateTol||10;
   document.getElementById('cfg-maxh').value=DB.settings?.maxHours||45;
   DB.settings.openingHours=DB.settings.openingHours||defOpeningHours();
@@ -6134,7 +6392,7 @@ async function renderMaster(){
       <div class="sb-resto-logo" style="margin-top:2px">${esc(r.emoji||'🍽️')}</div>
       <div style="flex:1;min-width:0;display:grid;grid-template-columns:minmax(150px,1.2fr) repeat(3,minmax(70px,.5fr));gap:8px;align-items:center">
         <div style="min-width:0">
-          <div class="fw7 fs14" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name||'Restaurant')} ${frozen?'<span class="chip chip-red" style="margin-left:6px">Congelado</span>':''}</div>
+          <div class="fw7 fs14" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name||'Negocio')} ${frozen?'<span class="chip chip-red" style="margin-left:6px">Congelado</span>':''}</div>
           <div class="fs11 muted" style="font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.id)}</div>
         </div>
         <div><div class="fs11 muted">${tx.employees}</div><div class="fw8">${count}</div></div>
@@ -6143,8 +6401,8 @@ async function renderMaster(){
       </div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
         <span class="chip ${r.id===REST_ID?'chip-green':'chip-blue'}">${r.id===REST_ID?tx.active:tx.open}</span>
-        <button class="btn btn-ghost btn-sm" onclick="toggleRestaurantStatusMaster(event,${jsArg(r.id)},${jsArg(r.name||'Restaurant')},${jsArg(frozen?'active':'frozen')})">${frozen?'Reactivar':'Congelar'}</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteRestaurantMaster(event,${jsArg(r.id)},${jsArg(r.name||'Restaurant')})">Eliminar</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleRestaurantStatusMaster(event,${jsArg(r.id)},${jsArg(r.name||'Negocio')},${jsArg(frozen?'active':'frozen')})">${frozen?'Reactivar':'Congelar'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRestaurantMaster(event,${jsArg(r.id)},${jsArg(r.name||'Negocio')})">Eliminar</button>
       </div>
     </div>`;
   }).join(''):`<div class="empty-state"><h3>${tx.noneTitle}</h3><p>${tx.noneText}</p></div>`;
@@ -6160,7 +6418,7 @@ function renderMasterSignals(signals=[],restaurants=[]){
     box.innerHTML='<div class="empty-state"><h3>Sin señales todavía</h3><p>Cuando un manager pregunte algo que la app no pueda resolver, aparecerá aquí.</p></div>';
     return;
   }
-  const restName=id=>restaurants.find(r=>r.id===id)?.name||'Restaurante';
+  const restName=id=>restaurants.find(r=>r.id===id)?.name||'Negocio';
   const colors={feature_request:'chip-purple',data_quality:'chip-orange',reporting:'chip-blue',daily_ops:'chip-green',app_help:'chip-gray',other:'chip-gray'};
   box.innerHTML=signals.slice(0,12).map(s=>`<div class="card" style="margin-bottom:8px">
     <div style="display:flex;align-items:flex-start;gap:10px;justify-content:space-between">
@@ -6186,7 +6444,7 @@ async function deleteRestaurantMaster(ev,id,name){
   ev?.stopPropagation?.();
   if(currentUser?.role!=='super_admin'){toast('Solo master admin','#ef4444');return;}
   const label=name||id;
-  const typed=prompt(`Eliminar restaurante: ${label}\n\nEsto borra empleados, fichajes, ausencias, turnos y desvincula usuarios admin.\n\nEscribe el nombre exacto del restaurante para confirmar:`);
+  const typed=prompt(`Eliminar negocio: ${label}\n\nEsto borra empleados, fichajes, ausencias, turnos y desvincula usuarios admin.\n\nEscribe el nombre exacto del negocio para confirmar:`);
   if(typed!==label){toast('Eliminación cancelada','#f59e0b');return;}
   try{
     await sbDeleteRestaurant(id);
@@ -6197,7 +6455,7 @@ async function deleteRestaurantMaster(ev,id,name){
     await loadMaster();
     if(id===REST_ID&&MASTER.restaurants?.length)await loadSB();
     renderAll();
-    toast('Restaurante eliminado','#ef4444');
+    toast('Negocio eliminado','#ef4444');
   }catch(e){
     console.error(e);
     toast('No se pudo eliminar. Ejecuta el SQL nuevo en Supabase.','#ef4444');
@@ -6207,13 +6465,13 @@ async function toggleRestaurantStatusMaster(ev,id,name,nextStatus){
   ev?.stopPropagation?.();
   if(currentUser?.role!=='super_admin'){toast('Solo master admin','#ef4444');return;}
   const action=nextStatus==='frozen'?'congelar':'reactivar';
-  if(!confirm(`¿Quieres ${action} el restaurante "${name}"?${nextStatus==='frozen'?' Los managers y empleados no podrán entrar, pero los datos se conservan.':''}`))return;
+  if(!confirm(`¿Quieres ${action} el negocio "${name}"?${nextStatus==='frozen'?' Los managers y empleados no podrán entrar, pero los datos se conservan.':''}`))return;
   try{
     await sbSetRestaurantStatus(id,nextStatus);
     await loadMaster();
     if(id===REST_ID)await loadSB();
     renderAll();
-    toast(nextStatus==='frozen'?'Restaurante congelado':'Restaurante reactivado',nextStatus==='frozen'?'#ef4444':'#10b981');
+    toast(nextStatus==='frozen'?'Negocio congelado':'Negocio reactivado',nextStatus==='frozen'?'#ef4444':'#10b981');
   }catch(e){
     console.error(e);
     toast('No se pudo cambiar el estado. Ejecuta el SQL nuevo en Supabase.','#ef4444');
@@ -6262,7 +6520,7 @@ function exportPayCSV(){
   if(!requirePerm('view_payroll'))return;
   const y=payMD.getFullYear(),m=payMD.getMonth(),rows=DB.employees.map(emp=>({emp,...calcPay(emp,y,m)}));
   const total=rows.reduce((s,r)=>s+r.pay,0);
-  const body=`<h1>Salarios · ${xlsCell(fmtMonth(payMD))}</h1><div class="muted">${xlsCell(DB.settings?.company||'Restaurant')} · Exportado ${xlsCell(fmtDate(new Date()))}</div>
+  const body=`<h1>Salarios · ${xlsCell(fmtMonth(payMD))}</h1><div class="muted">${xlsCell(DB.settings?.company||'Manager Pro')} · Exportado ${xlsCell(fmtDate(new Date()))}</div>
   <h2>Resumen</h2><table class="kpi"><tr><td>Total salarios</td><td class="money">CHF ${total.toFixed(2)}</td><td>Empleados</td><td>${rows.length}</td></tr></table>
   <h2>Detalle de salarios</h2><table><tr>${['Empleado','Puesto','Contrato','Tipo salario','Base salario','Horas','H.Supp','Salario estimado'].map(h=>`<th>${h}</th>`).join('')}</tr>
   ${rows.map(r=>`<tr><td>${xlsCell(fullName(r.emp))}</td><td>${xlsCell(r.emp.position)}</td><td>${xlsCell(r.emp.contract)}</td><td>${xlsCell(payModeLabel(r.emp))}</td><td>${xlsCell(payBaseLabel(r.emp))}</td><td>${r.hrs.toFixed(2)}</td><td>${r.ot.toFixed(2)}</td><td class="money">CHF ${r.pay.toFixed(2)}</td></tr>`).join('')}</table>`;
@@ -6288,7 +6546,7 @@ function exportRepCSV(){
     ...(r.hrs===0?[`${fullName(r.emp)}: ${rx.noHours}`]:[]),
     ...(r.annual>0?[`${fullName(r.emp)}: ${r.annual.toFixed(1)}h ${tx.annualExtra.toLowerCase()} · ${(r.annual/8.4).toFixed(1)} ${rx.annualDays}`]:[])
   ]);
-  const body=`<h1>${rx.report} · ${xlsCell(fmtMonth(repMD))}</h1><div class="muted">${xlsCell(DB.settings?.company||'Restaurant')} · ${rx.exported} ${xlsCell(fmtDate(new Date()))}</div>
+  const body=`<h1>${rx.report} · ${xlsCell(fmtMonth(repMD))}</h1><div class="muted">${xlsCell(DB.settings?.company||'Manager Pro')} · ${rx.exported} ${xlsCell(fmtDate(new Date()))}</div>
   <h2>${rx.summary}</h2><table class="kpi"><tr><td>${tx.payroll}</td><td class="money">CHF ${totalPay.toFixed(2)}</td><td>${tx.netHours}</td><td>${totalHrs.toFixed(1)}h</td></tr><tr><td>${tx.breaksDiscounted}</td><td>${totalBreaks.toFixed(1)}h</td><td>${tx.monthOvertime}</td><td class="${totalOt>0?'bad':''}">${totalOt.toFixed(1)}h</td></tr><tr><td>${tx.absences}</td><td class="${totalAbs>0?'bad':''}">${totalAbs}</td><td>${tx.late}</td><td class="${totalLate>0?'warn':''}">${totalLate}</td></tr><tr><td>${tx.avgPresence}</td><td class="${avgAtt>=80?'good':avgAtt>=60?'warn':'bad'}">${avgAtt.toFixed(0)}%</td><td>${tx.employees}</td><td>${rows.length}</td></tr></table>
   <h2>${rx.alerts}</h2><table><tr><th>${rx.observation}</th></tr>${(alerts.length?alerts:[rx.noAlerts]).map(a=>`<tr><td class="note">${xlsCell(a)}</td></tr>`).join('')}</table>
   <h2>${rx.detail}</h2><table><tr>${[rx.employee,rx.position,rx.contract,rx.salaryType,rx.salaryBase,tx.workedDays,tx.netHours,tx.breaks,tx.late,tx.absences,rx.absenceDays,rx.attendancePct,tx.monthOvertime,rx.estimatedSalary,tx.vacLeft,tx.annualExtra,rx.restEquivalent,rx.lateComments].map(h=>`<th>${h}</th>`).join('')}</tr>

@@ -63,6 +63,8 @@ create table if not exists public.sales_products (
   track_stock boolean not null default false,
   stock numeric(12,2) not null default 0,
   min_stock numeric(12,2) not null default 0,
+  avg_cost numeric(12,4) not null default 0,
+  stock_value numeric(14,2) not null default 0,
   recipe jsonb not null default '[]'::jsonb,
   active boolean not null default true,
   created_at timestamptz default now()
@@ -74,6 +76,8 @@ add column if not exists unit text default 'unit',
 add column if not exists track_stock boolean not null default false,
 add column if not exists stock numeric(12,2) not null default 0,
 add column if not exists min_stock numeric(12,2) not null default 0,
+add column if not exists avg_cost numeric(12,4) not null default 0,
+add column if not exists stock_value numeric(14,2) not null default 0,
 add column if not exists recipe jsonb not null default '[]'::jsonb;
 
 do $$
@@ -108,6 +112,8 @@ create table if not exists public.sales (
   quantity numeric(12,2) not null default 1,
   unit_price numeric(12,2) not null default 0,
   total numeric(12,2) not null default 0,
+  cost numeric(12,2) not null default 0,
+  margin numeric(12,2) not null default 0,
   payment_method text not null default 'cash',
   note text default '',
   sold_at timestamptz default now(),
@@ -116,7 +122,9 @@ create table if not exists public.sales (
 
 alter table public.sales
 add column if not exists employee_id uuid references public.employees(id) on delete set null,
-add column if not exists employee_name text default '';
+add column if not exists employee_name text default '',
+add column if not exists cost numeric(12,2) not null default 0,
+add column if not exists margin numeric(12,2) not null default 0;
 
 create table if not exists public.inventory_suppliers (
   id uuid primary key default gen_random_uuid(),
@@ -137,10 +145,18 @@ create table if not exists public.inventory_purchases (
   supplier_name text default '',
   quantity numeric(12,2) not null default 0,
   total_cost numeric(12,2) not null default 0,
+  unit_cost numeric(12,4) not null default 0,
+  avg_cost_after numeric(12,4) not null default 0,
+  stock_after numeric(12,2) not null default 0,
   note text default '',
   purchased_at timestamptz default now(),
   created_at timestamptz default now()
 );
+
+alter table public.inventory_purchases
+add column if not exists unit_cost numeric(12,4) not null default 0,
+add column if not exists avg_cost_after numeric(12,4) not null default 0,
+add column if not exists stock_after numeric(12,2) not null default 0;
 
 create table if not exists public.profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
