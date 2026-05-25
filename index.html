@@ -4107,10 +4107,11 @@ function managerAssistantContext(){
     business:DB.settings?.company||'Business',
     restaurant:DB.settings?.company||'Business',
     page:currentPage,
+    area:typeof tourRoleForPage==='function'?tourRoleForPage():currentPage,
     role:currentUser?.role||'manager',
     lang,
     date:new Date().toISOString(),
-    settings:{lateTolerance:DB.settings?.lateTol,maxHoursWeek:DB.settings?.maxHours},
+    settings:{lateTolerance:DB.settings?.lateTol,maxHoursWeek:DB.settings?.maxHours,currency:currencyCode(),businessSector:DB.settings?.businessSector||'general'},
     counts:{employees:employees.length,activeEmployees:active.length,todayPunches:todayRecs.length,pendingAbsences:absences.filter(a=>!a.approved).length},
     alerts:{missingSalary,openBreaks,pendingAbs,lateToday},
     topWorkers,
@@ -4159,6 +4160,78 @@ function assistantPeopleCoachingAnswer(ctx){
   };
   return copy[lang]||copy.es;
 }
+function localSalesAssistantAnswer(ctx){
+  const s=ctx.sales||{},inv=ctx.inventory||{},top=s.topProducts||[],payments=s.byPayment||[],team=s.byEmployee||[],low=inv.lowStock||[],currency=currencyCode();
+  const noSales=!(Number(s.todaySales)||Number(s.monthSales));
+  if(noSales){
+    return `Todavía no veo ventas registradas para analizar.
+
+Para que el asistente pueda ayudarte bien en Ventas, el flujo mínimo es:
+
+1. Crea productos o servicios finales en Ventas > Productos.
+2. Si algo consume materia prima, márcalo como preparado y agrega su consumo por venta.
+3. Registra ventas con método de pago y, si aplica, empleado responsable.
+4. Revisa Reportes ventas para exportar cierre diario, ventas mensuales, producto, método de pago, empleado e inventario afectado.
+
+Cuando tengas ventas, podré decirte qué se vende más, por qué método entra más dinero, qué empleado vendió más, qué productos afectan inventario y dónde puede haber margen bajo.`;
+  }
+  const topTxt=top.length?`Producto o servicio más fuerte: ${top[0].name}, con ${money(top[0].total)} y ${round1(top[0].qty)} unidad(es).`:'Aún no hay un producto líder claro.';
+  const payTxt=payments.length?`Métodos de pago principales: ${payments.slice(0,3).map(x=>`${x.method}: ${money(x.total)}`).join(' · ')}.`:'No veo métodos de pago suficientes para comparar.';
+  const teamTxt=team.length?`Ventas por empleado: ${team.slice(0,3).map(x=>`${x.name}: ${money(x.total)} en ${x.sales} venta(s)`).join(' · ')}.`:'Si quieres medir ventas por empleado, registra el responsable al guardar cada venta.';
+  const invTxt=low.length?`Atención: hay ${low.length} ítem(s) con stock bajo que pueden afectar ventas: ${low.slice(0,5).map(x=>`${x.name} (${x.stock} ${x.unit})`).join(', ')}.`:'No veo bajo stock crítico conectado a ventas en este resumen.';
+  return `Lectura rápida de Ventas:
+
+1. Hoy llevas ${money(s.todayRevenue||0)} en ${s.todaySales||0} venta(s).
+2. Este mes llevas ${money(s.monthRevenue||0)} en ${s.monthSales||0} venta(s).
+3. Ticket promedio: ${money(s.avgTicket||0)}.
+4. ${topTxt}
+5. ${payTxt}
+6. ${teamTxt}
+7. ${invTxt}
+
+Qué haría ahora como manager:
+
+1. Revisa si el producto más vendido tiene receta y costo conectado a inventario. Sin eso, ves ingresos pero no margen real.
+2. Exporta Reporte por producto y Reporte por método de pago para cerrar caja con datos claros.
+3. Si vendes con equipo, empieza a asignar empleado responsable. Así después podrás ver productividad comercial sin mezclarlo con horas trabajadas.
+4. Si un producto vende mucho y baja inventario, registra compras para que el costo promedio (${currency}) se actualice y el margen sea más real.`;
+}
+function localInventoryAssistantAnswer(ctx){
+  const inv=ctx.inventory||{},sales=ctx.sales||{},low=inv.lowStock||[],cons=inv.consumedBySales||[],costs=inv.productCosts||[];
+  const noInventory=!(Number(inv.items)||Number(inv.purchasesThisMonth)||low.length);
+  if(noInventory){
+    return `Todavía no veo inventario suficiente para analizar.
+
+Para que Inventario empiece a funcionar de verdad:
+
+1. Crea insumos o materias primas en Inventario > Stock.
+2. Define unidad correcta: kg, g, L, ml, unidad, caja o paquete.
+3. Agrega stock inicial y costo inicial si ya tienes una referencia.
+4. Registra compras reales en Inventario > Compras. Esas compras actualizan el costo promedio ponderado.
+5. En Ventas > Productos, conecta los productos preparados con sus insumos. Ejemplo: Pizza = harina + queso + salsa.
+
+Con eso podré ayudarte a detectar bajo stock, consumo por ventas, costo estimado por producto final y margen aproximado.`;
+  }
+  const lowTxt=low.length?`Bajo stock: ${low.slice(0,6).map(x=>`${x.name} (${x.stock} ${x.unit}, mínimo ${x.minimum})`).join(', ')}.`:'No veo productos por debajo del mínimo.';
+  const consTxt=cons.length?`Consumo por ventas del mes: ${cons.slice(0,5).map(x=>`${x.name}: ${x.qty} ${x.unit} (${money(x.cost)})`).join(' · ')}.`:'Todavía no hay consumo conectado desde ventas; revisa recetas o productos con stock.';
+  const marginRisk=costs.filter(p=>Number(p.price)>0&&Number(p.estimatedUnitCost)>0&&Number(p.estimatedMargin)<=0).slice(0,5);
+  const marginTxt=marginRisk.length?`Hay productos con margen estimado bajo o negativo: ${marginRisk.map(p=>`${p.name} (${money(p.estimatedMargin)})`).join(', ')}.`:'No veo margen negativo en los productos con costo calculable.';
+  return `Lectura rápida de Inventario:
+
+1. Ítems con control de stock: ${inv.items||0}.
+2. Valor estimado de inventario: ${money(inv.estimatedValue||0)}.
+3. Compras registradas este mes: ${inv.purchasesThisMonth||0}, por ${money(inv.purchaseValueThisMonth||0)}.
+4. ${lowTxt}
+5. ${consTxt}
+6. ${marginTxt}
+
+Qué haría ahora como manager:
+
+1. Prioriza reponer lo que está bajo mínimo antes de que afecte ventas.
+2. Registra cada compra con cantidad y costo total; así el costo promedio se actualiza solo.
+3. Para productos preparados, revisa que la receta use las unidades correctas. Eso conecta Ventas con Inventario.
+4. Usa Reportes inventario: Stock actual, Stock bajo, Compras del mes, Consumo por ventas y Costo por producto final.`;
+}
 function localAssistantAnswer(question,ctx){
   const q=String(question||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   let category='app_help',shouldSaveSignal=false;
@@ -4173,12 +4246,10 @@ function localAssistantAnswer(question,ctx){
     answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.business||ctx.restaurant}.`;
   }else if(/venta|ingreso|caja|ticket|producto.*vend|mas vendido|m[aá]s vendido|metodo.*pago|m[eé]todo.*pago/.test(q)){
     category='reporting';
-    const s=ctx.sales||{},top=(s.topProducts||[])[0],payments=(s.byPayment||[]).slice(0,3).map(x=>`${x.method}: ${money(x.total)}`).join(' · ');
-    answer=`Resumen de ventas: hoy llevas ${money(s.todayRevenue||0)} en ${s.todaySales||0} venta(s). Este mes llevas ${money(s.monthRevenue||0)} en ${s.monthSales||0} venta(s), con ticket promedio de ${money(s.avgTicket||0)}. ${top?`Producto/servicio más fuerte: ${top.name} (${money(top.total)}). `:''}${payments?`Métodos de pago principales: ${payments}.`:''}`;
+    answer=localSalesAssistantAnswer(ctx);
   }else if(/stock|inventario|compra|proveedor|costo|margen|insumo|materia prima|receta|consumo/.test(q)){
     category='reporting';
-    const inv=ctx.inventory||{},low=inv.lowStock||[],cons=(inv.consumedBySales||[]).slice(0,3).map(x=>`${x.name}: ${x.qty} ${x.unit}`).join(' · ');
-    answer=`Inventario: tienes ${inv.items||0} ítem(s) con control de stock y un valor estimado de ${money(inv.estimatedValue||0)}. Este mes registraste ${inv.purchasesThisMonth||0} compra(s) por ${money(inv.purchaseValueThisMonth||0)}. ${low.length?`Atención a bajo stock: ${low.slice(0,5).map(x=>`${x.name} (${x.stock} ${x.unit})`).join(', ')}. `:'No veo bajo stock en este resumen. '}${cons?`Consumo conectado a ventas: ${cons}.`:''}`;
+    answer=localInventoryAssistantAnswer(ctx);
   }else if(asksTermination){
     category='daily_ops';
     answer=isDemo()?`En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y, cuando aplica, con búsqueda web.\n\nPara investigarlo ahora puedes abrir Claude y pegar esta pregunta:\n"${question}"\n\nhttps://claude.ai/new`:`No pude conectar con Claude desde Manager Pro en este momento. Esta pregunta necesita la IA principal porque combina RH, contrato y posible riesgo legal.\n\nPuedes intentar de nuevo o abrir Claude y pegar esta pregunta:\n"${question}"\n\nhttps://claude.ai/new`;
@@ -4197,6 +4268,12 @@ function localAssistantAnswer(question,ctx){
   }else if(/falta|faltan|configurar|empleado/.test(q)){
     category='data_quality';
     answer=`Datos para revisar: ${ctx.alerts.missingSalary.length?`salario de ${ctx.alerts.missingSalary.join(', ')}`:'no veo salarios faltantes en este resumen'}. También conviene confirmar inicio de contrato, PIN, horario base y vacaciones de cada empleado.`;
+  }else if(/^(\s*)?(que|qué|como|cómo|revisa|revisar|analiza|analizar|ayuda|ayudame|ayúdame|estado|resumen|panel|que hago|qué hago)/.test(q)&&String(ctx.page||'').startsWith('sales')){
+    category='reporting';
+    answer=localSalesAssistantAnswer(ctx);
+  }else if(/^(\s*)?(que|qué|como|cómo|revisa|revisar|analiza|analizar|ayuda|ayudame|ayúdame|estado|resumen|panel|que hago|qué hago)/.test(q)&&String(ctx.page||'').startsWith('inventory')){
+    category='reporting';
+    answer=localInventoryAssistantAnswer(ctx);
   }else{
     category='feature_request';shouldSaveSignal=true;
     answer=isDemo()?`En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y puede apoyarse en búsqueda web cuando aplica.\n\nTambién puedes abrir Claude:\nhttps://claude.ai/new`:`No pude consultar Claude desde Manager Pro en este momento. Intenta de nuevo en unos segundos.\n\nSi necesitas resolverlo ya, abre Claude aquí:\nhttps://claude.ai/new`;
@@ -4205,11 +4282,13 @@ function localAssistantAnswer(question,ctx){
 }
 function isAssistantDataQuestion(question){
   const q=String(question||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const genericAreaQuestion=/\b(que hago|que reviso|que debo|como voy|como va|resumen|analiza|analizar|ayuda|ayudame|estado|panel|indicadores|reporte|reportes|insights?)\b/.test(q);
   return /(quien|persona|empleado|trabajador).*(mas).*(trabaj|hora)|top.*trabaj/.test(q)
     || /cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)/.test(q)
     || /venta|ingreso|caja|ticket|producto.*vend|mas vendido|metodo.*pago/.test(q)
     || /stock|inventario|compra|proveedor|costo|margen|insumo|materia prima|receta|consumo/.test(q)
-    || /^(revisa|mostrar|muestra|ver|listar|lista|cuantas tengo|cuantos tengo).*(salario|nomina|pago|ausencia|retardo|pausa)/.test(q);
+    || /^(revisa|mostrar|muestra|ver|listar|lista|cuantas tengo|cuantos tengo).*(salario|nomina|pago|ausencia|retardo|pausa)/.test(q)
+    || (genericAreaQuestion&&['sales','salesProducts','salesReports','inventory','inventoryStock','inventoryPurchases','inventorySuppliers','inventoryReports'].includes(currentPage));
 }
 function withTimeout(promise,ms,message='Tiempo agotado'){
   return Promise.race([promise,new Promise((_,rej)=>setTimeout(()=>rej(new Error(message)),ms))]);
