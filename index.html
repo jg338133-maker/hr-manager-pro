@@ -2129,7 +2129,7 @@ function auditAction(type,detail='',meta={}){
     saveLocal();
   }catch(e){console.warn('audit failed',e);}
 }
-const alertDayKey=date=>new Date(date).toISOString().slice(0,10);
+const alertDayKey=date=>localDateKey(date);
 const alertKey=(date,empId,type)=>`${alertDayKey(date)}_${empId}_${type}`;
 function smartAlertKey(date,empId,type){
   const d=new Date(date);
@@ -2180,7 +2180,7 @@ function clearActiveBreak(empId){try{localStorage.removeItem(activeBreakKey(empI
 loadLocal();
 
 function demoDB(){
-  const today=new Date(),fmt=d=>d.toISOString().split('T')[0],day=n=>fmt(new Date(today.getTime()-n*86400000));
+  const today=new Date(),fmt=d=>localDateKey(d),day=n=>fmt(new Date(today.getTime()-n*86400000));
   const sched={};for(let i=0;i<7;i++)sched[i]={enabled:i>=1&&i<=5,blocks:[{start:'09:00',end:'17:00'}]};
   const split={...sched,1:{enabled:true,blocks:[{start:'10:00',end:'14:00'},{start:'17:30',end:'22:00'}]},3:{enabled:true,blocks:[{start:'18:00',end:'23:00'}]}};
   const employees=[
@@ -3295,7 +3295,7 @@ function openManualModal(empId=null,opts={}){
   if(!active.length){toast('Aucun employé actif','#ef4444');return;}
   pendingCorrectionId=opts.correctionId||null;
   document.getElementById('man-emp').innerHTML=active.map(e=>`<option value="${esc(e.id)}" ${e.id===empId?'selected':''}>${safeEmpName(e)}</option>`).join('');
-  document.getElementById('man-date').value=opts.date||new Date().toISOString().split('T')[0];
+  document.getElementById('man-date').value=opts.date||localDateKey(new Date());
   document.getElementById('man-in').value=opts.in||'09:00';
   document.getElementById('man-out').value=opts.out||'17:00';
   document.getElementById('man-note').value=opts.note||'Correction manager';
@@ -3935,7 +3935,7 @@ function empRequestsHTML(emp,et,ep){
   </div>
   <div class="card">
     <div class="section-lbl" style="margin-top:0">${ep.correction}</div>
-    <div class="fg"><label>${ep.correctionDate}</label><input type="date" id="emp-cor-date" value="${new Date().toISOString().split('T')[0]}"></div>
+    <div class="fg"><label>${ep.correctionDate}</label><input type="date" id="emp-cor-date" value="${localDateKey(new Date())}"></div>
     <div class="fg"><label>${ep.correctionType}</label><select id="emp-cor-type"><option value="forgotIn">${ep.forgotIn}</option><option value="forgotOut">${ep.forgotOut}</option><option value="wrongTime">${ep.wrongTime}</option><option value="other">${ep.other}</option></select></div>
     <div class="fg"><label>${ep.correctionNote}</label><input id="emp-cor-notes" placeholder="-"></div>
     <button class="btn btn-primary" onclick="requestEmpCorrection()">${et.send}</button>
@@ -6080,7 +6080,7 @@ function openEmpModal(id){
   if(aiJson)aiJson.value='';
   const fields={name:'name',last:'last',num:'num',start:'startDate',phone:'phone',email:'email',vac:'vacWeeks',avs:'avs',emergency:'emergency',notes:'notes'};
   Object.entries(fields).forEach(([f,k])=>{const el=document.getElementById('ef-'+f);if(el)el.value=emp?.[k]||'';});
-  document.getElementById('ef-start').value=emp?.startDate||new Date().toISOString().split('T')[0];
+  document.getElementById('ef-start').value=emp?.startDate||localDateKey(new Date());
   document.getElementById('ef-vac').value=emp?.vacWeeks||5;
   document.getElementById('ef-paytype').value=emp?.payType||'hourly';
   document.getElementById('ef-rate').value=emp?.payType==='hourly'?(emp?.rate||''):(emp?.salary||'');
@@ -6142,7 +6142,7 @@ function getSchedEd(){const s={};for(let i=0;i<7;i++){const on=document.getEleme
 function seedVisibleWeekFromSchedule(emp){
   if(!emp?.id||!emp.schedules)return;
   for(let i=0;i<7;i++){
-    const d=new Date(shiftWS.getTime()+i*86400000),ds=d.toISOString().split('T')[0],key=`${emp.id}_${ds}`;
+    const d=new Date(shiftWS.getTime()+i*86400000),ds=localDateKey(d),key=`${emp.id}_${ds}`;
     if(DB.shifts[key]&&DB.shifts[key].notes!=='Horaire de base')continue;
     const sch=empDaySchedule(emp,d),first=sch.blocks[0];
     if(sch?.enabled&&first){
@@ -6433,7 +6433,7 @@ function renderShifts(){
   document.getElementById('shift-grid').innerHTML=active.map(emp=>{
     let row=`<div class="shift-row" style="grid-template-columns:${cols}"><div style="display:flex;align-items:center;gap:6px;min-width:0">${mkAv(emp,'av-28')}<span style="font-size:10px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${emp.name}</span></div>`;
     dates.forEach(d=>{
-      const ds=d.toISOString().split('T')[0],key=`${emp.id}_${ds}`,manual=DB.shifts[key],sch=empDaySchedule(emp,d),abs=getAbs(emp.id,d);
+      const ds=localDateKey(d),key=`${emp.id}_${ds}`,manual=DB.shifts[key],sch=empDaySchedule(emp,d),abs=getAbs(emp.id,d);
       let sh=null,type='off';
       if(!isRestaurantOpen(d)){sh={type:'closed'};type='off';}
       else if(abs){sh={type:'abs'};type='abs';}
@@ -6448,8 +6448,9 @@ function renderShifts(){
 function openShiftModal(empId,dateStr){
   const emp=DB.employees.find(e=>e.id===empId);
   shiftKey=`${empId}_${dateStr}`;const sh=DB.shifts[shiftKey];
-  const base=empDaySchedule(emp,new Date(dateStr)),blocks=(sh?.blocks?.length?sh.blocks:base.blocks)||[],first=blocks[0]||{},second=blocks[1]||{};
-  document.getElementById('shift-mtitle').textContent=`${emp?.name||'?'} · ${new Date(dateStr).toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'})}`;
+  const modalDate=localDateOnly(dateStr);
+  const base=empDaySchedule(emp,modalDate),blocks=(sh?.blocks?.length?sh.blocks:base.blocks)||[],first=blocks[0]||{},second=blocks[1]||{};
+  document.getElementById('shift-mtitle').textContent=`${emp?.name||'?'} · ${modalDate.toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'})}`;
   shiftType=['rest','off'].includes(sh?.type)?sh.type:'morning';
   document.getElementById('sh-in').value=sh?.in||first.start||'09:00';
   document.getElementById('sh-out').value=sh?.out||first.end||'17:00';
@@ -6535,7 +6536,7 @@ async function delAbs(id){
 function openAbsModal(empId){
   if(!requirePerm('approve_requests'))return;
   document.getElementById('abs-emp').innerHTML=DB.employees.map(e=>`<option value="${e.id}" ${e.id===empId?'selected':''}>${fullName(e)}</option>`).join('');
-  const today=new Date().toISOString().split('T')[0];
+  const today=localDateKey(new Date());
   document.getElementById('abs-start').value=today;document.getElementById('abs-end').value=today;
   document.getElementById('abs-notes').value='';document.getElementById('abs-appr').classList.add('on');
   ['abs-emp','abs-type'].forEach(id=>document.getElementById(id).onchange=updateAbsConflictWarning);
@@ -6572,7 +6573,7 @@ function calcPay(emp,y,m){
     const date=new Date(ds),w=workedOn(emp.id,date);
     if(!w)continue;
     hrs+=w;
-    const wk=getMonday(date).toISOString().split('T')[0];
+    const wk=localDateKey(getMonday(date));
     weekHours[wk]=(weekHours[wk]||0)+w;
   }
   const maxW=DB.settings?.maxHours||45;
