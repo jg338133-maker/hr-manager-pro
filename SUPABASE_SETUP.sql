@@ -551,7 +551,8 @@ begin
     brand_color,
     brand_color2,
     opening_hours,
-    status
+    status,
+    onboarding_completed
   )
   values (
     trim(p_business_name),
@@ -564,7 +565,8 @@ begin
     '#4f6ef7',
     '#7c3aed',
     '{}'::jsonb,
-    'active'
+    'active',
+    false
   )
   returning id into v_restaurant_id;
 
@@ -685,6 +687,7 @@ alter table public.restaurants add column if not exists status text default 'act
 alter table public.restaurants add column if not exists opening_hours jsonb default '{}'::jsonb;
 alter table public.restaurants add column if not exists sales_panel_widgets jsonb default null;
 alter table public.restaurants add column if not exists business_sector text default 'general';
+alter table public.restaurants add column if not exists onboarding_completed boolean default false;
 alter table public.shifts add column if not exists blocks jsonb default '[]'::jsonb;
 update public.employees set pin = '0000' where pin is null or pin = '';
 update public.restaurants set emoji = '🍽️' where emoji is null or emoji = '';
@@ -693,6 +696,7 @@ update public.restaurants set brand_color2 = '#7c3aed' where brand_color2 is nul
 update public.restaurants set status = 'active' where status is null or status = '';
 update public.restaurants set opening_hours = '{}'::jsonb where opening_hours is null;
 update public.restaurants set business_sector = 'general' where business_sector is null or trim(business_sector) = '';
+update public.restaurants set onboarding_completed = false where onboarding_completed is null;
 create unique index if not exists shifts_employee_date_unique on public.shifts(employee_id, shift_date);
 create index if not exists employee_documents_employee_idx on public.employee_documents(employee_id, created_at desc);
 

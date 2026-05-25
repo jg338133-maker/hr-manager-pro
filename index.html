@@ -164,6 +164,16 @@ input[type=date],input[type=time]{color-scheme:dark}
 .modal-handle{width:38px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px}
 .modal-title{font-size:19px;font-weight:800;margin-bottom:20px}
 .modal-actions{display:flex;gap:10px;margin-top:20px}
+.setup-hero{background:linear-gradient(135deg,var(--brand),var(--brand2));color:white;border-radius:18px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden}
+.setup-hero:after{content:'';position:absolute;right:-35px;top:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.16)}
+.setup-hero h2{font-size:23px;line-height:1.08;margin:6px 0 8px;letter-spacing:-.4px}
+.setup-hero p{font-size:13px;line-height:1.45;opacity:.9;max-width:520px}
+.setup-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.24);border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px}
+.setup-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.setup-card{background:var(--s3);border:1px solid var(--border);border-radius:16px;padding:13px}
+.setup-card strong{display:block;font-size:13px;margin-bottom:4px}
+.setup-card span{display:block;color:var(--text2);font-size:11px;line-height:1.35}
+@media(max-width:640px){.setup-grid{grid-template-columns:1fr}.modal-actions{flex-direction:column}.modal-actions .btn{width:100%}}
 
 /* TABS */
 .tabs{display:flex;background:var(--s3);border-radius:var(--r2);padding:3px;margin-bottom:16px;gap:2px;overflow-x:auto}
@@ -1637,6 +1647,10 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   </div>
 </div>
 
+<div class="ov" id="business-setup-modal">
+  <div class="modal" id="business-setup-content" style="max-width:760px;margin:0 auto"></div>
+</div>
+
 <script>
 // ═══════ SUPABASE ═══════
 const SB_URL='https://grztncvdsvtrwekekpss.supabase.co';
@@ -1758,6 +1772,69 @@ function renderBusinessRegistrationSelectors(){
     currency.innerHTML=currencyOptionsHTML(current);
     currency.value=current||'CHF';
   }
+}
+const BUSINESS_SETUP_TX={
+  es:{pill:'Primer ingreso',title:'Configura tu negocio',sub:'Antes de entrar, confirma los datos base. Así Manager Pro adapta cargos, moneda, reportes y alertas a tu operación.',name:'Nombre del negocio',sector:'Sector',currency:'Moneda',language:'Idioma',late:'Margen de retardo (min)',maxh:'Horas máximas por semana',save:'Guardar y entrar',cards:[['Datos correctos','El nombre, sector y moneda se usan en toda la app.'],['Alertas útiles','El margen de retardo define cuándo avisar al manager.'],['Reportes claros','Salarios, ventas e inventario usan la moneda elegida.']]},
+  fr:{pill:'Première entrée',title:'Configurez votre business',sub:'Avant de continuer, confirmez les données de base. Manager Pro adapte les rôles, la devise, les rapports et les alertes.',name:'Nom du commerce',sector:'Secteur',currency:'Devise',language:'Langue',late:'Tolérance retard (min)',maxh:'Heures max par semaine',save:'Enregistrer et entrer',cards:[['Données correctes','Le nom, le secteur et la devise sont utilisés dans toute l’app.'],['Alertes utiles','La tolérance définit quand avertir le manager.'],['Rapports clairs','Salaires, ventes et inventaire utilisent la devise choisie.']]},
+  en:{pill:'First setup',title:'Set up your business',sub:'Before entering, confirm the basics. Manager Pro adapts roles, currency, reports and alerts to your operation.',name:'Business name',sector:'Sector',currency:'Currency',language:'Language',late:'Late tolerance (min)',maxh:'Max hours per week',save:'Save and enter',cards:[['Correct data','Name, sector and currency are used across the app.'],['Useful alerts','Late tolerance controls when the manager is warned.'],['Clear reports','Payroll, sales and inventory use the chosen currency.']]},
+  de:{pill:'Erste Einrichtung',title:'Betrieb einrichten',sub:'Bestätigen Sie zuerst die Basisdaten. Manager Pro passt Rollen, Währung, Berichte und Warnungen an.',name:'Betriebsname',sector:'Bereich',currency:'Währung',language:'Sprache',late:'Verspätungstoleranz (Min)',maxh:'Max. Stunden pro Woche',save:'Speichern und öffnen',cards:[['Korrekte Daten','Name, Bereich und Währung gelten in der ganzen App.'],['Nützliche Warnungen','Die Toleranz bestimmt, wann der Manager gewarnt wird.'],['Klare Berichte','Löhne, Verkäufe und Inventar nutzen die gewählte Währung.']]},
+  it:{pill:'Prima configurazione',title:'Configura il tuo business',sub:'Prima di entrare, conferma i dati base. Manager Pro adatta ruoli, valuta, report e avvisi alla tua attività.',name:'Nome attività',sector:'Settore',currency:'Valuta',language:'Lingua',late:'Tolleranza ritardo (min)',maxh:'Ore massime settimanali',save:'Salva ed entra',cards:[['Dati corretti','Nome, settore e valuta sono usati in tutta l’app.'],['Avvisi utili','La tolleranza definisce quando avvisare il manager.'],['Report chiari','Salari, vendite e inventario usano la valuta scelta.']]}
+};
+const setupTx=()=>BUSINESS_SETUP_TX[lang]||BUSINESS_SETUP_TX.es;
+const businessSetupFlag=()=>sessionStorage.getItem('managerpro_show_business_setup')==='1';
+function shouldShowBusinessSetup(){
+  return !isDemo()&&currentUser?.role!=='super_admin'&&businessSetupFlag();
+}
+function maybeShowBusinessSetup(){
+  if(shouldShowBusinessSetup())openBusinessSetup();
+}
+function openBusinessSetup(){
+  const tx=setupTx();
+  const content=document.getElementById('business-setup-content');
+  if(!content)return;
+  const currentSector=businessSector();
+  const currentCurrency=currencyCode();
+  const currentLang=DB.settings?.lang||lang||'fr';
+  content.innerHTML=`
+    <div class="modal-handle"></div>
+    <div class="setup-hero">
+      <span class="setup-pill">✨ ${esc(tx.pill)}</span>
+      <h2>${esc(tx.title)}</h2>
+      <p>${esc(tx.sub)}</p>
+    </div>
+    <div class="setup-grid mb12">
+      ${tx.cards.map(([title,body])=>`<div class="setup-card"><strong>${esc(title)}</strong><span>${esc(body)}</span></div>`).join('')}
+    </div>
+    <div class="fg"><label>${esc(tx.name)}</label><input id="setup-company" value="${esc(DB.settings?.company||'')}" placeholder="Manager Pro"></div>
+    <div class="frow">
+      <div class="fg"><label>${esc(tx.sector)}</label><select id="setup-sector">${Object.keys(BUSINESS_SECTORS).map(k=>`<option value="${k}" ${k===currentSector?'selected':''}>${esc(sectorLabel(k))}</option>`).join('')}</select></div>
+      <div class="fg"><label>${esc(tx.currency)}</label><select id="setup-currency">${currencyOptionsHTML(currentCurrency)}</select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>${esc(tx.language)}</label><select id="setup-lang">${Object.keys(LANGS).map(k=>`<option value="${k}" ${k===currentLang?'selected':''}>${LANGS[k].flag} ${LANGS[k].name}</option>`).join('')}</select></div>
+      <div class="fg"><label>${esc(tx.late)}</label><input type="number" id="setup-late" min="0" max="60" value="${Number(DB.settings?.lateTol)||10}"></div>
+    </div>
+    <div class="fg"><label>${esc(tx.maxh)}</label><input type="number" id="setup-maxh" min="20" max="60" value="${Number(DB.settings?.maxHours)||45}"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" style="flex:1" onclick="saveBusinessSetup()">${esc(tx.save)}</button>
+    </div>`;
+  openModal('business-setup-modal');
+}
+async function saveBusinessSetup(){
+  const company=clean(document.getElementById('setup-company')?.value)||DB.settings.company||'Manager Pro';
+  const sector=document.getElementById('setup-sector')?.value||'general';
+  const currency=document.getElementById('setup-currency')?.value||'CHF';
+  const nextLang=document.getElementById('setup-lang')?.value||lang||'fr';
+  const lateTol=Math.max(0,Math.min(60,parseInt(document.getElementById('setup-late')?.value,10)||10));
+  const maxHours=Math.max(20,Math.min(60,parseInt(document.getElementById('setup-maxh')?.value,10)||45));
+  DB.settings={...DB.settings,company,businessSector:sector,currency,lang:nextLang,lateTol,maxHours,onboardingDone:true};
+  lang=nextLang;
+  sessionStorage.removeItem('managerpro_show_business_setup');
+  saveLocal();applyBrand();applyUITexts();renderAll();goPage('hub','replace');
+  closeModal('business-setup-modal');
+  toast('✅ Configuración guardada');
+  try{await sbSaveSettings(DB.settings);}catch(e){console.warn(e);toast('No se pudo guardar en Supabase. Revisa el SQL nuevo.','#ef4444');}
+  setTimeout(()=>maybeStartTour('hub'),250);
 }
 function positionOptions(){const preset=(ROLE_PRESETS[lang]||ROLE_PRESETS.es)[businessSector()]||(ROLE_PRESETS[lang]||ROLE_PRESETS.es).general;return preset.pos||L().pos;}
 function departmentOptions(){const preset=(ROLE_PRESETS[lang]||ROLE_PRESETS.es)[businessSector()]||(ROLE_PRESETS[lang]||ROLE_PRESETS.es).general;return preset.depts||L().depts;}
@@ -2203,6 +2280,7 @@ async function completePendingRegistration(user){
   LOGIN_RESTAURANTS=[...LOGIN_RESTAURANTS.filter(r=>r.id!==profile.restaurant_id),{id:profile.restaurant_id,name:pending.restName,emoji:'MP'}];
   localStorage.setItem('hrm_restaurant_directory',JSON.stringify(LOGIN_RESTAURANTS));
   clearPendingRegistration();
+  sessionStorage.setItem('managerpro_show_business_setup','1');
   toast('✅ Negocio creado y conectado');
   return profile;
 }
@@ -2220,7 +2298,7 @@ async function loadSB(){
     if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp,note:x.note||''}));
     if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     if(sh.data){DB.shifts={};sh.data.forEach(x=>{const blocks=normalizeBlocks({blocks:x.blocks,start:x.start_time,end:x.end_time},'restaurant');DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,blocks,notes:x.notes||''};});}
-    if(r.data){DB.settings={company:r.data.name||'Mon Business',emoji:r.data.emoji||'MP',currency:r.data.currency||'CHF',businessSector:r.data.business_sector||'general',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active',openingHours:r.data.opening_hours||defOpeningHours()};DB.salesPanelWidgets=Array.isArray(r.data.sales_panel_widgets)?r.data.sales_panel_widgets:DB.salesPanelWidgets;lang=DB.settings.lang;}
+    if(r.data){DB.settings={company:r.data.name||'Mon Business',emoji:r.data.emoji||'MP',currency:r.data.currency||'CHF',businessSector:r.data.business_sector||'general',lateTol:r.data.late_tolerance||10,maxHours:r.data.max_hours_week||45,lang:r.data.lang||'fr',brandColor:r.data.brand_color||'#4f6ef7',brandColor2:r.data.brand_color2||'#7c3aed',status:r.data.status||'active',openingHours:r.data.opening_hours||defOpeningHours(),onboardingDone:r.data.onboarding_completed===true};DB.salesPanelWidgets=Array.isArray(r.data.sales_panel_widgets)?r.data.sales_panel_widgets:DB.salesPanelWidgets;lang=DB.settings.lang;}
     try{
       const docs=await sb.from('employee_documents').select('*').eq('restaurant_id',REST_ID).order('created_at',{ascending:false});
       if(!docs.error)DB.documents=(docs.data||[]).map(docFromSBRow);
@@ -2311,7 +2389,7 @@ async function sbSaveShift(key,sh){
   }
   if(res.error)throw res.error;
 }
-async function sbSaveSettings(s){if(isDemo())return;await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,business_sector:s.businessSector||'general',late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours(),sales_panel_widgets:DB.salesPanelWidgets||null}).eq('id',REST_ID);}
+async function sbSaveSettings(s){if(isDemo())return;await sb.from('restaurants').update({name:s.company,emoji:s.emoji,currency:s.currency,business_sector:s.businessSector||'general',late_tolerance:s.lateTol,max_hours_week:s.maxHours,lang:s.lang,brand_color:s.brandColor,brand_color2:s.brandColor2,opening_hours:s.openingHours||defOpeningHours(),sales_panel_widgets:DB.salesPanelWidgets||null,onboarding_completed:!!s.onboardingDone}).eq('id',REST_ID);}
 function salesProductFromSB(x){return{id:x.id,name:x.name||'',category:x.category||'',type:x.type||'product',price:Number(x.price)||0,sku:x.sku||'',unit:x.unit||'unit',trackStock:!!x.track_stock,stock:Number(x.stock)||0,minStock:Number(x.min_stock)||0,avgCost:Number(x.avg_cost)||0,stockValue:Number(x.stock_value)||0,recipe:x.recipe||[],active:x.active!==false,createdAt:x.created_at||new Date().toISOString()};}
 function saleFromSB(x){return{id:x.id,productId:x.product_id,productName:x.product_name||'',category:x.category||'',qty:Number(x.quantity)||0,unitPrice:Number(x.unit_price)||0,total:Number(x.total)||0,cost:Number(x.cost)||0,margin:Number(x.margin)||0,method:x.payment_method||'cash',employeeId:x.employee_id||'',employeeName:x.employee_name||'',note:x.note||'',ts:x.sold_at||x.created_at||new Date().toISOString()};}
 function supplierFromSB(x){return{id:x.id,name:x.name||'',phone:x.phone||'',email:x.email||'',notes:x.notes||'',createdAt:x.created_at||new Date().toISOString()};}
@@ -3087,7 +3165,8 @@ function showManagerUI(){
   goPage(currentPage||'hub','replace');
   if(currentUser.role==='super_admin')renderMaster();
   startAutoRefresh();
-  maybeStartTour('hub');
+  if(shouldShowBusinessSetup())setTimeout(maybeShowBusinessSetup,250);
+  else maybeStartTour('hub');
 }
 
 function showEmpUI(emp){
@@ -4244,7 +4323,7 @@ function hubIcon(type){
 }
 function hubCardHTML(card){
   const tx=areaTx(),style=`--hub-color:${card.color};--hub-soft:${card.soft}`;
-  return `<div class="hub-card ${card.active?'active':'soon'}" style="${style}">
+  return `<div ${card.id?`id="${esc(card.id)}"`:''} class="hub-card ${card.active?'active':'soon'}" style="${style}">
     <div class="hub-icon">${hubIcon(card.icon)}</div>
     <div class="hub-status">${esc(card.active?tx.active:tx.soon)}</div>
     <h3>${esc(card.title)}</h3>
@@ -4260,19 +4339,19 @@ function renderHub(){
   const tx=areaTx(),active=DB.employees.filter(e=>e.status==='active'),pending=(DB.absences||[]).filter(a=>!a.approved).length;
   const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
   const cards=[
-    {icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,action:"goPage('dashboard')",button:tx.openTeam},
-    {icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1',active:true,action:"goPage('sales')",button:tx.open},
-    {icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df',active:true,action:"goPage('inventory')",button:tx.open},
-    {icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:['Expedientes','Vencimientos','IA'],color:'#7c3aed',soft:'#f3edff'},
-    {icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:['Rutinas','Responsables','Pendientes'],color:'#0891b2',soft:'#e6f8fc'},
-    {icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:['IA','Reportes','Señales'],color:'#be123c',soft:'#fff1f2'}
+    {id:'hub-card-people',icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,action:"goPage('dashboard')",button:tx.openTeam},
+    {id:'hub-card-sales',icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1',active:true,action:"goPage('sales')",button:tx.open},
+    {id:'hub-card-inventory',icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df',active:true,action:"goPage('inventory')",button:tx.open},
+    {id:'hub-card-documents',icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:['Expedientes','Vencimientos','IA'],color:'#7c3aed',soft:'#f3edff'},
+    {id:'hub-card-tasks',icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:['Rutinas','Responsables','Pendientes'],color:'#0891b2',soft:'#e6f8fc'},
+    {id:'hub-card-insights',icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:['IA','Reportes','Señales'],color:'#be123c',soft:'#fff1f2'}
   ];
-  el.innerHTML=`<section class="hub-hero">
+  el.innerHTML=`<section class="hub-hero" id="hub-tour-hero">
     <div class="hub-kicker">${esc(tx.eyebrow)}</div>
     <h2>${esc(tx.title)}</h2>
     <p>${esc(tx.sub)}</p>
   </section>
-  <section class="hub-grid">${cards.map(hubCardHTML).join('')}</section>
+  <section class="hub-grid" id="hub-area-grid">${cards.map(hubCardHTML).join('')}</section>
   <section class="hub-side">
     <div class="hub-panel">
       <div class="card-header" style="margin:0">${esc(tx.today)}</div>
@@ -4281,7 +4360,7 @@ function renderHub(){
         <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${pending}</div><div class="kpi-sub">${esc(tx.pending)}</div></div>
         <div class="kpi"><div class="kpi-val" style="color:var(--red)">${smart}</div><div class="kpi-sub">${esc(tx.alerts)}</div></div>
       </div>
-      ${canPage('settings')?`<div class="hub-line" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      ${canPage('settings')?`<div class="hub-line" id="hub-settings-card" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
         <div class="hub-icon" style="width:42px;height:42px;color:var(--brand);background:var(--brand-light);box-shadow:none">${hubIcon('settings')}</div>
         <div style="flex:1;min-width:0">
           <div class="fs14 fw8">${esc(tx.settings)}</div>
@@ -4290,7 +4369,7 @@ function renderHub(){
         <button class="btn btn-ghost btn-sm" onclick="goPage('settings')">${esc(tx.openSettings)}</button>
       </div>`:''}
     </div>
-    <div class="hub-panel">
+    <div class="hub-panel" id="hub-roadmap-card">
       <div class="card-header" style="margin:0">${esc(tx.roadmap)}</div>
       <div class="hub-timeline">
         ${[tx.p1,tx.p2,tx.p3,tx.p4].map((p,i)=>`<div class="hub-line"><div class="hub-line-dot" style="background:${['var(--brand)','var(--green)','var(--orange)','var(--purple)'][i]}"></div><div class="fs12 fw7">${esc(p)}</div></div>`).join('')}
@@ -4587,7 +4666,7 @@ function salesByPeriod(period=salesPeriod()){
 }
 function salesPeriodTabs(){
   const w=salesWidgetText(),p=salesPeriod();
-  return `<div class="sales-period-tabs">
+  return `<div class="sales-period-tabs" id="sales-period-tabs">
     ${[['today',w.periodToday],['week',w.periodWeek],['month',w.periodMonth],['custom',w.periodCustom]].map(([k,l])=>`<button class="sales-period-tab ${p===k?'active':''}" onclick="setSalesPeriod('${k}')">${esc(l)}</button>`).join('')}
   </div>`;
 }
@@ -4665,7 +4744,7 @@ function renderSales(){
     active.includes('inventoryImpact')?salesStockPanel():'',
     active.includes('employeeSales')?salesEmployeePanel(list):''
   ].filter(Boolean);
-  el.innerHTML=`<section class="sales-hero">
+  el.innerHTML=`<section class="sales-hero" id="sales-tour-hero">
     <div class="hub-kicker">${esc(tx.today)}</div>
     <h2>${esc(tx.title)}</h2>
     <p>${esc(tx.sub)}</p>
@@ -4674,7 +4753,7 @@ function renderSales(){
   <section class="sales-kpis" id="sales-summary">
     ${kpis.map(k=>salesKpiRich(...k)).join('')}
   </section>
-  <section class="sales-panel">
+  <section class="sales-panel" id="sales-control-panel">
     <div class="flex-b">
       <div>
         <div class="card-header" style="margin:0">${esc(tx.areaTitle)}</div>
@@ -4689,13 +4768,13 @@ function renderSales(){
   ${secondaryKpis.length?`<section class="sales-panel"><div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(salesReportText().moreIndicators)}</h3><div class="sales-panel-sub">${esc(salesReportText().moreIndicatorsSub)}</div></div></div><div class="sales-kpis sales-kpis-secondary">${secondaryKpis.map(k=>salesKpiRich(...k)).join('')}</div></section>`:''}
   <section class="sales-grid">
     <div>
-      <div class="sales-panel">
+      <div class="sales-panel" id="sales-activity-panel">
         <div class="flex-b mb12"><div class="card-header" style="margin:0">${esc(tx.activity)}</div><button class="btn btn-primary btn-sm" onclick="openSaleModal()">${esc(tx.newSale)}</button></div>
         ${today.length?today.map(s=>`<div class="sales-row"><div><div class="fw8 fs13">${esc(s.productName)}</div><div class="fs11 muted">${fmtTime(s.ts)} · ${Number(s.qty)||0} × ${esc(money(s.unitPrice))} · <span class="sales-method">${esc(salesMethodLabel(s.method))}</span>${s.employeeName?` · ${esc(s.employeeName)}`:''}</div>${s.note?`<div class="fs11 muted mt4">${esc(s.note)}</div>`:''}</div><div class="fw8" style="color:var(--green)">${esc(money(s.total))}</div></div>`).join(''):`<div class="sales-empty">${esc(tx.empty)}</div>`}
       </div>
     </div>
     <div>
-      <div class="sales-panel">
+      <div class="sales-panel" id="sales-catalog-panel">
         <div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.catalog)}</div><div class="fs12 muted">${products.length} ${esc(tx.products).toLowerCase()}</div></div><button class="btn btn-ghost btn-sm" onclick="goPage('salesProducts')">${esc(tx.openSection)}</button></div>
         <div class="sales-empty">${esc(tx.goCatalogDesc)}</div>
       </div>
@@ -4707,12 +4786,12 @@ function renderSalesProducts(){
   const el=document.getElementById('sales-products-content');if(!el)return;
   DB.salesProducts=DB.salesProducts||[];
   const tx=salesTx(),products=sellableProducts();
-  el.innerHTML=`<section class="sales-hero">
+  el.innerHTML=`<section class="sales-hero" id="sales-products-hero">
     <div class="hub-kicker">${esc(tx.catalog)}</div>
     <h2>${esc(tx.goCatalog)}</h2>
     <p>${esc(tx.goCatalogDesc)}</p>
   </section>
-  <section class="sales-panel">
+  <section class="sales-panel" id="sales-products-panel">
     <div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.catalog)}</div><div class="fs12 muted">${esc(tx.product)}, ${esc(tx.price)}, ${esc(tx.category)}</div></div><button class="btn btn-primary btn-sm" onclick="openProductModal('sales')">${esc(tx.newProduct)}</button></div>
     ${products.length?products.map(p=>`<div class="sales-product"><div class="sales-product-dot">${esc((p.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(p.name)}</div><div class="fs11 muted">${esc(p.category||'-')} · ${esc(salesProductTypeLabel(p.type))}${p.sku?` · ${esc(p.sku)}`:''}</div>${p.trackStock?`<div class="fs11 ${Number(p.stock)<=Number(p.minStock)?'red':'muted'} mt4">${esc(tx.stock)}: ${Number(p.stock)||0} ${esc(salesUnitLabel(p.unit))} · ${esc(tx.minStock)}: ${Number(p.minStock)||0}</div>`:''}${recipeText(p)?`<div class="fs11 muted mt4">${esc(recipeText(p))}</div>`:''}</div><div style="display:flex;align-items:center;gap:8px"><div class="fw8">${esc(money(p.price))}</div><button class="btn btn-ghost btn-sm" onclick="openProductModal('sales','${p.id}')">${esc(editLabel())}</button></div></div>`).join(''):`<div class="sales-empty">${esc(tx.missingProduct)}</div>`}
   </section>`;
@@ -4736,7 +4815,7 @@ function salesReportCard(type,title,desc,icon){
 function renderSalesReports(){
   const el=document.getElementById('sales-reports-content');if(!el)return;
   const tx=salesTx(),rt=salesReportText(),list=salesByPeriod(salesPeriod()),sum=salesSummary(list);
-  el.innerHTML=`<section class="sales-hero">
+  el.innerHTML=`<section class="sales-hero" id="sales-reports-hero">
     <div class="hub-kicker">${esc(rt.reports)}</div>
     <h2>${esc(rt.reports)}</h2>
     <p>${esc(rt.priorityHelp)}</p>
@@ -4748,7 +4827,7 @@ function renderSalesReports(){
     ${salesKpiRich('avgTicket',tx.ticket,money(sum.ticket),'','')}
     ${salesKpiRich('productsSold',salesWidgetText().productsSold,String(sum.qty),'neutral','')}
   </section>
-  <section class="sales-report-grid">
+  <section class="sales-report-grid" id="sales-reports-grid">
     ${salesReportCard('daily',rt.dailyClose,rt.dailyCloseDesc,'$')}
     ${salesReportCard('monthly',rt.monthlySales,rt.monthlySalesDesc,'M')}
     ${salesReportCard('product',rt.byProduct,rt.byProductDesc,'P')}
@@ -4879,26 +4958,26 @@ function inventoryValue(){
 function renderInventory(){
   const el=document.getElementById('inventory-content');if(!el)return;
   const tx=inventoryTx(),items=stockItems(),low=lowStockItems(),purchases=DB.inventoryPurchases||[],suppliers=DB.suppliers||[];
-  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#78350f 0%,#b45309 55%,#14b8a6 145%)">
+  el.innerHTML=`<section class="sales-hero" id="inventory-tour-hero" style="background:linear-gradient(135deg,#78350f 0%,#b45309 55%,#14b8a6 145%)">
     <div class="hub-kicker">${esc(tx.title)}</div>
     <h2>${esc(tx.title)}</h2>
     <p>${esc(tx.sub)}</p>
   </section>
-  <section class="sales-kpis">
+  <section class="sales-kpis" id="inventory-summary">
     <div class="sales-kpi"><div class="num" style="color:var(--orange)">${items.length}</div><div class="kpi-sub">${esc(tx.items)}</div></div>
     <div class="sales-kpi"><div class="num" style="color:var(--red)">${low.length}</div><div class="kpi-sub">${esc(tx.low)}</div></div>
     <div class="sales-kpi"><div class="num" style="color:var(--green)">${purchases.length}</div><div class="kpi-sub">${esc(tx.purchases)}</div></div>
     <div class="sales-kpi"><div class="num" style="color:var(--cyan)">${esc(money(inventoryValue()))}</div><div class="kpi-sub">${esc(tx.value)}</div></div>
   </section>
-  <section class="sales-area-panel">
-    <div class="sales-area-card primary" onclick="goPage('inventoryStock')"><div><div class="sales-area-icon">${hubIcon('inventory')}</div><div class="sales-area-title">${esc(tx.stock)}</div><div class="sales-area-desc">${esc(tx.items)} · ${esc(tx.low)} ${low.length}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
-    <div class="sales-area-card" onclick="goPage('inventoryPurchases')"><div><div class="sales-area-icon">+</div><div class="sales-area-title">${esc(tx.purchases)}</div><div class="sales-area-desc">${esc(tx.newPurchase)}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
-    <div class="sales-area-card" onclick="goPage('inventorySuppliers')"><div><div class="sales-area-icon">P</div><div class="sales-area-title">${esc(tx.suppliers)}</div><div class="sales-area-desc">${esc(tx.newSupplier)}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
-    <div class="sales-area-card" onclick="goPage('inventoryReports')"><div><div class="sales-area-icon">R</div><div class="sales-area-title">${esc(tx.reports||'Reportes inventario')}</div><div class="sales-area-desc">${esc(tx.reportsDesc||'Stock, compras, consumo y costos')}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
+  <section class="sales-area-panel" id="inventory-area-panel">
+    <div class="sales-area-card primary" id="inventory-stock-card" onclick="goPage('inventoryStock')"><div><div class="sales-area-icon">${hubIcon('inventory')}</div><div class="sales-area-title">${esc(tx.stock)}</div><div class="sales-area-desc">${esc(tx.items)} · ${esc(tx.low)} ${low.length}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
+    <div class="sales-area-card" id="inventory-purchases-card" onclick="goPage('inventoryPurchases')"><div><div class="sales-area-icon">+</div><div class="sales-area-title">${esc(tx.purchases)}</div><div class="sales-area-desc">${esc(tx.newPurchase)}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
+    <div class="sales-area-card" id="inventory-suppliers-card" onclick="goPage('inventorySuppliers')"><div><div class="sales-area-icon">P</div><div class="sales-area-title">${esc(tx.suppliers)}</div><div class="sales-area-desc">${esc(tx.newSupplier)}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
+    <div class="sales-area-card" id="inventory-reports-card" onclick="goPage('inventoryReports')"><div><div class="sales-area-icon">R</div><div class="sales-area-title">${esc(tx.reports||'Reportes inventario')}</div><div class="sales-area-desc">${esc(tx.reportsDesc||'Stock, compras, consumo y costos')}</div></div><div class="sales-area-meta">${esc(areaTx().open)}</div></div>
   </section>
   <section class="sales-grid">
-    <div class="sales-panel"><div class="card-header" style="margin:0 0 12px">${esc(tx.low)}</div>${low.length?low.map(stockItemHTML).join(''):`<div class="sales-empty">${esc(tx.noStock)}</div>`}</div>
-    <div class="sales-panel"><div class="card-header" style="margin:0 0 12px">${esc(tx.purchases)}</div>${purchases.length?purchases.slice(0,5).map(purchaseHTML).join(''):`<div class="sales-empty">${esc(tx.noPurchases)}</div>`}</div>
+    <div class="sales-panel" id="inventory-low-panel"><div class="card-header" style="margin:0 0 12px">${esc(tx.low)}</div>${low.length?low.map(stockItemHTML).join(''):`<div class="sales-empty">${esc(tx.noStock)}</div>`}</div>
+    <div class="sales-panel" id="inventory-recent-purchases-panel"><div class="card-header" style="margin:0 0 12px">${esc(tx.purchases)}</div>${purchases.length?purchases.slice(0,5).map(purchaseHTML).join(''):`<div class="sales-empty">${esc(tx.noPurchases)}</div>`}</div>
   </section>`;
 }
 function stockItemHTML(p){
@@ -4915,20 +4994,20 @@ function supplierHTML(s){
 function renderInventoryStock(){
   const el=document.getElementById('inventory-stock-content');if(!el)return;
   const tx=inventoryTx(),items=stockItems();
-  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#78350f,#d97706)"><div class="hub-kicker">${esc(tx.stock)}</div><h2>${esc(tx.stock)}</h2><p>${esc(tx.sub)}</p></section>
-  <section class="sales-panel"><div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.stock)}</div><div class="fs12 muted">${items.length} ${esc(tx.items).toLowerCase()}</div></div><button class="btn btn-primary btn-sm" onclick="openProductModal('inventory')">${esc(salesTx().addIngredient||salesTx().newProduct)}</button></div>${items.length?items.map(stockItemHTML).join(''):`<div class="sales-empty">${esc(tx.noStock)}</div>`}</section>`;
+  el.innerHTML=`<section class="sales-hero" id="inventory-stock-hero" style="background:linear-gradient(135deg,#78350f,#d97706)"><div class="hub-kicker">${esc(tx.stock)}</div><h2>${esc(tx.stock)}</h2><p>${esc(tx.sub)}</p></section>
+  <section class="sales-panel" id="inventory-stock-panel"><div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.stock)}</div><div class="fs12 muted">${items.length} ${esc(tx.items).toLowerCase()}</div></div><button class="btn btn-primary btn-sm" onclick="openProductModal('inventory')">${esc(salesTx().addIngredient||salesTx().newProduct)}</button></div>${items.length?items.map(stockItemHTML).join(''):`<div class="sales-empty">${esc(tx.noStock)}</div>`}</section>`;
 }
 function renderInventoryPurchases(){
   const el=document.getElementById('inventory-purchases-content');if(!el)return;
   const tx=inventoryTx(),purchases=DB.inventoryPurchases||[];
-  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#7c2d12,#ea580c)"><div class="hub-kicker">${esc(tx.purchases)}</div><h2>${esc(tx.purchases)}</h2><p>${esc(tx.sub)}</p></section>
-  <section class="sales-panel"><div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.purchases)}</div><div class="fs12 muted">${esc(tx.newPurchase)}</div></div><button class="btn btn-primary btn-sm" onclick="openPurchaseModal()">${esc(tx.newPurchase)}</button></div>${purchases.length?purchases.map(purchaseHTML).join(''):`<div class="sales-empty">${esc(tx.noPurchases)}</div>`}</section>`;
+  el.innerHTML=`<section class="sales-hero" id="inventory-purchases-hero" style="background:linear-gradient(135deg,#7c2d12,#ea580c)"><div class="hub-kicker">${esc(tx.purchases)}</div><h2>${esc(tx.purchases)}</h2><p>${esc(tx.sub)}</p></section>
+  <section class="sales-panel" id="inventory-purchases-panel"><div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.purchases)}</div><div class="fs12 muted">${esc(tx.newPurchase)}</div></div><button class="btn btn-primary btn-sm" onclick="openPurchaseModal()">${esc(tx.newPurchase)}</button></div>${purchases.length?purchases.map(purchaseHTML).join(''):`<div class="sales-empty">${esc(tx.noPurchases)}</div>`}</section>`;
 }
 function renderInventorySuppliers(){
   const el=document.getElementById('inventory-suppliers-content');if(!el)return;
   const tx=inventoryTx(),suppliers=DB.suppliers||[];
-  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#164e63,#0891b2)"><div class="hub-kicker">${esc(tx.suppliers)}</div><h2>${esc(tx.suppliers)}</h2><p>${esc(tx.sub)}</p></section>
-  <section class="sales-panel"><div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.suppliers)}</div><div class="fs12 muted">${esc(tx.newSupplier)}</div></div><button class="btn btn-primary btn-sm" onclick="openSupplierModal()">${esc(tx.newSupplier)}</button></div>${suppliers.length?suppliers.map(supplierHTML).join(''):`<div class="sales-empty">${esc(tx.noSuppliers)}</div>`}</section>`;
+  el.innerHTML=`<section class="sales-hero" id="inventory-suppliers-hero" style="background:linear-gradient(135deg,#164e63,#0891b2)"><div class="hub-kicker">${esc(tx.suppliers)}</div><h2>${esc(tx.suppliers)}</h2><p>${esc(tx.sub)}</p></section>
+  <section class="sales-panel" id="inventory-suppliers-panel"><div class="flex-b mb12"><div><div class="card-header" style="margin:0">${esc(tx.suppliers)}</div><div class="fs12 muted">${esc(tx.newSupplier)}</div></div><button class="btn btn-primary btn-sm" onclick="openSupplierModal()">${esc(tx.newSupplier)}</button></div>${suppliers.length?suppliers.map(supplierHTML).join(''):`<div class="sales-empty">${esc(tx.noSuppliers)}</div>`}</section>`;
 }
 function adjustStock(id,delta){
   const p=productById(id);if(!p)return;
@@ -4999,18 +5078,18 @@ function inventoryReportCard(def){
 function renderInventoryReports(){
   const el=document.getElementById('inventory-reports-content');if(!el)return;
   const tx=inventoryTx();
-  el.innerHTML=`<section class="sales-hero" style="background:linear-gradient(135deg,#78350f 0%,#b45309 55%,#14b8a6 145%)">
+  el.innerHTML=`<section class="sales-hero" id="inventory-reports-hero" style="background:linear-gradient(135deg,#78350f 0%,#b45309 55%,#14b8a6 145%)">
     <div class="hub-kicker">${esc(tx.reports)}</div>
     <h2>${esc(tx.reports)}</h2>
     <p>${esc(tx.reportsDesc)}</p>
   </section>
-  <section class="sales-kpis">
+  <section class="sales-kpis" id="inventory-reports-summary">
     ${salesKpiRich('productsSold',tx.items,String(stockItems().length),'neutral','')}
     ${salesKpiRich('inventoryImpact',tx.low,String(lowStockItems().length),lowStockItems().length?'warn':'neutral','')}
     ${salesKpiRich('revenueMonth',tx.value,money(inventoryValue()),'neutral','')}
     ${salesKpiRich('salesCount',tx.purchases,String(inventoryMonthPurchases().length),'neutral','')}
   </section>
-  <section class="sales-report-grid">${inventoryReportDefs().map(inventoryReportCard).join('')}</section>
+  <section class="sales-report-grid" id="inventory-reports-grid">${inventoryReportDefs().map(inventoryReportCard).join('')}</section>
   <section class="sales-panel" id="inventory-report-preview"></section>`;
   previewInventoryReport('stock');
 }
@@ -5116,28 +5195,35 @@ window.addEventListener('pageshow',resumeEmpPortal);
 
 // ═══════ ONBOARDING TOUR ═══════
 let tourRole=null,tourStep=0;
-const TOUR_VERSION='2026-05-24-area-tours';
+const TOUR_VERSION='2026-05-25-area-deep-tours';
 const TOUR={
   hub:[
-    {key:'hubIntro',page:'hub',sel:'#pg-hub'},
-    {key:'hubPersonal',page:'hub',sel:'#pg-hub'},
-    {key:'hubSales',page:'hub',sel:'#pg-hub'},
-    {key:'hubInventory',page:'hub',sel:'#pg-hub'},
-    {key:'hubSettings',page:'hub',sel:'#pg-hub'}
+    {key:'hubIntro',page:'hub',sel:'#hub-tour-hero'},
+    {key:'hubAreas',page:'hub',sel:'#hub-area-grid'},
+    {key:'hubPersonal',page:'hub',sel:'#hub-card-people'},
+    {key:'hubSales',page:'hub',sel:'#hub-card-sales'},
+    {key:'hubInventory',page:'hub',sel:'#hub-card-inventory'},
+    {key:'hubRoadmap',page:'hub',sel:'#hub-roadmap-card'},
+    {key:'hubSettings',page:'hub',sel:'#hub-settings-card'}
   ],
   sales:[
-    {key:'salesIntro',page:'sales',sel:'#sales-content'},
-    {key:'salesRegister',page:'sales',sel:'#sales-content'},
-    {key:'salesProducts',page:'salesProducts',sel:'#sales-products-content'},
-    {key:'salesReports',page:'salesReports',sel:'#sales-reports-content'},
+    {key:'salesIntro',page:'sales',sel:'#sales-tour-hero'},
+    {key:'salesPeriod',page:'sales',sel:'#sales-period-tabs'},
+    {key:'salesIndicators',page:'sales',sel:'#sales-summary'},
+    {key:'salesRegister',page:'sales',sel:'#sales-activity-panel'},
+    {key:'salesProducts',page:'salesProducts',sel:'#sales-products-panel'},
+    {key:'salesReports',page:'salesReports',sel:'#sales-reports-grid'},
+    {key:'salesReportPreview',page:'salesReports',sel:'#sales-report-preview'},
     {key:'salesAssistant',sel:'#top-ai-btn'}
   ],
   inventory:[
-    {key:'inventoryIntro',page:'inventory',sel:'#inventory-content'},
-    {key:'inventoryStock',page:'inventoryStock',sel:'#inventory-stock-content'},
-    {key:'inventoryPurchases',page:'inventoryPurchases',sel:'#inventory-purchases-content'},
-    {key:'inventoryReports',page:'inventoryReports',sel:'#inventory-reports-content'},
-    {key:'inventoryConnection',page:'salesProducts',sel:'#sales-products-content'}
+    {key:'inventoryIntro',page:'inventory',sel:'#inventory-tour-hero'},
+    {key:'inventoryFlow',page:'inventory',sel:'#inventory-area-panel'},
+    {key:'inventoryStock',page:'inventoryStock',sel:'#inventory-stock-panel'},
+    {key:'inventoryPurchases',page:'inventoryPurchases',sel:'#inventory-purchases-panel'},
+    {key:'inventorySuppliers',page:'inventorySuppliers',sel:'#inventory-suppliers-panel'},
+    {key:'inventoryReports',page:'inventoryReports',sel:'#inventory-reports-grid'},
+    {key:'inventoryConnection',page:'salesProducts',sel:'#sales-products-panel'}
   ],
   manager:[
     {key:'language',kind:'language',sel:null},
@@ -5247,6 +5333,146 @@ Object.assign(TOUR_TX.en,{hub:{hubIntro:['Area hub','This hub separates the app 
 Object.assign(TOUR_TX.fr,{hub:{hubIntro:['Hub des domaines','Ce hub sépare l’app par domaines pour que le commerce ne devienne pas lourd: Personnel, Ventes, Inventaire et prochains modules.'],hubPersonal:['Personnel','Le contrôle quotidien de l’équipe commence ici: employés, présences, horaires, demandes, salaires, documents et rapports.'],hubSales:['Ventes','Ventes enregistre les produits ou services finaux, moyens de paiement et clôtures. Cela aide à comprendre les revenus et les meilleures ventes.'],hubInventory:['Inventaire','L’inventaire contrôle matières premières, stock, achats, fournisseurs, coûts moyens et consommation issue des ventes.'],hubSettings:['Paramètres','Les paramètres sont au niveau plateforme: langue, couleurs, horaires, tolérances, rôles et données du commerce.']},sales:{salesIntro:['Tableau des ventes','Commencez par l’essentiel: revenus, nombre de ventes, ticket moyen et signaux de caisse. Les indicateurs vont du plus important au moins important.'],salesRegister:['Enregistrer une vente','Chaque vente utilise un produit ou service final. Vous pouvez ajouter moyen de paiement, employé responsable et note.'],salesProducts:['Produits finaux','Dans Ventes, on garde ce que le commerce vend. Si une préparation a une recette, elle se connecte à l’inventaire.'],salesReports:['Rapports de ventes','Export Excel: clôture quotidienne, ventes mensuelles, produits, moyens de paiement, marge estimée et inventaire affecté.'],salesAssistant:['IA connectée','L’assistant relie ventes, inventaire, personnel, rapports et décisions réelles du commerce.']},inventory:{inventoryIntro:['Tableau inventaire','Voyez stock, valeur estimée, achats du mois, fournisseurs et alertes de stock bas.'],inventoryStock:['Stock et coût moyen','Chaque intrant peut avoir un coût initial. Ensuite les achats mettent à jour le coût moyen pondéré automatiquement.'],inventoryPurchases:['Achats','Si vous achetez 100 kg pour CHF 300, le système calcule CHF 3/kg et le mélange au stock existant pour actualiser le coût réel.'],inventoryReports:['Rapports inventaire','Rapports clés: stock actuel, stock bas, achats du mois, consommation par ventes et coût estimé par produit final.'],inventoryConnection:['Connexion aux ventes','Une pizza ou préparation peut déduire farine, fromage ou unités de l’inventaire et montrer la marge estimée avec coût réel.']}});
 Object.assign(TOUR_TX.de,{hub:{hubIntro:['Bereichs-Hub','Dieser Hub trennt die App in Bereiche, damit der Betrieb übersichtlich bleibt: Personal, Verkauf, Inventar und nächste Module.'],hubPersonal:['Personal','Hier beginnt die tägliche Teamsteuerung: Mitarbeiter, Anwesenheit, Pläne, Anfragen, Löhne, Dokumente und Berichte.'],hubSales:['Verkauf','Verkauf erfasst Endprodukte oder Services, Zahlungsarten und Abschlüsse. So versteht man Umsatz und Bestseller.'],hubInventory:['Inventar','Inventar steuert Rohstoffe, Lager, Einkäufe, Lieferanten, Durchschnittskosten und Verbrauch aus Verkäufen.'],hubSettings:['Einstellungen','Einstellungen gehören zur Plattform: Sprache, Farben, Öffnungszeiten, Toleranzen, Rollen und Betriebsdaten.']},sales:{salesIntro:['Verkaufsübersicht','Start mit dem Wichtigsten: Umsatz, Anzahl Verkäufe, Durchschnittsbon und Kassensignale. Indikatoren sind nach Relevanz geordnet.'],salesRegister:['Verkauf erfassen','Jeder Verkauf nutzt ein Endprodukt oder Service. Zahlungsart, verantwortlicher Mitarbeiter und Notiz sind möglich.'],salesProducts:['Endprodukte','Im Verkauf stehen Produkte oder Services, die der Betrieb verkauft. Rezepte verbinden sie mit Inventar.'],salesReports:['Verkaufsberichte','Excel-Export für Tagesabschluss, Monatsumsatz, Produkte, Zahlungsarten, geschätzte Marge und betroffenes Inventar.'],salesAssistant:['Vernetzte KI','Der Assistent verbindet Verkauf mit Inventar, Personal, Berichten und realen Geschäftsentscheidungen.']},inventory:{inventoryIntro:['Inventarübersicht','Sehen Sie Lager, geschätzten Wert, Monatseinkäufe, Lieferanten und Warnungen bei niedrigem Bestand.'],inventoryStock:['Lager und Durchschnittskosten','Jeder Input kann Startkosten haben. Einkäufe aktualisieren danach automatisch den gewichteten Durchschnitt.'],inventoryPurchases:['Einkäufe','Wenn Sie 100 kg für CHF 300 kaufen, berechnet das System CHF 3/kg und mischt es mit vorhandenem Bestand.'],inventoryReports:['Inventarberichte','Wichtige Berichte: aktueller Bestand, niedriger Bestand, Monatseinkäufe, Verbrauch durch Verkäufe und Kosten pro Endprodukt.'],inventoryConnection:['Verbindung mit Verkauf','Pizza oder Zubereitungen können Mehl, Käse oder Einheiten vom Inventar abziehen und geschätzte Marge zeigen.']}});
 Object.assign(TOUR_TX.it,{hub:{hubIntro:['Hub delle aree','Questo hub separa l’app per aree così il business resta leggero: Personale, Vendite, Inventario e prossimi moduli.'],hubPersonal:['Personale','Il controllo quotidiano del team parte qui: dipendenti, presenze, orari, richieste, stipendi, documenti e report.'],hubSales:['Vendite','Vendite registra prodotti o servizi finali, metodi di pagamento e chiusure. Aiuta a capire ricavi e cosa vende di più.'],hubInventory:['Inventario','Inventario controlla materie prime, stock, acquisti, fornitori, costi medi e consumo generato dalle vendite.'],hubSettings:['Impostazioni','Le impostazioni sono della piattaforma: lingua, colori, orari, tolleranze, ruoli e dati del business.']},sales:{salesIntro:['Dashboard vendite','Inizia da ciò che conta: ricavi, numero vendite, scontrino medio e segnali di cassa. Gli indicatori sono ordinati per importanza.'],salesRegister:['Registrare una vendita','Ogni vendita usa un prodotto o servizio finale. Puoi indicare pagamento, dipendente responsabile e nota.'],salesProducts:['Prodotti finali','In Vendite ci sono prodotti o servizi venduti. Se una preparazione ha ricetta, si collega all’inventario.'],salesReports:['Report vendite','Esporta Excel di chiusura giornaliera, vendite mensili, prodotti, pagamenti, margine stimato e inventario coinvolto.'],salesAssistant:['IA collegata','L’assistente collega vendite, inventario, personale, report e decisioni reali del business.']},inventory:{inventoryIntro:['Dashboard inventario','Vedi stock, valore stimato, acquisti del mese, fornitori e avvisi di stock basso.'],inventoryStock:['Stock e costo medio','Ogni ingrediente può avere costo iniziale. Poi gli acquisti aggiornano automaticamente il costo medio ponderato.'],inventoryPurchases:['Acquisti','Se compri 100 kg a CHF 300, il sistema calcola CHF 3/kg e lo combina con lo stock esistente.'],inventoryReports:['Report inventario','Report chiave: stock attuale, stock basso, acquisti del mese, consumo da vendite e costo per prodotto finale.'],inventoryConnection:['Connessione con vendite','Una pizza o preparazione può scalare farina, formaggio o unità dall’inventario e mostrare margine stimato.']}});
+Object.assign(TOUR_TX.es.hub,{
+  hubIntro:['El Hub es el mapa del negocio','Después de crear tu cuenta, este es el punto de partida. Desde aquí eliges qué área gestionar sin mezclar ventas, personal, inventario y configuración.'],
+  hubAreas:['Áreas separadas','Cada área tiene su propio panel y sus propias subsecciones. Así el negocio puede empezar simple y activar más módulos cuando los necesite.'],
+  hubPersonal:['Personal','Controla empleados, fichajes, horarios, solicitudes, salarios, documentos y reportes RH. Es el módulo base para operar el equipo.'],
+  hubSales:['Ventas','Registra productos o servicios finales, métodos de pago, caja diaria y reportes. Cuando un producto tiene consumo o receta, puede alimentar inventario.'],
+  hubInventory:['Inventario','Aquí viven materias primas, insumos, proveedores, compras, stock y costos promedio. Ventas consume inventario, pero inventario mantiene el costo real.'],
+  hubRoadmap:['Crece por etapas','Manager Pro no obliga a usar todo desde el primer día. Personal, Ventas e Inventario quedan activos; documentos, tareas e insights pueden crecer después.'],
+  hubSettings:['Configuración central','Define idioma, moneda, sector, horarios de apertura, tolerancias, roles y datos del negocio. Estos parámetros afectan toda la app.']
+});
+Object.assign(TOUR_TX.en.hub,{
+  hubIntro:['The Hub is the business map','After creating the account, this is the starting point. Choose which area to manage without mixing sales, people, inventory and settings.'],
+  hubAreas:['Separated areas','Each area has its own dashboard and subsections. The business can start simple and activate more modules when needed.'],
+  hubPersonal:['People','Manage employees, clocking, schedules, requests, payroll, documents and HR reports. This is the base module for the team.'],
+  hubSales:['Sales','Register final products or services, payment methods, daily cash and reports. When an item has consumption or recipe, it can feed inventory.'],
+  hubInventory:['Inventory','Raw materials, supplies, suppliers, purchases, stock and average costs live here. Sales consumes inventory, but inventory keeps the real cost.'],
+  hubRoadmap:['Grow in stages','Manager Pro does not force everything on day one. People, Sales and Inventory are active; documents, tasks and insights can grow later.'],
+  hubSettings:['Central settings','Set language, currency, sector, opening hours, tolerances, roles and business data. These parameters affect the whole app.']
+});
+Object.assign(TOUR_TX.fr.hub,{
+  hubIntro:['Le Hub est la carte du commerce','Après la création du compte, c’est le point de départ. Choisissez le domaine sans mélanger ventes, personnel, inventaire et paramètres.'],
+  hubAreas:['Domaines séparés','Chaque domaine a son tableau et ses sous-sections. Le commerce commence simple et active plus de modules quand il en a besoin.'],
+  hubPersonal:['Personnel','Gérez employés, pointages, horaires, demandes, salaires, documents et rapports RH. C’est la base pour gérer l’équipe.'],
+  hubSales:['Ventes','Enregistrez produits ou services finaux, paiements, caisse quotidienne et rapports. Un article avec recette peut alimenter l’inventaire.'],
+  hubInventory:['Inventaire','Matières premières, fournitures, fournisseurs, achats, stock et coûts moyens vivent ici. Les ventes consomment, l’inventaire garde le coût réel.'],
+  hubRoadmap:['Grandir par étapes','Manager Pro n’oblige pas à tout utiliser dès le premier jour. Personnel, Ventes et Inventaire sont actifs; le reste peut venir après.'],
+  hubSettings:['Configuration centrale','Définissez langue, monnaie, secteur, horaires, tolérances, rôles et données du commerce. Ces paramètres affectent toute l’app.']
+});
+Object.assign(TOUR_TX.de.hub,{
+  hubIntro:['Der Hub ist die Betriebskarte','Nach dem Erstellen des Kontos starten Sie hier. Wählen Sie den Bereich, ohne Verkauf, Personal, Inventar und Einstellungen zu mischen.'],
+  hubAreas:['Getrennte Bereiche','Jeder Bereich hat sein eigenes Dashboard und Unterseiten. Der Betrieb startet einfach und aktiviert später weitere Module.'],
+  hubPersonal:['Personal','Mitarbeiter, Buchungen, Pläne, Anfragen, Löhne, Dokumente und HR-Berichte verwalten. Das ist die Basis für das Team.'],
+  hubSales:['Verkauf','Endprodukte oder Services, Zahlungsarten, Tageskasse und Berichte erfassen. Artikel mit Rezept können Inventar verbrauchen.'],
+  hubInventory:['Inventar','Rohstoffe, Vorräte, Lieferanten, Einkäufe, Lager und Durchschnittskosten sind hier. Verkauf verbraucht Inventar, Inventar hält die realen Kosten.'],
+  hubRoadmap:['Schrittweise wachsen','Manager Pro zwingt nicht alles am ersten Tag auf. Personal, Verkauf und Inventar sind aktiv; weitere Module kommen später.'],
+  hubSettings:['Zentrale Einstellungen','Sprache, Währung, Branche, Öffnungszeiten, Toleranzen, Rollen und Betriebsdaten festlegen. Das wirkt auf die ganze App.']
+});
+Object.assign(TOUR_TX.it.hub,{
+  hubIntro:['L’Hub è la mappa del business','Dopo aver creato l’account, questo è il punto di partenza. Scegli l’area senza mischiare vendite, personale, inventario e impostazioni.'],
+  hubAreas:['Aree separate','Ogni area ha il suo pannello e le sue sezioni. Il business parte semplice e attiva altri moduli quando servono.'],
+  hubPersonal:['Personale','Gestisci dipendenti, timbrature, orari, richieste, stipendi, documenti e report HR. È il modulo base per il team.'],
+  hubSales:['Vendite','Registra prodotti o servizi finali, pagamenti, cassa giornaliera e report. Se un articolo ha consumo o ricetta, alimenta inventario.'],
+  hubInventory:['Inventario','Materie prime, forniture, fornitori, acquisti, stock e costi medi vivono qui. Le vendite consumano inventario, l’inventario mantiene il costo reale.'],
+  hubRoadmap:['Crescere per fasi','Manager Pro non obbliga a usare tutto dal primo giorno. Personale, Vendite e Inventario sono attivi; gli altri moduli possono arrivare dopo.'],
+  hubSettings:['Impostazioni centrali','Definisci lingua, valuta, settore, orari, tolleranze, ruoli e dati del business. Questi parametri influenzano tutta l’app.']
+});
+Object.assign(TOUR_TX.es.sales,{
+  salesIntro:['Ventas empieza por caja','Aquí ves ingresos, cantidad de ventas, ticket promedio y señales que ayudan a controlar el día.'],
+  salesPeriod:['Cambia el periodo','Puedes mirar hoy, semana o mes. Esto evita saturar el panel y mantiene el foco del manager.'],
+  salesIndicators:['Indicadores clave','Arriba quedan los datos más importantes. Los indicadores extra se activan desde Configurar panel según el tipo de negocio.'],
+  salesRegister:['Registrar una venta','La venta usa productos o servicios finales. Puedes agregar método de pago, responsable y nota.'],
+  salesProducts:['Catálogo de venta','Aquí van solo los productos o servicios que se venden al cliente. Materias primas e insumos viven en Inventario.'],
+  salesReports:['Reportes de ventas','Genera Excel de cierre diario, ventas mensuales, productos, métodos de pago, margen e inventario afectado.'],
+  salesReportPreview:['Vista previa antes de descargar','Antes de exportar, revisa el reporte en pantalla para confirmar que el periodo y los datos son correctos.'],
+  salesAssistant:['IA conectada al negocio','El asistente puede cruzar ventas con personal, inventario y reportes para ayudar a interpretar qué está pasando.']
+});
+Object.assign(TOUR_TX.en.sales,{
+  salesIntro:['Sales starts with cash control','Here you see revenue, number of sales, average ticket and signals that help control the day.'],
+  salesPeriod:['Change the period','Look at today, week or month. This keeps the dashboard focused and avoids overwhelming the manager.'],
+  salesIndicators:['Key indicators','The top area keeps the most important data. Extra indicators can be enabled from Configure panel by business type.'],
+  salesRegister:['Register a sale','A sale uses final products or services. Add payment method, responsible person and note.'],
+  salesProducts:['Sales catalog','Only customer-facing products or services go here. Raw materials and supplies live in Inventory.'],
+  salesReports:['Sales reports','Generate Excel for daily closing, monthly sales, products, payment methods, margin and affected inventory.'],
+  salesReportPreview:['Preview before downloading','Before exporting, review the report on screen to confirm period and data.'],
+  salesAssistant:['AI connected to the business','The assistant can connect sales with people, inventory and reports to help interpret what is happening.']
+});
+Object.assign(TOUR_TX.fr.sales,{
+  salesIntro:['Les ventes commencent par la caisse','Vous voyez revenus, nombre de ventes, ticket moyen et signaux pour contrôler la journée.'],
+  salesPeriod:['Changer la période','Regardez aujourd’hui, semaine ou mois. Cela garde le tableau clair et centré sur l’essentiel.'],
+  salesIndicators:['Indicateurs clés','En haut restent les données les plus importantes. Les indicateurs extra s’activent selon le type de commerce.'],
+  salesRegister:['Enregistrer une vente','La vente utilise des produits ou services finaux. Ajoutez paiement, responsable et note.'],
+  salesProducts:['Catalogue de vente','Ici vont seulement les produits ou services vendus au client. Les matières premières vivent dans Inventaire.'],
+  salesReports:['Rapports de ventes','Générez Excel: clôture quotidienne, ventes mensuelles, produits, paiements, marge et inventaire affecté.'],
+  salesReportPreview:['Aperçu avant téléchargement','Avant export, vérifiez le rapport à l’écran pour confirmer période et données.'],
+  salesAssistant:['IA connectée au commerce','L’assistant peut croiser ventes, personnel, inventaire et rapports pour interpréter la situation.']
+});
+Object.assign(TOUR_TX.de.sales,{
+  salesIntro:['Verkauf beginnt mit Kasse','Hier sehen Sie Umsatz, Anzahl Verkäufe, Durchschnittsbon und Signale zur Tageskontrolle.'],
+  salesPeriod:['Zeitraum wechseln','Heute, Woche oder Monat ansehen. So bleibt das Dashboard fokussiert und übersichtlich.'],
+  salesIndicators:['Wichtige Kennzahlen','Oben stehen die wichtigsten Daten. Zusätzliche Kennzahlen werden je nach Betrieb aktiviert.'],
+  salesRegister:['Verkauf erfassen','Ein Verkauf nutzt Endprodukte oder Services. Zahlungsart, Verantwortliche und Notiz können ergänzt werden.'],
+  salesProducts:['Verkaufskatalog','Hier stehen nur Produkte oder Services für Kunden. Rohstoffe und Vorräte sind im Inventar.'],
+  salesReports:['Verkaufsberichte','Excel für Tagesabschluss, Monatsumsatz, Produkte, Zahlungsarten, Marge und betroffenes Inventar erstellen.'],
+  salesReportPreview:['Vorschau vor Download','Vor dem Export prüfen Sie Bericht, Zeitraum und Daten direkt auf dem Bildschirm.'],
+  salesAssistant:['KI mit dem Betrieb verbunden','Der Assistent verbindet Verkauf mit Personal, Inventar und Berichten, um die Lage zu verstehen.']
+});
+Object.assign(TOUR_TX.it.sales,{
+  salesIntro:['Le vendite partono dalla cassa','Qui vedi ricavi, numero vendite, scontrino medio e segnali per controllare la giornata.'],
+  salesPeriod:['Cambia periodo','Guarda oggi, settimana o mese. Così il pannello resta chiaro e focalizzato.'],
+  salesIndicators:['Indicatori chiave','In alto restano i dati più importanti. Gli indicatori extra si attivano in base al tipo di business.'],
+  salesRegister:['Registrare una vendita','La vendita usa prodotti o servizi finali. Aggiungi metodo di pagamento, responsabile e nota.'],
+  salesProducts:['Catalogo vendite','Qui vanno solo prodotti o servizi venduti al cliente. Materie prime e forniture vivono in Inventario.'],
+  salesReports:['Report vendite','Genera Excel di chiusura giornaliera, vendite mensili, prodotti, pagamenti, margine e inventario coinvolto.'],
+  salesReportPreview:['Anteprima prima del download','Prima di esportare, controlla il report a schermo per confermare periodo e dati.'],
+  salesAssistant:['IA collegata al business','L’assistente collega vendite, personale, inventario e report per interpretare cosa succede.']
+});
+Object.assign(TOUR_TX.es.inventory,{
+  inventoryIntro:['Inventario controla el costo real','Aquí están insumos, materias primas, proveedores, compras, stock y costo promedio.'],
+  inventoryFlow:['Flujo de inventario','Stock muestra lo que tienes, Compras actualiza cantidades y costo promedio, Proveedores organiza a quién compras.'],
+  inventoryStock:['Stock','Controla cantidad actual, mínimo, unidad y costo promedio. Si baja del mínimo, aparece alerta.'],
+  inventoryPurchases:['Compras','Cada compra suma unidades y recalcula costo promedio ponderado. Ejemplo: 100 kg por CHF 300 actualiza a CHF 3/kg mezclado con stock existente.'],
+  inventorySuppliers:['Proveedores','Guarda proveedores para saber de dónde vienen las compras y mantener historial.'],
+  inventoryReports:['Reportes de inventario','Stock actual, bajo stock, compras del mes, consumo por ventas y costo estimado por producto final.'],
+  inventoryConnection:['Conexión con ventas','Un producto final, como una pizza, puede descontar harina, queso o unidades del inventario al venderse.']
+});
+Object.assign(TOUR_TX.en.inventory,{
+  inventoryIntro:['Inventory controls real cost','This is where supplies, raw materials, suppliers, purchases, stock and average cost live.'],
+  inventoryFlow:['Inventory flow','Stock shows what you have, Purchases update quantities and average cost, Suppliers organize who you buy from.'],
+  inventoryStock:['Stock','Control current quantity, minimum, unit and average cost. If it goes below minimum, an alert appears.'],
+  inventoryPurchases:['Purchases','Each purchase adds units and recalculates weighted average cost. Example: 100 kg for CHF 300 updates to CHF 3/kg mixed with existing stock.'],
+  inventorySuppliers:['Suppliers','Save suppliers to know where purchases come from and keep history.'],
+  inventoryReports:['Inventory reports','Current stock, low stock, monthly purchases, sales consumption and estimated cost per final product.'],
+  inventoryConnection:['Connection with sales','A final product, like a pizza, can deduct flour, cheese or units from inventory when sold.']
+});
+Object.assign(TOUR_TX.fr.inventory,{
+  inventoryIntro:['L’inventaire contrôle le coût réel','Ici vivent fournitures, matières premières, fournisseurs, achats, stock et coût moyen.'],
+  inventoryFlow:['Flux d’inventaire','Stock montre ce que vous avez, Achats met à jour quantités et coût moyen, Fournisseurs organise les achats.'],
+  inventoryStock:['Stock','Contrôlez quantité actuelle, minimum, unité et coût moyen. Si le stock passe sous le minimum, une alerte apparaît.'],
+  inventoryPurchases:['Achats','Chaque achat ajoute des unités et recalcule le coût moyen pondéré. Exemple: 100 kg pour CHF 300 met à jour CHF 3/kg avec le stock existant.'],
+  inventorySuppliers:['Fournisseurs','Enregistrez les fournisseurs pour savoir d’où viennent les achats et garder l’historique.'],
+  inventoryReports:['Rapports inventaire','Stock actuel, stock bas, achats du mois, consommation par ventes et coût estimé par produit final.'],
+  inventoryConnection:['Connexion aux ventes','Un produit final, comme une pizza, peut déduire farine, fromage ou unités de l’inventaire à la vente.']
+});
+Object.assign(TOUR_TX.de.inventory,{
+  inventoryIntro:['Inventar steuert reale Kosten','Hier liegen Vorräte, Rohstoffe, Lieferanten, Einkäufe, Lager und Durchschnittskosten.'],
+  inventoryFlow:['Inventarfluss','Stock zeigt Bestand, Einkäufe aktualisieren Mengen und Durchschnittskosten, Lieferanten organisieren den Einkauf.'],
+  inventoryStock:['Lager','Aktuelle Menge, Minimum, Einheit und Durchschnittskosten kontrollieren. Unter Minimum erscheint eine Warnung.'],
+  inventoryPurchases:['Einkäufe','Jeder Einkauf addiert Einheiten und berechnet gewichtete Durchschnittskosten neu. Beispiel: 100 kg für CHF 300 werden mit Bestand gemischt.'],
+  inventorySuppliers:['Lieferanten','Lieferanten speichern, um Herkunft der Einkäufe und Historie zu behalten.'],
+  inventoryReports:['Inventarberichte','Aktueller Bestand, niedriger Bestand, Monatseinkäufe, Verbrauch durch Verkäufe und Kosten pro Endprodukt.'],
+  inventoryConnection:['Verbindung mit Verkauf','Ein Endprodukt wie Pizza kann beim Verkauf Mehl, Käse oder Einheiten aus dem Inventar abziehen.']
+});
+Object.assign(TOUR_TX.it.inventory,{
+  inventoryIntro:['Inventario controlla il costo reale','Qui ci sono forniture, materie prime, fornitori, acquisti, stock e costo medio.'],
+  inventoryFlow:['Flusso inventario','Stock mostra cosa hai, Acquisti aggiorna quantità e costo medio, Fornitori organizza da chi compri.'],
+  inventoryStock:['Stock','Controlla quantità attuale, minimo, unità e costo medio. Se scende sotto il minimo, appare un avviso.'],
+  inventoryPurchases:['Acquisti','Ogni acquisto aggiunge unità e ricalcola il costo medio ponderato. Esempio: 100 kg a CHF 300 si mescolano allo stock esistente.'],
+  inventorySuppliers:['Fornitori','Salva i fornitori per sapere da dove arrivano gli acquisti e mantenere lo storico.'],
+  inventoryReports:['Report inventario','Stock attuale, stock basso, acquisti del mese, consumo da vendite e costo stimato per prodotto finale.'],
+  inventoryConnection:['Connessione con vendite','Un prodotto finale, come una pizza, può scalare farina, formaggio o unità dall’inventario quando viene venduto.']
+});
 ['es','en','fr','de','it'].forEach(k=>{TOUR_TX[k].personal=TOUR_TX[k].manager;});
 const tourTxt=(role,key)=>((TOUR_TX[lang]||TOUR_TX.es)[role]||{})[key]||(TOUR_TX.es[role]||{})[key]||['',''];
 const tourButtons=()=>((TOUR_TX[lang]||TOUR_TX.es).buttons||TOUR_TX.es.buttons);
