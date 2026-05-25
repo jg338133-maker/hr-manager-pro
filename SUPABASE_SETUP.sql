@@ -578,6 +578,7 @@ alter table public.restaurants add column if not exists brand_color2 text defaul
 alter table public.restaurants add column if not exists status text default 'active';
 alter table public.restaurants add column if not exists opening_hours jsonb default '{}'::jsonb;
 alter table public.restaurants add column if not exists sales_panel_widgets jsonb default null;
+alter table public.restaurants add column if not exists business_sector text default 'general';
 alter table public.shifts add column if not exists blocks jsonb default '[]'::jsonb;
 update public.employees set pin = '0000' where pin is null or pin = '';
 update public.restaurants set emoji = '🍽️' where emoji is null or emoji = '';
@@ -585,6 +586,7 @@ update public.restaurants set brand_color = '#4f6ef7' where brand_color is null 
 update public.restaurants set brand_color2 = '#7c3aed' where brand_color2 is null or brand_color2 = '';
 update public.restaurants set status = 'active' where status is null or status = '';
 update public.restaurants set opening_hours = '{}'::jsonb where opening_hours is null;
+update public.restaurants set business_sector = 'general' where business_sector is null or trim(business_sector) = '';
 create unique index if not exists shifts_employee_date_unique on public.shifts(employee_id, shift_date);
 create index if not exists employee_documents_employee_idx on public.employee_documents(employee_id, created_at desc);
 
@@ -621,7 +623,8 @@ returns table (
   max_hours_week integer,
   lang text,
   brand_color text,
-  brand_color2 text
+  brand_color2 text,
+  business_sector text
 )
 language sql
 security definer
@@ -657,7 +660,8 @@ as $$
     r.max_hours_week,
     r.lang,
     r.brand_color,
-    r.brand_color2
+    r.brand_color2,
+    r.business_sector
   from public.employees e
   join public.restaurants r on r.id = e.restaurant_id
   where lower(e.email) = lower(trim(p_email))
