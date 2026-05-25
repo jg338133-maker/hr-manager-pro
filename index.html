@@ -844,6 +844,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
     </div>
     <!-- Business Register -->
     <div id="login-register" style="display:none">
+      <div class="section-lbl" id="reg-business-step" style="margin:0 0 10px;padding:0">1. Datos del negocio</div>
       <div class="fg"><label id="reg-rest-label">Nom du commerce</label><input id="reg-rest-name" placeholder="Bellevue Studio"></div>
       <div class="frow" id="reg-business-fields">
         <div class="fg"><label id="reg-sector-label">Sector</label><select id="reg-sector"></select></div>
@@ -856,11 +857,12 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
           <option value="MXN">MXN · México</option>
         </select></div>
       </div>
+      <div class="section-lbl" id="reg-admin-step" style="margin:2px 0 10px;padding:0">2. Cuenta administradora</div>
       <div class="fg"><label id="reg-email-label">Email administrateur</label><input type="email" id="reg-email" placeholder="admin@manager-pro.app"></div>
       <div class="fg"><label id="reg-password-label">Mot de passe</label><div style="display:flex;gap:8px"><input type="password" id="reg-password" placeholder="Minimum 6 caractères"><button type="button" class="btn btn-ghost btn-sm" onclick="togglePassword('reg-password',this)" style="width:46px;padding:0">👁</button></div></div>
       <div class="fg"><label id="reg-password2-label">Répéter le mot de passe</label><div style="display:flex;gap:8px"><input type="password" id="reg-password2" placeholder="Répéter le mot de passe"><button type="button" class="btn btn-ghost btn-sm" onclick="togglePassword('reg-password2',this)" style="width:46px;padding:0">👁</button></div></div>
-      <button class="btn btn-primary" onclick="registerRestaurant()" style="margin-bottom:10px">Créer compte admin</button>
-      <div style="font-size:11px;color:var(--text2);line-height:1.5">Crée l’espace du commerce et lie cet utilisateur comme administrateur. Si Supabase demande confirmation email, confirmez avant de vous connecter.</div>
+      <button class="btn btn-primary" id="reg-submit-btn" onclick="registerRestaurant()" style="margin-bottom:10px">Guardar negocio y crear cuenta admin</button>
+      <div id="reg-flow-note" style="font-size:11px;color:var(--text2);line-height:1.5">Primero guardamos los parámetros del negocio. Si Supabase pide confirmar email, al iniciar sesión se crea el negocio independiente y se conecta este administrador.</div>
     </div>
   </div>
   </div>
@@ -1886,10 +1888,15 @@ Object.assign(UI.fr.login,{chip1:'Restaurants',chip1Sub:'Services et pauses',chi
 Object.assign(UI.de.login,{chip1:'Restaurants',chip1Sub:'Schichten und Pausen',chip2:'Läden',chip2Sub:'Team und Kasse',chip3:'Kleine Hotels',chip3Sub:'Pläne und Anfragen',chip4:'Services',chip4Sub:'Dokumente und Berichte'});
 Object.assign(UI.it.login,{chip1:'Ristoranti',chip1Sub:'Turni e pause',chip2:'Negozi',chip2Sub:'Team e cassa',chip3:'Piccoli hotel',chip3Sub:'Orari e richieste',chip4:'Servizi',chip4Sub:'Documenti e report'});
 Object.assign(UI.fr.login,{registerNote:'Créez l’espace de votre commerce et invitez votre équipe.',restName:'Nom du commerce'});
-Object.assign(UI.es.login,{registerNote:'Crea el espacio de tu negocio e invita a tu equipo.',restName:'Nombre del negocio'});
-Object.assign(UI.en.login,{registerNote:'Create your business workspace and invite your team.',restName:'Business name'});
-Object.assign(UI.de.login,{registerNote:'Betriebsbereich erstellen und Team einladen.',restName:'Name des Betriebs'});
-Object.assign(UI.it.login,{registerNote:'Crea lo spazio del tuo business e invita il team.',restName:'Nome attività'});
+Object.assign(UI.fr.login,{createAdmin:'Enregistrer le commerce et créer l’admin',businessStep:'1. Données du commerce',adminStep:'2. Compte administrateur',flowNote:'Nous sauvegardons d’abord les paramètres du commerce. Si Supabase demande une confirmation email, le commerce indépendant sera créé et connecté lors de la première connexion.'});
+Object.assign(UI.es.login,{createAdmin:'Guardar negocio y crear admin',businessStep:'1. Datos del negocio',adminStep:'2. Cuenta administradora',flowNote:'Primero guardamos los parámetros del negocio. Si Supabase pide confirmar email, al iniciar sesión se crea el negocio independiente y se conecta este administrador.'});
+Object.assign(UI.en.login,{createAdmin:'Save business and create admin',businessStep:'1. Business settings',adminStep:'2. Admin account',flowNote:'We save the business settings first. If Supabase asks for email confirmation, the independent business is created and connected on the first sign-in.'});
+Object.assign(UI.de.login,{createAdmin:'Betrieb speichern und Admin erstellen',businessStep:'1. Betriebsdaten',adminStep:'2. Admin-Konto',flowNote:'Zuerst speichern wir die Betriebseinstellungen. Wenn Supabase eine E-Mail-Bestätigung verlangt, wird der unabhängige Betrieb beim ersten Login erstellt und verbunden.'});
+Object.assign(UI.it.login,{createAdmin:'Salva attività e crea admin',businessStep:'1. Dati attività',adminStep:'2. Account amministratore',flowNote:'Prima salviamo i parametri dell’attività. Se Supabase richiede la conferma email, l’attività indipendente viene creata e collegata al primo accesso.'});
+Object.assign(UI.es.login,{registerNote:'Crea el espacio de tu negocio y configura sus parámetros.',restName:'Nombre del negocio'});
+Object.assign(UI.en.login,{registerNote:'Create your business workspace and configure its settings.',restName:'Business name'});
+Object.assign(UI.de.login,{registerNote:'Betrieb erstellen und Einstellungen konfigurieren.',restName:'Name des Betriebs'});
+Object.assign(UI.it.login,{registerNote:'Crea lo spazio della tua attività e configura i parametri.',restName:'Nome attività'});
 Object.assign(UI.fr.settings,{restaurant:'Votre commerce',companyName:'Nom du commerce',emoji:'Emoji du commerce'});
 Object.assign(UI.es.settings,{restaurant:'Tu negocio',companyName:'Nombre del negocio',emoji:'Emoji del negocio'});
 Object.assign(UI.en.settings,{restaurant:'Your business',companyName:'Business name',emoji:'Business emoji'});
@@ -1900,11 +1907,11 @@ Object.assign(UI.es.master,{managed:'Negocios gestionados',restaurants:'Negocios
 Object.assign(UI.en.master,{managed:'Managed businesses',restaurants:'Businesses',noRestaurant:'no business',noneTitle:'No businesses',noneText:'Create the first one from registration or Supabase.',changed:'Active business changed'});
 Object.assign(UI.de.master,{managed:'Verwaltete Betriebe',restaurants:'Betriebe',noRestaurant:'kein Betrieb',noneTitle:'Keine Betriebe',noneText:'Erstellen Sie den ersten über Registrierung oder Supabase.',changed:'Aktiver Betrieb geändert'});
 Object.assign(UI.it.master,{managed:'Business gestiti',restaurants:'Business',noRestaurant:'nessun business',noneTitle:'Nessun business',noneText:'Crea il primo dalla registrazione o da Supabase.',changed:'Business attivo cambiato'});
-Object.assign(UI.fr.login,{sub:'Gestion simple du business',registerNote:'Créez l’espace de votre commerce et invitez votre équipe.',restName:'Nom du commerce'});
-Object.assign(UI.es.login,{sub:'Gestión simple del negocio',registerNote:'Crea el espacio de tu negocio e invita a tu equipo.',restName:'Nombre del negocio'});
-Object.assign(UI.en.login,{sub:'Simple business management',registerNote:'Create your business workspace and invite your team.',restName:'Business name'});
-Object.assign(UI.de.login,{sub:'Einfache Betriebsverwaltung',registerNote:'Betriebsbereich erstellen und Team einladen.',restName:'Name des Betriebs'});
-Object.assign(UI.it.login,{sub:'Gestione semplice del business',registerNote:'Crea lo spazio del tuo business e invita il team.',restName:'Nome attività'});
+Object.assign(UI.fr.login,{sub:'Gestion simple du business',registerNote:'Créez l’espace de votre commerce et configurez ses paramètres.',restName:'Nom du commerce'});
+Object.assign(UI.es.login,{sub:'Gestión simple del negocio',registerNote:'Crea el espacio de tu negocio y configura sus parámetros.',restName:'Nombre del negocio'});
+Object.assign(UI.en.login,{sub:'Simple business management',registerNote:'Create your business workspace and configure its settings.',restName:'Business name'});
+Object.assign(UI.de.login,{sub:'Einfache Betriebsverwaltung',registerNote:'Betrieb erstellen und Einstellungen konfigurieren.',restName:'Name des Betriebs'});
+Object.assign(UI.it.login,{sub:'Gestione semplice del business',registerNote:'Crea lo spazio della tua attività e configura i parametri.',restName:'Nome attività'});
 const EMP_UI={
   fr:{clockIn:"Pointer l'entrée",clockOut:'Pointer la sortie',breakStart:'Début pause',breakEnd:'Terminer pause',breakChoose:'Choisir la durée',breakActive:'En pause depuis',breakEndsAt:'À terminer à',breakEndedAt:'Devait terminer à',latePrompt:'Vous êtes arrivé en retard. Vous pouvez écrire le motif:',outOpenBreak:'Vous avez une pause ouverte. Si vous pointez la sortie maintenant, elle restera sans fermeture. Continuer?',outNoBreak:'Aucune pause enregistrée. Si vous pointez la sortie, le manager sera averti. Continuer?',clockInFirst:"Enregistrez d'abord l'entrée",breakAlready:'Pause déjà en cours',breakDone:'Pause terminée',logout:'Déconnexion',tour:'Voir le tour',today:"Aujourd'hui",week:'Cette semaine',vac:'Vacances',medical:'Incapacité / maladie',personal:'Personnel',monthHours:'Heures du mois',calendar:'Calendrier',absence:'Demander une absence',type:'Type',start:'Début',end:'Fin',note:'Note',send:'Envoyer la demande',todaySchedule:"Horaire d'aujourd'hui",expectedIn:'Entrée prévue',expectedOut:'Sortie prévue',off:'Jour non travaillé',todayPunches:"Pointages d'aujourd'hui",noneToday:"Aucun pointage aujourd'hui",in:'Entrée',out:'Sortie',badge:'Mon carnet',badgeOpen:'Cliquez pour ouvrir votre portail',badgeLink:'Cliquez ici pour ouvrir',pdf:'Télécharger PDF',card:'Télécharger mon carnet'},
   es:{clockIn:'Fichar entrada',clockOut:'Fichar salida',breakStart:'Iniciar pausa',breakEnd:'Terminar pausa',breakChoose:'Elegir duración',breakActive:'En pausa desde',breakEndsAt:'Debe terminar a las',breakEndedAt:'Debía terminar a las',latePrompt:'Llegaste tarde. Puedes escribir el motivo:',outOpenBreak:'Tienes una pausa abierta. Si fichas salida ahora, la pausa quedará sin cierre. ¿Continuar?',outNoBreak:'No tienes una pausa registrada. Si fichas salida, se avisará al manager. ¿Continuar?',clockInFirst:'Primero registra entrada',breakAlready:'Pausa ya en curso',breakDone:'Pausa terminada',logout:'Cerrar sesión',tour:'Ver tour',today:'Hoy',week:'Esta semana',vac:'Vacaciones',medical:'Incapacidad / enfermedad',personal:'Personal',monthHours:'Horas del mes',calendar:'Calendario',absence:'Solicitar ausencia',type:'Tipo',start:'Inicio',end:'Fin',note:'Nota',send:'Enviar solicitud',todaySchedule:'Horario de hoy',expectedIn:'Entrada prevista',expectedOut:'Salida prevista',off:'Día no trabajado',todayPunches:'Fichajes de hoy',noneToday:'Sin fichajes hoy',in:'Entrada',out:'Salida',badge:'Mi carnet',badgeOpen:'Haz click para abrir tu portal',badgeLink:'Haz click aquí para abrir',pdf:'Descargar PDF',card:'Descargar mi carnet'},
@@ -2174,13 +2181,26 @@ function savePendingRegistration(payload){
   localStorage.setItem('managerpro_pending_registration',JSON.stringify({...payload,createdAt:new Date().toISOString()}));
 }
 function clearPendingRegistration(){localStorage.removeItem('managerpro_pending_registration');}
+function metadataPendingRegistration(user){
+  const meta=user?.user_metadata?.pending_business||user?.user_metadata?.businessSetup||null;
+  if(!meta||typeof meta!=='object')return null;
+  return {
+    restName:meta.restName||meta.businessName||meta.name||'',
+    email:user?.email||meta.email||'',
+    businessSector:meta.businessSector||meta.sector||'general',
+    currency:meta.currency||'CHF',
+    lang:meta.lang||lang||'fr'
+  };
+}
 async function completePendingRegistration(user){
-  const pending=pendingRegistration();
-  if(!pending||!user?.email||pending.email.toLowerCase()!==user.email.toLowerCase())return null;
-  const restaurant=await sbCreateRestaurant(pending.restName,user.email,pending);
-  const profile=await ensureProfile(user,'restaurant_admin',restaurant.id);
-  setRestaurantId(restaurant.id);
-  LOGIN_RESTAURANTS=[...LOGIN_RESTAURANTS.filter(r=>r.id!==restaurant.id),{id:restaurant.id,name:restaurant.name,emoji:restaurant.emoji}];
+  const local=pendingRegistration();
+  const meta=metadataPendingRegistration(user);
+  const pending=(local&&user?.email&&local.email?.toLowerCase()===user.email.toLowerCase())?local:meta;
+  if(!pending||!clean(pending.restName||''))return null;
+  const profile=await sbCreateBusinessForCurrentUser(pending);
+  if(!profile?.restaurant_id)return profile||null;
+  setRestaurantId(profile.restaurant_id);
+  LOGIN_RESTAURANTS=[...LOGIN_RESTAURANTS.filter(r=>r.id!==profile.restaurant_id),{id:profile.restaurant_id,name:pending.restName,emoji:'MP'}];
   localStorage.setItem('hrm_restaurant_directory',JSON.stringify(LOGIN_RESTAURANTS));
   clearPendingRegistration();
   toast('✅ Negocio creado y conectado');
@@ -2374,6 +2394,16 @@ async function sbCreateRestaurant(name,email,opts={}){
   }).select('*').single();
   if(error)throw error;
   return data;
+}
+async function sbCreateBusinessForCurrentUser(opts={}){
+  const {data,error}=await sb.rpc('create_business_for_current_user',{
+    p_business_name:opts.restName||opts.name||'',
+    p_business_sector:opts.businessSector||'general',
+    p_currency:opts.currency||'CHF',
+    p_lang:opts.lang||lang||'fr'
+  });
+  if(error)throw error;
+  return Array.isArray(data)?data[0]:data;
 }
 async function sbEmployeeLogin(email,pin){
   const {data,error}=await sb.rpc('employee_login',{p_email:email,p_pin:pin});
@@ -2589,6 +2619,9 @@ function applyUITexts(){
   const regEmail=document.getElementById('reg-email-label');if(regEmail)regEmail.textContent=lt.adminEmail;
   const regPass=document.getElementById('reg-password-label');if(regPass)regPass.textContent=lt.password;
   const regPass2=document.getElementById('reg-password2-label');if(regPass2)regPass2.textContent=lt.confirmPassword;
+  const regBusinessStep=document.getElementById('reg-business-step');if(regBusinessStep)regBusinessStep.textContent=lt.businessStep;
+  const regAdminStep=document.getElementById('reg-admin-step');if(regAdminStep)regAdminStep.textContent=lt.adminStep;
+  const regFlowNote=document.getElementById('reg-flow-note');if(regFlowNote)regFlowNote.textContent=lt.flowNote;
   const create=document.querySelector('[onclick="registerRestaurant()"]');if(create)create.textContent=lt.createAdmin;
   const sub=document.querySelector('.login-sub');if(sub)sub.textContent=lt.sub;
   const cardSub=document.querySelector('.login-card-sub');if(cardSub)cardSub.textContent=lt.sub;
@@ -2910,11 +2943,16 @@ async function registerRestaurant(){
   const oldBtn=btn?.innerHTML;
   if(btn){btn.disabled=true;btn.innerHTML='Creando...';}
   try{
-    const {data,error}=await sb.auth.signUp({email,password:pass});
+    const setup={restName,email,businessSector,currency,lang};
+    savePendingRegistration(setup);
+    const {data,error}=await sb.auth.signUp({
+      email,
+      password:pass,
+      options:{data:{pending_business:setup}}
+    });
     if(error)throw error;
     if(!data.user)throw new Error('Utilisateur non créé');
     if(!data.session&&!token){
-      savePendingRegistration({restName,email,businessSector,currency,lang});
       document.getElementById('login-email').value=email;
       toast('Cuenta creada. Confirma el correo y luego inicia sesión para terminar el negocio.','#f59e0b');
       setLoginTab('manager',document.querySelector('.login-tab'));
@@ -2933,11 +2971,7 @@ async function registerRestaurant(){
         return;
       }
     }
-    const restaurant=await sbCreateRestaurant(restName,email,{businessSector,currency,lang});
-    await ensureProfile(data.user,'restaurant_admin',restaurant.id);
-    setRestaurantId(restaurant.id);
-    LOGIN_RESTAURANTS=[...LOGIN_RESTAURANTS.filter(r=>r.id!==restaurant.id),{id:restaurant.id,name:restaurant.name,emoji:restaurant.emoji}];
-    localStorage.setItem('hrm_restaurant_directory',JSON.stringify(LOGIN_RESTAURANTS));
+    await completePendingRegistration(data.user);
     toast('✅ Compte créé. Connectez-vous avec cet email.');
     setLoginTab('manager',document.querySelector('.login-tab'));
   }catch(e){

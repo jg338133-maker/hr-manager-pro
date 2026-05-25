@@ -489,6 +489,112 @@ begin
 end;
 $$;
 
+-- Self-service signup: create an independent business for the logged-in user.
+-- Used after email confirmation, so the business is not lost when Supabase
+-- creates the auth user before there is an active session.
+create or replace function public.create_business_for_current_user(
+  p_business_name text,
+  p_business_sector text default 'general',
+  p_currency text default 'CHF',
+  p_lang text default 'fr'
+)
+returns public.profiles
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_profile public.profiles%rowtype;
+  v_restaurant_id uuid;
+  v_email text;
+begin
+  if auth.uid() is null then
+    raise exception 'Authentication required';
+  end if;
+
+  if p_business_name is null or trim(p_business_name) = '' then
+    raise exception 'Business name is required';
+  end if;
+
+  select *
+  into v_profile
+  from public.profiles
+  where user_id = auth.uid()
+  limit 1;
+
+  if v_profile.role = 'super_admin' then
+    return v_profile;
+  end if;
+
+  if v_profile.restaurant_id is not null then
+    return v_profile;
+  end if;
+
+  v_email := coalesce(nullif(auth.jwt() ->> 'email',''), '');
+
+  if v_email = '' then
+    select email
+    into v_email
+    from auth.users
+    where id = auth.uid()
+    limit 1;
+  end if;
+
+  insert into public.restaurants (
+    name,
+    emoji,
+    currency,
+    business_sector,
+    late_tolerance,
+    max_hours_week,
+    lang,
+    brand_color,
+    brand_color2,
+    opening_hours,
+    status
+  )
+  values (
+    trim(p_business_name),
+    'MP',
+    coalesce(nullif(trim(p_currency),''),'CHF'),
+    coalesce(nullif(trim(p_business_sector),''),'general'),
+    10,
+    45,
+    coalesce(nullif(trim(p_lang),''),'fr'),
+    '#4f6ef7',
+    '#7c3aed',
+    '{}'::jsonb,
+    'active'
+  )
+  returning id into v_restaurant_id;
+
+  insert into public.profiles (user_id, email, name, role, restaurant_id)
+  values (
+    auth.uid(),
+    lower(coalesce(v_email,'')),
+    split_part(coalesce(v_email,'admin'), '@', 1),
+    'restaurant_admin',
+    v_restaurant_id
+  )
+  on conflict (user_id) do update
+  set email = excluded.email,
+      name = coalesce(public.profiles.name, excluded.name),
+      role = case
+        when public.profiles.role = 'super_admin' then public.profiles.role
+        else 'restaurant_admin'
+      end,
+      restaurant_id = case
+        when public.profiles.role = 'super_admin' then public.profiles.restaurant_id
+        else excluded.restaurant_id
+      end
+  returning * into v_profile;
+
+  return v_profile;
+end;
+$$;
+
+grant execute on function public.create_business_for_current_user(text,text,text,text) to authenticated;
+
 create or replace function public.update_manager_access(p_email text, p_role text)
 returns public.profiles
 language plpgsql
