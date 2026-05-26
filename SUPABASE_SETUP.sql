@@ -18,9 +18,17 @@ create table if not exists public.employee_documents (
   size_bytes integer default 0,
   file_data text,
   notes text default '',
+  ai_summary text default '',
+  ai_metadata jsonb default '{}'::jsonb,
+  ai_status text default 'pending',
   expires_at date,
   created_at timestamptz default now()
 );
+
+alter table public.employee_documents
+add column if not exists ai_summary text default '',
+add column if not exists ai_metadata jsonb default '{}'::jsonb,
+add column if not exists ai_status text default 'pending';
 
 -- Manager assistant product radar.
 -- Stores unanswered questions and feature signals so the master account can see what managers need.

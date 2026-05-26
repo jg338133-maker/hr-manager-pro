@@ -1005,6 +1005,11 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       <span>Reportes inventario</span>
     </div>
+    <div class="sb-section" data-sidebar-section="documents">Documentos</div>
+    <div class="sb-item" data-sidebar-area="documents" onclick="nav('documents',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
+      <span>Documentos</span>
+    </div>
     <div class="sb-section" data-sidebar-section="config">Configuration</div>
     <div class="sb-item" data-sidebar-area="config" onclick="nav('settings',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1102,6 +1107,10 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 
 <div class="page" id="pg-inventoryReports">
   <div id="inventory-reports-content"></div>
+</div>
+
+<div class="page" id="pg-documents">
+  <div id="documents-content"></div>
 </div>
 
 <div class="page" id="pg-attendance">
@@ -1863,15 +1872,15 @@ const UI={
   de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Konto erstellen',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Name des Betriebs',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Einfache Betriebsverwaltung'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
   it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Crea account',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome attività',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione semplice del business'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
 };
-Object.assign(UI.fr.pages,{hub:'Domaines',sales:'Ventes',salesProducts:'Produits',salesReports:'Rapports ventes',inventory:'Inventaire',inventoryStock:'Stock',inventoryPurchases:'Achats',inventorySuppliers:'Fournisseurs',inventoryReports:'Rapports inventaire'});
-Object.assign(UI.es.pages,{hub:'Áreas',sales:'Ventas',salesProducts:'Productos',salesReports:'Reportes ventas',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Compras',inventorySuppliers:'Proveedores',inventoryReports:'Reportes inventario'});
-Object.assign(UI.en.pages,{hub:'Areas',sales:'Sales',salesProducts:'Products',salesReports:'Sales reports',inventory:'Inventory',inventoryStock:'Stock',inventoryPurchases:'Purchases',inventorySuppliers:'Suppliers',inventoryReports:'Inventory reports'});
-Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkte',salesReports:'Verkaufsberichte',inventory:'Inventar',inventoryStock:'Lager',inventoryPurchases:'Einkäufe',inventorySuppliers:'Lieferanten',inventoryReports:'Inventarberichte'});
-Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti',salesReports:'Report vendite',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Acquisti',inventorySuppliers:'Fornitori',inventoryReports:'Report inventario'});
+Object.assign(UI.fr.pages,{hub:'Domaines',sales:'Ventes',salesProducts:'Produits',salesReports:'Rapports ventes',inventory:'Inventaire',inventoryStock:'Stock',inventoryPurchases:'Achats',inventorySuppliers:'Fournisseurs',inventoryReports:'Rapports inventaire',documents:'Documents'});
+Object.assign(UI.es.pages,{hub:'Áreas',sales:'Ventas',salesProducts:'Productos',salesReports:'Reportes ventas',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Compras',inventorySuppliers:'Proveedores',inventoryReports:'Reportes inventario',documents:'Documentos'});
+Object.assign(UI.en.pages,{hub:'Areas',sales:'Sales',salesProducts:'Products',salesReports:'Sales reports',inventory:'Inventory',inventoryStock:'Stock',inventoryPurchases:'Purchases',inventorySuppliers:'Suppliers',inventoryReports:'Inventory reports',documents:'Documents'});
+Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkte',salesReports:'Verkaufsberichte',inventory:'Inventar',inventoryStock:'Lager',inventoryPurchases:'Einkäufe',inventorySuppliers:'Lieferanten',inventoryReports:'Inventarberichte',documents:'Dokumente'});
+Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti',salesReports:'Report vendite',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Acquisti',inventorySuppliers:'Fornitori',inventoryReports:'Report inventario',documents:'Documenti'});
 
 const AREA_UI={
-  es:{eyebrow:'Manager Pro como plataforma',title:'¿Qué área quieres gestionar hoy?',sub:'Empieza por Personal y ve sumando ventas, inventario, documentos e insights cuando el negocio lo necesite.',open:'Abrir',soon:'Próximamente',next:'Siguiente módulo',active:'Activo ahora',today:'Hoy en Personal',roadmap:'Camino del producto',settings:'Configuración',settingsDesc:'Idioma, colores, horarios de apertura, tolerancias, accesos y datos del negocio.',openSettings:'Abrir ajustes',team:'Personal',teamDesc:'Empleados, horarios, fichajes, pausas, solicitudes, documentos, salarios y reportes.',sales:'Ventas',salesDesc:'Ventas por producto o servicio, caja diaria, métodos de pago y cierres.',inventory:'Inventario',inventoryDesc:'Stock, proveedores, compras y consumo conectado a ventas.',documents:'Documentos',documentsDesc:'Contratos, permisos, vencimientos y expediente de cada trabajador.',tasks:'Tareas',tasksDesc:'Rutinas, responsables, pendientes y seguimiento operativo.',insights:'IA e insights',insightsDesc:'Preguntas al negocio, señales de mejora y ayuda para tomar decisiones.',employees:'Empleados',pending:'Solicitudes pendientes',alerts:'Alertas abiertas',p1:'Personal listo: controlar equipo y cerrar el mes.',p2:'Ventas por items: registrar productos y servicios.',p3:'Inventario: conectar ventas con stock y compras.',p4:'Insights: entender qué pasa sin hablar lenguaje administrativo.',openTeam:'Entrar a Personal'},
-  en:{eyebrow:'Manager Pro as a platform',title:'Which area do you want to manage today?',sub:'Start with People and add sales, inventory, documents and insights when the business needs them.',open:'Open',soon:'Coming soon',next:'Next module',active:'Active now',today:'Today in People',roadmap:'Product path',settings:'Settings',settingsDesc:'Language, colors, opening hours, tolerances, access and business data.',openSettings:'Open settings',team:'People',teamDesc:'Employees, schedules, punches, breaks, requests, documents, payroll and reports.',sales:'Sales',salesDesc:'Sales by product or service, daily cash, payment methods and closing.',inventory:'Inventory',inventoryDesc:'Stock, suppliers, purchases and consumption connected to sales.',documents:'Documents',documentsDesc:'Contracts, permits, expiry dates and each employee file.',tasks:'Tasks',tasksDesc:'Routines, owners, pending work and operational follow-up.',insights:'AI and insights',insightsDesc:'Ask questions about the business, improvement signals and decision support.',employees:'Employees',pending:'Pending requests',alerts:'Open alerts',p1:'People ready: control the team and close the month.',p2:'Sales by items: register products and services.',p3:'Inventory: connect sales with stock and purchases.',p4:'Insights: understand what is happening without admin jargon.',openTeam:'Open People'},
+  es:{eyebrow:'Manager Pro como plataforma',title:'¿Qué área quieres gestionar hoy?',sub:'Empieza por Personal y ve sumando ventas, inventario, documentos e insights cuando el negocio lo necesite.',open:'Abrir',soon:'Próximamente',next:'Siguiente módulo',active:'Activo ahora',today:'Hoy en Personal',roadmap:'Camino del producto',settings:'Configuración',settingsDesc:'Idioma, colores, horarios de apertura, tolerancias, accesos y datos del negocio.',openSettings:'Abrir ajustes',team:'Personal',teamDesc:'Empleados, horarios, fichajes, pausas, solicitudes, documentos, salarios y reportes.',sales:'Ventas',salesDesc:'Ventas por producto o servicio, caja diaria, métodos de pago y cierres.',inventory:'Inventario',inventoryDesc:'Stock, proveedores, compras y consumo conectado a ventas.',documents:'Documentos',documentsDesc:'Contratos de empleados, arriendo, permisos, recetas, proveedores y archivos clave del negocio.',tasks:'Tareas',tasksDesc:'Rutinas, responsables, pendientes y seguimiento operativo.',insights:'IA e insights',insightsDesc:'Preguntas al negocio, señales de mejora y ayuda para tomar decisiones.',employees:'Empleados',pending:'Solicitudes pendientes',alerts:'Alertas abiertas',p1:'Personal listo: controlar equipo y cerrar el mes.',p2:'Ventas por items: registrar productos y servicios.',p3:'Inventario: conectar ventas con stock y compras.',p4:'Insights: entender qué pasa sin hablar lenguaje administrativo.',openTeam:'Entrar a Personal'},
+  en:{eyebrow:'Manager Pro as a platform',title:'Which area do you want to manage today?',sub:'Start with People and add sales, inventory, documents and insights when the business needs them.',open:'Open',soon:'Coming soon',next:'Next module',active:'Active now',today:'Today in People',roadmap:'Product path',settings:'Settings',settingsDesc:'Language, colors, opening hours, tolerances, access and business data.',openSettings:'Open settings',team:'People',teamDesc:'Employees, schedules, punches, breaks, requests, documents, payroll and reports.',sales:'Sales',salesDesc:'Sales by product or service, daily cash, payment methods and closing.',inventory:'Inventory',inventoryDesc:'Stock, suppliers, purchases and consumption connected to sales.',documents:'Documents',documentsDesc:'Employee contracts, lease, permits, recipes, suppliers and key business files.',tasks:'Tasks',tasksDesc:'Routines, owners, pending work and operational follow-up.',insights:'AI and insights',insightsDesc:'Ask questions about the business, improvement signals and decision support.',employees:'Employees',pending:'Pending requests',alerts:'Open alerts',p1:'People ready: control the team and close the month.',p2:'Sales by items: register products and services.',p3:'Inventory: connect sales with stock and purchases.',p4:'Insights: understand what is happening without admin jargon.',openTeam:'Open People'},
   fr:{eyebrow:'Manager Pro comme plateforme',title:'Quel domaine voulez-vous gérer aujourd’hui ?',sub:'Commencez par le personnel puis ajoutez ventes, inventaire, documents et insights quand le commerce en a besoin.',open:'Ouvrir',soon:'Bientôt',next:'Module suivant',active:'Actif maintenant',today:'Aujourd’hui côté personnel',roadmap:'Chemin du produit',settings:'Paramètres',settingsDesc:'Langue, couleurs, horaires d’ouverture, tolérances, accès et données du commerce.',openSettings:'Ouvrir les paramètres',team:'Personnel',teamDesc:'Employés, horaires, pointages, pauses, demandes, documents, salaires et rapports.',sales:'Ventes',salesDesc:'Ventes par produit ou service, caisse quotidienne, moyens de paiement et clôtures.',inventory:'Inventaire',inventoryDesc:'Stock, fournisseurs, achats et consommation connectée aux ventes.',documents:'Documents',documentsDesc:'Contrats, permis, échéances et dossier de chaque employé.',tasks:'Tâches',tasksDesc:'Routines, responsables, tâches en attente et suivi opérationnel.',insights:'IA et insights',insightsDesc:'Questions sur le commerce, signaux d’amélioration et aide à la décision.',employees:'Employés',pending:'Demandes en attente',alerts:'Alertes ouvertes',p1:'Personnel prêt: suivre l’équipe et clôturer le mois.',p2:'Ventes par items: enregistrer produits et services.',p3:'Inventaire: connecter ventes, stock et achats.',p4:'Insights: comprendre sans jargon administratif.',openTeam:'Entrer dans Personnel'},
   de:{eyebrow:'Manager Pro als Plattform',title:'Welchen Bereich möchten Sie heute verwalten?',sub:'Starten Sie mit Personal und ergänzen Sie Verkauf, Inventar, Dokumente und Einblicke, wenn der Betrieb sie braucht.',open:'Öffnen',soon:'Demnächst',next:'Nächstes Modul',active:'Jetzt aktiv',today:'Heute im Personal',roadmap:'Produktweg',settings:'Einstellungen',settingsDesc:'Sprache, Farben, Öffnungszeiten, Toleranzen, Zugänge und Betriebsdaten.',openSettings:'Einstellungen öffnen',team:'Personal',teamDesc:'Mitarbeiter, Pläne, Buchungen, Pausen, Anfragen, Dokumente, Löhne und Berichte.',sales:'Verkauf',salesDesc:'Verkäufe nach Produkt oder Service, Tageskasse, Zahlungsarten und Abschlüsse.',inventory:'Inventar',inventoryDesc:'Lager, Lieferanten, Einkäufe und Verbrauch mit Verkauf verbunden.',documents:'Dokumente',documentsDesc:'Verträge, Bewilligungen, Fristen und Mitarbeiterakten.',tasks:'Aufgaben',tasksDesc:'Routinen, Verantwortliche, offene Aufgaben und operativer Überblick.',insights:'KI und Einblicke',insightsDesc:'Fragen zum Betrieb, Verbesserungssignale und Entscheidungshilfe.',employees:'Mitarbeiter',pending:'Offene Anfragen',alerts:'Offene Warnungen',p1:'Personal bereit: Team steuern und Monat abschließen.',p2:'Verkäufe nach Artikeln: Produkte und Services erfassen.',p3:'Inventar: Verkauf mit Lager und Einkauf verbinden.',p4:'Einblicke: verstehen, was passiert, ohne Verwaltungsjargon.',openTeam:'Personal öffnen'},
   it:{eyebrow:'Manager Pro come piattaforma',title:'Quale area vuoi gestire oggi?',sub:'Inizia dal personale e aggiungi vendite, inventario, documenti e insight quando il business ne ha bisogno.',open:'Apri',soon:'Prossimamente',next:'Prossimo modulo',active:'Attivo ora',today:'Oggi nel personale',roadmap:'Percorso prodotto',settings:'Impostazioni',settingsDesc:'Lingua, colori, orari di apertura, tolleranze, accessi e dati del business.',openSettings:'Apri impostazioni',team:'Personale',teamDesc:'Dipendenti, turni, timbrature, pause, richieste, documenti, stipendi e report.',sales:'Vendite',salesDesc:'Vendite per prodotto o servizio, cassa giornaliera, metodi di pagamento e chiusure.',inventory:'Inventario',inventoryDesc:'Stock, fornitori, acquisti e consumo collegato alle vendite.',documents:'Documenti',documentsDesc:'Contratti, permessi, scadenze e fascicolo di ogni dipendente.',tasks:'Attività',tasksDesc:'Routine, responsabili, pendenti e controllo operativo.',insights:'IA e insight',insightsDesc:'Domande sul business, segnali di miglioramento e aiuto decisionale.',employees:'Dipendenti',pending:'Richieste in attesa',alerts:'Avvisi aperti',p1:'Personale pronto: controllare il team e chiudere il mese.',p2:'Vendite per item: registrare prodotti e servizi.',p3:'Inventario: collegare vendite, stock e acquisti.',p4:'Insight: capire cosa succede senza gergo amministrativo.',openTeam:'Apri Personale'}
@@ -1880,7 +1889,7 @@ const areaTx=()=>({...AREA_UI.es,...(AREA_UI[lang]||{})});
 const ROADMAP_UI={
   es:{
     title:'Siguiente paso: {module}',intro:'Este módulo todavía está en hoja de ruta, pero ya tiene una lógica clara para crecer sin volver pesada la app.',why:'Por qué importa',first:'Primeras funciones',close:'Cerrar',preview:'Ver plan',
-    documents:{pills:['Expedientes','Vencimientos','Firmas'],why:'Centraliza contratos, permisos, anexos y soportes para que el manager no dependa de carpetas sueltas.',items:['Expediente por trabajador con documentos y vencimientos.','Alertas antes de que venza un contrato, permiso o certificado.','Lectura IA para sugerir datos del perfil y detectar faltantes.'],note:'Este módulo se conecta con Personal, porque vive dentro del ciclo de vida del empleado.'},
+    documents:{pills:['Archivo central','Vencimientos','IA'],why:'Centraliza contratos de empleados, arrendamiento, permisos, recetas, proveedores y soportes clave para que el manager no dependa de carpetas sueltas.',items:['Expediente por trabajador con documentos y vencimientos.','Carpetas para empresa, local, operación, recetas/procesos y proveedores.','Lectura IA para sugerir datos, detectar faltantes y ayudar a responder preguntas del negocio.'],note:'Este módulo se conecta con Personal, Ventas e Inventario porque guarda la memoria legal y operativa del negocio.'},
     tasks:{pills:['Rutinas','Responsables','Seguimiento'],why:'Convierte tareas repetitivas del negocio en rutinas visibles: apertura, cierre, limpieza, compras, caja o mantenimiento.',items:['Listas de rutina por día o turno.','Responsables y estados: pendiente, hecho, bloqueado.','Avisos cuando una tarea crítica no se completa a tiempo.'],note:'Este módulo ayuda a que el negocio funcione aunque el dueño no esté mirando todo el día.'},
     insights:{pills:['IA','Señales','Decisiones'],why:'Une datos de personal, ventas e inventario para explicar qué está pasando y sugerir próximos pasos en lenguaje simple.',items:['Preguntas al negocio: qué vendió más, qué empleado necesita apoyo o qué stock preocupa.','Señales automáticas: retrasos repetidos, bajo stock, margen bajo o ventas inusuales.','Ayuda para preparar conversaciones, decisiones y reportes para el dueño.'],note:'La IA debe entender la relación entre áreas, no responder como una sección aislada.'}
   },
@@ -2154,7 +2163,7 @@ function roleLabel(){
   return r==='master'?tx.master:r==='owner'?tx.owner:r==='manager'?tx.manager:tx.employee;
 }
 function canPage(page){
-  const map={payroll:'view_payroll',reports:'view_reports',settings:'edit_settings',master:'master'};
+  const map={payroll:'view_payroll',reports:'view_reports',documents:'view_documents',settings:'edit_settings',master:'master'};
   return !map[page]||can(map[page]);
 }
 function restrictedHTML(){
@@ -2401,10 +2410,10 @@ async function sbSaveEmp(emp){
   const{error}=await sb.from('employees').upsert({id:emp.id,restaurant_id:REST_ID,name:emp.name,last_name:emp.last||'',employee_number:emp.num||'',position:emp.position||'',department:emp.dept||'',phone:emp.phone||'',email:emp.email||'',start_date:emp.startDate||null,contract_type:emp.contract||'CDI',pay_type:emp.payType||'hourly',hourly_rate:emp.rate||0,monthly_salary:emp.salary||0,vacation_weeks:emp.vacWeeks||5,avs_number:emp.avs||'',emergency_contact:emp.emergency||'',notes:emp.notes||'',status:emp.status||'active',photo_url:emp.photo||null,color:emp.color||'#4f6ef7',schedules:emp.schedules||{},pin:emp.pin||'0000'});
   if(error)console.error(error);
 }
-function docFromSBRow(x){return{id:x.id,empId:x.employee_id,type:x.type||'other',name:x.name||'',fileName:x.file_name||'',mimeType:x.mime_type||'',size:x.size_bytes||0,data:x.file_data||'',notes:x.notes||'',expiresAt:x.expires_at||'',createdAt:x.created_at||new Date().toISOString()};}
+function docFromSBRow(x){return{id:x.id,empId:x.employee_id,type:x.type||'other',name:x.name||'',fileName:x.file_name||'',mimeType:x.mime_type||'',size:x.size_bytes||0,data:x.file_data||'',notes:x.notes||'',aiSummary:x.ai_summary||'',aiMetadata:x.ai_metadata||{},aiStatus:x.ai_status||'pending',expiresAt:x.expires_at||'',createdAt:x.created_at||new Date().toISOString()};}
 async function sbSaveDoc(doc){
   if(isDemo())return;
-  const payload={id:doc.id,restaurant_id:REST_ID,employee_id:doc.empId,type:doc.type||'other',name:doc.name||'',file_name:doc.fileName||'',mime_type:doc.mimeType||'',size_bytes:doc.size||0,file_data:doc.data||'',notes:doc.notes||'',expires_at:doc.expiresAt||null};
+  const payload={id:doc.id,restaurant_id:REST_ID,employee_id:doc.empId,type:doc.type||'other',name:doc.name||'',file_name:doc.fileName||'',mime_type:doc.mimeType||'',size_bytes:doc.size||0,file_data:doc.data||'',notes:doc.notes||'',ai_summary:doc.aiSummary||'',ai_metadata:doc.aiMetadata||{},ai_status:doc.aiStatus||'pending',expires_at:doc.expiresAt||null};
   const{error}=await sb.from('employee_documents').upsert(payload);
   if(error)console.error(error);
 }
@@ -2715,11 +2724,11 @@ function renderEmployeeLangBar(){
 function applyUITexts(){
   const t=T();
   renderLoginLangBar();
-  const sectionLabels={main:t.nav.principal,people:areaTx().team,sales:areaTx().sales,inventory:areaTx().inventory,config:t.nav.config,master:t.nav.master};
+  const sectionLabels={main:t.nav.principal,people:areaTx().team,sales:areaTx().sales,inventory:areaTx().inventory,documents:areaTx().documents,config:t.nav.config,master:t.nav.master};
   document.querySelectorAll('.sb-section[data-sidebar-section]').forEach(el=>{el.textContent=sectionLabels[el.dataset.sidebarSection]||el.textContent;});
   const masterManagedTitle=document.getElementById('master-managed-title');if(masterManagedTitle)masterManagedTitle.textContent=t.master?.managed||masterManagedTitle.textContent;
   const setNav=(page,text)=>{const el=document.querySelector(`[onclick="nav('${page}',this)"] span`);if(el)el.textContent=text;};
-  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('sales',t.pages.sales);setNav('salesProducts',t.pages.salesProducts);setNav('salesReports',t.pages.salesReports);setNav('inventory',t.pages.inventory);setNav('inventoryStock',t.pages.inventoryStock);setNav('inventoryPurchases',t.pages.inventoryPurchases);setNav('inventorySuppliers',t.pages.inventorySuppliers);setNav('inventoryReports',t.pages.inventoryReports);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
+  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('sales',t.pages.sales);setNav('salesProducts',t.pages.salesProducts);setNav('salesReports',t.pages.salesReports);setNav('inventory',t.pages.inventory);setNav('inventoryStock',t.pages.inventoryStock);setNav('inventoryPurchases',t.pages.inventoryPurchases);setNav('inventorySuppliers',t.pages.inventorySuppliers);setNav('inventoryReports',t.pages.inventoryReports);setNav('documents',t.pages.documents);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
   const mt=document.querySelector('[onclick="nav(\'master\',this)"] span');if(mt)mt.textContent=t.pages.master;
   document.getElementById('page-title').textContent=t.pages[currentPage]||currentPage;
   const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].textContent=t.login.manager;if(tabs[1])tabs[1].textContent=t.login.employee;if(tabs[2])tabs[2].textContent=t.login.restaurant;
@@ -2859,15 +2868,18 @@ function applyPermissionsUI(){
   const visible=(sel,show)=>document.querySelectorAll(sel).forEach(el=>el.style.display=show?'':'none');
   visible('#pg-payroll',can('view_payroll'));
   visible('#pg-reports',can('view_reports'));
+  visible('#pg-documents',can('view_documents'));
   visible('#pg-settings',can('edit_settings'));
   visible('.sb-item[onclick*="payroll"]',can('view_payroll'));
   visible('.sb-item[onclick*="reports"]',can('view_reports'));
+  visible('.sb-item[onclick*="documents"]',can('view_documents'));
   visible('.sb-item[onclick*="settings"]',can('edit_settings'));
   visible('#top-new-emp-btn,#dash-add-emp-btn,#pg-employees .btn-primary.mt12',can('employee_write'));
   visible('#pg-settings .card:nth-of-type(6) .btn-danger',can('delete_all'));
   visible('#master-nav',can('master'));
   if(currentPage==='payroll'&&!can('view_payroll'))goPage('dashboard');
   if(currentPage==='reports'&&!can('view_reports'))goPage('dashboard');
+  if(currentPage==='documents'&&!can('view_documents'))goPage('dashboard');
   if(currentPage==='settings'&&!can('edit_settings'))goPage('dashboard');
   if(currentPage==='master'&&!can('master'))goPage('dashboard');
   updateSidebarScope();
@@ -2875,22 +2887,24 @@ function applyPermissionsUI(){
 function updateSidebarScope(){
   const salesPages=['sales','salesProducts','salesReports'];
   const inventoryPages=['inventory','inventoryStock','inventoryPurchases','inventorySuppliers','inventoryReports'];
+  const documentsPages=['documents'];
   const configPages=['settings','master'];
   const peoplePages=['dashboard','attendance','employees','shifts','vacations','payroll','reports','history'];
   const hubPage=currentPage==='hub';
   let scope='all';
   if(salesPages.includes(currentPage))scope='sales';
   else if(inventoryPages.includes(currentPage))scope='inventory';
+  else if(documentsPages.includes(currentPage))scope='documents';
   else if(peoplePages.includes(currentPage))scope='people';
   else if(configPages.includes(currentPage))scope='config';
-  const showAreas=scope==='all'?['main','people','sales','inventory','config','master']:scope==='sales'?['main','sales']:scope==='inventory'?['main','inventory']:scope==='people'?['main','people']:['main','config','master'];
+  const showAreas=scope==='all'?['main','people','sales','inventory','documents','config','master']:scope==='sales'?['main','sales']:scope==='inventory'?['main','inventory']:scope==='documents'?['main','documents']:scope==='people'?['main','people']:['main','config','master'];
   document.querySelectorAll('[data-sidebar-section]').forEach(el=>{
     const key=el.dataset.sidebarSection;
-    el.style.display=showAreas.includes(key)&&(!(key==='master')||can('master'))?'':'none';
+    el.style.display=showAreas.includes(key)&&(!(key==='master')||can('master'))&&(!(key==='documents')||can('view_documents'))?'':'none';
   });
   document.querySelectorAll('[data-sidebar-area]').forEach(el=>{
     const key=el.dataset.sidebarArea;
-    let show=showAreas.includes(key)&&(!(key==='config')||can('edit_settings'));
+    let show=showAreas.includes(key)&&(!(key==='config')||can('edit_settings'))&&(!(key==='documents')||can('view_documents'));
     if(hubPage){
       const action=el.getAttribute('onclick')||'';
       show=show&&(
@@ -2898,6 +2912,7 @@ function updateSidebarScope(){
         (key==='people'&&action.includes("dashboard"))||
         (key==='sales'&&action.includes("sales',"))||
         (key==='inventory'&&action.includes("inventory',"))||
+        (key==='documents'&&action.includes("documents"))||
         key==='config'
       );
     }
@@ -4415,6 +4430,7 @@ function renderPage(p){
   if(p==='inventoryPurchases')renderInventoryPurchases();
   if(p==='inventorySuppliers')renderInventorySuppliers();
   if(p==='inventoryReports')renderInventoryReports();
+  if(p==='documents')renderDocuments();
   if(p==='attendance')renderAtt();
   if(p==='employees')renderEmps();
   if(p==='shifts')renderShifts();
@@ -4426,7 +4442,7 @@ function renderPage(p){
   if(p==='master')renderMaster();
   applyPermissionsUI();
 }
-function renderAll(){renderHub();renderDash();renderSales();renderSalesProducts();renderSalesReports();renderInventory();renderInventoryStock();renderInventoryPurchases();renderInventorySuppliers();renderInventoryReports();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
+function renderAll(){renderHub();renderDash();renderSales();renderSalesProducts();renderSalesReports();renderInventory();renderInventoryStock();renderInventoryPurchases();renderInventorySuppliers();renderInventoryReports();renderDocuments();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
 
 function hubIcon(type){
   const icons={
@@ -4476,13 +4492,14 @@ function openRoadmapModule(module){
 function renderHub(){
   const el=document.getElementById('hub-content');if(!el)return;
   const tx=areaTx(),active=DB.employees.filter(e=>e.status==='active'),pending=(DB.absences||[]).filter(a=>!a.approved).length;
+  const dtx=documentsPageTx();
   const rm=roadmapTx();
   const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
   const cards=[
     {id:'hub-card-people',icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,action:"goPage('dashboard')",button:tx.openTeam},
     {id:'hub-card-sales',icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1',active:true,action:"goPage('sales')",button:tx.open},
     {id:'hub-card-inventory',icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df',active:true,action:"goPage('inventory')",button:tx.open},
-    {id:'hub-card-documents',module:'documents',icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:rm.documents.pills,color:'#7c3aed',soft:'#f3edff'},
+    {id:'hub-card-documents',module:'documents',icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:[`${DB.documents?.length||0} ${dtx.docs}`,`${active.filter(e=>employeeFileStatus(e).level!=='complete').length} ${tx.alerts}`,dtx.files],color:'#7c3aed',soft:'#f3edff',active:can('view_documents'),action:"goPage('documents')",button:tx.open},
     {id:'hub-card-tasks',module:'tasks',icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:rm.tasks.pills,color:'#0891b2',soft:'#e6f8fc'},
     {id:'hub-card-insights',module:'insights',icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:rm.insights.pills,color:'#be123c',soft:'#fff1f2'}
   ];
@@ -6097,6 +6114,20 @@ async function extractContractText(file){
   }
   return await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result||''));r.onerror=rej;r.readAsText(file);});
 }
+async function extractBusinessDocumentText(file){
+  const isImage=/^image\//.test(file.type||'')||/\.(png|jpe?g|webp)$/i.test(file.name);
+  if(isImage){
+    try{
+      const result=await Tesseract.recognize(file,'spa+fra+deu+ita+eng');
+      const text=result?.data?.text||'';
+      return text.trim()||`Imagen sin texto OCR legible. Archivo: ${file.name}`;
+    }catch(e){
+      console.warn('Image OCR failed',e);
+      return `No se pudo leer texto de la imagen. Archivo: ${file.name}`;
+    }
+  }
+  return extractContractText(file);
+}
 async function handleContractAssist(ev){
   const file=ev.target.files?.[0];if(!file)return;
   if(file.size>3*1024*1024){toast('Contrato muy grande. Máximo 3 MB por ahora.','#ef4444');ev.target.value='';return;}
@@ -6251,16 +6282,84 @@ const DOC_TYPES={
   it:{contract:'Contratto',id:'Documento identità',permit:'Permesso lavoro',medical:'Certificato medico',training:'Formazione',annex:'Allegato',other:'Altro'}
 };
 const DOC_UI={
-  fr:{file:'Dossier',complete:'Dossier complet',review:'Dossier à compléter',critical:'À traiter',missing:'Manque',expiring:'Expire bientôt',expired:'Expiré',required:'Documents et données à vérifier',contractMissing:'Contrat non archivé',payMissing:'Salaire à configurer',scheduleMissing:'Horaire base manquant',contactMissing:'Contact employé incomplet',startMissing:'Début contrat manquant',uploadType:'Type de document',expiry:'Échéance optionnelle',note:'Note',notePh:'Ex: contrat signé, permis B, annexe salaire',upload:'Ajouter document',helper:"Le dossier sert à garder les preuves RH importantes et à déclencher des alertes avant les échéances.",open:'Ouvrir',delete:'Supprimer',emptyTitle:'Aucun document',emptyText:'Ajoutez contrat, permis ou certificats pour compléter le dossier.',expires:'Expire',ok:'OK'},
-  es:{file:'Expediente',complete:'Expediente completo',review:'Expediente por completar',critical:'Requiere acción',missing:'Falta',expiring:'Vence pronto',expired:'Vencido',required:'Documentos y datos por revisar',contractMissing:'Contrato sin archivar',payMissing:'Salario por configurar',scheduleMissing:'Horario base faltante',contactMissing:'Contacto del empleado incompleto',startMissing:'Inicio de contrato faltante',uploadType:'Tipo de documento',expiry:'Vencimiento opcional',note:'Nota',notePh:'Ej: contrato firmado, permiso B, anexo salario',upload:'Subir documento',helper:'El expediente guarda soportes RH importantes y activa alertas antes de los vencimientos.',open:'Abrir',delete:'Eliminar',emptyTitle:'Sin documentos',emptyText:'Sube contrato, permiso o certificados para tener el expediente completo.',expires:'Vence',ok:'OK'},
-  en:{file:'File',complete:'File complete',review:'File to complete',critical:'Needs action',missing:'Missing',expiring:'Expiring soon',expired:'Expired',required:'Documents and data to review',contractMissing:'Contract not archived',payMissing:'Pay data missing',scheduleMissing:'Base schedule missing',contactMissing:'Employee contact incomplete',startMissing:'Contract start missing',uploadType:'Document type',expiry:'Optional expiry',note:'Note',notePh:'E.g. signed contract, permit B, salary annex',upload:'Upload document',helper:'The file keeps important HR evidence and triggers alerts before expiry dates.',open:'Open',delete:'Delete',emptyTitle:'No documents',emptyText:'Upload contract, permit or certificates to complete the file.',expires:'Expires',ok:'OK'},
+  fr:{file:'Dossier',complete:'Dossier complet',review:'Dossier à compléter',critical:'À traiter',missing:'Manque',expiring:'Expire bientôt',expired:'Expiré',required:'Documents et données à vérifier',contractMissing:'Contrat non archivé',payMissing:'Salaire à configurer',scheduleMissing:'Horaire base manquant',contactMissing:'Contact employé incomplet',startMissing:'Début contrat manquant',uploadType:'Type de document',expiry:'Échéance optionnelle',note:'Note',notePh:'Ex: contrat signé, permis B, annexe salaire',upload:'Ajouter document',helper:"Le dossier sert à garder les preuves RH importantes et à déclencher des alertes avant les échéances.",open:'Ouvrir',delete:'Supprimer',emptyTitle:'Aucun document',emptyText:'Ajoutez contrat, permis ou certificats pour compléter le dossier.',expires:'Expire',ok:'OK',aiAnalyzing:'IA en analyse',aiDone:'Description IA',aiReview:'IA à vérifier',responsible:'Responsable',counterparty:'Partie liée',obligations:'À retenir',warnings:'Alertes'},
+  es:{file:'Expediente',complete:'Expediente completo',review:'Expediente por completar',critical:'Requiere acción',missing:'Falta',expiring:'Vence pronto',expired:'Vencido',required:'Documentos y datos por revisar',contractMissing:'Contrato sin archivar',payMissing:'Salario por configurar',scheduleMissing:'Horario base faltante',contactMissing:'Contacto del empleado incompleto',startMissing:'Inicio de contrato faltante',uploadType:'Tipo de documento',expiry:'Vencimiento opcional',note:'Nota',notePh:'Ej: contrato firmado, permiso B, anexo salario',upload:'Subir documento',helper:'El expediente guarda soportes RH importantes y activa alertas antes de los vencimientos.',open:'Abrir',delete:'Eliminar',emptyTitle:'Sin documentos',emptyText:'Sube contrato, permiso o certificados para tener el expediente completo.',expires:'Vence',ok:'OK',aiAnalyzing:'IA analizando',aiDone:'Descripción IA',aiReview:'IA por revisar',responsible:'Responsable',counterparty:'Contraparte',obligations:'A recordar',warnings:'Alertas'},
+  en:{file:'File',complete:'File complete',review:'File to complete',critical:'Needs action',missing:'Missing',expiring:'Expiring soon',expired:'Expired',required:'Documents and data to review',contractMissing:'Contract not archived',payMissing:'Pay data missing',scheduleMissing:'Base schedule missing',contactMissing:'Employee contact incomplete',startMissing:'Contract start missing',uploadType:'Document type',expiry:'Optional expiry',note:'Note',notePh:'E.g. signed contract, permit B, salary annex',upload:'Upload document',helper:'The file keeps important HR evidence and triggers alerts before expiry dates.',open:'Open',delete:'Delete',emptyTitle:'No documents',emptyText:'Upload contract, permit or certificates to complete the file.',expires:'Expires',ok:'OK',aiAnalyzing:'AI analyzing',aiDone:'AI description',aiReview:'AI needs review',responsible:'Responsible',counterparty:'Counterparty',obligations:'To remember',warnings:'Alerts'},
   de:{file:'Akte',complete:'Akte vollständig',review:'Akte ergänzen',critical:'Handlungsbedarf',missing:'Fehlt',expiring:'Läuft bald ab',expired:'Abgelaufen',required:'Dokumente und Daten prüfen',contractMissing:'Vertrag nicht archiviert',payMissing:'Lohndaten fehlen',scheduleMissing:'Basis-Dienstplan fehlt',contactMissing:'Mitarbeiterkontakt unvollständig',startMissing:'Vertragsbeginn fehlt',uploadType:'Dokumenttyp',expiry:'Optionales Ablaufdatum',note:'Notiz',notePh:'z. B. unterschriebener Vertrag, Bewilligung B, Lohnanhang',upload:'Dokument hochladen',helper:'Die Akte bewahrt wichtige HR-Nachweise und löst Warnungen vor Fristen aus.',open:'Öffnen',delete:'Löschen',emptyTitle:'Keine Dokumente',emptyText:'Vertrag, Bewilligung oder Zertifikate hochladen, um die Akte zu vervollständigen.',expires:'Läuft ab',ok:'OK'},
   it:{file:'Fascicolo',complete:'Fascicolo completo',review:'Fascicolo da completare',critical:'Richiede azione',missing:'Manca',expiring:'In scadenza',expired:'Scaduto',required:'Documenti e dati da rivedere',contractMissing:'Contratto non archiviato',payMissing:'Dati salario da configurare',scheduleMissing:'Orario base mancante',contactMissing:'Contatto dipendente incompleto',startMissing:'Inizio contratto mancante',uploadType:'Tipo documento',expiry:'Scadenza opzionale',note:'Nota',notePh:'Es: contratto firmato, permesso B, allegato salario',upload:'Carica documento',helper:'Il fascicolo conserva prove HR importanti e attiva avvisi prima delle scadenze.',open:'Apri',delete:'Elimina',emptyTitle:'Nessun documento',emptyText:'Carica contratto, permesso o certificati per completare il fascicolo.',expires:'Scade',ok:'OK'}
 };
 const docTx=()=>DOC_UI[lang]||DOC_UI.fr;
+const DOCUMENTS_PAGE_UI={
+  es:{title:'Documentos del negocio',sub:'Contratos de empleados, arrendamiento, permisos, recetas, proveedores y documentos clave en un solo archivo central.',complete:'Expedientes completos',needs:'Requieren atención',expiring:'Vencen pronto',total:'Documentos guardados',attention:'Requieren atención',files:'Expedientes del equipo',latest:'Últimos documentos',checklist:'Checklist base',folders:'Carpetas sugeridas',customFolders:'Carpetas personalizadas',newFolder:'Nueva carpeta',customFolderHint:'Crea más carpetas según la lógica de tu negocio: impuestos, seguros, mantenimiento, franquicia o cualquier archivo interno.',openFile:'Abrir expediente',noAttention:'Todo está en orden',noAttentionText:'No hay documentos vencidos, próximos a vencer o datos críticos faltantes.',noDocs:'Aún no hay documentos guardados.',missing:'Pendiente',critical:'Crítico',review:'Revisar',completeState:'Completo',nextExpiry:'Próximo vencimiento',docs:'docs',uploadHint:'Para subir un documento, abre el expediente del empleado.',contract:'Contrato firmado',permit:'Permiso o autorización',identity:'Documento de identidad',medical:'Certificado médico si aplica',salary:'Anexos salariales y cambios',folderEmployees:'Empleados',folderEmployeesText:'Contratos, permisos, certificados, anexos y vencimientos.',folderCompany:'Empresa',folderCompanyText:'Registro mercantil, seguros, impuestos, políticas y documentos legales.',folderLease:'Local / arriendo',folderLeaseText:'Contrato de arriendo, garantías, pagos, planos y permisos del local.',folderOperations:'Operación',folderOperationsText:'Manuales, protocolos, checklists, seguridad e higiene.',folderRecipes:'Recetas / procesos',folderRecipesText:'Recetas, fichas técnicas, procesos de producción y estándares.',folderSuppliers:'Proveedores',folderSuppliersText:'Contratos, listas de precios, condiciones, facturas y acuerdos.'},
+  en:{title:'Business documents',sub:'Employee contracts, lease, permits, recipes, suppliers and key company files in one central archive.',complete:'Complete files',needs:'Need attention',expiring:'Expiring soon',total:'Saved documents',attention:'Need attention',files:'Team files',latest:'Latest documents',checklist:'Base checklist',folders:'Suggested folders',customFolders:'Custom folders',newFolder:'New folder',customFolderHint:'Create more folders for your business logic: taxes, insurance, maintenance, franchise or any internal archive.',openFile:'Open file',noAttention:'Everything is fine',noAttentionText:'No expired, expiring or critical missing documents.',noDocs:'No documents saved yet.',missing:'Pending',critical:'Critical',review:'Review',completeState:'Complete',nextExpiry:'Next expiry',docs:'docs',uploadHint:'To upload a document, open the employee file.',contract:'Signed contract',permit:'Permit or authorization',identity:'Identity document',medical:'Medical certificate if needed',salary:'Salary annexes and changes',folderEmployees:'Employees',folderEmployeesText:'Contracts, permits, certificates, annexes and expiry dates.',folderCompany:'Company',folderCompanyText:'Business registration, insurance, taxes, policies and legal files.',folderLease:'Premises / lease',folderLeaseText:'Lease contract, guarantees, payments, plans and permits.',folderOperations:'Operations',folderOperationsText:'Manuals, protocols, checklists, safety and hygiene.',folderRecipes:'Recipes / processes',folderRecipesText:'Recipes, technical sheets, production processes and standards.',folderSuppliers:'Suppliers',folderSuppliersText:'Contracts, price lists, conditions, invoices and agreements.'},
+  fr:{title:'Documents du commerce',sub:'Contrats employés, bail, permis, recettes, fournisseurs et documents clés dans une archive centrale.',complete:'Dossiers complets',needs:'À traiter',expiring:'Expirent bientôt',total:'Documents gardés',attention:'À traiter',files:'Dossiers de l’équipe',latest:'Derniers documents',checklist:'Checklist de base',folders:'Dossiers suggérés',customFolders:'Dossiers personnalisés',newFolder:'Nouveau dossier',customFolderHint:'Créez plus de dossiers selon votre logique: impôts, assurances, maintenance, franchise ou archive interne.',openFile:'Ouvrir dossier',noAttention:'Tout est en ordre',noAttentionText:'Aucun document expiré, proche d’expiration ou donnée critique manquante.',noDocs:'Aucun document enregistré.',missing:'En attente',critical:'Critique',review:'À revoir',completeState:'Complet',nextExpiry:'Prochaine échéance',docs:'docs',uploadHint:'Pour ajouter un document, ouvrez le dossier de l’employé.',contract:'Contrat signé',permit:'Permis ou autorisation',identity:'Pièce d’identité',medical:'Certificat médical si besoin',salary:'Annexes salaire et changements',folderEmployees:'Employés',folderEmployeesText:'Contrats, permis, certificats, annexes et échéances.',folderCompany:'Entreprise',folderCompanyText:'Registre, assurances, impôts, politiques et documents légaux.',folderLease:'Local / bail',folderLeaseText:'Contrat de bail, garanties, paiements, plans et permis.',folderOperations:'Opération',folderOperationsText:'Manuels, protocoles, checklists, sécurité et hygiène.',folderRecipes:'Recettes / processus',folderRecipesText:'Recettes, fiches techniques, production et standards.',folderSuppliers:'Fournisseurs',folderSuppliersText:'Contrats, listes de prix, conditions, factures et accords.'},
+  de:{title:'Dokumente und Akten',sub:'Verträge, Bewilligungen, Zertifikate und Team-Fristen an einem Ort.',complete:'Vollständige Akten',needs:'Handlungsbedarf',expiring:'Laufen bald ab',total:'Gespeicherte Dokumente',attention:'Handlungsbedarf',files:'Teamakten',latest:'Neueste Dokumente',checklist:'Basis-Checkliste',openFile:'Akte öffnen',noAttention:'Alles in Ordnung',noAttentionText:'Keine abgelaufenen, bald ablaufenden oder kritisch fehlenden Dokumente.',noDocs:'Noch keine Dokumente gespeichert.',missing:'Offen',critical:'Kritisch',review:'Prüfen',completeState:'Vollständig',nextExpiry:'Nächste Frist',docs:'Dok.',uploadHint:'Zum Hochladen eines Dokuments die Mitarbeiterakte öffnen.',contract:'Unterschriebener Vertrag',permit:'Bewilligung oder Erlaubnis',identity:'Ausweis',medical:'Arztzeugnis falls nötig',salary:'Lohnanhänge und Änderungen'},
+  it:{title:'Documenti e fascicoli',sub:'Contratti, permessi, certificati e scadenze del team in un unico posto.',complete:'Fascicoli completi',needs:'Richiedono attenzione',expiring:'In scadenza',total:'Documenti salvati',attention:'Richiedono attenzione',files:'Fascicoli del team',latest:'Ultimi documenti',checklist:'Checklist base',openFile:'Apri fascicolo',noAttention:'Tutto in ordine',noAttentionText:'Nessun documento scaduto, in scadenza o dato critico mancante.',noDocs:'Nessun documento salvato.',missing:'Pendente',critical:'Critico',review:'Da rivedere',completeState:'Completo',nextExpiry:'Prossima scadenza',docs:'doc',uploadHint:'Per caricare un documento, apri il fascicolo del dipendente.',contract:'Contratto firmato',permit:'Permesso o autorizzazione',identity:'Documento identità',medical:'Certificato medico se serve',salary:'Allegati salario e modifiche'}
+};
+const documentsPageTx=()=>({...DOCUMENTS_PAGE_UI.es,...(DOCUMENTS_PAGE_UI[lang]||{})});
 function employeeDocs(empId){return (DB.documents||[]).filter(d=>d.empId===empId).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));}
 function docTypeLabel(t){const types=DOC_TYPES[lang]||DOC_TYPES.fr;return types[t]||types.other;}
 function fmtBytes(n){n=Number(n)||0;if(n<1024)return `${n} B`;if(n<1048576)return `${(n/1024).toFixed(0)} KB`;return `${(n/1048576).toFixed(1)} MB`;}
+function docAITx(){return {...DOC_UI.es,...(DOC_UI[lang]||{})};}
+function documentAiMetaHTML(d){
+  const tx=docAITx(),m=d.aiMetadata||{};
+  const chips=[];
+  const addChip=(label,value,cls='chip-gray')=>{if(value)chips.push(`<span class="chip ${cls}">${esc(label)}: ${esc(value)}</span>`);};
+  addChip(tx.responsible,m.responsiblePeople?.[0]||m.responsible||'', 'chip-blue');
+  addChip(tx.counterparty,m.counterparty||'', 'chip-gray');
+  addChip(tx.expires,m.suggestedExpiry||m.expiryDate||m.endDate||'', 'chip-orange');
+  if(m.amount)addChip('Monto',`${m.currency||''} ${m.amount}`.trim(),'chip-gray');
+  const obligations=Array.isArray(m.obligations)?m.obligations:[];
+  const warnings=Array.isArray(m.warnings)?m.warnings:[];
+  const relevant=Array.isArray(m.relevantData)?m.relevantData:[];
+  const status=d.aiStatus==='analyzing'
+    ? `<span class="chip chip-blue">${esc(tx.aiAnalyzing)}</span>`
+    : d.aiStatus==='review'||d.aiStatus==='manual_review'
+      ? `<span class="chip chip-orange">${esc(tx.aiReview)}</span>`
+      : d.aiSummary?`<span class="chip chip-green">${esc(tx.aiDone)}</span>`:'';
+  if(!status&&!d.aiSummary&&!chips.length&&!obligations.length&&!warnings.length&&!relevant.length)return '';
+  return `<div style="margin-top:8px;border:1px solid var(--border);background:var(--s2);border-radius:12px;padding:10px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${status}${chips.join('')}</div>
+    ${d.aiSummary?`<div class="fs12 mt8" style="color:var(--text);line-height:1.45">${esc(d.aiSummary)}</div>`:''}
+    ${relevant.length?`<div class="fs11 muted mt6">${relevant.slice(0,3).map(esc).join(' · ')}</div>`:''}
+    ${obligations.length?`<div class="fs11 mt6"><span class="fw8">${esc(tx.obligations)}:</span> ${obligations.slice(0,2).map(esc).join(' · ')}</div>`:''}
+    ${warnings.length?`<div class="fs11 mt6" style="color:var(--orange)"><span class="fw8">${esc(tx.warnings)}:</span> ${warnings.slice(0,2).map(esc).join(' · ')}</div>`:''}
+  </div>`;
+}
+async function analyzeEmployeeDocumentWithAI(doc,text){
+  const saveAndRefresh=async()=>{
+    saveLocal();
+    await sbSaveDoc(doc).catch(console.error);
+    if(document.getElementById(`det-${doc.empId}`))openDetail(doc.empId);
+    renderDocuments();
+  };
+  if(isDemo()||!sb?.functions){
+    doc.aiStatus='review';
+    doc.aiSummary='Documento guardado. La descripción IA se generará cuando la función esté disponible.';
+    await saveAndRefresh();
+    return;
+  }
+  const cleanText=String(text||'').trim();
+  doc.aiStatus='analyzing';
+  await saveAndRefresh();
+  try{
+    const {data,error}=await sb.functions.invoke('analyze-document',{body:{text:cleanText.slice(0,18000),fileName:doc.fileName||doc.name||'documento',documentType:doc.type||'other',folder:'employees'}});
+    if(error)throw error;
+    const result=data||{};
+    doc.aiSummary=result.summary||'';
+    doc.aiMetadata=result;
+    doc.aiStatus=result.confidence==='low'?'review':'analyzed';
+    if(!doc.expiresAt&&(result.suggestedExpiry||result.expiryDate||result.endDate))doc.expiresAt=result.suggestedExpiry||result.expiryDate||result.endDate;
+    if(!doc.notes&&doc.aiSummary)doc.notes=doc.aiSummary;
+    await saveAndRefresh();
+    toast('IA agregó la descripción del documento');
+  }catch(e){
+    console.warn('Document AI analysis failed',e);
+    doc.aiStatus='review';
+    doc.aiSummary=cleanText&&cleanText.length<80?'No pude leer suficiente texto. Revisa este documento manualmente.':'Documento guardado. La IA no pudo completar el análisis.';
+    await saveAndRefresh();
+  }
+}
 function employeeFileStatus(emp){
   const tx=docTx(),docs=employeeDocs(emp.id),missing=[],expired=[],expiring=[];
   if(!docs.some(d=>d.type==='contract'))missing.push(tx.contractMissing);
@@ -6312,6 +6411,7 @@ function employeeDocsHTML(emp){
         <div class="fs11 muted">${esc(docTypeLabel(d.type))} · ${esc(d.fileName||'archivo')} · ${fmtBytes(d.size)}</div>
         ${d.expiresAt?`<div class="fs11" style="color:${(daysUntil(d.expiresAt)<0)?'var(--red)':'var(--orange)'}">${esc(tx.expires)}: ${fmtDate(d.expiresAt)}</div>`:''}
         ${d.notes?`<div class="fs11 muted">${esc(d.notes)}</div>`:''}
+        ${documentAiMetaHTML(d)}
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
         ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc('${d.id}')">${esc(tx.open)}</button>`:''}
@@ -6325,11 +6425,13 @@ function handleEmployeeDocUpload(ev,empId){
   const file=ev.target.files?.[0];if(!file)return;
   if(file.size>3*1024*1024){toast('Documento muy grande. Máximo 3 MB por ahora.','#ef4444');ev.target.value='';return;}
   const reader=new FileReader();
-  reader.onload=()=>{
+  reader.onload=async()=>{
     const type=document.getElementById('doc-type')?.value||'other';
-    const doc={id:uid(),empId,type,name:docTypeLabel(type),fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data:reader.result,notes:clean(document.getElementById('doc-notes')?.value||''),expiresAt:document.getElementById('doc-exp')?.value||'',createdAt:new Date().toISOString()};
-    DB.documents=[doc,...(DB.documents||[])];auditAction('document',`Documento agregado: ${file.name}`,{empId,type});saveLocal();openDetail(empId);toast('✅ Documento guardado');
+    const doc={id:uid(),empId,type,name:docTypeLabel(type),fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data:reader.result,notes:clean(document.getElementById('doc-notes')?.value||''),aiSummary:'',aiMetadata:{},aiStatus:'pending',expiresAt:document.getElementById('doc-exp')?.value||'',createdAt:new Date().toISOString()};
+    DB.documents=[doc,...(DB.documents||[])];auditAction('document',`Documento agregado: ${file.name}`,{empId,type});saveLocal();openDetail(empId);toast('Documento guardado. IA analizando...');
     sbSaveDoc(doc).catch(console.error);
+    const text=await extractBusinessDocumentText(file).catch(e=>{console.warn('Document text extraction failed',e);return `Archivo: ${file.name}`;});
+    analyzeEmployeeDocumentWithAI(doc,text);
   };
   reader.readAsDataURL(file);
 }
@@ -6342,6 +6444,118 @@ function deleteEmployeeDoc(id,empId){
   if(!requirePerm('view_documents'))return;
   if(!confirm('¿Eliminar este documento del expediente?'))return;
   DB.documents=(DB.documents||[]).filter(d=>d.id!==id);auditAction('document','Documento eliminado',{empId,docId:id});saveLocal();openDetail(empId);toast('Documento eliminado');sbDelDoc(id).catch(console.error);
+}
+function docStatusMeta(st){
+  const tx=documentsPageTx();
+  if(st.level==='complete')return {label:tx.completeState,cls:'chip-green',color:'var(--green)'};
+  if(st.level==='critical')return {label:tx.critical,cls:'chip-red',color:'var(--red)'};
+  return {label:tx.review,cls:'chip-orange',color:'var(--orange)'};
+}
+function nextEmployeeDocExpiry(st){
+  const dates=[...(st.expired||[]),...(st.expiring||[])].map(d=>d.expiresAt).filter(Boolean).sort();
+  return dates[0]||'';
+}
+function openEmployeeDocuments(empId){
+  openDetail(empId);
+  setTimeout(()=>{
+    const btn=[...document.querySelectorAll('#dtabs .tab')].find(b=>(b.getAttribute('onclick')||'').includes('dt-docs'));
+    if(btn)dtab('dt-docs',btn);
+  },0);
+}
+function renderDocuments(){
+  const el=document.getElementById('documents-content');if(!el)return;
+  if(!can('view_documents')){el.innerHTML=restrictedHTML();return;}
+  const tx=documentsPageTx(),employees=(DB.employees||[]).filter(e=>e.status!=='inactive'),docs=DB.documents||[];
+  const rows=employees.map(emp=>({emp,st:employeeFileStatus(emp)}));
+  const complete=rows.filter(r=>r.st.level==='complete').length;
+  const attention=rows.filter(r=>r.st.level!=='complete').sort((a,b)=>(a.st.level==='critical'?-1:1)-(b.st.level==='critical'?-1:1));
+  const expiringDocs=docs.filter(d=>{const left=daysUntil(d.expiresAt);return left!==null&&left<=30;}).sort((a,b)=>String(a.expiresAt).localeCompare(String(b.expiresAt)));
+  const latest=[...docs].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,6);
+  const checklist=[tx.contract,tx.permit,tx.identity,tx.medical,tx.salary];
+  const folders=[
+    {icon:'team',title:tx.folderEmployees,text:tx.folderEmployeesText,count:docs.filter(d=>d.empId).length,action:"document.getElementById('doc-team-files')?.scrollIntoView({behavior:'smooth',block:'start'})",active:true},
+    {icon:'settings',title:tx.folderCompany,text:tx.folderCompanyText,count:0},
+    {icon:'documents',title:tx.folderLease,text:tx.folderLeaseText,count:0},
+    {icon:'tasks',title:tx.folderOperations,text:tx.folderOperationsText,count:0},
+    {icon:'inventory',title:tx.folderRecipes,text:tx.folderRecipesText,count:0},
+    {icon:'sales',title:tx.folderSuppliers,text:tx.folderSuppliersText,count:0}
+  ];
+  el.innerHTML=`<section class="hub-hero" style="background:linear-gradient(135deg,#3f1f72,#172554 60%,#0f766e)">
+    <div class="hub-kicker">${esc(areaTx().documents)}</div>
+    <h2>${esc(tx.title)}</h2>
+    <p>${esc(tx.sub)}</p>
+  </section>
+  <section class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:14px 0">
+    <div class="kpi"><div class="kpi-val" style="color:var(--green)">${complete}</div><div class="kpi-sub">${esc(tx.complete)}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--red)">${attention.length}</div><div class="kpi-sub">${esc(tx.needs)}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${expiringDocs.length}</div><div class="kpi-sub">${esc(tx.expiring)}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--brand)">${docs.length}</div><div class="kpi-sub">${esc(tx.total)}</div></div>
+  </section>
+  <section class="card" style="margin-bottom:12px">
+    <div class="flex-b" style="gap:10px;align-items:flex-start">
+      <div>
+        <div class="card-header" style="padding:0;border:0;margin-bottom:4px">${esc(tx.folders)}</div>
+        <div class="fs12 muted">${esc(tx.customFolderHint)}</div>
+      </div>
+      <button class="btn btn-primary" onclick="toast('${esc(tx.newFolder)}: pronto podrás crear carpetas propias')">+ ${esc(tx.newFolder)}</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px">
+      ${folders.map(f=>`<button class="module-card" style="text-align:left;min-height:150px;border-radius:var(--r2);padding:16px" ${f.active?`onclick="${f.action}"`:''}>
+        <div class="module-icon" style="background:#eef2ff;color:#4f6ef7">${hubIcon(f.icon)}</div>
+        <h3 style="font-size:18px;margin:10px 0 6px">${esc(f.title)}</h3>
+        <p style="font-size:13px;line-height:1.35">${esc(f.text)}</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><span class="chip chip-blue">${f.count} ${esc(tx.docs)}</span></div>
+      </button>`).join('')}
+    </div>
+  </section>
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+    <div class="card" id="doc-team-files">
+      <div class="card-header">${esc(tx.attention)}</div>
+      ${attention.length?attention.map(({emp,st})=>{const meta=docStatusMeta(st),issues=[...st.missing,...st.expired.map(d=>`${docTypeLabel(d.type)} · ${fmtDate(d.expiresAt)}`),...st.expiring.map(d=>`${docTypeLabel(d.type)} · ${fmtDate(d.expiresAt)}`)].slice(0,3);return`<div class="rrow" style="align-items:flex-start;gap:10px">
+        ${mkAv(emp,'')}
+        <div style="flex:1;min-width:0">
+          <div class="fw8">${safeEmpName(emp)}</div>
+          <div class="fs11 muted">${esc(emp.position||'')} ${emp.dept?`· ${esc(emp.dept)}`:''}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:7px">${issues.map(x=>`<span class="chip chip-orange">${esc(x)}</span>`).join('')}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <span class="chip ${meta.cls}">${esc(meta.label)}</span>
+          <button class="btn btn-sm btn-primary" onclick="openEmployeeDocuments(${jsArg(emp.id)})">${esc(tx.openFile)}</button>
+        </div>
+      </div>`;}).join(''):`<div class="empty-state" style="padding:20px"><h3>${esc(tx.noAttention)}</h3><p>${esc(tx.noAttentionText)}</p></div>`}
+    </div>
+    <div class="card">
+      <div class="card-header">${esc(tx.checklist)}</div>
+      <div style="display:grid;gap:8px">${checklist.map(x=>`<div class="rrow"><span class="fw7">${esc(x)}</span><span style="color:var(--green)">✓</span></div>`).join('')}</div>
+      <div class="fs12 muted mt12">${esc(tx.uploadHint)}</div>
+    </div>
+  </section>
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:12px">
+    <div class="card">
+      <div class="card-header">${esc(tx.files)}</div>
+      ${rows.length?rows.map(({emp,st})=>{const meta=docStatusMeta(st),next=nextEmployeeDocExpiry(st);return`<div class="rrow" style="gap:10px">
+        ${mkAv(emp,'')}
+        <div style="flex:1;min-width:0">
+          <div class="fw8">${safeEmpName(emp)}</div>
+          <div class="fs11 muted">${st.docs.length} ${esc(tx.docs)}${next?` · ${esc(tx.nextExpiry)} ${fmtDate(next)}`:''}</div>
+        </div>
+        <span class="chip ${meta.cls}">${esc(meta.label)}</span>
+        <button class="btn btn-sm btn-ghost" onclick="openEmployeeDocuments(${jsArg(emp.id)})">${esc(tx.openFile)}</button>
+      </div>`;}).join(''):`<div class="empty-state"><h3>${esc(T().emp.none)}</h3></div>`}
+    </div>
+    <div class="card">
+      <div class="card-header">${esc(tx.latest)}</div>
+      ${latest.length?latest.map(d=>{const emp=DB.employees.find(e=>e.id===d.empId);return`<div class="rrow" style="align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div class="fw8">${esc(d.fileName||d.name||'Documento')}</div>
+          <div class="fs11 muted">${esc(docTypeLabel(d.type))} · ${esc(emp?safeEmpName(emp):'-')}</div>
+          ${d.aiSummary?`<div class="fs11 mt4" style="color:var(--text2);line-height:1.35">${esc(d.aiSummary).slice(0,180)}${d.aiSummary.length>180?'...':''}</div>`:''}
+          ${d.expiresAt?`<div class="fs11" style="color:${daysUntil(d.expiresAt)<0?'var(--red)':'var(--orange)'}">${fmtDate(d.expiresAt)}</div>`:''}
+        </div>
+        ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc(${jsArg(d.id)})">${esc(docTx().open)}</button>`:''}
+      </div>`;}).join(''):`<div class="empty-state" style="padding:20px"><p>${esc(tx.noDocs)}</p></div>`}
+    </div>
+  </section>`;
 }
 
 function openAlertReview(key,empId,type,msg){
