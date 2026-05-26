@@ -164,6 +164,12 @@ input[type=date],input[type=time]{color-scheme:dark}
 .modal-handle{width:38px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px}
 .modal-title{font-size:19px;font-weight:800;margin-bottom:20px}
 .modal-actions{display:flex;gap:10px;margin-top:20px}
+.roadmap-card{background:var(--s3);border:1px solid var(--border);border-radius:18px;padding:14px;margin-top:12px}
+.roadmap-card h4{font-size:14px;margin:0 0 8px;color:var(--text)}
+.roadmap-list{display:grid;gap:8px;margin:10px 0 0}
+.roadmap-item{display:flex;gap:10px;align-items:flex-start;color:var(--text2);font-size:13px;line-height:1.35}
+.roadmap-check{width:20px;height:20px;border-radius:8px;background:var(--brand-light);color:var(--brand);display:grid;place-items:center;font-size:12px;font-weight:900;flex-shrink:0}
+.roadmap-note{border-left:3px solid var(--brand);padding:10px 12px;background:rgba(79,110,247,.08);border-radius:12px;color:var(--text2);font-size:13px;line-height:1.4;margin-top:14px}
 .setup-hero{background:linear-gradient(135deg,var(--brand),var(--brand2));color:white;border-radius:18px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden}
 .setup-hero:after{content:'';position:absolute;right:-35px;top:-40px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.16)}
 .setup-hero h2{font-size:23px;line-height:1.08;margin:6px 0 8px;letter-spacing:-.4px}
@@ -1422,6 +1428,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 
 <!-- Detail -->
 <div class="ov" id="detail-modal"><div class="modal" id="detail-content"></div></div>
+<div class="ov" id="roadmap-modal"><div class="modal" id="roadmap-content"></div></div>
 
 <!-- Absence -->
 <div class="ov" id="abs-modal">
@@ -1870,6 +1877,39 @@ const AREA_UI={
   it:{eyebrow:'Manager Pro come piattaforma',title:'Quale area vuoi gestire oggi?',sub:'Inizia dal personale e aggiungi vendite, inventario, documenti e insight quando il business ne ha bisogno.',open:'Apri',soon:'Prossimamente',next:'Prossimo modulo',active:'Attivo ora',today:'Oggi nel personale',roadmap:'Percorso prodotto',settings:'Impostazioni',settingsDesc:'Lingua, colori, orari di apertura, tolleranze, accessi e dati del business.',openSettings:'Apri impostazioni',team:'Personale',teamDesc:'Dipendenti, turni, timbrature, pause, richieste, documenti, stipendi e report.',sales:'Vendite',salesDesc:'Vendite per prodotto o servizio, cassa giornaliera, metodi di pagamento e chiusure.',inventory:'Inventario',inventoryDesc:'Stock, fornitori, acquisti e consumo collegato alle vendite.',documents:'Documenti',documentsDesc:'Contratti, permessi, scadenze e fascicolo di ogni dipendente.',tasks:'Attività',tasksDesc:'Routine, responsabili, pendenti e controllo operativo.',insights:'IA e insight',insightsDesc:'Domande sul business, segnali di miglioramento e aiuto decisionale.',employees:'Dipendenti',pending:'Richieste in attesa',alerts:'Avvisi aperti',p1:'Personale pronto: controllare il team e chiudere il mese.',p2:'Vendite per item: registrare prodotti e servizi.',p3:'Inventario: collegare vendite, stock e acquisti.',p4:'Insight: capire cosa succede senza gergo amministrativo.',openTeam:'Apri Personale'}
 };
 const areaTx=()=>({...AREA_UI.es,...(AREA_UI[lang]||{})});
+const ROADMAP_UI={
+  es:{
+    title:'Siguiente paso: {module}',intro:'Este módulo todavía está en hoja de ruta, pero ya tiene una lógica clara para crecer sin volver pesada la app.',why:'Por qué importa',first:'Primeras funciones',close:'Cerrar',preview:'Ver plan',
+    documents:{pills:['Expedientes','Vencimientos','Firmas'],why:'Centraliza contratos, permisos, anexos y soportes para que el manager no dependa de carpetas sueltas.',items:['Expediente por trabajador con documentos y vencimientos.','Alertas antes de que venza un contrato, permiso o certificado.','Lectura IA para sugerir datos del perfil y detectar faltantes.'],note:'Este módulo se conecta con Personal, porque vive dentro del ciclo de vida del empleado.'},
+    tasks:{pills:['Rutinas','Responsables','Seguimiento'],why:'Convierte tareas repetitivas del negocio en rutinas visibles: apertura, cierre, limpieza, compras, caja o mantenimiento.',items:['Listas de rutina por día o turno.','Responsables y estados: pendiente, hecho, bloqueado.','Avisos cuando una tarea crítica no se completa a tiempo.'],note:'Este módulo ayuda a que el negocio funcione aunque el dueño no esté mirando todo el día.'},
+    insights:{pills:['IA','Señales','Decisiones'],why:'Une datos de personal, ventas e inventario para explicar qué está pasando y sugerir próximos pasos en lenguaje simple.',items:['Preguntas al negocio: qué vendió más, qué empleado necesita apoyo o qué stock preocupa.','Señales automáticas: retrasos repetidos, bajo stock, margen bajo o ventas inusuales.','Ayuda para preparar conversaciones, decisiones y reportes para el dueño.'],note:'La IA debe entender la relación entre áreas, no responder como una sección aislada.'}
+  },
+  en:{
+    title:'Next step: {module}',intro:'This module is still on the roadmap, but the logic is already clear so the app can grow without becoming heavy.',why:'Why it matters',first:'First features',close:'Close',preview:'View plan',
+    documents:{pills:['Files','Expiries','Signatures'],why:'Centralizes contracts, permits, addenda and supporting files so the manager does not depend on scattered folders.',items:['Employee file with documents and expiration dates.','Alerts before a contract, permit or certificate expires.','AI reading to suggest profile data and detect missing fields.'],note:'This module connects to People because it belongs to the employee lifecycle.'},
+    tasks:{pills:['Routines','Owners','Follow-up'],why:'Turns repeated business tasks into visible routines: opening, closing, cleaning, purchases, cash or maintenance.',items:['Routine lists by day or shift.','Owners and statuses: pending, done, blocked.','Alerts when a critical task is not completed on time.'],note:'This module helps the business run even when the owner is not watching everything.'},
+    insights:{pills:['AI','Signals','Decisions'],why:'Connects people, sales and inventory data to explain what is happening and suggest next steps in plain language.',items:['Ask the business: what sold most, who needs support or which stock is at risk.','Automatic signals: repeated lateness, low stock, low margin or unusual sales.','Help preparing conversations, decisions and owner reports.'],note:'AI should understand relationships between areas, not answer as an isolated section.'}
+  },
+  fr:{
+    title:'Prochaine étape : {module}',intro:'Ce module est encore dans la feuille de route, mais sa logique est déjà claire pour faire grandir l’app sans la rendre lourde.',why:'Pourquoi c’est important',first:'Premières fonctions',close:'Fermer',preview:'Voir le plan',
+    documents:{pills:['Dossiers','Échéances','Signatures'],why:'Centralise contrats, permis, avenants et justificatifs pour éviter les dossiers dispersés.',items:['Dossier par employé avec documents et échéances.','Alertes avant expiration d’un contrat, permis ou certificat.','Lecture IA pour suggérer des données du profil et repérer les manques.'],note:'Ce module se connecte au Personnel car il fait partie du cycle de vie de l’employé.'},
+    tasks:{pills:['Routines','Responsables','Suivi'],why:'Transforme les tâches répétitives en routines visibles : ouverture, fermeture, nettoyage, achats, caisse ou maintenance.',items:['Listes de routines par jour ou shift.','Responsables et statuts : en attente, fait, bloqué.','Alertes lorsqu’une tâche critique n’est pas terminée à temps.'],note:'Ce module aide le commerce à fonctionner même quand le propriétaire ne surveille pas tout.'},
+    insights:{pills:['IA','Signaux','Décisions'],why:'Relie personnel, ventes et inventaire pour expliquer ce qui se passe et proposer des actions simples.',items:['Questions au commerce : ce qui vend le plus, qui a besoin d’aide ou quel stock inquiète.','Signaux automatiques : retards répétés, stock bas, marge basse ou ventes inhabituelles.','Aide pour préparer conversations, décisions et rapports au propriétaire.'],note:'L’IA doit comprendre les liens entre domaines, pas répondre comme une section isolée.'}
+  },
+  de:{
+    title:'Nächster Schritt: {module}',intro:'Dieses Modul ist noch auf der Roadmap, aber die Logik ist klar, damit die App wachsen kann ohne schwer zu werden.',why:'Warum es wichtig ist',first:'Erste Funktionen',close:'Schließen',preview:'Plan ansehen',
+    documents:{pills:['Akten','Fristen','Signaturen'],why:'Bündelt Verträge, Bewilligungen, Anhänge und Nachweise, damit nichts in einzelnen Ordnern verloren geht.',items:['Mitarbeiterakte mit Dokumenten und Fristen.','Warnungen vor Ablauf von Vertrag, Bewilligung oder Zertifikat.','KI-Lesung für Profildaten und fehlende Angaben.'],note:'Dieses Modul gehört zu Personal, weil es den Mitarbeiter-Lebenszyklus begleitet.'},
+    tasks:{pills:['Routinen','Verantwortliche','Kontrolle'],why:'Macht wiederkehrende Aufgaben sichtbar: Öffnung, Abschluss, Reinigung, Einkauf, Kasse oder Wartung.',items:['Routinenlisten nach Tag oder Schicht.','Verantwortliche und Status: offen, erledigt, blockiert.','Warnungen, wenn kritische Aufgaben nicht rechtzeitig erledigt werden.'],note:'Dieses Modul hilft dem Betrieb, auch ohne ständige Kontrolle des Inhabers zu laufen.'},
+    insights:{pills:['KI','Signale','Entscheidungen'],why:'Verbindet Personal, Verkauf und Inventar, erklärt was passiert und schlägt nächste Schritte vor.',items:['Fragen an den Betrieb: was verkauft sich, wer braucht Hilfe, welcher Bestand ist kritisch.','Automatische Signale: wiederholte Verspätung, niedriger Bestand, niedrige Marge oder ungewöhnliche Verkäufe.','Hilfe für Gespräche, Entscheidungen und Berichte.'],note:'Die KI muss Beziehungen zwischen Bereichen verstehen, nicht isoliert antworten.'}
+  },
+  it:{
+    title:'Prossimo passo: {module}',intro:'Questo modulo è ancora nella roadmap, ma la logica è già chiara per far crescere l’app senza renderla pesante.',why:'Perché conta',first:'Prime funzioni',close:'Chiudi',preview:'Vedi piano',
+    documents:{pills:['Fascicoli','Scadenze','Firme'],why:'Centralizza contratti, permessi, allegati e documenti così il manager non dipende da cartelle sparse.',items:['Fascicolo per dipendente con documenti e scadenze.','Avvisi prima della scadenza di contratto, permesso o certificato.','Lettura IA per suggerire dati del profilo e trovare mancanze.'],note:'Questo modulo si collega al Personale perché fa parte del ciclo di vita del dipendente.'},
+    tasks:{pills:['Routine','Responsabili','Controllo'],why:'Trasforma attività ripetitive in routine visibili: apertura, chiusura, pulizia, acquisti, cassa o manutenzione.',items:['Liste di routine per giorno o turno.','Responsabili e stati: pendente, fatto, bloccato.','Avvisi quando un’attività critica non viene completata in tempo.'],note:'Questo modulo aiuta il business a funzionare anche quando il proprietario non controlla tutto.'},
+    insights:{pills:['IA','Segnali','Decisioni'],why:'Collega personale, vendite e inventario per spiegare cosa succede e suggerire prossimi passi semplici.',items:['Domande al business: cosa vende di più, chi ha bisogno di supporto o quale stock preoccupa.','Segnali automatici: ritardi ripetuti, stock basso, margine basso o vendite insolite.','Aiuto per preparare conversazioni, decisioni e report.'],note:'L’IA deve capire le relazioni tra aree, non rispondere come una sezione isolata.'}
+  }
+};
+const roadmapTx=()=>({...ROADMAP_UI.es,...(ROADMAP_UI[lang]||{})});
 const SALES_UI={
   es:{title:'Ventas y caja',sub:'Registra ventas por producto o servicio. Así después podremos sacar insights y conectar inventario.',today:'Hoy',revenue:'Ingresos',sales:'Ventas',ticket:'Ticket prom.',products:'Productos',newSale:'Nueva venta',newProduct:'Nuevo producto',catalog:'Catálogo',activity:'Actividad del día',empty:'Aún no hay ventas registradas hoy.',product:'Producto o servicio',qty:'Cantidad',price:'Precio',method:'Método de pago',note:'Nota',total:'Total',saveSale:'Guardar venta',cancel:'Cancelar',productName:'Nombre',category:'Categoría',type:'Tipo',saveProduct:'Guardar',cash:'Efectivo',card:'Tarjeta',twint:'TWINT',transfer:'Transferencia',productType:'Producto',serviceType:'Servicio',ingredientType:'Insumo',bundleType:'Combo/preparado',sku:'SKU / Código',unit:'Unidad',unitUnit:'Unidad',unitHour:'Hora',unitPortion:'Porción',unitPack:'Paquete',unitBox:'Caja',unitBottle:'Botella',trackStock:'Controlar inventario',stock:'Stock actual',minStock:'Stock mínimo',lowStock:'Stock bajo',recipeTitle:'Consumo por venta',recipeHelp:'Cada insumo usa su propia unidad: kg, g, L, ml, unidades, cajas o paquetes.',addIngredient:'+ Insumo',ingredient:'Insumo',consumption:'Consumo',noIngredients:'Crea insumos primero para armar esta preparación.',saved:'Venta guardada',productSaved:'Producto guardado',missingProduct:'Crea primero un producto o servicio.',topProduct:'Más vendido',byMethod:'Por método de pago',areaTitle:'Panel de ventas',areaDesc:'Elige qué necesitas hacer en esta área.',goSummary:'Ver resumen',goSummaryDesc:'Ingresos, ticket promedio y actividad del día.',goRegister:'Registrar venta',goRegisterDesc:'Añade una venta rápida por producto o servicio.',goCatalog:'Gestionar catálogo',goCatalogDesc:'Productos, servicios y precios base.',goClose:'Caja e insights',goCloseDesc:'Métodos de pago, más vendido y señales para decidir.',openSection:'Abrir'},
   en:{title:'Sales and cash',sub:'Register sales by product or service. Later we can generate insights and connect inventory.',today:'Today',revenue:'Revenue',sales:'Sales',ticket:'Avg. ticket',products:'Products',newSale:'New sale',newProduct:'New product',catalog:'Catalog',activity:'Day activity',empty:'No sales registered today yet.',product:'Product or service',qty:'Quantity',price:'Price',method:'Payment method',note:'Note',total:'Total',saveSale:'Save sale',cancel:'Cancel',productName:'Name',category:'Category',type:'Type',saveProduct:'Save',cash:'Cash',card:'Card',twint:'TWINT',transfer:'Transfer',productType:'Product',serviceType:'Service',ingredientType:'Ingredient/input',bundleType:'Bundle/prepared',sku:'SKU / Code',unit:'Unit',unitUnit:'Unit',unitHour:'Hour',unitPortion:'Portion',unitPack:'Pack',unitBox:'Box',unitBottle:'Bottle',trackStock:'Track inventory',stock:'Current stock',minStock:'Minimum stock',lowStock:'Low stock',recipeTitle:'Consumption per sale',recipeHelp:'Each input uses its own unit: kg, g, L, ml, units, boxes or packs.',addIngredient:'+ Input',ingredient:'Input',consumption:'Consumption',noIngredients:'Create ingredients first to build this preparation.',saved:'Sale saved',productSaved:'Product saved',missingProduct:'Create a product or service first.',topProduct:'Top seller',byMethod:'By payment method',areaTitle:'Sales panel',areaDesc:'Choose what you need to do in this area.',goSummary:'View summary',goSummaryDesc:'Revenue, average ticket and daily activity.',goRegister:'Register sale',goRegisterDesc:'Add a quick sale by product or service.',goCatalog:'Manage catalog',goCatalogDesc:'Products, services and base prices.',goClose:'Cash and insights',goCloseDesc:'Payment methods, top seller and decision signals.',openSection:'Open'},
@@ -4409,21 +4449,42 @@ function hubCardHTML(card){
     <p>${esc(card.desc)}</p>
     <div class="hub-meta">${card.meta.map(x=>`<span class="hub-pill">${esc(x)}</span>`).join('')}</div>
     <div class="hub-actions">
-      ${card.active?`<button class="btn btn-primary" onclick="${card.action}">${esc(card.button||tx.open)}</button>`:`<button class="btn btn-ghost" onclick="toast(${jsArg(tx.next)},'#2563eb')">${esc(tx.next)}</button>`}
+      ${card.active?`<button class="btn btn-primary" onclick="${card.action}">${esc(card.button||tx.open)}</button>`:`<button class="btn btn-ghost" onclick="openRoadmapModule('${esc(card.module)}')">${esc(roadmapTx().preview||tx.next)}</button>`}
     </div>
   </div>`;
+}
+function openRoadmapModule(module){
+  const tx=areaTx(),rt=roadmapTx(),data=rt[module];if(!data)return;
+  const title=tx[module]||module;
+  const el=document.getElementById('roadmap-content');if(!el)return;
+  el.innerHTML=`<div class="modal-handle"></div>
+    <div class="modal-title">${esc((rt.title||'').replace('{module}',title))}</div>
+    <p class="muted fs14" style="line-height:1.45">${esc(rt.intro)}</p>
+    <div class="hub-meta mt12">${(data.pills||[]).map(x=>`<span class="hub-pill">${esc(x)}</span>`).join('')}</div>
+    <div class="roadmap-card">
+      <h4>${esc(rt.why)}</h4>
+      <p class="muted fs13" style="line-height:1.45">${esc(data.why)}</p>
+    </div>
+    <div class="roadmap-card">
+      <h4>${esc(rt.first)}</h4>
+      <div class="roadmap-list">${(data.items||[]).map(x=>`<div class="roadmap-item"><span class="roadmap-check">✓</span><span>${esc(x)}</span></div>`).join('')}</div>
+    </div>
+    <div class="roadmap-note">${esc(data.note)}</div>
+    <button class="btn btn-primary mt12" onclick="closeModal('roadmap-modal')">${esc(rt.close)}</button>`;
+  openModal('roadmap-modal');
 }
 function renderHub(){
   const el=document.getElementById('hub-content');if(!el)return;
   const tx=areaTx(),active=DB.employees.filter(e=>e.status==='active'),pending=(DB.absences||[]).filter(a=>!a.approved).length;
+  const rm=roadmapTx();
   const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
   const cards=[
     {id:'hub-card-people',icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,action:"goPage('dashboard')",button:tx.openTeam},
     {id:'hub-card-sales',icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1',active:true,action:"goPage('sales')",button:tx.open},
     {id:'hub-card-inventory',icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df',active:true,action:"goPage('inventory')",button:tx.open},
-    {id:'hub-card-documents',icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:['Expedientes','Vencimientos','IA'],color:'#7c3aed',soft:'#f3edff'},
-    {id:'hub-card-tasks',icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:['Rutinas','Responsables','Pendientes'],color:'#0891b2',soft:'#e6f8fc'},
-    {id:'hub-card-insights',icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:['IA','Reportes','Señales'],color:'#be123c',soft:'#fff1f2'}
+    {id:'hub-card-documents',module:'documents',icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:rm.documents.pills,color:'#7c3aed',soft:'#f3edff'},
+    {id:'hub-card-tasks',module:'tasks',icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:rm.tasks.pills,color:'#0891b2',soft:'#e6f8fc'},
+    {id:'hub-card-insights',module:'insights',icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:rm.insights.pills,color:'#be123c',soft:'#fff1f2'}
   ];
   el.innerHTML=`<section class="hub-hero" id="hub-tour-hero">
     <div class="hub-kicker">${esc(tx.eyebrow)}</div>
