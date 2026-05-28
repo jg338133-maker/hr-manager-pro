@@ -2077,6 +2077,7 @@ let DB={
   settings:{company:'Mon Business',emoji:'MP',currency:'CHF',businessSector:'general',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],signals:[],stats:{}};
+let activeDocumentFolder='employees';
 const isDemo=()=>currentUser?.demo===true;
 function loadLocal(){try{const s=localStorage.getItem('hrm_pro');if(s)DB={...DB,...JSON.parse(s)};}catch(e){}}
 function saveLocal(){try{if(isDemo())return;localStorage.setItem('hrm_pro',JSON.stringify(DB));}catch(e){}}
@@ -2410,10 +2411,10 @@ async function sbSaveEmp(emp){
   const{error}=await sb.from('employees').upsert({id:emp.id,restaurant_id:REST_ID,name:emp.name,last_name:emp.last||'',employee_number:emp.num||'',position:emp.position||'',department:emp.dept||'',phone:emp.phone||'',email:emp.email||'',start_date:emp.startDate||null,contract_type:emp.contract||'CDI',pay_type:emp.payType||'hourly',hourly_rate:emp.rate||0,monthly_salary:emp.salary||0,vacation_weeks:emp.vacWeeks||5,avs_number:emp.avs||'',emergency_contact:emp.emergency||'',notes:emp.notes||'',status:emp.status||'active',photo_url:emp.photo||null,color:emp.color||'#4f6ef7',schedules:emp.schedules||{},pin:emp.pin||'0000'});
   if(error)console.error(error);
 }
-function docFromSBRow(x){return{id:x.id,empId:x.employee_id,type:x.type||'other',name:x.name||'',fileName:x.file_name||'',mimeType:x.mime_type||'',size:x.size_bytes||0,data:x.file_data||'',notes:x.notes||'',aiSummary:x.ai_summary||'',aiMetadata:x.ai_metadata||{},aiStatus:x.ai_status||'pending',expiresAt:x.expires_at||'',createdAt:x.created_at||new Date().toISOString()};}
+function docFromSBRow(x){return{id:x.id,empId:x.employee_id||'',folder:x.folder||'employees',type:x.type||'other',name:x.name||'',fileName:x.file_name||'',mimeType:x.mime_type||'',size:x.size_bytes||0,data:x.file_data||'',notes:x.notes||'',aiSummary:x.ai_summary||'',aiMetadata:x.ai_metadata||{},aiStatus:x.ai_status||'pending',expiresAt:x.expires_at||'',createdAt:x.created_at||new Date().toISOString()};}
 async function sbSaveDoc(doc){
   if(isDemo())return;
-  const payload={id:doc.id,restaurant_id:REST_ID,employee_id:doc.empId,type:doc.type||'other',name:doc.name||'',file_name:doc.fileName||'',mime_type:doc.mimeType||'',size_bytes:doc.size||0,file_data:doc.data||'',notes:doc.notes||'',ai_summary:doc.aiSummary||'',ai_metadata:doc.aiMetadata||{},ai_status:doc.aiStatus||'pending',expires_at:doc.expiresAt||null};
+  const payload={id:doc.id,restaurant_id:REST_ID,employee_id:doc.empId||null,folder:doc.folder||'employees',type:doc.type||'other',name:doc.name||'',file_name:doc.fileName||'',mime_type:doc.mimeType||'',size_bytes:doc.size||0,file_data:doc.data||'',notes:doc.notes||'',ai_summary:doc.aiSummary||'',ai_metadata:doc.aiMetadata||{},ai_status:doc.aiStatus||'pending',expires_at:doc.expiresAt||null};
   const{error}=await sb.from('employee_documents').upsert(payload);
   if(error)console.error(error);
 }
@@ -6261,7 +6262,7 @@ function saveEmp(){
   else DB.employees.push(data);
   if(!editEmpId&&pendingContractDoc){
     const contractEnd=contractPlainValue(pendingContractDoc.fields?.endDate);
-    const doc={...pendingContractDoc,empId:data.id,expiresAt:pendingContractDoc.expiresAt||contractEnd||'',fields:undefined};
+    const doc={...pendingContractDoc,empId:data.id,folder:'employees',expiresAt:pendingContractDoc.expiresAt||contractEnd||'',fields:undefined};
     if(contractEnd&&!pendingContractDoc.notes?.includes(contractEnd))doc.notes=`${pendingContractDoc.notes||'Contrato subido'} · Fin contrato: ${contractEnd}`;
     DB.documents=[doc,...(DB.documents||[])];
     sbSaveDoc(doc).catch(console.error);
@@ -6290,7 +6291,7 @@ const DOC_UI={
 };
 const docTx=()=>DOC_UI[lang]||DOC_UI.fr;
 const DOCUMENTS_PAGE_UI={
-  es:{title:'Documentos del negocio',sub:'Contratos de empleados, arrendamiento, permisos, recetas, proveedores y documentos clave en un solo archivo central.',complete:'Expedientes completos',needs:'Requieren atención',expiring:'Vencen pronto',total:'Documentos guardados',attention:'Requieren atención',files:'Expedientes del equipo',latest:'Últimos documentos',checklist:'Checklist base',folders:'Carpetas sugeridas',customFolders:'Carpetas personalizadas',newFolder:'Nueva carpeta',customFolderHint:'Crea más carpetas según la lógica de tu negocio: impuestos, seguros, mantenimiento, franquicia o cualquier archivo interno.',openFile:'Abrir expediente',noAttention:'Todo está en orden',noAttentionText:'No hay documentos vencidos, próximos a vencer o datos críticos faltantes.',noDocs:'Aún no hay documentos guardados.',missing:'Pendiente',critical:'Crítico',review:'Revisar',completeState:'Completo',nextExpiry:'Próximo vencimiento',docs:'docs',uploadHint:'Para subir un documento, abre el expediente del empleado.',contract:'Contrato firmado',permit:'Permiso o autorización',identity:'Documento de identidad',medical:'Certificado médico si aplica',salary:'Anexos salariales y cambios',folderEmployees:'Empleados',folderEmployeesText:'Contratos, permisos, certificados, anexos y vencimientos.',folderCompany:'Empresa',folderCompanyText:'Registro mercantil, seguros, impuestos, políticas y documentos legales.',folderLease:'Local / arriendo',folderLeaseText:'Contrato de arriendo, garantías, pagos, planos y permisos del local.',folderOperations:'Operación',folderOperationsText:'Manuales, protocolos, checklists, seguridad e higiene.',folderRecipes:'Recetas / procesos',folderRecipesText:'Recetas, fichas técnicas, procesos de producción y estándares.',folderSuppliers:'Proveedores',folderSuppliersText:'Contratos, listas de precios, condiciones, facturas y acuerdos.'},
+  es:{title:'Documentos del negocio',sub:'Contratos de empleados, arrendamiento, permisos, recetas, proveedores y documentos clave en un solo archivo central.',complete:'Expedientes completos',needs:'Requieren atención',expiring:'Vencen pronto',total:'Documentos guardados',attention:'Requieren atención',files:'Expedientes del equipo',latest:'Últimos documentos',checklist:'Checklist base',folders:'Carpetas sugeridas',customFolders:'Carpetas personalizadas',newFolder:'Nueva carpeta',customFolderHint:'Entra a una carpeta para subir archivos. La IA genera una descripción, fechas clave, responsables y alertas si encuentra vencimientos.',openFolder:'Abrir carpeta',folderDocs:'Documentos de la carpeta',uploadHere:'Subir documento aquí',uploadGeneral:'Sube contratos, permisos, recetas, facturas o archivos clave directamente en esta carpeta.',openFile:'Abrir expediente',noAttention:'Todo está en orden',noAttentionText:'No hay documentos vencidos, próximos a vencer o datos críticos faltantes.',noDocs:'Aún no hay documentos guardados.',missing:'Pendiente',critical:'Crítico',review:'Revisar',completeState:'Completo',nextExpiry:'Próximo vencimiento',docs:'docs',uploadHint:'También puedes subir documentos del trabajador desde su expediente.',contract:'Contrato firmado',permit:'Permiso o autorización',identity:'Documento de identidad',medical:'Certificado médico si aplica',salary:'Anexos salariales y cambios',folderEmployees:'Empleados',folderEmployeesText:'Contratos, permisos, certificados, anexos y vencimientos.',folderCompany:'Empresa',folderCompanyText:'Registro mercantil, seguros, impuestos, políticas y documentos legales.',folderLease:'Local / arriendo',folderLeaseText:'Contrato de arriendo, garantías, pagos, planos y permisos del local.',folderOperations:'Operación',folderOperationsText:'Manuales, protocolos, checklists, seguridad e higiene.',folderRecipes:'Recetas / procesos',folderRecipesText:'Recetas, fichas técnicas, procesos de producción y estándares.',folderSuppliers:'Proveedores',folderSuppliersText:'Contratos, listas de precios, condiciones, facturas y acuerdos.'},
   en:{title:'Business documents',sub:'Employee contracts, lease, permits, recipes, suppliers and key company files in one central archive.',complete:'Complete files',needs:'Need attention',expiring:'Expiring soon',total:'Saved documents',attention:'Need attention',files:'Team files',latest:'Latest documents',checklist:'Base checklist',folders:'Suggested folders',customFolders:'Custom folders',newFolder:'New folder',customFolderHint:'Create more folders for your business logic: taxes, insurance, maintenance, franchise or any internal archive.',openFile:'Open file',noAttention:'Everything is fine',noAttentionText:'No expired, expiring or critical missing documents.',noDocs:'No documents saved yet.',missing:'Pending',critical:'Critical',review:'Review',completeState:'Complete',nextExpiry:'Next expiry',docs:'docs',uploadHint:'To upload a document, open the employee file.',contract:'Signed contract',permit:'Permit or authorization',identity:'Identity document',medical:'Medical certificate if needed',salary:'Salary annexes and changes',folderEmployees:'Employees',folderEmployeesText:'Contracts, permits, certificates, annexes and expiry dates.',folderCompany:'Company',folderCompanyText:'Business registration, insurance, taxes, policies and legal files.',folderLease:'Premises / lease',folderLeaseText:'Lease contract, guarantees, payments, plans and permits.',folderOperations:'Operations',folderOperationsText:'Manuals, protocols, checklists, safety and hygiene.',folderRecipes:'Recipes / processes',folderRecipesText:'Recipes, technical sheets, production processes and standards.',folderSuppliers:'Suppliers',folderSuppliersText:'Contracts, price lists, conditions, invoices and agreements.'},
   fr:{title:'Documents du commerce',sub:'Contrats employés, bail, permis, recettes, fournisseurs et documents clés dans une archive centrale.',complete:'Dossiers complets',needs:'À traiter',expiring:'Expirent bientôt',total:'Documents gardés',attention:'À traiter',files:'Dossiers de l’équipe',latest:'Derniers documents',checklist:'Checklist de base',folders:'Dossiers suggérés',customFolders:'Dossiers personnalisés',newFolder:'Nouveau dossier',customFolderHint:'Créez plus de dossiers selon votre logique: impôts, assurances, maintenance, franchise ou archive interne.',openFile:'Ouvrir dossier',noAttention:'Tout est en ordre',noAttentionText:'Aucun document expiré, proche d’expiration ou donnée critique manquante.',noDocs:'Aucun document enregistré.',missing:'En attente',critical:'Critique',review:'À revoir',completeState:'Complet',nextExpiry:'Prochaine échéance',docs:'docs',uploadHint:'Pour ajouter un document, ouvrez le dossier de l’employé.',contract:'Contrat signé',permit:'Permis ou autorisation',identity:'Pièce d’identité',medical:'Certificat médical si besoin',salary:'Annexes salaire et changements',folderEmployees:'Employés',folderEmployeesText:'Contrats, permis, certificats, annexes et échéances.',folderCompany:'Entreprise',folderCompanyText:'Registre, assurances, impôts, politiques et documents légaux.',folderLease:'Local / bail',folderLeaseText:'Contrat de bail, garanties, paiements, plans et permis.',folderOperations:'Opération',folderOperationsText:'Manuels, protocoles, checklists, sécurité et hygiène.',folderRecipes:'Recettes / processus',folderRecipesText:'Recettes, fiches techniques, production et standards.',folderSuppliers:'Fournisseurs',folderSuppliersText:'Contrats, listes de prix, conditions, factures et accords.'},
   de:{title:'Dokumente und Akten',sub:'Verträge, Bewilligungen, Zertifikate und Team-Fristen an einem Ort.',complete:'Vollständige Akten',needs:'Handlungsbedarf',expiring:'Laufen bald ab',total:'Gespeicherte Dokumente',attention:'Handlungsbedarf',files:'Teamakten',latest:'Neueste Dokumente',checklist:'Basis-Checkliste',openFile:'Akte öffnen',noAttention:'Alles in Ordnung',noAttentionText:'Keine abgelaufenen, bald ablaufenden oder kritisch fehlenden Dokumente.',noDocs:'Noch keine Dokumente gespeichert.',missing:'Offen',critical:'Kritisch',review:'Prüfen',completeState:'Vollständig',nextExpiry:'Nächste Frist',docs:'Dok.',uploadHint:'Zum Hochladen eines Dokuments die Mitarbeiterakte öffnen.',contract:'Unterschriebener Vertrag',permit:'Bewilligung oder Erlaubnis',identity:'Ausweis',medical:'Arztzeugnis falls nötig',salary:'Lohnanhänge und Änderungen'},
@@ -6298,8 +6299,20 @@ const DOCUMENTS_PAGE_UI={
 };
 const documentsPageTx=()=>({...DOCUMENTS_PAGE_UI.es,...(DOCUMENTS_PAGE_UI[lang]||{})});
 function employeeDocs(empId){return (DB.documents||[]).filter(d=>d.empId===empId).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));}
+function folderDocs(folder){return (DB.documents||[]).filter(d=>(d.folder||'employees')===folder).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));}
 function docTypeLabel(t){const types=DOC_TYPES[lang]||DOC_TYPES.fr;return types[t]||types.other;}
 function fmtBytes(n){n=Number(n)||0;if(n<1024)return `${n} B`;if(n<1048576)return `${(n/1024).toFixed(0)} KB`;return `${(n/1048576).toFixed(1)} MB`;}
+function documentFolderDefs(){
+  const tx=documentsPageTx();
+  return [
+    {key:'employees',icon:'team',title:tx.folderEmployees,text:tx.folderEmployeesText},
+    {key:'company',icon:'settings',title:tx.folderCompany,text:tx.folderCompanyText},
+    {key:'lease',icon:'documents',title:tx.folderLease,text:tx.folderLeaseText},
+    {key:'operations',icon:'tasks',title:tx.folderOperations,text:tx.folderOperationsText},
+    {key:'recipes',icon:'inventory',title:tx.folderRecipes,text:tx.folderRecipesText},
+    {key:'suppliers',icon:'sales',title:tx.folderSuppliers,text:tx.folderSuppliersText}
+  ];
+}
 function docAITx(){return {...DOC_UI.es,...(DOC_UI[lang]||{})};}
 function documentAiMetaHTML(d){
   const tx=docAITx(),m=d.aiMetadata||{};
@@ -6343,7 +6356,7 @@ async function analyzeEmployeeDocumentWithAI(doc,text){
   doc.aiStatus='analyzing';
   await saveAndRefresh();
   try{
-    const {data,error}=await sb.functions.invoke('analyze-document',{body:{text:cleanText.slice(0,18000),fileName:doc.fileName||doc.name||'documento',documentType:doc.type||'other',folder:'employees'}});
+    const {data,error}=await sb.functions.invoke('analyze-document',{body:{text:cleanText.slice(0,18000),fileName:doc.fileName||doc.name||'documento',documentType:doc.type||'other',folder:doc.folder||'employees'}});
     if(error)throw error;
     const result=data||{};
     doc.aiSummary=result.summary||'';
@@ -6427,10 +6440,31 @@ function handleEmployeeDocUpload(ev,empId){
   const reader=new FileReader();
   reader.onload=async()=>{
     const type=document.getElementById('doc-type')?.value||'other';
-    const doc={id:uid(),empId,type,name:docTypeLabel(type),fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data:reader.result,notes:clean(document.getElementById('doc-notes')?.value||''),aiSummary:'',aiMetadata:{},aiStatus:'pending',expiresAt:document.getElementById('doc-exp')?.value||'',createdAt:new Date().toISOString()};
+    const doc={id:uid(),empId,folder:'employees',type,name:docTypeLabel(type),fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data:reader.result,notes:clean(document.getElementById('doc-notes')?.value||''),aiSummary:'',aiMetadata:{},aiStatus:'pending',expiresAt:document.getElementById('doc-exp')?.value||'',createdAt:new Date().toISOString()};
     DB.documents=[doc,...(DB.documents||[])];auditAction('document',`Documento agregado: ${file.name}`,{empId,type});saveLocal();openDetail(empId);toast('Documento guardado. IA analizando...');
     sbSaveDoc(doc).catch(console.error);
     const text=await extractBusinessDocumentText(file).catch(e=>{console.warn('Document text extraction failed',e);return `Archivo: ${file.name}`;});
+    analyzeEmployeeDocumentWithAI(doc,text);
+  };
+  reader.readAsDataURL(file);
+}
+function openDocumentsFolder(folder){
+  activeDocumentFolder=folder||'employees';
+  renderDocuments();
+  setTimeout(()=>document.getElementById('doc-folder-panel')?.scrollIntoView({behavior:'smooth',block:'start'}),0);
+}
+function handleFolderDocUpload(ev,folder){
+  if(!requirePerm('view_documents')){ev.target.value='';return;}
+  const file=ev.target.files?.[0];if(!file)return;
+  if(file.size>3*1024*1024){toast('Documento muy grande. Máximo 3 MB por ahora.','#ef4444');ev.target.value='';return;}
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    const folderDef=documentFolderDefs().find(f=>f.key===folder)||documentFolderDefs()[0];
+    const type=folder==='employees'?'other':folder;
+    const doc={id:uid(),empId:'',folder:folderDef.key,type,name:folderDef.title,fileName:file.name,mimeType:file.type||'application/octet-stream',size:file.size,data:reader.result,notes:'',aiSummary:'',aiMetadata:{},aiStatus:'pending',expiresAt:'',createdAt:new Date().toISOString()};
+    DB.documents=[doc,...(DB.documents||[])];auditAction('document',`Documento agregado en ${folderDef.title}: ${file.name}`,{folder:folderDef.key,type});saveLocal();renderDocuments();toast('Documento guardado. IA analizando...');
+    sbSaveDoc(doc).catch(console.error);
+    const text=await extractBusinessDocumentText(file).catch(e=>{console.warn('Folder document text extraction failed',e);return `Archivo: ${file.name}`;});
     analyzeEmployeeDocumentWithAI(doc,text);
   };
   reader.readAsDataURL(file);
@@ -6443,7 +6477,7 @@ function openEmployeeDoc(id){
 function deleteEmployeeDoc(id,empId){
   if(!requirePerm('view_documents'))return;
   if(!confirm('¿Eliminar este documento del expediente?'))return;
-  DB.documents=(DB.documents||[]).filter(d=>d.id!==id);auditAction('document','Documento eliminado',{empId,docId:id});saveLocal();openDetail(empId);toast('Documento eliminado');sbDelDoc(id).catch(console.error);
+  DB.documents=(DB.documents||[]).filter(d=>d.id!==id);auditAction('document','Documento eliminado',{empId,docId:id});saveLocal();if(empId)openDetail(empId);else renderDocuments();toast('Documento eliminado');sbDelDoc(id).catch(console.error);
 }
 function docStatusMeta(st){
   const tx=documentsPageTx();
@@ -6472,14 +6506,9 @@ function renderDocuments(){
   const expiringDocs=docs.filter(d=>{const left=daysUntil(d.expiresAt);return left!==null&&left<=30;}).sort((a,b)=>String(a.expiresAt).localeCompare(String(b.expiresAt)));
   const latest=[...docs].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,6);
   const checklist=[tx.contract,tx.permit,tx.identity,tx.medical,tx.salary];
-  const folders=[
-    {icon:'team',title:tx.folderEmployees,text:tx.folderEmployeesText,count:docs.filter(d=>d.empId).length,action:"document.getElementById('doc-team-files')?.scrollIntoView({behavior:'smooth',block:'start'})",active:true},
-    {icon:'settings',title:tx.folderCompany,text:tx.folderCompanyText,count:0},
-    {icon:'documents',title:tx.folderLease,text:tx.folderLeaseText,count:0},
-    {icon:'tasks',title:tx.folderOperations,text:tx.folderOperationsText,count:0},
-    {icon:'inventory',title:tx.folderRecipes,text:tx.folderRecipesText,count:0},
-    {icon:'sales',title:tx.folderSuppliers,text:tx.folderSuppliersText,count:0}
-  ];
+  const folders=documentFolderDefs().map(f=>({...f,count:folderDocs(f.key).length}));
+  const selected=folders.find(f=>f.key===activeDocumentFolder)||folders[0];
+  const selectedDocs=folderDocs(selected.key);
   el.innerHTML=`<section class="hub-hero" style="background:linear-gradient(135deg,#3f1f72,#172554 60%,#0f766e)">
     <div class="hub-kicker">${esc(areaTx().documents)}</div>
     <h2>${esc(tx.title)}</h2>
@@ -6500,12 +6529,42 @@ function renderDocuments(){
       <button class="btn btn-primary" onclick="toast('${esc(tx.newFolder)}: pronto podrás crear carpetas propias')">+ ${esc(tx.newFolder)}</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px">
-      ${folders.map(f=>`<button class="module-card" style="text-align:left;min-height:150px;border-radius:var(--r2);padding:16px" ${f.active?`onclick="${f.action}"`:''}>
+      ${folders.map(f=>`<button class="module-card" style="text-align:left;min-height:150px;border-radius:var(--r2);padding:16px;border-color:${f.key===selected.key?'var(--brand)':'var(--border)'}" onclick="openDocumentsFolder(${jsArg(f.key)})">
         <div class="module-icon" style="background:#eef2ff;color:#4f6ef7">${hubIcon(f.icon)}</div>
         <h3 style="font-size:18px;margin:10px 0 6px">${esc(f.title)}</h3>
         <p style="font-size:13px;line-height:1.35">${esc(f.text)}</p>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><span class="chip chip-blue">${f.count} ${esc(tx.docs)}</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><span class="chip ${f.key===selected.key?'chip-green':'chip-blue'}">${f.count} ${esc(tx.docs)}</span><span class="chip chip-gray">${esc(tx.openFolder)}</span></div>
       </button>`).join('')}
+    </div>
+  </section>
+  <section class="card" id="doc-folder-panel" style="margin-bottom:12px">
+    <div class="flex-b" style="gap:12px;align-items:flex-start">
+      <div style="display:flex;gap:12px;align-items:flex-start">
+        <div class="module-icon" style="background:#eef2ff;color:#4f6ef7">${hubIcon(selected.icon)}</div>
+        <div>
+          <div class="card-header" style="padding:0;border:0;margin-bottom:4px">${esc(selected.title)}</div>
+          <div class="fs12 muted">${esc(selected.text)}</div>
+        </div>
+      </div>
+      <div>
+        <input id="doc-folder-file-${selected.key}" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.txt,.csv" style="display:none" onchange="handleFolderDocUpload(event,${jsArg(selected.key)})">
+        <button class="btn btn-primary" onclick="document.getElementById('doc-folder-file-${selected.key}').click()">+ ${esc(tx.uploadHere)}</button>
+      </div>
+    </div>
+    <div class="fs12 muted mt10">${esc(tx.uploadGeneral)}</div>
+    <div style="display:grid;gap:8px;margin-top:12px">
+      ${selectedDocs.length?selectedDocs.map(d=>`<div class="rrow" style="align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div class="fw8">${esc(d.fileName||d.name||'Documento')}</div>
+          <div class="fs11 muted">${esc(docTypeLabel(d.type))} · ${fmtBytes(d.size)} · ${fmtDate(d.createdAt)}</div>
+          ${d.expiresAt?`<div class="fs11" style="color:${daysUntil(d.expiresAt)<0?'var(--red)':'var(--orange)'}">${esc(docTx().expires)}: ${fmtDate(d.expiresAt)}</div>`:''}
+          ${documentAiMetaHTML(d)}
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc(${jsArg(d.id)})">${esc(docTx().open)}</button>`:''}
+          <button class="btn btn-sm btn-ghost" style="color:var(--red)" onclick="deleteEmployeeDoc(${jsArg(d.id)},${jsArg(d.empId||'')})">${esc(docTx().delete)}</button>
+        </div>
+      </div>`).join(''):`<div class="empty-state" style="padding:20px"><p>${esc(tx.noDocs)}</p></div>`}
     </div>
   </section>
   <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">

@@ -10,7 +10,8 @@ create extension if not exists pgcrypto;
 create table if not exists public.employee_documents (
   id uuid primary key default gen_random_uuid(),
   restaurant_id uuid not null references public.restaurants(id) on delete cascade,
-  employee_id uuid not null references public.employees(id) on delete cascade,
+  employee_id uuid references public.employees(id) on delete cascade,
+  folder text default 'employees',
   type text not null default 'other',
   name text,
   file_name text,
@@ -24,6 +25,12 @@ create table if not exists public.employee_documents (
   expires_at date,
   created_at timestamptz default now()
 );
+
+alter table public.employee_documents
+alter column employee_id drop not null;
+
+alter table public.employee_documents
+add column if not exists folder text default 'employees';
 
 alter table public.employee_documents
 add column if not exists ai_summary text default '',
@@ -707,6 +714,7 @@ update public.restaurants set business_sector = 'general' where business_sector 
 update public.restaurants set onboarding_completed = false where onboarding_completed is null;
 create unique index if not exists shifts_employee_date_unique on public.shifts(employee_id, shift_date);
 create index if not exists employee_documents_employee_idx on public.employee_documents(employee_id, created_at desc);
+create index if not exists employee_documents_folder_idx on public.employee_documents(restaurant_id, folder, created_at desc);
 
 -- Employee self-service login by email + PIN.
 -- This lets employees access only their own badge screen without knowing the restaurant id.
