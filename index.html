@@ -1010,6 +1010,11 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg>
       <span>Documentos</span>
     </div>
+    <div class="sb-section" data-sidebar-section="receivables">Cartera</div>
+    <div class="sb-item" data-sidebar-area="receivables" onclick="nav('receivables',this)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4z"/><path d="M8 9h8"/><path d="M8 13h5"/><path d="M17 17l3 3"/><circle cx="16" cy="16" r="2"/></svg>
+      <span>Cartera</span>
+    </div>
     <div class="sb-section" data-sidebar-section="config">Configuration</div>
     <div class="sb-item" data-sidebar-area="config" onclick="nav('settings',this)">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1111,6 +1116,10 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 
 <div class="page" id="pg-documents">
   <div id="documents-content"></div>
+</div>
+
+<div class="page" id="pg-receivables">
+  <div id="receivables-content"></div>
 </div>
 
 <div class="page" id="pg-attendance">
@@ -1437,6 +1446,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 
 <!-- Detail -->
 <div class="ov" id="detail-modal"><div class="modal" id="detail-content"></div></div>
+<div class="ov" id="doc-modal"><div class="modal" id="doc-modal-content"></div></div>
 <div class="ov" id="roadmap-modal"><div class="modal" id="roadmap-content"></div></div>
 
 <!-- Absence -->
@@ -1872,11 +1882,11 @@ const UI={
   de:{pages:{dashboard:'Dashboard',attendance:'Anwesenheit',employees:'Mitarbeiter',shifts:'Dienstplan',vacations:'Abwesenheiten',payroll:'Löhne',reports:'Berichte',history:'Historie',settings:'Einstellungen',master:'Master Admin'},nav:{principal:'Hauptmenü',planning:'Planung',finance:'Finanzen',config:'Konfiguration',master:'Master'},login:{manager:'Manager',employee:'Mitarbeiter',restaurant:'Konto erstellen',email:'E-Mail',password:'Passwort',signin:'Anmelden',forgot:'Passwort vergessen?',demo:'Demo-Zugang',restName:'Name des Betriebs',adminEmail:'Admin E-Mail',createAdmin:'Admin-Konto erstellen',sub:'Einfache Betriebsverwaltung'},dash:{active:'Aktive Mitarbeiter',present:'Anwesend / Geplant',absent:'Abwesend',vacation:'Im Urlaub',live:'Aktuell anwesend',alerts:'Tagesalarme',allGood:'Alles in Ordnung',missing:'Einstempeln fehlt',late:'Zu spät angekommen',scan:'QR scannen',addEmp:'+ Mitarbeiter'},emp:{search:'Mitarbeiter suchen...',all:'Alle',active:'Aktiv',inactive:'Inaktiv',new:'Neuer Mitarbeiter',edit:'Bearbeiten',none:'Keine Mitarbeiter',noResult:'Keine Ergebnisse',addFirst:'Ersten Mitarbeiter hinzufügen',in:'Eingang',out:'Ausgang'}},
   it:{pages:{dashboard:'Dashboard',attendance:'Presenze',employees:'Dipendenti',shifts:'Turni',vacations:'Assenze',payroll:'Stipendi',reports:'Report',history:'Storico',settings:'Impostazioni',master:'Master Admin'},nav:{principal:'Principale',planning:'Pianificazione',finance:'Finanza',config:'Configurazione',master:'Master'},login:{manager:'Manager',employee:'Dipendente',restaurant:'Crea account',email:'Email',password:'Password',signin:'Accedi',forgot:'Password dimenticata?',demo:'Accesso demo',restName:'Nome attività',adminEmail:'Email amministratore',createAdmin:'Crea account admin',sub:'Gestione semplice del business'},dash:{active:'Dipendenti attivi',present:'Presenti / Previsti',absent:'Assenti',vacation:'In vacanza',live:'Presenti ora',alerts:'Avvisi del giorno',allGood:'Tutto in ordine',missing:'Entrata non registrata',late:'Arrivato in ritardo',scan:'Scansiona QR',addEmp:'+ Dipendente'},emp:{search:'Cerca dipendente...',all:'Tutti',active:'Attivi',inactive:'Inattivi',new:'Nuovo dipendente',edit:'Modifica',none:'Nessun dipendente',noResult:'Nessun risultato',addFirst:'Aggiungi il primo dipendente',in:'Entrata',out:'Uscita'}}
 };
-Object.assign(UI.fr.pages,{hub:'Domaines',sales:'Ventes',salesProducts:'Produits',salesReports:'Rapports ventes',inventory:'Inventaire',inventoryStock:'Stock',inventoryPurchases:'Achats',inventorySuppliers:'Fournisseurs',inventoryReports:'Rapports inventaire',documents:'Documents'});
-Object.assign(UI.es.pages,{hub:'Áreas',sales:'Ventas',salesProducts:'Productos',salesReports:'Reportes ventas',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Compras',inventorySuppliers:'Proveedores',inventoryReports:'Reportes inventario',documents:'Documentos'});
-Object.assign(UI.en.pages,{hub:'Areas',sales:'Sales',salesProducts:'Products',salesReports:'Sales reports',inventory:'Inventory',inventoryStock:'Stock',inventoryPurchases:'Purchases',inventorySuppliers:'Suppliers',inventoryReports:'Inventory reports',documents:'Documents'});
-Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkte',salesReports:'Verkaufsberichte',inventory:'Inventar',inventoryStock:'Lager',inventoryPurchases:'Einkäufe',inventorySuppliers:'Lieferanten',inventoryReports:'Inventarberichte',documents:'Dokumente'});
-Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti',salesReports:'Report vendite',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Acquisti',inventorySuppliers:'Fornitori',inventoryReports:'Report inventario',documents:'Documenti'});
+Object.assign(UI.fr.pages,{hub:'Domaines',sales:'Ventes',salesProducts:'Produits',salesReports:'Rapports ventes',inventory:'Inventaire',inventoryStock:'Stock',inventoryPurchases:'Achats',inventorySuppliers:'Fournisseurs',inventoryReports:'Rapports inventaire',documents:'Documents',receivables:'Créances'});
+Object.assign(UI.es.pages,{hub:'Áreas',sales:'Ventas',salesProducts:'Productos',salesReports:'Reportes ventas',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Compras',inventorySuppliers:'Proveedores',inventoryReports:'Reportes inventario',documents:'Documentos',receivables:'Cartera'});
+Object.assign(UI.en.pages,{hub:'Areas',sales:'Sales',salesProducts:'Products',salesReports:'Sales reports',inventory:'Inventory',inventoryStock:'Stock',inventoryPurchases:'Purchases',inventorySuppliers:'Suppliers',inventoryReports:'Inventory reports',documents:'Documents',receivables:'Receivables'});
+Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkte',salesReports:'Verkaufsberichte',inventory:'Inventar',inventoryStock:'Lager',inventoryPurchases:'Einkäufe',inventorySuppliers:'Lieferanten',inventoryReports:'Inventarberichte',documents:'Dokumente',receivables:'Forderungen'});
+Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti',salesReports:'Report vendite',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Acquisti',inventorySuppliers:'Fornitori',inventoryReports:'Report inventario',documents:'Documenti',receivables:'Crediti'});
 
 const AREA_UI={
   es:{eyebrow:'Manager Pro como plataforma',title:'¿Qué área quieres gestionar hoy?',sub:'Empieza por Personal y ve sumando ventas, inventario, documentos e insights cuando el negocio lo necesite.',open:'Abrir',soon:'Próximamente',next:'Siguiente módulo',active:'Activo ahora',today:'Hoy en Personal',roadmap:'Camino del producto',settings:'Configuración',settingsDesc:'Idioma, colores, horarios de apertura, tolerancias, accesos y datos del negocio.',openSettings:'Abrir ajustes',team:'Personal',teamDesc:'Empleados, horarios, fichajes, pausas, solicitudes, documentos, salarios y reportes.',sales:'Ventas',salesDesc:'Ventas por producto o servicio, caja diaria, métodos de pago y cierres.',inventory:'Inventario',inventoryDesc:'Stock, proveedores, compras y consumo conectado a ventas.',documents:'Documentos',documentsDesc:'Contratos de empleados, arriendo, permisos, recetas, proveedores y archivos clave del negocio.',tasks:'Tareas',tasksDesc:'Rutinas, responsables, pendientes y seguimiento operativo.',insights:'IA e insights',insightsDesc:'Preguntas al negocio, señales de mejora y ayuda para tomar decisiones.',employees:'Empleados',pending:'Solicitudes pendientes',alerts:'Alertas abiertas',p1:'Personal listo: controlar equipo y cerrar el mes.',p2:'Ventas por items: registrar productos y servicios.',p3:'Inventario: conectar ventas con stock y compras.',p4:'Insights: entender qué pasa sin hablar lenguaje administrativo.',openTeam:'Entrar a Personal'},
@@ -1886,6 +1896,11 @@ const AREA_UI={
   it:{eyebrow:'Manager Pro come piattaforma',title:'Quale area vuoi gestire oggi?',sub:'Inizia dal personale e aggiungi vendite, inventario, documenti e insight quando il business ne ha bisogno.',open:'Apri',soon:'Prossimamente',next:'Prossimo modulo',active:'Attivo ora',today:'Oggi nel personale',roadmap:'Percorso prodotto',settings:'Impostazioni',settingsDesc:'Lingua, colori, orari di apertura, tolleranze, accessi e dati del business.',openSettings:'Apri impostazioni',team:'Personale',teamDesc:'Dipendenti, turni, timbrature, pause, richieste, documenti, stipendi e report.',sales:'Vendite',salesDesc:'Vendite per prodotto o servizio, cassa giornaliera, metodi di pagamento e chiusure.',inventory:'Inventario',inventoryDesc:'Stock, fornitori, acquisti e consumo collegato alle vendite.',documents:'Documenti',documentsDesc:'Contratti, permessi, scadenze e fascicolo di ogni dipendente.',tasks:'Attività',tasksDesc:'Routine, responsabili, pendenti e controllo operativo.',insights:'IA e insight',insightsDesc:'Domande sul business, segnali di miglioramento e aiuto decisionale.',employees:'Dipendenti',pending:'Richieste in attesa',alerts:'Avvisi aperti',p1:'Personale pronto: controllare il team e chiudere il mese.',p2:'Vendite per item: registrare prodotti e servizi.',p3:'Inventario: collegare vendite, stock e acquisti.',p4:'Insight: capire cosa succede senza gergo amministrativo.',openTeam:'Apri Personale'}
 };
 const areaTx=()=>({...AREA_UI.es,...(AREA_UI[lang]||{})});
+Object.assign(AREA_UI.es,{receivables:'Cartera',receivablesDesc:'Clientes, cuentas por cobrar, vencimientos, soportes y seguimiento de cobro.'});
+Object.assign(AREA_UI.en,{receivables:'Receivables',receivablesDesc:'Clients, accounts receivable, due dates, supporting files and collection follow-up.'});
+Object.assign(AREA_UI.fr,{receivables:'Créances',receivablesDesc:'Clients, comptes à recevoir, échéances, justificatifs et suivi de recouvrement.'});
+Object.assign(AREA_UI.de,{receivables:'Forderungen',receivablesDesc:'Kunden, offene Forderungen, Fälligkeiten, Nachweise und Inkasso-Verfolgung.'});
+Object.assign(AREA_UI.it,{receivables:'Crediti',receivablesDesc:'Clienti, crediti aperti, scadenze, documenti di supporto e follow-up incassi.'});
 const ROADMAP_UI={
   es:{
     title:'Siguiente paso: {module}',intro:'Este módulo todavía está en hoja de ruta, pero ya tiene una lógica clara para crecer sin volver pesada la app.',why:'Por qué importa',first:'Primeras funciones',close:'Cerrar',preview:'Ver plan',
@@ -2073,11 +2088,12 @@ const ATW=()=>ATT_WORDS[lang]||ATT_WORDS.fr;
 
 // ═══════ DB ═══════
 let DB={
-  employees:[],history:[],absences:[],shifts:{},documents:[],salesProducts:[],sales:[],inventoryPurchases:[],suppliers:[],salesPanelWidgets:null,reviewedAlerts:{},audit:[],monthClosures:{},
+  employees:[],history:[],absences:[],shifts:{},documents:[],receivableClients:[],receivables:[],receivableFollowups:[],salesProducts:[],sales:[],inventoryPurchases:[],suppliers:[],salesPanelWidgets:null,reviewedAlerts:{},audit:[],monthClosures:{},
   settings:{company:'Mon Business',emoji:'MP',currency:'CHF',businessSector:'general',lateTol:10,maxHours:45,lang:'fr',brandColor:'#4f6ef7',brandColor2:'#7c3aed',openingHours:null}
 };
 let MASTER={restaurants:[],profiles:[],signals:[],stats:{}};
 let activeDocumentFolder='employees';
+let documentSearch='',documentStatusFilter='all';
 const isDemo=()=>currentUser?.demo===true;
 function loadLocal(){try{const s=localStorage.getItem('hrm_pro');if(s)DB={...DB,...JSON.parse(s)};}catch(e){}}
 function saveLocal(){try{if(isDemo())return;localStorage.setItem('hrm_pro',JSON.stringify(DB));}catch(e){}}
@@ -2375,6 +2391,21 @@ async function loadSB(){
       DB.suppliers=DB.suppliers||[];
       DB.inventoryPurchases=DB.inventoryPurchases||[];
     }
+    try{
+      const [rc,rr,rf]=await Promise.all([
+        sb.from('receivable_clients').select('*').eq('restaurant_id',REST_ID).order('created_at',{ascending:false}),
+        sb.from('receivables').select('*').eq('restaurant_id',REST_ID).order('due_date',{ascending:true}),
+        sb.from('receivable_followups').select('*').eq('restaurant_id',REST_ID).order('followup_at',{ascending:false}).limit(500)
+      ]);
+      if(!rc.error)DB.receivableClients=(rc.data||[]).map(receivableClientFromSB);
+      if(!rr.error)DB.receivables=(rr.data||[]).map(receivableFromSB);
+      if(!rf.error)DB.receivableFollowups=(rf.data||[]).map(receivableFollowupFromSB);
+    }catch(receivableErr){
+      console.warn('Receivables tables not available yet:',receivableErr);
+      DB.receivableClients=DB.receivableClients||[];
+      DB.receivables=DB.receivables||[];
+      DB.receivableFollowups=DB.receivableFollowups||[];
+    }
     saveLocal();return true;
   }catch(e){console.warn('SB error:',e);return false;}
 }
@@ -2444,10 +2475,16 @@ function salesProductFromSB(x){return{id:x.id,name:x.name||'',category:x.categor
 function saleFromSB(x){return{id:x.id,productId:x.product_id,productName:x.product_name||'',category:x.category||'',qty:Number(x.quantity)||0,unitPrice:Number(x.unit_price)||0,total:Number(x.total)||0,cost:Number(x.cost)||0,margin:Number(x.margin)||0,method:x.payment_method||'cash',employeeId:x.employee_id||'',employeeName:x.employee_name||'',note:x.note||'',ts:x.sold_at||x.created_at||new Date().toISOString()};}
 function supplierFromSB(x){return{id:x.id,name:x.name||'',phone:x.phone||'',email:x.email||'',notes:x.notes||'',createdAt:x.created_at||new Date().toISOString()};}
 function purchaseFromSB(x){return{id:x.id,productId:x.product_id||'',productName:x.product_name||'',supplierId:x.supplier_id||'',supplierName:x.supplier_name||'',qty:Number(x.quantity)||0,cost:Number(x.total_cost)||0,unitCost:Number(x.unit_cost)||0,avgCostAfter:Number(x.avg_cost_after)||0,stockAfter:Number(x.stock_after)||0,note:x.note||'',ts:x.purchased_at||x.created_at||new Date().toISOString()};}
+function receivableClientFromSB(x){return{id:x.id,name:x.name||'',type:x.client_type||'company',owner:x.responsible||'',contact:x.contact_name||'',phone:x.phone||'',email:x.email||'',note:x.note||'',metadata:x.metadata||{},createdAt:x.created_at||new Date().toISOString()};}
+function receivableFromSB(x){return{id:x.id,clientId:x.client_id||'',reference:x.reference||'',amount:Number(x.amount)||0,currency:x.currency||DB.settings?.currency||'CHF',dueDate:x.due_date||'',status:x.status||'sent',priority:x.priority||'normal',note:x.note||'',documentIds:x.document_ids||[],paidAt:x.paid_at||'',createdAt:x.created_at||new Date().toISOString(),updatedAt:x.updated_at||x.created_at||new Date().toISOString()};}
+function receivableFollowupFromSB(x){return{id:x.id,receivableId:x.receivable_id||'',note:x.note||'',channel:x.channel||'',outcome:x.outcome||'',ts:x.followup_at||x.created_at||new Date().toISOString(),user:x.created_by||''};}
 async function sbSaveSalesProduct(p){if(isDemo())return;const {error}=await sb.from('sales_products').upsert({id:p.id,restaurant_id:REST_ID,name:p.name,category:p.category||'',type:p.type||'product',price:p.price||0,sku:p.sku||'',unit:p.unit||'unit',track_stock:!!p.trackStock,stock:p.stock||0,min_stock:p.minStock||0,avg_cost:p.avgCost||0,stock_value:p.stockValue||0,recipe:p.recipe||[],active:p.active!==false});if(error)console.warn('Sales product save failed',error);}
 async function sbSaveSale(s){if(isDemo())return;const {error}=await sb.from('sales').upsert({id:s.id,restaurant_id:REST_ID,product_id:s.productId||null,product_name:s.productName||'',category:s.category||'',quantity:s.qty||0,unit_price:s.unitPrice||0,total:s.total||0,cost:s.cost||0,margin:s.margin||0,payment_method:s.method||'cash',employee_id:s.employeeId||null,employee_name:s.employeeName||'',note:s.note||'',sold_at:s.ts||new Date().toISOString()});if(error)console.warn('Sale save failed',error);}
 async function sbSaveSupplier(s){if(isDemo())return;const {error}=await sb.from('inventory_suppliers').upsert({id:s.id,restaurant_id:REST_ID,name:s.name||'',phone:s.phone||'',email:s.email||'',notes:s.notes||''});if(error)console.warn('Supplier save failed',error);}
 async function sbSavePurchase(p){if(isDemo())return;const {error}=await sb.from('inventory_purchases').upsert({id:p.id,restaurant_id:REST_ID,product_id:p.productId||null,product_name:p.productName||'',supplier_id:p.supplierId||null,supplier_name:p.supplierName||'',quantity:p.qty||0,total_cost:p.cost||0,unit_cost:p.unitCost||0,avg_cost_after:p.avgCostAfter||0,stock_after:p.stockAfter||0,note:p.note||'',purchased_at:p.ts||new Date().toISOString()});if(error)console.warn('Purchase save failed',error);}
+async function sbSaveReceivableClient(c){if(isDemo())return;const {error}=await sb.from('receivable_clients').upsert({id:c.id,restaurant_id:REST_ID,name:c.name||'',client_type:c.type||'company',contact_name:c.contact||'',email:c.email||'',phone:c.phone||'',responsible:c.owner||'',note:c.note||'',metadata:c.metadata||{}});if(error)console.warn('Receivable client save failed',error);}
+async function sbSaveReceivable(r){if(isDemo())return;const {error}=await sb.from('receivables').upsert({id:r.id,restaurant_id:REST_ID,client_id:r.clientId||null,reference:r.reference||'',amount:r.amount||0,currency:r.currency||DB.settings?.currency||'CHF',due_date:r.dueDate||null,status:r.status||'sent',priority:r.priority||'normal',note:r.note||'',document_ids:r.documentIds||[],paid_at:r.paidAt||null});if(error)console.warn('Receivable save failed',error);}
+async function sbSaveReceivableFollowup(f){if(isDemo())return;const {error}=await sb.from('receivable_followups').upsert({id:f.id,restaurant_id:REST_ID,receivable_id:f.receivableId,note:f.note||'',channel:f.channel||'',outcome:f.outcome||'',followup_at:f.ts||new Date().toISOString(),created_by:currentUser?.id||null});if(error)console.warn('Receivable followup save failed',error);}
 async function sbUpdateAbsApproved(id,approved){if(isDemo())return;await sb.from('absences').update({approved}).eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDelAbs(id){if(isDemo())return;await sb.from('absences').delete().eq('id',id).eq('restaurant_id',REST_ID);}
 async function sbDeleteAll(){
@@ -2461,6 +2498,9 @@ async function sbDeleteAll(){
     sb.from('inventory_suppliers').delete().eq('restaurant_id',REST_ID),
     sb.from('sales').delete().eq('restaurant_id',REST_ID),
     sb.from('sales_products').delete().eq('restaurant_id',REST_ID),
+    sb.from('receivable_followups').delete().eq('restaurant_id',REST_ID),
+    sb.from('receivables').delete().eq('restaurant_id',REST_ID),
+    sb.from('receivable_clients').delete().eq('restaurant_id',REST_ID),
     sb.from('employees').delete().eq('restaurant_id',REST_ID)
   ]);
 }
@@ -2725,11 +2765,11 @@ function renderEmployeeLangBar(){
 function applyUITexts(){
   const t=T();
   renderLoginLangBar();
-  const sectionLabels={main:t.nav.principal,people:areaTx().team,sales:areaTx().sales,inventory:areaTx().inventory,documents:areaTx().documents,config:t.nav.config,master:t.nav.master};
+  const sectionLabels={main:t.nav.principal,people:areaTx().team,sales:areaTx().sales,inventory:areaTx().inventory,documents:areaTx().documents,receivables:areaTx().receivables,config:t.nav.config,master:t.nav.master};
   document.querySelectorAll('.sb-section[data-sidebar-section]').forEach(el=>{el.textContent=sectionLabels[el.dataset.sidebarSection]||el.textContent;});
   const masterManagedTitle=document.getElementById('master-managed-title');if(masterManagedTitle)masterManagedTitle.textContent=t.master?.managed||masterManagedTitle.textContent;
   const setNav=(page,text)=>{const el=document.querySelector(`[onclick="nav('${page}',this)"] span`);if(el)el.textContent=text;};
-  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('sales',t.pages.sales);setNav('salesProducts',t.pages.salesProducts);setNav('salesReports',t.pages.salesReports);setNav('inventory',t.pages.inventory);setNav('inventoryStock',t.pages.inventoryStock);setNav('inventoryPurchases',t.pages.inventoryPurchases);setNav('inventorySuppliers',t.pages.inventorySuppliers);setNav('inventoryReports',t.pages.inventoryReports);setNav('documents',t.pages.documents);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
+  setNav('hub',t.pages.hub);setNav('dashboard',t.pages.dashboard);setNav('sales',t.pages.sales);setNav('salesProducts',t.pages.salesProducts);setNav('salesReports',t.pages.salesReports);setNav('inventory',t.pages.inventory);setNav('inventoryStock',t.pages.inventoryStock);setNav('inventoryPurchases',t.pages.inventoryPurchases);setNav('inventorySuppliers',t.pages.inventorySuppliers);setNav('inventoryReports',t.pages.inventoryReports);setNav('documents',t.pages.documents);setNav('receivables',t.pages.receivables);setNav('attendance',t.pages.attendance);setNav('employees',t.pages.employees);setNav('shifts',t.pages.shifts);setNav('vacations',t.pages.vacations);setNav('payroll',t.pages.payroll);setNav('reports',t.pages.reports);setNav('history',t.pages.history);setNav('settings',t.pages.settings);
   const mt=document.querySelector('[onclick="nav(\'master\',this)"] span');if(mt)mt.textContent=t.pages.master;
   document.getElementById('page-title').textContent=t.pages[currentPage]||currentPage;
   const tabs=document.querySelectorAll('.login-tab');if(tabs[0])tabs[0].textContent=t.login.manager;if(tabs[1])tabs[1].textContent=t.login.employee;if(tabs[2])tabs[2].textContent=t.login.restaurant;
@@ -2889,6 +2929,7 @@ function updateSidebarScope(){
   const salesPages=['sales','salesProducts','salesReports'];
   const inventoryPages=['inventory','inventoryStock','inventoryPurchases','inventorySuppliers','inventoryReports'];
   const documentsPages=['documents'];
+  const receivablesPages=['receivables'];
   const configPages=['settings','master'];
   const peoplePages=['dashboard','attendance','employees','shifts','vacations','payroll','reports','history'];
   const hubPage=currentPage==='hub';
@@ -2896,9 +2937,10 @@ function updateSidebarScope(){
   if(salesPages.includes(currentPage))scope='sales';
   else if(inventoryPages.includes(currentPage))scope='inventory';
   else if(documentsPages.includes(currentPage))scope='documents';
+  else if(receivablesPages.includes(currentPage))scope='receivables';
   else if(peoplePages.includes(currentPage))scope='people';
   else if(configPages.includes(currentPage))scope='config';
-  const showAreas=scope==='all'?['main','people','sales','inventory','documents','config','master']:scope==='sales'?['main','sales']:scope==='inventory'?['main','inventory']:scope==='documents'?['main','documents']:scope==='people'?['main','people']:['main','config','master'];
+  const showAreas=scope==='all'?['main','people','sales','inventory','documents','receivables','config','master']:scope==='sales'?['main','sales']:scope==='inventory'?['main','inventory']:scope==='documents'?['main','documents']:scope==='receivables'?['main','receivables','documents']:scope==='people'?['main','people']:['main','config','master'];
   document.querySelectorAll('[data-sidebar-section]').forEach(el=>{
     const key=el.dataset.sidebarSection;
     el.style.display=showAreas.includes(key)&&(!(key==='master')||can('master'))&&(!(key==='documents')||can('view_documents'))?'':'none';
@@ -2914,6 +2956,7 @@ function updateSidebarScope(){
         (key==='sales'&&action.includes("sales',"))||
         (key==='inventory'&&action.includes("inventory',"))||
         (key==='documents'&&action.includes("documents"))||
+        (key==='receivables'&&action.includes("receivables"))||
         key==='config'
       );
     }
@@ -4432,6 +4475,7 @@ function renderPage(p){
   if(p==='inventorySuppliers')renderInventorySuppliers();
   if(p==='inventoryReports')renderInventoryReports();
   if(p==='documents')renderDocuments();
+  if(p==='receivables')renderReceivables();
   if(p==='attendance')renderAtt();
   if(p==='employees')renderEmps();
   if(p==='shifts')renderShifts();
@@ -4443,7 +4487,7 @@ function renderPage(p){
   if(p==='master')renderMaster();
   applyPermissionsUI();
 }
-function renderAll(){renderHub();renderDash();renderSales();renderSalesProducts();renderSalesReports();renderInventory();renderInventoryStock();renderInventoryPurchases();renderInventorySuppliers();renderInventoryReports();renderDocuments();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
+function renderAll(){renderHub();renderDash();renderSales();renderSalesProducts();renderSalesReports();renderInventory();renderInventoryStock();renderInventoryPurchases();renderInventorySuppliers();renderInventoryReports();renderDocuments();renderReceivables();renderEmps();renderHistory();renderSettings();if(currentUser?.role==='super_admin')renderMaster();applyPermissionsUI();}
 
 function hubIcon(type){
   const icons={
@@ -4451,6 +4495,7 @@ function hubIcon(type){
     sales:'<path d="M6 2v20"/><path d="M18 6H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H6"/>',
     inventory:'<path d="M21 16V8a2 2 0 0 0-1-1.73L13 2.27a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/>',
     documents:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
+    receivables:'<path d="M4 5h16v14H4z"/><path d="M8 9h8"/><path d="M8 13h5"/><path d="M17 17l3 3"/><circle cx="16" cy="16" r="2"/>',
     tasks:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
     insights:'<path d="M12 2a7 7 0 0 0-4 12.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26A7 7 0 0 0 12 2z"/><path d="M9 22h6"/>',
     settings:'<path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-.6 1.7 1.7 0 0 0-1.88.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 .6-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 .6 1.7 1.7 0 0 0 1.88-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.22.35.42.7.6 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-.6 1z"/>'
@@ -4495,12 +4540,16 @@ function renderHub(){
   const tx=areaTx(),active=DB.employees.filter(e=>e.status==='active'),pending=(DB.absences||[]).filter(a=>!a.approved).length;
   const dtx=documentsPageTx();
   const rm=roadmapTx();
+  const rtx=receivablesTx();
   const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
+  const receivableOpen=(DB.receivables||[]).filter(r=>r.status!=='paid'&&r.status!=='cancelled');
+  const receivableOverdue=receivableOpen.filter(r=>new Date((r.dueDate||localDateKey(new Date()))+'T12:00:00')<todayStart()).length;
   const cards=[
     {id:'hub-card-people',icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,action:"goPage('dashboard')",button:tx.openTeam},
     {id:'hub-card-sales',icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1',active:true,action:"goPage('sales')",button:tx.open},
     {id:'hub-card-inventory',icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df',active:true,action:"goPage('inventory')",button:tx.open},
     {id:'hub-card-documents',module:'documents',icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:[`${DB.documents?.length||0} ${dtx.docs}`,`${active.filter(e=>employeeFileStatus(e).level!=='complete').length} ${tx.alerts}`,dtx.files],color:'#7c3aed',soft:'#f3edff',active:can('view_documents'),action:"goPage('documents')",button:tx.open},
+    {id:'hub-card-receivables',icon:'receivables',title:tx.receivables,desc:tx.receivablesDesc,meta:[`${receivableOpen.length} ${rtx.open}`,`${receivableOverdue} ${rtx.overdue}`,money(receivableOpen.reduce((a,r)=>a+(Number(r.amount)||0),0))],color:'#0f766e',soft:'#e6fffb',active:true,action:"goPage('receivables')",button:tx.open},
     {id:'hub-card-tasks',module:'tasks',icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:rm.tasks.pills,color:'#0891b2',soft:'#e6f8fc'},
     {id:'hub-card-insights',module:'insights',icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:rm.insights.pills,color:'#be123c',soft:'#fff1f2'}
   ];
@@ -4534,6 +4583,200 @@ function renderHub(){
       </div>
     </div>
   </section>`;
+}
+
+const RECEIVABLES_UI={
+  es:{title:'Centro de cartera',sub:'Gestiona clientes, cuentas por cobrar, vencimientos, documentos de soporte y seguimiento.',clients:'Clientes',accounts:'Cuentas por cobrar',open:'Abiertas',overdue:'Vencidas',dueSoon:'Por vencer',collected:'Cobrado',pending:'Pendiente',newClient:'Nuevo cliente',newAccount:'Nueva cuenta',client:'Cliente',type:'Tipo',contact:'Contacto',email:'Email',phone:'Teléfono',responsible:'Responsable',amount:'Monto',dueDate:'Vence',status:'Estado',note:'Nota',lastFollow:'Último seguimiento',addFollow:'Agregar seguimiento',markPaid:'Marcar pagada',edit:'Editar',save:'Guardar',cancel:'Cancelar',noClients:'Aún no hay clientes en cartera.',noAccounts:'Aún no hay cuentas por cobrar.',company:'Empresa',person:'Persona',insurer:'Aseguradora / convenio',draft:'Borrador',sent:'Enviada',partial:'Abono parcial',paid:'Pagada',disputed:'En revisión',priority:'Prioridad',normal:'Normal',high:'Alta',critical:'Crítica',today:'Hoy',support:'Soportes',openDocs:'Abrir documentos',insightTitle:'Qué debe mirar el administrador',insight1:'Primero: dinero vencido y clientes críticos.',insight2:'Segundo: cuentas que vencen esta semana para cobrar antes de que se atrasen.',insight3:'Tercero: soportes incompletos, porque sin documentos el cobro se vuelve lento.',center:'Centro de clientes',followPlaceholder:'Llamada, email enviado, compromiso de pago...',saved:'Cartera actualizada',uploadDoc:'Subir soporte',documents:'Documentos',saveFirst:'Guarda primero para subir soportes.',docHint:'Sube contratos, facturas, autorizaciones, soportes de servicio o acuerdos de pago. La IA genera descripción, vencimientos y responsables.',docSaved:'Soporte guardado. IA analizando...'},
+  fr:{title:'Centre des créances',sub:'Gérez clients, comptes à recevoir, échéances, justificatifs et suivi.',clients:'Clients',accounts:'Comptes à recevoir',open:'Ouverts',overdue:'Échus',dueSoon:'À échéance',collected:'Encaissé',pending:'En attente',newClient:'Nouveau client',newAccount:'Nouvelle créance',client:'Client',type:'Type',contact:'Contact',email:'Email',phone:'Téléphone',responsible:'Responsable',amount:'Montant',dueDate:'Échéance',status:'Statut',note:'Note',lastFollow:'Dernier suivi',addFollow:'Ajouter suivi',markPaid:'Marquer payé',edit:'Modifier',save:'Enregistrer',cancel:'Annuler',noClients:'Aucun client en créances pour le moment.',noAccounts:'Aucune créance pour le moment.',company:'Entreprise',person:'Personne',insurer:'Assureur / convention',draft:'Brouillon',sent:'Envoyée',partial:'Paiement partiel',paid:'Payée',disputed:'En révision',priority:'Priorité',normal:'Normal',high:'Haute',critical:'Critique',today:'Aujourd’hui',support:'Justificatifs',openDocs:'Ouvrir documents',insightTitle:'Ce que le manager doit regarder',insight1:'D’abord : argent échu et clients critiques.',insight2:'Ensuite : échéances de la semaine pour encaisser avant retard.',insight3:'Puis : justificatifs incomplets, car sans documents le recouvrement ralentit.',center:'Centre clients',followPlaceholder:'Appel, email envoyé, promesse de paiement...',saved:'Créances mises à jour',uploadDoc:'Ajouter justificatif',documents:'Documents',saveFirst:'Enregistrez d’abord pour ajouter des justificatifs.',docHint:'Ajoutez contrats, factures, autorisations, justificatifs de service ou accords de paiement. L’IA génère description, échéances et responsables.',docSaved:'Justificatif enregistré. IA en analyse...'},
+  en:{title:'Receivables center',sub:'Manage clients, accounts receivable, due dates, supporting files and follow-up.',clients:'Clients',accounts:'Accounts receivable',open:'Open',overdue:'Overdue',dueSoon:'Due soon',collected:'Collected',pending:'Pending',newClient:'New client',newAccount:'New receivable',client:'Client',type:'Type',contact:'Contact',email:'Email',phone:'Phone',responsible:'Owner',amount:'Amount',dueDate:'Due date',status:'Status',note:'Note',lastFollow:'Last follow-up',addFollow:'Add follow-up',markPaid:'Mark paid',edit:'Edit',save:'Save',cancel:'Cancel',noClients:'No receivable clients yet.',noAccounts:'No accounts receivable yet.',company:'Company',person:'Person',insurer:'Insurer / agreement',draft:'Draft',sent:'Sent',partial:'Partial payment',paid:'Paid',disputed:'Under review',priority:'Priority',normal:'Normal',high:'High',critical:'Critical',today:'Today',support:'Supporting files',openDocs:'Open documents',insightTitle:'What the manager should watch',insight1:'First: overdue money and critical clients.',insight2:'Second: accounts due this week to collect before they become late.',insight3:'Third: incomplete supporting files, because without documents collection slows down.',center:'Client center',followPlaceholder:'Call, email sent, payment promise...',saved:'Receivables updated',uploadDoc:'Upload support file',documents:'Documents',saveFirst:'Save first to upload support files.',docHint:'Upload contracts, invoices, authorizations, service evidence or payment agreements. AI generates description, due dates and responsible people.',docSaved:'Support file saved. AI analyzing...'}
+};
+const receivablesTx=()=>({...RECEIVABLES_UI.es,...(RECEIVABLES_UI[lang]||{})});
+function receivableClient(id){return (DB.receivableClients||[]).find(c=>c.id===id);}
+function receivableClientName(id){const c=receivableClient(id);return c?.name||'-';}
+function receivableFollowups(id){return (DB.receivableFollowups||[]).filter(f=>f.receivableId===id).sort((a,b)=>new Date(b.ts)-new Date(a.ts));}
+function receivableClientDocs(clientId){return (DB.documents||[]).filter(d=>(d.folder||'')==='receivables'&&(d.aiMetadata?.receivableClientId||'')===clientId).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));}
+function receivableAccountDocs(receivableId){return (DB.documents||[]).filter(d=>(d.folder||'')==='receivables'&&(d.aiMetadata?.receivableId||'')===receivableId).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));}
+function receivableDocsHTML(docs,compact=false){
+  const tx=receivablesTx(),dt=docTx();
+  if(!docs.length)return `<div class="fs12 muted">${esc(tx.docHint)}</div>`;
+  return docs.map(d=>`<div class="rrow" style="align-items:flex-start;gap:10px;padding:${compact?'8px 0':'10px'}">
+    <div style="flex:1;min-width:0">
+      <div class="fw8">${esc(d.name||d.fileName||'Documento')}</div>
+      <div class="fs11 muted">${esc(d.fileName||'archivo')} · ${fmtBytes(d.size)}${d.expiresAt?` · ${esc(dt.expires)} ${fmtDate(d.expiresAt)}`:''}</div>
+      ${documentAiMetaHTML(d)}
+    </div>
+    <div style="display:flex;gap:6px;flex-shrink:0">
+      <button class="btn btn-sm btn-ghost" onclick="openDocEditor(${jsArg(d.id)})">${esc(docEditTx().edit)}</button>
+      ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc(${jsArg(d.id)})">${esc(dt.open)}</button><button class="btn btn-sm btn-ghost" onclick="downloadEmployeeDoc(${jsArg(d.id)})">${esc(dt.download||'Descargar')}</button>`:''}
+    </div>
+  </div>`).join('');
+}
+function receivableState(r){
+  if(r.status==='paid')return 'paid';
+  const due=r.dueDate?new Date(r.dueDate+'T12:00:00'):null;
+  if(due&&due<todayStart())return 'overdue';
+  if(due&&daysUntil(r.dueDate)!==null&&daysUntil(r.dueDate)<=7)return 'dueSoon';
+  return 'open';
+}
+function receivableStateMeta(r){
+  const tx=receivablesTx(),state=receivableState(r);
+  if(state==='paid')return {label:tx.paid,cls:'chip-green',color:'var(--green)'};
+  if(state==='overdue')return {label:tx.overdue,cls:'chip-red',color:'var(--red)'};
+  if(state==='dueSoon')return {label:tx.dueSoon,cls:'chip-orange',color:'var(--orange)'};
+  return {label:tx.open,cls:'chip-blue',color:'var(--brand)'};
+}
+function receivablesSummary(){
+  const rows=DB.receivables||[],open=rows.filter(r=>r.status!=='paid'&&r.status!=='cancelled'),paid=rows.filter(r=>r.status==='paid');
+  const overdue=open.filter(r=>receivableState(r)==='overdue'),dueSoon=open.filter(r=>receivableState(r)==='dueSoon');
+  return {
+    open:open.length,overdue:overdue.length,dueSoon:dueSoon.length,
+    pendingAmount:open.reduce((a,r)=>a+(Number(r.amount)||0),0),
+    overdueAmount:overdue.reduce((a,r)=>a+(Number(r.amount)||0),0),
+    collected:paid.reduce((a,r)=>a+(Number(r.amount)||0),0)
+  };
+}
+function receivableTypeLabel(type){
+  const tx=receivablesTx();
+  return {company:tx.company,person:tx.person,insurer:tx.insurer}[type]||tx.company;
+}
+function receivableStatusOptions(selected='sent'){
+  const tx=receivablesTx(),opts=[['draft',tx.draft],['sent',tx.sent],['partial',tx.partial],['paid',tx.paid],['disputed',tx.disputed]];
+  return opts.map(([v,l])=>`<option value="${v}" ${v===selected?'selected':''}>${esc(l)}</option>`).join('');
+}
+function receivableClientOptions(selected=''){
+  const clients=DB.receivableClients||[];
+  return clients.map(c=>`<option value="${esc(c.id)}" ${c.id===selected?'selected':''}>${esc(c.name)}</option>`).join('');
+}
+function renderReceivables(){
+  const el=document.getElementById('receivables-content');if(!el)return;
+  const tx=receivablesTx(),sum=receivablesSummary(),clients=DB.receivableClients||[],accounts=[...(DB.receivables||[])].sort((a,b)=>String(a.dueDate||'9999').localeCompare(String(b.dueDate||'9999')));
+  const topClients=clients.map(c=>{
+    const rows=(DB.receivables||[]).filter(r=>r.clientId===c.id&&r.status!=='paid');
+    return {...c,openAmount:rows.reduce((a,r)=>a+(Number(r.amount)||0),0),openCount:rows.length,overdue:rows.filter(r=>receivableState(r)==='overdue').length};
+  }).sort((a,b)=>b.openAmount-a.openAmount).slice(0,6);
+  el.innerHTML=`<section class="hub-hero" style="background:linear-gradient(135deg,#0f766e,#172554 65%,#7c2d12)">
+    <div class="hub-kicker">${esc(areaTx().receivables)}</div>
+    <h2>${esc(tx.title)}</h2>
+    <p>${esc(tx.sub)}</p>
+  </section>
+  <section class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:14px 0">
+    <div class="kpi"><div class="kpi-val" style="color:var(--brand)">${esc(money(sum.pendingAmount))}</div><div class="kpi-sub">${esc(tx.pending)}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--red)">${esc(money(sum.overdueAmount))}</div><div class="kpi-sub">${esc(tx.overdue)}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${sum.dueSoon}</div><div class="kpi-sub">${esc(tx.dueSoon)}</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--green)">${esc(money(sum.collected))}</div><div class="kpi-sub">${esc(tx.collected)}</div></div>
+  </section>
+  <section class="sales-area-grid">
+    <div class="sales-panel">
+      <div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(tx.center)}</h3><div class="sales-panel-sub">${clients.length} ${esc(tx.clients)}</div></div><button class="btn btn-primary btn-sm" onclick="openReceivableClientModal()">${esc(tx.newClient)}</button></div>
+      <div style="display:grid;gap:8px">
+        ${topClients.length?topClients.map(c=>`<div class="sales-product">
+          <div class="sales-product-dot" style="background:linear-gradient(135deg,#0f766e,#2563eb)">${esc((c.name||'?').slice(0,2).toUpperCase())}</div>
+          <div style="flex:1;min-width:0">
+            <div class="fw8 fs13">${esc(c.name)}</div>
+            <div class="fs11 muted">${esc(receivableTypeLabel(c.type))}${c.contact?` · ${esc(c.contact)}`:''}</div>
+            <div class="fs11 muted mt4">${c.openCount} ${esc(tx.open)} · ${c.overdue} ${esc(tx.overdue)}</div>
+          </div>
+          <div style="text-align:right"><div class="fw8">${esc(money(c.openAmount))}</div><div class="fs11 muted">${receivableClientDocs(c.id).length} ${esc(tx.documents)}</div><button class="btn btn-sm btn-ghost mt4" onclick="openReceivableClientModal('${esc(c.id)}')">${esc(tx.edit)}</button></div>
+        </div>`).join(''):`<div class="sales-empty">${esc(tx.noClients)}</div>`}
+      </div>
+    </div>
+    <div class="sales-panel">
+      <div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(tx.insightTitle)}</h3><div class="sales-panel-sub">${esc(tx.accounts)}</div></div><button class="btn btn-primary btn-sm" onclick="openReceivableModal()">${esc(tx.newAccount)}</button></div>
+      <div class="roadmap-list">
+        <div class="roadmap-item"><span class="roadmap-check" style="background:var(--red)">1</span><span>${esc(tx.insight1)}</span></div>
+        <div class="roadmap-item"><span class="roadmap-check" style="background:var(--orange)">2</span><span>${esc(tx.insight2)}</span></div>
+        <div class="roadmap-item"><span class="roadmap-check" style="background:var(--brand)">3</span><span>${esc(tx.insight3)}</span></div>
+      </div>
+      <button class="btn btn-ghost mt12" onclick="goPage('documents')">${esc(tx.openDocs)}</button>
+    </div>
+  </section>
+  <section class="card mt12">
+    <div class="flex-b mb12"><div class="card-header" style="padding:0;border:0">${esc(tx.accounts)}</div><button class="btn btn-primary btn-sm" onclick="openReceivableModal()">${esc(tx.newAccount)}</button></div>
+    <div style="display:grid;gap:8px">
+      ${accounts.length?accounts.map(r=>{const c=receivableClient(r.clientId),meta=receivableStateMeta(r),last=receivableFollowups(r.id)[0],docs=receivableAccountDocs(r.id);return`<div class="rrow" style="align-items:flex-start;gap:12px;border-left:4px solid ${meta.color}">
+        <div style="flex:1;min-width:0">
+          <div class="fw8">${esc(c?.name||tx.client)} · ${esc(r.title||r.reference||tx.accounts)}</div>
+          <div class="fs11 muted">${esc(r.reference||'')} ${r.dueDate?`· ${esc(tx.dueDate)} ${fmtDate(r.dueDate)}`:''} ${r.responsible?`· ${esc(tx.responsible)}: ${esc(r.responsible)}`:''}</div>
+          ${r.note?`<div class="fs12 mt6" style="color:var(--text2)">${esc(r.note)}</div>`:''}
+          ${last?`<div class="fs11 muted mt6">${esc(tx.lastFollow)}: ${fmtDate(last.ts)} ${fmtTime(last.ts)} · ${esc(last.note)}</div>`:''}
+          ${docs.length?`<div class="mt8">${receivableDocsHTML(docs,true)}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+          <div class="fw8">${esc(money(r.amount))}</div>
+          <span class="chip ${meta.cls}">${esc(meta.label)}</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+            <input id="receivable-doc-${esc(r.id)}" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.txt,.csv" style="display:none" onchange="handleReceivableDocUpload(event,${jsArg(r.clientId||'')},${jsArg(r.id)})">
+            <button class="btn btn-sm btn-ghost" onclick="document.getElementById('receivable-doc-${esc(r.id)}').click()">+ ${esc(tx.uploadDoc)}</button>
+            <button class="btn btn-sm btn-ghost" onclick="openReceivableModal('${esc(r.id)}')">${esc(tx.edit)}</button>
+            <button class="btn btn-sm btn-ghost" onclick="addReceivableFollowup('${esc(r.id)}')">${esc(tx.addFollow)}</button>
+            ${r.status!=='paid'?`<button class="btn btn-sm btn-success" onclick="markReceivablePaid('${esc(r.id)}')">${esc(tx.markPaid)}</button>`:''}
+          </div>
+        </div>
+      </div>`;}).join(''):`<div class="empty-state" style="padding:20px"><p>${esc(tx.noAccounts)}</p></div>`}
+    </div>
+  </section>`;
+}
+function openReceivableClientModal(id=null){
+  const tx=receivablesTx(),c=id?receivableClient(id):{},docs=id?receivableClientDocs(id):[];
+  document.getElementById('doc-modal-content').innerHTML=`<div class="modal-handle"></div><div class="modal-title">${esc(id?tx.edit:tx.newClient)}</div>
+    <div class="fg"><label>${esc(tx.client)}</label><input id="rc-name" value="${esc(c?.name||'')}" placeholder="EPS / Cliente / Empresa"></div>
+    <div class="grid-2"><div class="fg"><label>${esc(tx.type)}</label><select id="rc-type"><option value="company" ${c?.type==='company'?'selected':''}>${esc(tx.company)}</option><option value="person" ${c?.type==='person'?'selected':''}>${esc(tx.person)}</option><option value="insurer" ${c?.type==='insurer'?'selected':''}>${esc(tx.insurer)}</option></select></div><div class="fg"><label>${esc(tx.responsible)}</label><input id="rc-owner" value="${esc(c?.owner||'')}"></div></div>
+    <div class="grid-2"><div class="fg"><label>${esc(tx.contact)}</label><input id="rc-contact" value="${esc(c?.contact||'')}"></div><div class="fg"><label>${esc(tx.phone)}</label><input id="rc-phone" value="${esc(c?.phone||'')}"></div></div>
+    <div class="fg"><label>${esc(tx.email)}</label><input id="rc-email" value="${esc(c?.email||'')}"></div>
+    <div style="border:1px solid var(--border);border-radius:var(--r2);padding:12px;margin-top:10px">
+      <div class="flex-b mb8"><div><div class="fw8">${esc(tx.documents)}</div><div class="fs11 muted">${esc(tx.docHint)}</div></div>${id?`<div><input id="rc-doc-file-${esc(id)}" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.txt,.csv" style="display:none" onchange="handleReceivableDocUpload(event,${jsArg(id)},'')"><button class="btn btn-sm btn-primary" onclick="document.getElementById('rc-doc-file-${esc(id)}').click()">+ ${esc(tx.uploadDoc)}</button></div>`:`<span class="chip chip-orange">${esc(tx.saveFirst)}</span>`}</div>
+      ${id?receivableDocsHTML(docs):''}
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('doc-modal')">${esc(tx.cancel)}</button><button class="btn btn-primary" onclick="saveReceivableClient('${esc(id||'')}')">${esc(tx.save)}</button></div>`;
+  openModal('doc-modal');
+}
+function saveReceivableClient(id=''){
+  const tx=receivablesTx(),name=clean(document.getElementById('rc-name').value);if(!name)return toast(tx.client,'#ef4444');
+  const row=id?receivableClient(id):{id:uid(),createdAt:new Date().toISOString()};
+  Object.assign(row,{name,type:document.getElementById('rc-type').value,owner:clean(document.getElementById('rc-owner').value),contact:clean(document.getElementById('rc-contact').value),phone:clean(document.getElementById('rc-phone').value),email:clean(document.getElementById('rc-email').value)});
+  if(!id)DB.receivableClients=[row,...(DB.receivableClients||[])];
+  sbSaveReceivableClient(row).catch(console.error);
+  saveLocal();closeModal('doc-modal');renderReceivables();renderHub();toast(tx.saved);
+}
+function openReceivableModal(id=null){
+  const tx=receivablesTx(),r=id?(DB.receivables||[]).find(x=>x.id===id):{},docs=id?receivableAccountDocs(id):[];
+  if(!(DB.receivableClients||[]).length){openReceivableClientModal();toast(tx.newClient,'#f59e0b');return;}
+  document.getElementById('doc-modal-content').innerHTML=`<div class="modal-handle"></div><div class="modal-title">${esc(id?tx.edit:tx.newAccount)}</div>
+    <div class="fg"><label>${esc(tx.client)}</label><select id="rr-client">${receivableClientOptions(r?.clientId)}</select></div>
+    <div class="grid-2"><div class="fg"><label>Referencia</label><input id="rr-ref" value="${esc(r?.reference||'')}" placeholder="Factura, contrato, autorización..."></div><div class="fg"><label>${esc(tx.status)}</label><select id="rr-status">${receivableStatusOptions(r?.status||'sent')}</select></div></div>
+    <div class="grid-2"><div class="fg"><label>${esc(tx.amount)}</label><input type="number" step="0.01" id="rr-amount" value="${esc(r?.amount||'')}"></div><div class="fg"><label>${esc(tx.dueDate)}</label><input type="date" id="rr-due" value="${esc(r?.dueDate||localDateKey(new Date()))}"></div></div>
+    <div class="grid-2"><div class="fg"><label>${esc(tx.responsible)}</label><input id="rr-owner" value="${esc(r?.responsible||'')}"></div><div class="fg"><label>${esc(tx.priority)}</label><select id="rr-priority"><option value="normal" ${r?.priority==='normal'?'selected':''}>${esc(tx.normal)}</option><option value="high" ${r?.priority==='high'?'selected':''}>${esc(tx.high)}</option><option value="critical" ${r?.priority==='critical'?'selected':''}>${esc(tx.critical)}</option></select></div></div>
+    <div class="fg"><label>${esc(tx.note)}</label><textarea id="rr-note" rows="3">${esc(r?.note||'')}</textarea></div>
+    <div style="border:1px solid var(--border);border-radius:var(--r2);padding:12px;margin-top:10px">
+      <div class="flex-b mb8"><div><div class="fw8">${esc(tx.support)}</div><div class="fs11 muted">${esc(tx.docHint)}</div></div>${id?`<div><input id="rr-doc-file-${esc(id)}" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.txt,.csv" style="display:none" onchange="handleReceivableDocUpload(event,${jsArg(r?.clientId||'')},${jsArg(id)})"><button class="btn btn-sm btn-primary" onclick="document.getElementById('rr-doc-file-${esc(id)}').click()">+ ${esc(tx.uploadDoc)}</button></div>`:`<span class="chip chip-orange">${esc(tx.saveFirst)}</span>`}</div>
+      ${id?receivableDocsHTML(docs):''}
+    </div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('doc-modal')">${esc(tx.cancel)}</button><button class="btn btn-primary" onclick="saveReceivable('${esc(id||'')}')">${esc(tx.save)}</button></div>`;
+  openModal('doc-modal');
+}
+function saveReceivable(id=''){
+  const tx=receivablesTx(),clientId=document.getElementById('rr-client').value;
+  const row=id?(DB.receivables||[]).find(x=>x.id===id):{id:uid(),createdAt:new Date().toISOString()};
+  Object.assign(row,{clientId,reference:clean(document.getElementById('rr-ref').value),status:document.getElementById('rr-status').value,amount:Number(document.getElementById('rr-amount').value)||0,dueDate:document.getElementById('rr-due').value,responsible:clean(document.getElementById('rr-owner').value),priority:document.getElementById('rr-priority').value,note:clean(document.getElementById('rr-note').value),updatedAt:new Date().toISOString()});
+  if(!id)DB.receivables=[row,...(DB.receivables||[])];
+  sbSaveReceivable(row).catch(console.error);
+  saveLocal();closeModal('doc-modal');renderReceivables();renderHub();toast(tx.saved);
+}
+function addReceivableFollowup(id){
+  const tx=receivablesTx(),note=clean(prompt(tx.followPlaceholder)||'');if(!note)return;
+  const follow={id:uid(),receivableId:id,note,ts:new Date().toISOString(),user:currentUser?.email||currentUser?.name||'manager'};
+  DB.receivableFollowups=[follow,...(DB.receivableFollowups||[])];
+  sbSaveReceivableFollowup(follow).catch(console.error);
+  saveLocal();renderReceivables();toast(tx.saved);
+}
+function markReceivablePaid(id){
+  const tx=receivablesTx(),r=(DB.receivables||[]).find(x=>x.id===id);if(!r)return;
+  r.status='paid';r.paidAt=new Date().toISOString();r.updatedAt=new Date().toISOString();
+  const follow={id:uid(),receivableId:id,note:tx.markPaid,ts:new Date().toISOString(),user:currentUser?.email||currentUser?.name||'manager'};
+  DB.receivableFollowups=[follow,...(DB.receivableFollowups||[])];
+  sbSaveReceivable(r).catch(console.error);
+  sbSaveReceivableFollowup(follow).catch(console.error);
+  saveLocal();renderReceivables();renderHub();toast(tx.saved);
 }
 
 function salesToday(){
@@ -6290,6 +6533,16 @@ const DOC_UI={
   it:{file:'Fascicolo',complete:'Fascicolo completo',review:'Fascicolo da completare',critical:'Richiede azione',missing:'Manca',expiring:'In scadenza',expired:'Scaduto',required:'Documenti e dati da rivedere',contractMissing:'Contratto non archiviato',payMissing:'Dati salario da configurare',scheduleMissing:'Orario base mancante',contactMissing:'Contatto dipendente incompleto',startMissing:'Inizio contratto mancante',uploadType:'Tipo documento',expiry:'Scadenza opzionale',note:'Nota',notePh:'Es: contratto firmato, permesso B, allegato salario',upload:'Carica documento',helper:'Il fascicolo conserva prove HR importanti e attiva avvisi prima delle scadenze.',open:'Apri',download:'Scarica',delete:'Elimina',emptyTitle:'Nessun documento',emptyText:'Carica contratto, permesso o certificati per completare il fascicolo.',expires:'Scade',ok:'OK'}
 };
 const docTx=()=>DOC_UI[lang]||DOC_UI.fr;
+function docEditTx(){
+  const txs={
+    es:{edit:'Editar',save:'Guardar',cancel:'Cancelar',visibleName:'Nombre visible',folder:'Carpeta',search:'Buscar documentos',searchPh:'Nombre, responsable, carpeta, vencimiento...',status:'Estado',all:'Todos',review:'Por revisar',expiring:'Vencen pronto',expired:'Vencidos',ok:'En orden',clear:'Limpiar',newFolderPrompt:'Nombre de la nueva carpeta',folderCreated:'Carpeta creada',customFolder:'Carpeta personalizada'},
+    en:{edit:'Edit',save:'Save',cancel:'Cancel',visibleName:'Display name',folder:'Folder',search:'Search documents',searchPh:'Name, owner, folder, expiry...',status:'Status',all:'All',review:'To review',expiring:'Expiring soon',expired:'Expired',ok:'In order',clear:'Clear',newFolderPrompt:'New folder name',folderCreated:'Folder created',customFolder:'Custom folder'},
+    fr:{edit:'Modifier',save:'Enregistrer',cancel:'Annuler',visibleName:'Nom visible',folder:'Dossier',search:'Rechercher documents',searchPh:'Nom, responsable, dossier, échéance...',status:'Statut',all:'Tous',review:'À revoir',expiring:'Expirent bientôt',expired:'Expirés',ok:'En ordre',clear:'Effacer',newFolderPrompt:'Nom du nouveau dossier',folderCreated:'Dossier créé',customFolder:'Dossier personnalisé'},
+    de:{edit:'Bearbeiten',save:'Speichern',cancel:'Abbrechen',visibleName:'Anzeigename',folder:'Ordner',search:'Dokumente suchen',searchPh:'Name, Verantwortliche, Ordner, Frist...',status:'Status',all:'Alle',review:'Zu prüfen',expiring:'Laufen bald ab',expired:'Abgelaufen',ok:'In Ordnung',clear:'Löschen',newFolderPrompt:'Name des neuen Ordners',folderCreated:'Ordner erstellt',customFolder:'Eigener Ordner'},
+    it:{edit:'Modifica',save:'Salva',cancel:'Annulla',visibleName:'Nome visibile',folder:'Cartella',search:'Cerca documenti',searchPh:'Nome, responsabile, cartella, scadenza...',status:'Stato',all:'Tutti',review:'Da rivedere',expiring:'In scadenza',expired:'Scaduti',ok:'In ordine',clear:'Pulisci',newFolderPrompt:'Nome nuova cartella',folderCreated:'Cartella creata',customFolder:'Cartella personalizzata'}
+  };
+  return txs[lang]||txs.es;
+}
 const DOCUMENTS_PAGE_UI={
   es:{title:'Documentos del negocio',sub:'Contratos de empleados, arrendamiento, permisos, recetas, proveedores y documentos clave en un solo archivo central.',complete:'Expedientes completos',needs:'Requieren atención',expiring:'Vencen pronto',total:'Documentos guardados',attention:'Requieren atención',files:'Expedientes del equipo',latest:'Últimos documentos',checklist:'Checklist base',folders:'Carpetas sugeridas',customFolders:'Carpetas personalizadas',newFolder:'Nueva carpeta',customFolderHint:'Entra a una carpeta para subir archivos. La IA genera una descripción, fechas clave, responsables y alertas si encuentra vencimientos.',openFolder:'Abrir carpeta',folderDocs:'Documentos de la carpeta',uploadHere:'Subir documento aquí',uploadGeneral:'Sube contratos, permisos, recetas, facturas o archivos clave directamente en esta carpeta.',openFile:'Abrir expediente',noAttention:'Todo está en orden',noAttentionText:'No hay documentos vencidos, próximos a vencer o datos críticos faltantes.',noDocs:'Aún no hay documentos guardados.',missing:'Pendiente',critical:'Crítico',review:'Revisar',completeState:'Completo',nextExpiry:'Próximo vencimiento',docs:'docs',uploadHint:'También puedes subir documentos del trabajador desde su expediente.',contract:'Contrato firmado',permit:'Permiso o autorización',identity:'Documento de identidad',medical:'Certificado médico si aplica',salary:'Anexos salariales y cambios',folderEmployees:'Empleados',folderEmployeesText:'Contratos, permisos, certificados, anexos y vencimientos.',folderCompany:'Empresa',folderCompanyText:'Registro mercantil, seguros, impuestos, políticas y documentos legales.',folderLease:'Local / arriendo',folderLeaseText:'Contrato de arriendo, garantías, pagos, planos y permisos del local.',folderOperations:'Operación',folderOperationsText:'Manuales, protocolos, checklists, seguridad e higiene.',folderRecipes:'Recetas / procesos',folderRecipesText:'Recetas, fichas técnicas, procesos de producción y estándares.',folderSuppliers:'Proveedores',folderSuppliersText:'Contratos, listas de precios, condiciones, facturas y acuerdos.'},
   en:{title:'Business documents',sub:'Employee contracts, lease, permits, recipes, suppliers and key company files in one central archive.',complete:'Complete files',needs:'Need attention',expiring:'Expiring soon',total:'Saved documents',attention:'Need attention',files:'Team files',latest:'Latest documents',checklist:'Base checklist',folders:'Suggested folders',customFolders:'Custom folders',newFolder:'New folder',customFolderHint:'Open a folder to upload files. AI creates a description, key dates, responsible people and alerts when it finds expiries.',openFolder:'Open folder',folderDocs:'Folder documents',uploadHere:'Upload document here',uploadGeneral:'Upload contracts, permits, recipes, invoices or key business files directly into this folder.',openFile:'Open file',noAttention:'Everything is fine',noAttentionText:'No expired, expiring or critical missing documents.',noDocs:'No documents saved yet.',missing:'Pending',critical:'Critical',review:'Review',completeState:'Complete',nextExpiry:'Next expiry',docs:'docs',uploadHint:'You can also upload employee documents from their file.',contract:'Signed contract',permit:'Permit or authorization',identity:'Identity document',medical:'Medical certificate if needed',salary:'Salary annexes and changes',folderEmployees:'Employees',folderEmployeesText:'Contracts, permits, certificates, annexes and expiry dates.',folderCompany:'Company',folderCompanyText:'Business registration, insurance, taxes, policies and legal files.',folderLease:'Premises / lease',folderLeaseText:'Lease contract, guarantees, payments, plans and permits.',folderOperations:'Operations',folderOperationsText:'Manuals, protocols, checklists, safety and hygiene.',folderRecipes:'Recipes / processes',folderRecipesText:'Recipes, technical sheets, production processes and standards.',folderSuppliers:'Suppliers',folderSuppliersText:'Contracts, price lists, conditions, invoices and agreements.'},
@@ -6302,15 +6555,35 @@ function employeeDocs(empId){return (DB.documents||[]).filter(d=>d.empId===empId
 function folderDocs(folder){return (DB.documents||[]).filter(d=>(d.folder||'employees')===folder).sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));}
 function docTypeLabel(t){const types=DOC_TYPES[lang]||DOC_TYPES.fr;return types[t]||types.other;}
 function fmtBytes(n){n=Number(n)||0;if(n<1024)return `${n} B`;if(n<1048576)return `${(n/1024).toFixed(0)} KB`;return `${(n/1048576).toFixed(1)} MB`;}
+function docFolderTitle(folder){return documentFolderDefs().find(f=>f.key===(folder||'employees'))?.title||folder||'Documentos';}
+function docOwnerName(d){const emp=DB.employees?.find(e=>e.id===d.empId);return emp?safeEmpName(emp):'';}
+function docSearchText(d){
+  const m=d.aiMetadata||{};
+  return [d.fileName,d.name,d.type,docTypeLabel(d.type),d.folder,docFolderTitle(d.folder),d.notes,d.aiSummary,m.counterparty,m.responsible,m.responsiblePeople?.join?.(' '),m.obligations?.join?.(' '),m.warnings?.join?.(' '),docOwnerName(d)].filter(Boolean).join(' ').toLowerCase();
+}
+function docStatus(d){
+  const left=daysUntil(d.expiresAt);
+  if(left!==null&&left<0)return 'expired';
+  if(left!==null&&left<=30)return 'expiring';
+  if(['review','manual_review','pending','analyzing'].includes(d.aiStatus))return 'review';
+  return 'ok';
+}
+function filteredDocs(list){
+  const q=String(documentSearch||'').trim().toLowerCase();
+  return (list||[]).filter(d=>(documentStatusFilter==='all'||docStatus(d)===documentStatusFilter)&&(!q||docSearchText(d).includes(q)));
+}
 function documentFolderDefs(){
   const tx=documentsPageTx();
+  const custom=(DB.settings?.documentFolders||[]).map(f=>({key:f.key,icon:f.icon||'documents',title:f.title,text:f.text||docEditTx().customFolder}));
   return [
     {key:'employees',icon:'team',title:tx.folderEmployees,text:tx.folderEmployeesText},
     {key:'company',icon:'settings',title:tx.folderCompany,text:tx.folderCompanyText},
     {key:'lease',icon:'documents',title:tx.folderLease,text:tx.folderLeaseText},
     {key:'operations',icon:'tasks',title:tx.folderOperations,text:tx.folderOperationsText},
     {key:'recipes',icon:'inventory',title:tx.folderRecipes,text:tx.folderRecipesText},
-    {key:'suppliers',icon:'sales',title:tx.folderSuppliers,text:tx.folderSuppliersText}
+    {key:'suppliers',icon:'sales',title:tx.folderSuppliers,text:tx.folderSuppliersText},
+    {key:'receivables',icon:'receivables',title:tx.folderReceivables||areaTx().receivables,text:tx.folderReceivablesText||receivablesTx().docHint},
+    ...custom
   ];
 }
 function docAITx(){return {...DOC_UI.es,...(DOC_UI[lang]||{})};}
@@ -6360,7 +6633,7 @@ async function analyzeEmployeeDocumentWithAI(doc,text){
     if(error)throw error;
     const result=data||{};
     doc.aiSummary=result.summary||'';
-    doc.aiMetadata=result;
+    doc.aiMetadata={...(doc.aiMetadata||{}),...result};
     doc.aiStatus=result.confidence==='low'?'review':'analyzed';
     if(!doc.expiresAt&&(result.suggestedExpiry||result.expiryDate||result.endDate))doc.expiresAt=result.suggestedExpiry||result.expiryDate||result.endDate;
     if(!doc.notes&&doc.aiSummary)doc.notes=doc.aiSummary;
@@ -6427,6 +6700,7 @@ function employeeDocsHTML(emp){
         ${documentAiMetaHTML(d)}
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-sm btn-ghost" onclick="openDocEditor('${d.id}')">${esc(docEditTx().edit)}</button>
         ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc('${d.id}')">${esc(tx.open)}</button><button class="btn btn-sm btn-ghost" onclick="downloadEmployeeDoc('${d.id}')">${esc(tx.download||'Descargar')}</button>`:''}
         <button class="btn btn-sm btn-ghost" style="color:var(--red)" onclick="deleteEmployeeDoc('${d.id}','${emp.id}')">${esc(tx.delete)}</button>
       </div>
@@ -6453,6 +6727,22 @@ function openDocumentsFolder(folder){
   renderDocuments();
   setTimeout(()=>document.getElementById('doc-folder-panel')?.scrollIntoView({behavior:'smooth',block:'start'}),0);
 }
+function setDocumentSearch(v){documentSearch=v||'';renderDocuments();}
+function setDocumentStatusFilter(v){documentStatusFilter=v||'all';renderDocuments();}
+function createDocumentFolder(){
+  if(!requirePerm('view_documents'))return;
+  const ex=docEditTx();
+  const title=clean(prompt(ex.newFolderPrompt)||'');
+  if(!title)return;
+  DB.settings.documentFolders=DB.settings.documentFolders||[];
+  const key='custom_'+uid().slice(0,8);
+  DB.settings.documentFolders.push({key,title,text:ex.customFolder,icon:'documents'});
+  activeDocumentFolder=key;
+  auditAction('document','Carpeta documental creada',{folder:key,title});
+  saveLocal();
+  renderDocuments();
+  toast(ex.folderCreated,'#10b981');
+}
 function handleFolderDocUpload(ev,folder){
   if(!requirePerm('view_documents')){ev.target.value='';return;}
   const file=ev.target.files?.[0];if(!file)return;
@@ -6469,6 +6759,57 @@ function handleFolderDocUpload(ev,folder){
   };
   reader.readAsDataURL(file);
 }
+function handleReceivableDocUpload(ev,clientId='',receivableId=''){
+  if(!requirePerm('view_documents')){ev.target.value='';return;}
+  const file=ev.target.files?.[0];if(!file)return;
+  const tx=receivablesTx();
+  if(file.size>3*1024*1024){toast('Documento muy grande. Máximo 3 MB por ahora.','#ef4444');ev.target.value='';return;}
+  const receivable=(DB.receivables||[]).find(r=>r.id===receivableId);
+  const client=receivableClient(clientId||receivable?.clientId);
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    const doc={
+      id:uid(),
+      empId:'',
+      folder:'receivables',
+      type:'receivable',
+      name:client?.name||receivable?.reference||tx.support,
+      fileName:file.name,
+      mimeType:file.type||'application/octet-stream',
+      size:file.size,
+      data:reader.result,
+      notes:receivable?.reference||client?.name||'',
+      aiSummary:'',
+      aiMetadata:{receivableClientId:client?.id||clientId||'',receivableId:receivableId||'',source:'receivables'},
+      aiStatus:'pending',
+      expiresAt:receivable?.dueDate||'',
+      createdAt:new Date().toISOString()
+    };
+    DB.documents=[doc,...(DB.documents||[])];
+    if(receivableId&&receivable){
+      receivable.documentIds=[...new Set([...(receivable.documentIds||[]),doc.id])];
+      receivable.updatedAt=new Date().toISOString();
+      sbSaveReceivable(receivable).catch(console.error);
+    }
+    auditAction('document',`Soporte de cartera agregado: ${file.name}`,{clientId:client?.id||clientId,receivableId});
+    saveLocal();
+    renderReceivables();
+    if(document.getElementById('doc-modal')?.classList.contains('open')){
+      if(receivableId)openReceivableModal(receivableId);
+      else if(client?.id||clientId)openReceivableClientModal(client?.id||clientId);
+    }
+    toast(tx.docSaved);
+    sbSaveDoc(doc).catch(console.error);
+    const text=await extractBusinessDocumentText(file).catch(e=>{console.warn('Receivable document text extraction failed',e);return `Archivo: ${file.name}. Cliente: ${client?.name||''}. Cuenta: ${receivable?.reference||''}`;});
+    await analyzeEmployeeDocumentWithAI(doc,text);
+    renderReceivables();
+    if(document.getElementById('doc-modal')?.classList.contains('open')){
+      if(receivableId)openReceivableModal(receivableId);
+      else if(client?.id||clientId)openReceivableClientModal(client?.id||clientId);
+    }
+  };
+  reader.readAsDataURL(file);
+}
 function openEmployeeDoc(id){
   if(!requirePerm('view_documents'))return;
   const doc=(DB.documents||[]).find(d=>d.id===id);if(!doc?.data){toast('Archivo no disponible','#ef4444');return;}
@@ -6481,6 +6822,43 @@ function downloadEmployeeDoc(id){
   if(!requirePerm('view_documents'))return;
   const doc=(DB.documents||[]).find(d=>d.id===id);if(!doc?.data){toast('Archivo no disponible','#ef4444');return;}
   const a=document.createElement('a');a.href=doc.data;a.download=doc.fileName||'documento';a.click();
+}
+function openDocEditor(id){
+  if(!requirePerm('view_documents'))return;
+  const doc=(DB.documents||[]).find(d=>d.id===id);if(!doc)return;
+  const tx=docTx(),ex=docEditTx(),folders=documentFolderDefs();
+  const folderOpts=folders.map(f=>`<option value="${esc(f.key)}" ${f.key===(doc.folder||'employees')?'selected':''}>${esc(f.title)}</option>`).join('');
+  const typeOpts=Object.entries(DOC_TYPES[lang]||DOC_TYPES.es).map(([v,l])=>`<option value="${esc(v)}" ${v===(doc.type||'other')?'selected':''}>${esc(l)}</option>`).join('');
+  document.getElementById('doc-modal-content').innerHTML=`<div class="modal-handle"></div>
+    <div class="modal-title">${esc(doc.fileName||doc.name||'Documento')}</div>
+    <div class="grid2">
+      <div class="fg"><label>${esc(ex.visibleName)}</label><input id="edit-doc-name" value="${esc(doc.name||'')}"></div>
+      <div class="fg"><label>${esc(tx.uploadType)}</label><select id="edit-doc-type">${typeOpts}</select></div>
+    </div>
+    <div class="grid2">
+      <div class="fg"><label>${esc(ex.folder)}</label><select id="edit-doc-folder">${folderOpts}</select></div>
+      <div class="fg"><label>${esc(tx.expiry)}</label><input id="edit-doc-exp" type="date" value="${esc(doc.expiresAt||'')}"></div>
+    </div>
+    <div class="fg"><label>${esc(tx.note)}</label><textarea id="edit-doc-notes" rows="3" placeholder="${esc(tx.notePh)}">${esc(doc.notes||'')}</textarea></div>
+    ${documentAiMetaHTML(doc)}
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('doc-modal')">${esc(ex.cancel)}</button>
+      ${doc.data?`<button class="btn btn-ghost" onclick="openEmployeeDoc(${jsArg(doc.id)})">${esc(tx.open)}</button><button class="btn btn-ghost" onclick="downloadEmployeeDoc(${jsArg(doc.id)})">${esc(tx.download||'Descargar')}</button>`:''}
+      <button class="btn btn-primary" onclick="saveDocEditor(${jsArg(doc.id)})">${esc(ex.save)}</button>
+    </div>`;
+  openModal('doc-modal');
+}
+function saveDocEditor(id){
+  const doc=(DB.documents||[]).find(d=>d.id===id);if(!doc)return;
+  const oldFolder=doc.folder||'employees';
+  doc.name=clean(document.getElementById('edit-doc-name')?.value||doc.name||'');
+  doc.type=document.getElementById('edit-doc-type')?.value||doc.type||'other';
+  doc.folder=document.getElementById('edit-doc-folder')?.value||doc.folder||'employees';
+  doc.expiresAt=document.getElementById('edit-doc-exp')?.value||'';
+  doc.notes=clean(document.getElementById('edit-doc-notes')?.value||'');
+  activeDocumentFolder=doc.folder||oldFolder;
+  auditAction('document','Documento actualizado',{docId:id,folder:doc.folder});
+  saveLocal();sbSaveDoc(doc).catch(console.error);closeModal('doc-modal');renderDocuments();toast('Documento actualizado');
 }
 function deleteEmployeeDoc(id,empId){
   if(!requirePerm('view_documents'))return;
@@ -6507,16 +6885,16 @@ function openEmployeeDocuments(empId){
 function renderDocuments(){
   const el=document.getElementById('documents-content');if(!el)return;
   if(!can('view_documents')){el.innerHTML=restrictedHTML();return;}
-  const tx=documentsPageTx(),employees=(DB.employees||[]).filter(e=>e.status!=='inactive'),docs=DB.documents||[];
+  const tx=documentsPageTx(),ex=docEditTx(),employees=(DB.employees||[]).filter(e=>e.status!=='inactive'),docs=DB.documents||[];
   const rows=employees.map(emp=>({emp,st:employeeFileStatus(emp)}));
   const complete=rows.filter(r=>r.st.level==='complete').length;
   const attention=rows.filter(r=>r.st.level!=='complete').sort((a,b)=>(a.st.level==='critical'?-1:1)-(b.st.level==='critical'?-1:1));
   const expiringDocs=docs.filter(d=>{const left=daysUntil(d.expiresAt);return left!==null&&left<=30;}).sort((a,b)=>String(a.expiresAt).localeCompare(String(b.expiresAt)));
-  const latest=[...docs].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,6);
+  const latest=filteredDocs([...docs].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0))).slice(0,6);
   const checklist=[tx.contract,tx.permit,tx.identity,tx.medical,tx.salary];
   const folders=documentFolderDefs().map(f=>({...f,count:folderDocs(f.key).length}));
   const selected=folders.find(f=>f.key===activeDocumentFolder)||folders[0];
-  const selectedDocs=folderDocs(selected.key);
+  const selectedDocs=filteredDocs(folderDocs(selected.key));
   el.innerHTML=`<section class="hub-hero" style="background:linear-gradient(135deg,#3f1f72,#172554 60%,#0f766e)">
     <div class="hub-kicker">${esc(areaTx().documents)}</div>
     <h2>${esc(tx.title)}</h2>
@@ -6529,12 +6907,32 @@ function renderDocuments(){
     <div class="kpi"><div class="kpi-val" style="color:var(--brand)">${docs.length}</div><div class="kpi-sub">${esc(tx.total)}</div></div>
   </section>
   <section class="card" style="margin-bottom:12px">
+    <div class="flex-b" style="gap:10px;align-items:end">
+      <div class="fg" style="margin:0;flex:1;min-width:220px">
+        <label>${esc(ex.search)}</label>
+        <input id="doc-search-input" value="${esc(documentSearch)}" placeholder="${esc(ex.searchPh)}" onkeydown="if(event.key==='Enter')setDocumentSearch(this.value)">
+      </div>
+      <div class="fg" style="margin:0;min-width:180px">
+        <label>${esc(ex.status)}</label>
+        <select onchange="setDocumentStatusFilter(this.value)">
+          <option value="all" ${documentStatusFilter==='all'?'selected':''}>${esc(ex.all)}</option>
+          <option value="review" ${documentStatusFilter==='review'?'selected':''}>${esc(ex.review)}</option>
+          <option value="expiring" ${documentStatusFilter==='expiring'?'selected':''}>${esc(ex.expiring)}</option>
+          <option value="expired" ${documentStatusFilter==='expired'?'selected':''}>${esc(ex.expired)}</option>
+          <option value="ok" ${documentStatusFilter==='ok'?'selected':''}>${esc(ex.ok)}</option>
+        </select>
+      </div>
+      <button class="btn btn-ghost" onclick="setDocumentSearch(document.getElementById('doc-search-input')?.value||'')">${esc(ex.search)}</button>
+      <button class="btn btn-ghost" onclick="documentSearch='';documentStatusFilter='all';renderDocuments()">${esc(ex.clear)}</button>
+    </div>
+  </section>
+  <section class="card" style="margin-bottom:12px">
     <div class="flex-b" style="gap:10px;align-items:flex-start">
       <div>
         <div class="card-header" style="padding:0;border:0;margin-bottom:4px">${esc(tx.folders)}</div>
         <div class="fs12 muted">${esc(tx.customFolderHint)}</div>
       </div>
-      <button class="btn btn-primary" onclick="toast('${esc(tx.newFolder)}: pronto podrás crear carpetas propias')">+ ${esc(tx.newFolder)}</button>
+      <button class="btn btn-primary" onclick="createDocumentFolder()">+ ${esc(tx.newFolder)}</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px">
       ${folders.map(f=>`<button class="module-card" style="text-align:left;min-height:150px;border-radius:var(--r2);padding:16px;border-color:${f.key===selected.key?'var(--brand)':'var(--border)'}" onclick="openDocumentsFolder(${jsArg(f.key)})">
@@ -6569,6 +6967,7 @@ function renderDocuments(){
           ${documentAiMetaHTML(d)}
         </div>
         <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-sm btn-ghost" onclick="openDocEditor(${jsArg(d.id)})">${esc(ex.edit)}</button>
           ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc(${jsArg(d.id)})">${esc(docTx().open)}</button><button class="btn btn-sm btn-ghost" onclick="downloadEmployeeDoc(${jsArg(d.id)})">${esc(docTx().download||'Descargar')}</button>`:''}
           <button class="btn btn-sm btn-ghost" style="color:var(--red)" onclick="deleteEmployeeDoc(${jsArg(d.id)},${jsArg(d.empId||'')})">${esc(docTx().delete)}</button>
         </div>
@@ -6619,6 +7018,7 @@ function renderDocuments(){
           ${d.aiSummary?`<div class="fs11 mt4" style="color:var(--text2);line-height:1.35">${esc(d.aiSummary).slice(0,180)}${d.aiSummary.length>180?'...':''}</div>`:''}
           ${d.expiresAt?`<div class="fs11" style="color:${daysUntil(d.expiresAt)<0?'var(--red)':'var(--orange)'}">${fmtDate(d.expiresAt)}</div>`:''}
         </div>
+        <button class="btn btn-sm btn-ghost" onclick="openDocEditor(${jsArg(d.id)})">${esc(ex.edit)}</button>
         ${d.data?`<button class="btn btn-sm btn-ghost" onclick="openEmployeeDoc(${jsArg(d.id)})">${esc(docTx().open)}</button><button class="btn btn-sm btn-ghost" onclick="downloadEmployeeDoc(${jsArg(d.id)})">${esc(docTx().download||'Descargar')}</button>`:''}
       </div>`;}).join(''):`<div class="empty-state" style="padding:20px"><p>${esc(tx.noDocs)}</p></div>`}
     </div>
