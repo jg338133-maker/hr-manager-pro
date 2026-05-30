@@ -374,6 +374,10 @@ input[type=date],input[type=time]{color-scheme:dark}
 .emp-action.out{background:linear-gradient(135deg,#ef4444,#f87171)}
 .emp-action.pause,.emp-action.logout{grid-column:1/-1;background:var(--s2);color:var(--text);box-shadow:none}
 .emp-action.logout{min-height:58px;color:var(--text2);font-size:15px}
+.emp-break-card{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.32);border-radius:var(--r2);padding:12px;color:var(--orange)}
+.emp-break-card>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;min-width:0}
+.emp-break-card span{font-size:11px;color:var(--text2);font-weight:800;line-height:1.2}
+.emp-break-card strong{font-size:22px;font-weight:950;font-variant-numeric:tabular-nums;line-height:1}
 .emp-downloads{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .emp-download-btn{border:1px solid var(--border);background:var(--s2);border-radius:14px;padding:13px 10px;color:var(--text);font:800 13px inherit;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer}
 .emp-download-btn.primary{background:linear-gradient(135deg,var(--brand),#6b7cff);border-color:transparent;color:#fff}
@@ -3491,7 +3495,12 @@ function breakInfoOn(empId,date){
   return {ranges,open:start};
 }
 function plannedBreakMinutes(open){
-  const m=String(open?.note||'').match(/(\d+)/);
+  let note=String(open?.note||'');
+  if(!note&&open?.empId){
+    const saved=readActiveBreak(open.empId);
+    if(saved?.ts&&sameDay(saved.ts,new Date())&&Math.abs(new Date(saved.ts)-new Date(open.ts))<5000)note=String(saved.note||'');
+  }
+  const m=note.match(/(\d+)/);
   return m?parseInt(m[1],10):0;
 }
 function breakCountdownData(open){
@@ -3502,13 +3511,17 @@ function breakCountdownData(open){
 }
 function breakEndInfoHTML(open,et=ETT()){
   const data=breakCountdownData(open);
-  if(!data)return '';
+  const startLabel=`${et.breakActive} ${fmtTime(open.ts)}`;
+  if(!data)return `<div class="emp-break-card"><div><span>${esc(startLabel)}</span></div><div><span>${esc(et.breakEndsAt)}</span><strong>-</strong></div></div>`;
   const done=data.remaining<=0;
-  return `<div id="emp-break-end-info" data-break-end="${data.end}" style="margin-top:8px;font-size:26px;font-weight:900;color:${done?'var(--red)':'var(--orange)'};letter-spacing:.5px">${fmtTime(new Date(data.end).toISOString())}</div><div id="emp-break-end-label" class="fs11 muted mt4">${done?et.breakEndedAt:et.breakEndsAt}</div>`;
+  return `<div class="emp-break-card">
+    <div><span>${esc(startLabel)}</span></div>
+    <div><span id="emp-break-end-label">${done?esc(et.breakEndedAt):esc(et.breakEndsAt)}</span><strong id="emp-break-end-info" data-break-end="${data.end}" style="color:${done?'var(--red)':'var(--orange)'}">${fmtTime(new Date(data.end).toISOString())}</strong></div>
+  </div>`;
 }
 function updateEmpBreakCountdown(){
   const emp=currentUser?.emp;
-  if(emp&&document.getElementById('emp-view')?.classList.contains('open')&&!document.getElementById('emp-break-end-info')&&openBreakOn(emp.id))renderEmpView(emp);
+  if(emp&&document.getElementById('emp-view')?.classList.contains('open')&&!document.querySelector('.emp-break-card')&&openBreakOn(emp.id))renderEmpView(emp);
   const el=document.getElementById('emp-break-end-info');if(!el)return;
   const end=parseInt(el.dataset.breakEnd,10);if(!end)return;
   const rem=end-Date.now(),et=ETT();
@@ -4137,7 +4150,7 @@ function renderEmpView(emp){
     <button class="emp-action in" onclick="register('${emp.id}','in');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">${iconIn()} ${et.clockIn}</button>
     <button class="emp-action out" onclick="register('${emp.id}','out');renderEmpView(DB.employees.find(e=>e.id==='${emp.id}'))">${iconOut()} ${et.clockOut}</button>
     ${openBreak?`
-      <div style="grid-column:1/-1;background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.28);border-radius:var(--r2);padding:12px;text-align:center;color:var(--orange);font-size:13px;font-weight:800">${et.breakActive} ${fmtTime(openBreak.ts)}${breakEndInfoHTML(openBreak,et)}</div>
+      ${breakEndInfoHTML(openBreak,et)}
       <button class="emp-action pause" onclick="endEmpBreak('${emp.id}')">${iconPause()} ${et.breakEnd}</button>
     `:`
       <button class="emp-action pause" onclick="toggleBreakPicker('${emp.id}')">${iconPause()} ${et.breakStart}</button>
