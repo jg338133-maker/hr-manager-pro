@@ -2705,7 +2705,7 @@ function normalizeBlocks(day,kind='restaurant'){
   if(!day)return[];
   const startKey=kind==='employee'?'entry':'start',endKey=kind==='employee'?'exit':'end';
   const blocks=Array.isArray(day.blocks)?day.blocks:[];
-  const out=blocks.map(b=>({start:b.start||b.entry||'09:00',end:b.end||b.exit||'17:00'})).filter(b=>b.start&&b.end);
+  const out=blocks.map(b=>({start:timeValue(b.start||b.entry),end:timeValue(b.end||b.exit)})).filter(b=>b.start&&b.end);
   if(out.length)return out;
   const s=day[startKey]||day.start||day.entry,e=day[endKey]||day.end||day.exit;
   return s&&e?[{start:s,end:e}]:[];
@@ -2734,6 +2734,10 @@ function isEmployeeScheduledOn(emp,date){
   return !!(sch?.enabled&&sch.blocks.length);
 }
 function fmtBlocks(blocks,sep='<br>'){return (blocks||[]).map(b=>`${esc(b.start)}–${esc(b.end)}`).join(sep)||'Libre';}
+function timeValue(v){const s=String(v||'').trim();return /^\d{2}:\d{2}$/.test(s)?s:'';}
+function readTimeBlocks(prefixStart,prefixEnd,i){
+  return [0,1].map(n=>({start:timeValue(document.getElementById(`${prefixStart}-${i}-${n}`)?.value),end:timeValue(document.getElementById(`${prefixEnd}-${i}-${n}`)?.value)})).filter(b=>b.start&&b.end);
+}
 function timeOn(date,time){const[h,m]=String(time||'00:00').split(':').map(Number),d=new Date(date);d.setHours(h||0,m||0,0,0);return d;}
 function blockHours(date,b){const s=timeOn(date,b.start),e=timeOn(date,b.end);if(e<=s)e.setDate(e.getDate()+1);return Math.max(0,(e-s)/3600000);}
 function firstRelevantBlock(emp,date){
@@ -2742,11 +2746,13 @@ function firstRelevantBlock(emp,date){
   const now=new Date(date),tol=DB.settings?.lateTol||10;
   return blocks.find(b=>now<=new Date(timeOn(date,b.end).getTime()+tol*60000))||blocks[blocks.length-1];
 }
-function saveOpeningDay(i){
+function saveOpeningDay(i,rerender=true){
   const h=DB.settings.openingHours||defOpeningHours();
-  const blocks=[0,1].map(n=>({start:document.getElementById(`rs-${i}-${n}`)?.value,end:document.getElementById(`re-${i}-${n}`)?.value})).filter(b=>b.start&&b.end);
+  const blocks=readTimeBlocks('rs','re',i);
   h[i]={open:document.getElementById(`ro-${i}`)?.classList.contains('on')||false,blocks:blocks.length?blocks:[{start:'09:00',end:'23:00'}]};
-  DB.settings.openingHours=h;saveLocal();renderOpeningHours();renderPage(currentPage);sbSaveSettings(DB.settings).catch(console.error);
+  DB.settings.openingHours=h;saveLocal();
+  if(rerender){renderOpeningHours();renderPage(currentPage);}
+  sbSaveSettings(DB.settings).catch(console.error);
 }
 function renderOpeningHours(){
   const box=document.getElementById('opening-hours-box');if(!box)return;
@@ -2755,12 +2761,12 @@ function renderOpeningHours(){
     <div style="background:var(--s3);border-radius:var(--r3);padding:10px 12px;margin-bottom:6px">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:${v.open!==false?'10px':'0'}">
         <span style="font-weight:700;font-size:13px">${esc(d)}</span>
-        <div class="tgl ${v.open!==false?'on':''}" id="ro-${i}" onclick="this.classList.toggle('on');saveOpeningDay(${i})"></div>
+        <div class="tgl ${v.open!==false?'on':''}" id="ro-${i}" onclick="this.classList.toggle('on');saveOpeningDay(${i},true)"></div>
       </div>
       <div style="display:${v.open!==false?'grid':'none'};gap:8px">
         ${blocks.map((b,n)=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="fg" style="margin:0"><label>${n?st.open2:st.open1}</label><input type="time" id="rs-${i}-${n}" value="${esc(b.start||'')}" onchange="saveOpeningDay(${i})"></div>
-          <div class="fg" style="margin:0"><label>${n?st.close2:st.close1}</label><input type="time" id="re-${i}-${n}" value="${esc(b.end||'')}" onchange="saveOpeningDay(${i})"></div>
+          <div class="fg" style="margin:0"><label>${n?st.open2:st.open1}</label><input type="time" id="rs-${i}-${n}" value="${esc(timeValue(b.start))}" onchange="saveOpeningDay(${i},false)"></div>
+          <div class="fg" style="margin:0"><label>${n?st.close2:st.close1}</label><input type="time" id="re-${i}-${n}" value="${esc(timeValue(b.end))}" onchange="saveOpeningDay(${i},false)"></div>
         </div>`).join('')}
         <div style="font-size:10px;color:var(--text2)">${st.splitHelp}</div>
       </div>
@@ -6565,15 +6571,15 @@ function renderSchedEd(sched){
       </div>
       <div id="stimes-${i}" style="display:${day.enabled?'grid':'none'};gap:8px">
         ${blocks.map((b,n)=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div class="fg" style="margin:0"><label>${n?st.entry2:st.entry1}</label><input type="time" id="se-${i}-${n}" value="${esc(b.start||'')}"></div>
-          <div class="fg" style="margin:0"><label>${n?st.exit2:st.exit1}</label><input type="time" id="sx-${i}-${n}" value="${esc(b.end||'')}"></div>
+          <div class="fg" style="margin:0"><label>${n?st.entry2:st.entry1}</label><input type="time" id="se-${i}-${n}" value="${esc(timeValue(b.start))}"></div>
+          <div class="fg" style="margin:0"><label>${n?st.exit2:st.exit1}</label><input type="time" id="sx-${i}-${n}" value="${esc(timeValue(b.end))}"></div>
         </div>`).join('')}
         <div style="font-size:10px;color:var(--text2)">${st.splitEmpHelp}</div>
       </div>
     </div>`;}).join('');
 }
 function toggleSD(i){const t=document.getElementById(`st-${i}`),m=document.getElementById(`stimes-${i}`);t.classList.toggle('on');m.style.display=t.classList.contains('on')?'grid':'none';}
-function getSchedEd(){const s={};for(let i=0;i<7;i++){const on=document.getElementById(`st-${i}`)?.classList.contains('on')||false;const blocks=[0,1].map(n=>({start:document.getElementById(`se-${i}-${n}`)?.value,end:document.getElementById(`sx-${i}-${n}`)?.value})).filter(b=>b.start&&b.end);s[i]={enabled:on,blocks:blocks.length?blocks:[{start:'09:00',end:'17:00'}]};}return s;}
+function getSchedEd(){const s={};for(let i=0;i<7;i++){const on=document.getElementById(`st-${i}`)?.classList.contains('on')||false;const blocks=readTimeBlocks('se','sx',i);s[i]={enabled:on,blocks:blocks.length?blocks:[{start:'09:00',end:'17:00'}]};}return s;}
 function seedVisibleWeekFromSchedule(emp){
   if(!emp?.id||!emp.schedules)return;
   for(let i=0;i<7;i++){
@@ -7293,10 +7299,10 @@ function openShiftModal(empId,dateStr){
   const base=empDaySchedule(emp,modalDate),blocks=(sh?.blocks?.length?sh.blocks:base.blocks)||[],first=blocks[0]||{},second=blocks[1]||{};
   document.getElementById('shift-mtitle').textContent=`${emp?.name||'?'} · ${modalDate.toLocaleDateString(appLocale(),{weekday:'long',day:'numeric',month:'long'})}`;
   shiftType=['rest','off'].includes(sh?.type)?sh.type:'morning';
-  document.getElementById('sh-in').value=sh?.in||first.start||'09:00';
-  document.getElementById('sh-out').value=sh?.out||first.end||'17:00';
-  document.getElementById('sh-in-2').value=second.start||'';
-  document.getElementById('sh-out-2').value=second.end||'';
+  document.getElementById('sh-in').value=timeValue(sh?.in||first.start)||'09:00';
+  document.getElementById('sh-out').value=timeValue(sh?.out||first.end)||'17:00';
+  document.getElementById('sh-in-2').value=timeValue(second.start);
+  document.getElementById('sh-out-2').value=timeValue(second.end);
   document.getElementById('sh-notes').value=sh?.notes||'';
   const tx=TL('shift'),st=STT();
   const labels={in1:document.getElementById('sh-in-lbl'),out1:document.getElementById('sh-out-lbl'),in2:document.getElementById('sh-in2-lbl'),out2:document.getElementById('sh-out2-lbl')};
@@ -7315,7 +7321,7 @@ function selST(type){
 }
 function getShiftBlocks(){
   if(['rest','off'].includes(shiftType))return[];
-  return [0,1].map(n=>({start:document.getElementById(n?`sh-in-2`:'sh-in')?.value,end:document.getElementById(n?`sh-out-2`:'sh-out')?.value})).filter(b=>b.start&&b.end);
+  return [0,1].map(n=>({start:timeValue(document.getElementById(n?`sh-in-2`:'sh-in')?.value),end:timeValue(document.getElementById(n?`sh-out-2`:'sh-out')?.value)})).filter(b=>b.start&&b.end);
 }
 function saveShift(){
   if(!shiftKey)return;
