@@ -7164,6 +7164,7 @@ function openDetail(empId,opts={}){
   const docCount=employeeDocs(empId).length;
   const canEditEmployee=can('employee_write'),canSensitive=can('view_payroll'),canDocs=can('view_documents');
   const schedHTML=L().daysFull.map((d,i)=>{const sch=empDaySchedule(emp,new Date(2026,0,4+i));return`<div class="rrow"><span class="muted">${esc(d)}</span><span style="font-weight:700;text-align:right;color:${sch?.enabled&&sch.blocks.length?'var(--text)':'var(--text3)'}">${sch?.enabled&&sch.blocks.length?fmtBlocks(sch.blocks,'<br>'):'Libre'}</span></div>`;}).join('');
+  const infoTx=({fr:{start:'Début contrat'},es:{start:'Inicio contrato'},en:{start:'Contract start'},de:{start:'Vertragsbeginn'},it:{start:'Inizio contratto'}}[lang]||{start:'Début contrat'});
   const al=opts.alert,dx=DX();
   const manualAlertTypes=['late','missing-in','out-no-break','out-open-break'];
   const alertNeedsManual=al&&manualAlertTypes.includes(al.type);
@@ -7237,6 +7238,10 @@ function openDetail(empId,opts={}){
     ${canDocs?`<div id="dt-docs" style="display:none">${employeeDocsHTML(emp)}</div>`:''}
     <div id="dt-info" style="display:none">
       <div class="card">
+        <div class="rrow">
+          <span class="muted">${esc(infoTx.start)}</span>
+          ${canEditEmployee?`<input type="date" value="${esc(emp.startDate||'')}" onchange="updateEmpStartDate(${jsArg(empId)},this.value)" style="width:190px;max-width:55%;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--s2);color:var(--text);font-weight:700;text-align:right">`:`<span style="font-weight:500;text-align:right;max-width:55%">${esc(emp.startDate?fmtDate(emp.startDate):'-')}</span>`}
+        </div>
         ${[['Téléphone',emp.phone],['Email',emp.email],['Contrat',emp.contract],...(canSensitive?[['Salaire',`${emp.payType==='hourly'?'Horaire':'Mensuel'} · ${currencyCode()} ${emp.payType==='hourly'?emp.rate+'/h':emp.salary+'/mois'}`]]:[]),['Vacances',`${emp.vacWeeks} sem. · ${vacLeft}j restants`],['Urgence',emp.emergency],...(canSensitive?[['AVS',emp.avs]]:[])].filter(r=>r[1]).map(([l,v])=>`<div class="rrow"><span class="muted">${esc(l)}</span><span style="font-weight:500;text-align:right;max-width:55%">${esc(v)}</span></div>`).join('')}
         ${canEditEmployee?`<div class="rrow"><span class="muted">PIN</span><span style="font-weight:800">${esc(emp.pin||'0000')}</span></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
@@ -7266,6 +7271,20 @@ function resetEmpPin(empId){
   emp.pin=pin;auditAction('security',`PIN regenerado: ${fullName(emp)}`,{empId});saveLocal();sbSaveEmp(emp).catch(console.error);
   openDetail(empId);
   copyText(pin,`Nouveau PIN: ${pin}`);
+}
+function updateEmpStartDate(empId,value){
+  if(!requirePerm('employee_write'))return;
+  const emp=DB.employees.find(e=>e.id===empId);if(!emp)return;
+  const next=String(value||'').trim();
+  const tx=({fr:{saved:'Début de contrat mis à jour',invalid:'Date invalide'},es:{saved:'Inicio de contrato actualizado',invalid:'Fecha inválida'},en:{saved:'Contract start updated',invalid:'Invalid date'},de:{saved:'Vertragsbeginn aktualisiert',invalid:'Ungültiges Datum'},it:{saved:'Inizio contratto aggiornato',invalid:'Data non valida'}}[lang]||{saved:'Inicio de contrato actualizado',invalid:'Fecha inválida'});
+  if(next&&!/^\d{4}-\d{2}-\d{2}$/.test(next)){toast(tx.invalid,'#ef4444');openDetail(empId);return;}
+  emp.startDate=next;
+  auditAction('employee',`Inicio contrato actualizado: ${fullName(emp)}`,{empId,startDate:next||null});
+  saveLocal();
+  sbSaveEmp(emp).catch(e=>{console.error(e);toast('No se pudo guardar en Supabase','#ef4444');});
+  renderPage(currentPage);
+  openDetail(empId);
+  toast(tx.saved,'#10b981');
 }
 function dtab(id,btn){['dt-pt','dt-badge','dt-docs','dt-info'].forEach(x=>{const el=document.getElementById(x);if(el)el.style.display='none';});document.getElementById('dtabs')?.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const el=document.getElementById(id);if(el)el.style.display='block';}
 function deleteEmp(id){if(!requirePerm('delete_employee'))return;if(!confirm('Supprimer cet employé?'))return;const emp=DB.employees.find(e=>e.id===id);DB.employees=DB.employees.filter(e=>e.id!==id);DB.history=DB.history.filter(h=>h.empId!==id);DB.absences=DB.absences.filter(a=>a.empId!==id);DB.documents=(DB.documents||[]).filter(d=>d.empId!==id);auditAction('employee',`Empleado eliminado: ${emp?fullName(emp):id}`,{empId:id});saveLocal();closeModal('detail-modal');renderPage(currentPage);toast('Employé supprimé');sbDelEmp(id).catch(console.error);}
