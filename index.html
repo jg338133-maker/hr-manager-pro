@@ -468,29 +468,46 @@ body.manager-theme .emp-row,
 body.manager-theme .login-card{box-shadow:0 10px 30px rgba(25,36,60,.06)}
 body.manager-theme .card{border-color:#dfe5f0}
 body.manager-theme #pg-hub{width:min(100%,1480px);margin:0 auto}
-.hub-hero{position:relative;overflow:hidden;border:0;border-radius:24px;padding:28px;background:linear-gradient(135deg,#13234a 0%,#184c61 62%,#d99623 140%);color:#fff;box-shadow:0 24px 60px rgba(25,36,60,.16)}
-.hub-hero::after{content:'';position:absolute;right:-70px;bottom:-105px;width:310px;height:310px;border-radius:90px;background:rgba(255,255,255,.11);transform:rotate(-15deg)}
-.hub-hero h2{position:relative;margin:4px 0 8px;font-size:clamp(28px,4vw,52px);line-height:1.02;letter-spacing:0;color:#fff}
-.hub-hero p{position:relative;max-width:680px;color:rgba(255,255,255,.82);font-size:16px;line-height:1.5;margin:0}
-.hub-kicker{position:relative;text-transform:uppercase;letter-spacing:.9px;font-weight:900;font-size:11px;color:#8fe5db}
-.hub-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}
-.hub-card{position:relative;overflow:hidden;border:1px solid #dbe4f1;background:#fff;border-radius:20px;padding:18px;min-height:210px;box-shadow:0 18px 46px rgba(25,36,60,.08);display:flex;flex-direction:column;gap:12px}
-.hub-card::after{content:'';position:absolute;right:-36px;top:-42px;width:130px;height:130px;border-radius:42px;background:var(--hub-soft,#eef4ff);transform:rotate(18deg)}
-.hub-card.active{border-color:rgba(37,99,235,.28);box-shadow:0 24px 58px rgba(37,99,235,.13)}
-.hub-card.soon{opacity:.9}
-.hub-icon{position:relative;width:48px;height:48px;border-radius:16px;background:var(--hub-soft,#eef4ff);display:grid;place-items:center;color:var(--hub-color,var(--brand));z-index:1}
+.hub-hero{position:relative;overflow:hidden;border:0;border-radius:28px;padding:34px 36px;background:radial-gradient(120% 150% at 88% 8%,rgba(105,190,170,.42),transparent 45%),radial-gradient(90% 130% at 8% 110%,rgba(79,110,247,.38),transparent 55%),linear-gradient(118deg,#0c1434 0%,#172457 52%,#233c67 100%);color:#fff;box-shadow:0 28px 70px rgba(25,36,60,.18)}
+.hub-hero::after{content:'';position:absolute;inset:0;opacity:.08;background-image:linear-gradient(rgba(255,255,255,.8) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.8) 1px,transparent 1px);background-size:36px 36px;mask-image:radial-gradient(80% 80% at 74% 18%,#000,transparent 74%)}
+.hub-hero::before{content:'';position:absolute;right:-58px;bottom:-96px;width:300px;height:300px;border-radius:90px;background:rgba(255,255,255,.10);transform:rotate(-15deg)}
+.hub-hero h2{position:relative;margin:8px 0 10px;font-size:clamp(32px,4.2vw,56px);line-height:1.02;letter-spacing:0;color:#fff;max-width:760px;z-index:1}
+.hub-hero p{position:relative;max-width:720px;color:rgba(255,255,255,.84);font-size:16px;line-height:1.5;margin:0;z-index:1}
+.hub-kicker{position:relative;text-transform:uppercase;letter-spacing:1.3px;font-weight:900;font-size:11px;color:#94f0dd;z-index:1}
+.hub-hero-meta{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.hub-hero-chip{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 13px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:12px;font-weight:800;backdrop-filter:blur(8px)}
+.hub-hero-chip::before{content:'';width:7px;height:7px;border-radius:50%;background:#6ee7b7;box-shadow:0 0 0 4px rgba(110,231,183,.14)}
+.hub-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:22px 2px 12px}
+.hub-section-head h3{font-size:18px;margin:0}
+.hub-section-head p{margin:3px 0 0;color:#66728a;font-size:13px}
+.hub-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:16px}
+.hub-card{position:relative;overflow:hidden;border:1px solid #dbe4f1;background:#fff;border-radius:22px;padding:22px;min-height:236px;box-shadow:0 20px 48px rgba(25,36,60,.08);display:flex;flex-direction:column;gap:13px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.hub-card::after{content:'';position:absolute;right:-42px;top:-48px;width:158px;height:158px;border-radius:54px;background:var(--hub-soft,#eef4ff);transform:rotate(18deg);transition:transform .2s ease,opacity .2s ease}
+.hub-card:hover{transform:translateY(-3px);box-shadow:0 34px 68px rgba(25,36,60,.13);border-color:color-mix(in srgb,var(--hub-color,var(--brand)) 35%,#dbe4f1)}
+.hub-card:hover::after{transform:rotate(18deg) scale(1.13);opacity:.95}
+.hub-card.active{border-color:rgba(37,99,235,.22)}
+.hub-card.primary{box-shadow:0 24px 62px rgba(37,99,235,.16)}
+.hub-card.soon{opacity:.92}
+.hub-icon{position:relative;width:50px;height:50px;border-radius:16px;background:var(--hub-soft,#eef4ff);display:grid;place-items:center;color:var(--hub-color,var(--brand));z-index:1}
 .hub-icon svg{width:25px;height:25px}
-.hub-card h3{position:relative;margin:2px 0 0;font-size:22px;z-index:1}
-.hub-card p{position:relative;margin:0;color:#5b6982;font-size:13px;line-height:1.45;z-index:1}
+.hub-card h3{position:relative;margin:2px 0 0;font-size:25px;line-height:1.08;z-index:1}
+.hub-card p{position:relative;margin:0;color:#5b6982;font-size:14px;line-height:1.48;z-index:1}
 .hub-meta{position:relative;display:flex;flex-wrap:wrap;gap:6px;z-index:1}
 .hub-pill{border-radius:999px;padding:6px 9px;background:#f3f6fb;color:#53617a;font-size:11px;font-weight:800}
 .hub-actions{position:relative;margin-top:auto;z-index:1;display:flex;gap:8px;align-items:center}
-.hub-status{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:var(--hub-color,var(--brand))}
+.hub-status{position:relative;z-index:1;display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.7px;color:var(--hub-color,var(--brand))}
+.hub-status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--hub-color,var(--brand));box-shadow:0 0 0 4px var(--hub-soft,#eef4ff)}
+.hub-ribbon{position:absolute;right:-30px;top:18px;z-index:3;transform:rotate(42deg);background:var(--hub-color,var(--brand));color:#fff;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:5px 34px}
 .hub-side{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:14px}
 .hub-panel{border:1px solid #dbe4f1;background:#fff;border-radius:20px;padding:18px;box-shadow:0 16px 38px rgba(25,36,60,.06)}
 .hub-timeline{display:grid;gap:9px;margin-top:12px}
 .hub-line{display:flex;gap:10px;align-items:flex-start;padding:11px;border-radius:14px;background:#f7f9fd;border:1px solid #e2e8f4}
 .hub-line-dot{width:10px;height:10px;border-radius:99px;background:var(--brand);margin-top:5px;flex-shrink:0}
+.hub-journey{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.hub-step{position:relative;padding:16px;border-radius:18px;background:#fff;border:1px solid #dbe4f1;box-shadow:0 14px 34px rgba(25,36,60,.06)}
+.hub-step::before{content:'';display:block;width:14px;height:14px;border-radius:50%;background:var(--step-color,var(--brand));box-shadow:0 0 0 5px color-mix(in srgb,var(--step-color,var(--brand)) 15%,#fff);margin-bottom:12px}
+.hub-step-title{font-weight:900;font-size:13px}
+.hub-step-text{font-size:12px;color:#66728a;line-height:1.38;margin-top:4px}
 .sales-hero{position:relative;overflow:hidden;border:0;border-radius:24px;padding:24px;background:linear-gradient(135deg,#123026 0%,#166534 58%,#f59e0b 140%);color:#fff;box-shadow:0 20px 54px rgba(22,101,52,.16);margin-bottom:14px}
 .sales-hero::after{content:'';position:absolute;right:-70px;top:-78px;width:240px;height:240px;border-radius:80px;background:rgba(255,255,255,.13);transform:rotate(20deg)}
 .sales-hero h2{position:relative;font-size:clamp(28px,4vw,46px);line-height:1.03;margin:6px 0;color:#fff}
@@ -649,7 +666,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
 @media(max-width:640px){
   body.manager-theme #main{padding:12px}
   .hub-hero{padding:22px;border-radius:20px}
-  .hub-grid,.hub-side,.sales-grid,.sales-kpis,.sales-area-panel{grid-template-columns:1fr}
+  .hub-grid,.hub-side,.hub-journey,.sales-grid,.sales-kpis,.sales-area-panel{grid-template-columns:1fr}
   .hub-card{min-height:190px}
   body.manager-theme #dash-hero{display:block;min-height:auto;padding:20px}
   body.manager-theme .dash-title{font-size:25px}
@@ -1889,11 +1906,11 @@ Object.assign(UI.de.pages,{hub:'Bereiche',sales:'Verkauf',salesProducts:'Produkt
 Object.assign(UI.it.pages,{hub:'Aree',sales:'Vendite',salesProducts:'Prodotti',salesReports:'Report vendite',inventory:'Inventario',inventoryStock:'Stock',inventoryPurchases:'Acquisti',inventorySuppliers:'Fornitori',inventoryReports:'Report inventario',documents:'Documenti',receivables:'Crediti'});
 
 const AREA_UI={
-  es:{eyebrow:'Manager Pro como plataforma',title:'¿Qué área quieres gestionar hoy?',sub:'Empieza por Personal y ve sumando ventas, inventario, documentos e insights cuando el negocio lo necesite.',open:'Abrir',soon:'Próximamente',next:'Siguiente módulo',active:'Activo ahora',today:'Hoy en Personal',roadmap:'Camino del producto',settings:'Configuración',settingsDesc:'Idioma, colores, horarios de apertura, tolerancias, accesos y datos del negocio.',openSettings:'Abrir ajustes',team:'Personal',teamDesc:'Empleados, horarios, fichajes, pausas, solicitudes, documentos, salarios y reportes.',sales:'Ventas',salesDesc:'Ventas por producto o servicio, caja diaria, métodos de pago y cierres.',inventory:'Inventario',inventoryDesc:'Stock, proveedores, compras y consumo conectado a ventas.',documents:'Documentos',documentsDesc:'Contratos de empleados, arriendo, permisos, recetas, proveedores y archivos clave del negocio.',tasks:'Tareas',tasksDesc:'Rutinas, responsables, pendientes y seguimiento operativo.',insights:'IA e insights',insightsDesc:'Preguntas al negocio, señales de mejora y ayuda para tomar decisiones.',employees:'Empleados',pending:'Solicitudes pendientes',alerts:'Alertas abiertas',p1:'Personal listo: controlar equipo y cerrar el mes.',p2:'Ventas por items: registrar productos y servicios.',p3:'Inventario: conectar ventas con stock y compras.',p4:'Insights: entender qué pasa sin hablar lenguaje administrativo.',openTeam:'Entrar a Personal'},
-  en:{eyebrow:'Manager Pro as a platform',title:'Which area do you want to manage today?',sub:'Start with People and add sales, inventory, documents and insights when the business needs them.',open:'Open',soon:'Coming soon',next:'Next module',active:'Active now',today:'Today in People',roadmap:'Product path',settings:'Settings',settingsDesc:'Language, colors, opening hours, tolerances, access and business data.',openSettings:'Open settings',team:'People',teamDesc:'Employees, schedules, punches, breaks, requests, documents, payroll and reports.',sales:'Sales',salesDesc:'Sales by product or service, daily cash, payment methods and closing.',inventory:'Inventory',inventoryDesc:'Stock, suppliers, purchases and consumption connected to sales.',documents:'Documents',documentsDesc:'Employee contracts, lease, permits, recipes, suppliers and key business files.',tasks:'Tasks',tasksDesc:'Routines, owners, pending work and operational follow-up.',insights:'AI and insights',insightsDesc:'Ask questions about the business, improvement signals and decision support.',employees:'Employees',pending:'Pending requests',alerts:'Open alerts',p1:'People ready: control the team and close the month.',p2:'Sales by items: register products and services.',p3:'Inventory: connect sales with stock and purchases.',p4:'Insights: understand what is happening without admin jargon.',openTeam:'Open People'},
-  fr:{eyebrow:'Manager Pro comme plateforme',title:'Quel domaine voulez-vous gérer aujourd’hui ?',sub:'Commencez par le personnel puis ajoutez ventes, inventaire, documents et insights quand le commerce en a besoin.',open:'Ouvrir',soon:'Bientôt',next:'Module suivant',active:'Actif maintenant',today:'Aujourd’hui côté personnel',roadmap:'Chemin du produit',settings:'Paramètres',settingsDesc:'Langue, couleurs, horaires d’ouverture, tolérances, accès et données du commerce.',openSettings:'Ouvrir les paramètres',team:'Personnel',teamDesc:'Employés, horaires, pointages, pauses, demandes, documents, salaires et rapports.',sales:'Ventes',salesDesc:'Ventes par produit ou service, caisse quotidienne, moyens de paiement et clôtures.',inventory:'Inventaire',inventoryDesc:'Stock, fournisseurs, achats et consommation connectée aux ventes.',documents:'Documents',documentsDesc:'Contrats, permis, échéances et dossier de chaque employé.',tasks:'Tâches',tasksDesc:'Routines, responsables, tâches en attente et suivi opérationnel.',insights:'IA et insights',insightsDesc:'Questions sur le commerce, signaux d’amélioration et aide à la décision.',employees:'Employés',pending:'Demandes en attente',alerts:'Alertes ouvertes',p1:'Personnel prêt: suivre l’équipe et clôturer le mois.',p2:'Ventes par items: enregistrer produits et services.',p3:'Inventaire: connecter ventes, stock et achats.',p4:'Insights: comprendre sans jargon administratif.',openTeam:'Entrer dans Personnel'},
-  de:{eyebrow:'Manager Pro als Plattform',title:'Welchen Bereich möchten Sie heute verwalten?',sub:'Starten Sie mit Personal und ergänzen Sie Verkauf, Inventar, Dokumente und Einblicke, wenn der Betrieb sie braucht.',open:'Öffnen',soon:'Demnächst',next:'Nächstes Modul',active:'Jetzt aktiv',today:'Heute im Personal',roadmap:'Produktweg',settings:'Einstellungen',settingsDesc:'Sprache, Farben, Öffnungszeiten, Toleranzen, Zugänge und Betriebsdaten.',openSettings:'Einstellungen öffnen',team:'Personal',teamDesc:'Mitarbeiter, Pläne, Buchungen, Pausen, Anfragen, Dokumente, Löhne und Berichte.',sales:'Verkauf',salesDesc:'Verkäufe nach Produkt oder Service, Tageskasse, Zahlungsarten und Abschlüsse.',inventory:'Inventar',inventoryDesc:'Lager, Lieferanten, Einkäufe und Verbrauch mit Verkauf verbunden.',documents:'Dokumente',documentsDesc:'Verträge, Bewilligungen, Fristen und Mitarbeiterakten.',tasks:'Aufgaben',tasksDesc:'Routinen, Verantwortliche, offene Aufgaben und operativer Überblick.',insights:'KI und Einblicke',insightsDesc:'Fragen zum Betrieb, Verbesserungssignale und Entscheidungshilfe.',employees:'Mitarbeiter',pending:'Offene Anfragen',alerts:'Offene Warnungen',p1:'Personal bereit: Team steuern und Monat abschließen.',p2:'Verkäufe nach Artikeln: Produkte und Services erfassen.',p3:'Inventar: Verkauf mit Lager und Einkauf verbinden.',p4:'Einblicke: verstehen, was passiert, ohne Verwaltungsjargon.',openTeam:'Personal öffnen'},
-  it:{eyebrow:'Manager Pro come piattaforma',title:'Quale area vuoi gestire oggi?',sub:'Inizia dal personale e aggiungi vendite, inventario, documenti e insight quando il business ne ha bisogno.',open:'Apri',soon:'Prossimamente',next:'Prossimo modulo',active:'Attivo ora',today:'Oggi nel personale',roadmap:'Percorso prodotto',settings:'Impostazioni',settingsDesc:'Lingua, colori, orari di apertura, tolleranze, accessi e dati del business.',openSettings:'Apri impostazioni',team:'Personale',teamDesc:'Dipendenti, turni, timbrature, pause, richieste, documenti, stipendi e report.',sales:'Vendite',salesDesc:'Vendite per prodotto o servizio, cassa giornaliera, metodi di pagamento e chiusure.',inventory:'Inventario',inventoryDesc:'Stock, fornitori, acquisti e consumo collegato alle vendite.',documents:'Documenti',documentsDesc:'Contratti, permessi, scadenze e fascicolo di ogni dipendente.',tasks:'Attività',tasksDesc:'Routine, responsabili, pendenti e controllo operativo.',insights:'IA e insight',insightsDesc:'Domande sul business, segnali di miglioramento e aiuto decisionale.',employees:'Dipendenti',pending:'Richieste in attesa',alerts:'Avvisi aperti',p1:'Personale pronto: controllare il team e chiudere il mese.',p2:'Vendite per item: registrare prodotti e servizi.',p3:'Inventario: collegare vendite, stock e acquisti.',p4:'Insight: capire cosa succede senza gergo amministrativo.',openTeam:'Apri Personale'}
+  es:{eyebrow:'Manager Pro como plataforma',title:'¿Qué área quieres gestionar hoy?',sub:'Abre Personal, Ventas, Inventario, Documentos, Cartera e IA desde un solo lugar.',open:'Abrir',soon:'Próximamente',next:'Siguiente módulo',active:'Activo ahora',today:'Hoy en Personal',roadmap:'Camino del producto',settings:'Configuración',settingsDesc:'Idioma, colores, horarios de apertura, tolerancias, accesos y datos del negocio.',openSettings:'Abrir ajustes',team:'Personal',teamDesc:'Empleados, horarios, fichajes, pausas, solicitudes, documentos, salarios y reportes.',sales:'Ventas',salesDesc:'Ventas por producto o servicio, caja diaria, métodos de pago y cierres.',inventory:'Inventario',inventoryDesc:'Stock, proveedores, compras y consumo conectado a ventas.',documents:'Documentos',documentsDesc:'Contratos de empleados, arrendamientos, permisos, recetas, proveedores y archivos clave del negocio.',tasks:'Tareas',tasksDesc:'Rutinas, responsables, pendientes y seguimiento operativo.',insights:'IA e insights',insightsDesc:'Asistente conectado a personal, ventas, inventario, documentos, cartera y reportes.',employees:'Empleados',pending:'Solicitudes pendientes',alerts:'Alertas abiertas',p1:'Personal listo: controlar equipo y cerrar el mes.',p2:'Ventas por items: registrar productos y servicios.',p3:'Inventario: conectar ventas con stock y compras.',p4:'Insights: entender qué pasa sin hablar lenguaje administrativo.',openTeam:'Entrar a Personal'},
+  en:{eyebrow:'Manager Pro as a platform',title:'Which area do you want to manage today?',sub:'Open People, Sales, Inventory, Documents, Receivables and AI from one place.',open:'Open',soon:'Coming soon',next:'Next module',active:'Active now',today:'Today in People',roadmap:'Product path',settings:'Settings',settingsDesc:'Language, colors, opening hours, tolerances, access and business data.',openSettings:'Open settings',team:'People',teamDesc:'Employees, schedules, punches, breaks, requests, documents, payroll and reports.',sales:'Sales',salesDesc:'Sales by product or service, daily cash, payment methods and closing.',inventory:'Inventory',inventoryDesc:'Stock, suppliers, purchases and consumption connected to sales.',documents:'Documents',documentsDesc:'Employee contracts, leases, permits, recipes, suppliers and key business files.',tasks:'Tasks',tasksDesc:'Routines, owners, pending work and operational follow-up.',insights:'AI and insights',insightsDesc:'Assistant connected to people, sales, inventory, documents, receivables and reports.',employees:'Employees',pending:'Pending requests',alerts:'Open alerts',p1:'People ready: control the team and close the month.',p2:'Sales by items: register products and services.',p3:'Inventory: connect sales with stock and purchases.',p4:'Insights: understand what is happening without admin jargon.',openTeam:'Open People'},
+  fr:{eyebrow:'Manager Pro comme plateforme',title:'Quel domaine voulez-vous gérer aujourd’hui ?',sub:'Ouvrez Personnel, Ventes, Inventaire, Documents, Créances et IA depuis un seul endroit.',open:'Ouvrir',soon:'Bientôt',next:'Module suivant',active:'Actif maintenant',today:'Aujourd’hui côté personnel',roadmap:'Chemin du produit',settings:'Paramètres',settingsDesc:'Langue, couleurs, horaires d’ouverture, tolérances, accès et données du commerce.',openSettings:'Ouvrir les paramètres',team:'Personnel',teamDesc:'Employés, horaires, pointages, pauses, demandes, documents, salaires et rapports.',sales:'Ventes',salesDesc:'Ventes par produit ou service, caisse quotidienne, moyens de paiement et clôtures.',inventory:'Inventaire',inventoryDesc:'Stock, fournisseurs, achats et consommation connectée aux ventes.',documents:'Documents',documentsDesc:'Contrats employés, baux, permis, recettes, fournisseurs et fichiers clés du commerce.',tasks:'Tâches',tasksDesc:'Routines, responsables, tâches en attente et suivi opérationnel.',insights:'IA et insights',insightsDesc:'Assistant connecté au personnel, ventes, inventaire, documents, créances et rapports.',employees:'Employés',pending:'Demandes en attente',alerts:'Alertes ouvertes',p1:'Personnel prêt: suivre l’équipe et clôturer le mois.',p2:'Ventes par items: enregistrer produits et services.',p3:'Inventaire: connecter ventes, stock et achats.',p4:'Insights: comprendre sans jargon administratif.',openTeam:'Entrer dans Personnel'},
+  de:{eyebrow:'Manager Pro als Plattform',title:'Welchen Bereich möchten Sie heute verwalten?',sub:'Öffnen Sie Personal, Verkauf, Inventar, Dokumente, Forderungen und KI an einem Ort.',open:'Öffnen',soon:'Demnächst',next:'Nächstes Modul',active:'Jetzt aktiv',today:'Heute im Personal',roadmap:'Produktweg',settings:'Einstellungen',settingsDesc:'Sprache, Farben, Öffnungszeiten, Toleranzen, Zugänge und Betriebsdaten.',openSettings:'Einstellungen öffnen',team:'Personal',teamDesc:'Mitarbeiter, Pläne, Buchungen, Pausen, Anfragen, Dokumente, Löhne und Berichte.',sales:'Verkauf',salesDesc:'Verkäufe nach Produkt oder Service, Tageskasse, Zahlungsarten und Abschlüsse.',inventory:'Inventar',inventoryDesc:'Lager, Lieferanten, Einkäufe und Verbrauch mit Verkauf verbunden.',documents:'Dokumente',documentsDesc:'Mitarbeiterverträge, Mietverträge, Bewilligungen, Rezepte, Lieferanten und wichtige Betriebsdateien.',tasks:'Aufgaben',tasksDesc:'Routinen, Verantwortliche, offene Aufgaben und operativer Überblick.',insights:'KI und Einblicke',insightsDesc:'Assistent für Personal, Verkauf, Inventar, Dokumente, Forderungen und Berichte.',employees:'Mitarbeiter',pending:'Offene Anfragen',alerts:'Offene Warnungen',p1:'Personal bereit: Team steuern und Monat abschließen.',p2:'Verkäufe nach Artikeln: Produkte und Services erfassen.',p3:'Inventar: Verkauf mit Lager und Einkauf verbinden.',p4:'Einblicke: verstehen, was passiert, ohne Verwaltungsjargon.',openTeam:'Personal öffnen'},
+  it:{eyebrow:'Manager Pro come piattaforma',title:'Quale area vuoi gestire oggi?',sub:'Apri Personale, Vendite, Inventario, Documenti, Crediti e IA da un solo posto.',open:'Apri',soon:'Prossimamente',next:'Prossimo modulo',active:'Attivo ora',today:'Oggi nel personale',roadmap:'Percorso prodotto',settings:'Impostazioni',settingsDesc:'Lingua, colori, orari di apertura, tolleranze, accessi e dati del business.',openSettings:'Apri impostazioni',team:'Personale',teamDesc:'Dipendenti, turni, timbrature, pause, richieste, documenti, stipendi e report.',sales:'Vendite',salesDesc:'Vendite per prodotto o servizio, cassa giornaliera, metodi di pagamento e chiusure.',inventory:'Inventario',inventoryDesc:'Stock, fornitori, acquisti e consumo collegato alle vendite.',documents:'Documenti',documentsDesc:'Contratti dipendenti, affitti, permessi, ricette, fornitori e file chiave del business.',tasks:'Attività',tasksDesc:'Routine, responsabili, pendenti e controllo operativo.',insights:'IA e insight',insightsDesc:'Assistente collegato a personale, vendite, inventario, documenti, crediti e report.',employees:'Dipendenti',pending:'Richieste in attesa',alerts:'Avvisi aperti',p1:'Personale pronto: controllare il team e chiudere il mese.',p2:'Vendite per item: registrare prodotti e servizi.',p3:'Inventario: collegare vendite, stock e acquisti.',p4:'Insight: capire cosa succede senza gergo amministrativo.',openTeam:'Apri Personale'}
 };
 const areaTx=()=>({...AREA_UI.es,...(AREA_UI[lang]||{})});
 Object.assign(AREA_UI.es,{receivables:'Cartera',receivablesDesc:'Clientes, cuentas por cobrar, vencimientos, soportes y seguimiento de cobro.'});
@@ -4504,7 +4521,8 @@ function hubIcon(type){
 }
 function hubCardHTML(card){
   const tx=areaTx(),style=`--hub-color:${card.color};--hub-soft:${card.soft}`;
-  return `<div ${card.id?`id="${esc(card.id)}"`:''} class="hub-card ${card.active?'active':'soon'}" style="${style}">
+  return `<div ${card.id?`id="${esc(card.id)}"`:''} class="hub-card ${card.active?'active':'soon'} ${card.primary?'primary':''}" style="${style}">
+    ${card.ribbon?`<div class="hub-ribbon">${esc(card.ribbon)}</div>`:''}
     <div class="hub-icon">${hubIcon(card.icon)}</div>
     <div class="hub-status">${esc(card.active?tx.active:tx.soon)}</div>
     <h3>${esc(card.title)}</h3>
@@ -4535,6 +4553,69 @@ function openRoadmapModule(module){
     <button class="btn btn-primary mt12" onclick="closeModal('roadmap-modal')">${esc(rt.close)}</button>`;
   openModal('roadmap-modal');
 }
+const HUB_REVIEW_UI={
+  es:{title:'Centro de revisión',sub:'Lo más importante de cada área para saber qué revisar primero.',okTitle:'Todo en orden',okText:'No hay urgencias abiertas ahora.',view:'Revisar',people:'Personal',sales:'Ventas',inventory:'Inventario',documents:'Documentos',receivables:'Cartera',settings:'Configuración',critical:'Crítico',warning:'Atención',info:'Seguimiento',pendingRequests:'solicitud(es) pendiente(s)',openPeopleAlerts:'alerta(s) de personal abierta(s)',lowStock:'producto(s) con stock bajo',catalogEmpty:'No hay productos o servicios de venta creados',noSalesToday:'Aún no hay ventas registradas hoy',docsReview:'documento(s) necesitan revisión IA',docsExpiring:'documento(s) vencidos o por vencer',receivablesOverdue:'cuenta(s) vencida(s)',receivablesDueSoon:'cuenta(s) por vencer',setupMissing:'Completa datos del negocio y configuración inicial'},
+  en:{title:'Review center',sub:'The most important signals from each area so you know what to review first.',okTitle:'Everything looks fine',okText:'No urgent items are open right now.',view:'Review',people:'People',sales:'Sales',inventory:'Inventory',documents:'Documents',receivables:'Receivables',settings:'Settings',critical:'Critical',warning:'Attention',info:'Follow-up',pendingRequests:'pending request(s)',openPeopleAlerts:'open people alert(s)',lowStock:'low-stock item(s)',catalogEmpty:'No sales products or services created yet',noSalesToday:'No sales registered today yet',docsReview:'document(s) need AI review',docsExpiring:'document(s) expired or expiring soon',receivablesOverdue:'overdue account(s)',receivablesDueSoon:'account(s) due soon',setupMissing:'Complete business data and first setup'},
+  fr:{title:'Centre de révision',sub:'Les signaux les plus importants de chaque domaine pour savoir quoi vérifier d’abord.',okTitle:'Tout est en ordre',okText:'Aucune urgence ouverte pour le moment.',view:'Réviser',people:'Personnel',sales:'Ventes',inventory:'Inventaire',documents:'Documents',receivables:'Créances',settings:'Paramètres',critical:'Critique',warning:'Attention',info:'Suivi',pendingRequests:'demande(s) en attente',openPeopleAlerts:'alerte(s) personnel ouverte(s)',lowStock:'produit(s) en stock bas',catalogEmpty:'Aucun produit ou service de vente créé',noSalesToday:'Aucune vente enregistrée aujourd’hui',docsReview:'document(s) à vérifier par IA',docsExpiring:'document(s) expirés ou bientôt expirés',receivablesOverdue:'compte(s) échus',receivablesDueSoon:'compte(s) bientôt échus',setupMissing:'Complétez les données du commerce et la configuration initiale'},
+  de:{title:'Prüfzentrum',sub:'Die wichtigsten Signale aus jedem Bereich, damit klar ist, was zuerst geprüft wird.',okTitle:'Alles in Ordnung',okText:'Aktuell gibt es keine dringenden offenen Punkte.',view:'Prüfen',people:'Personal',sales:'Verkauf',inventory:'Inventar',documents:'Dokumente',receivables:'Forderungen',settings:'Einstellungen',critical:'Kritisch',warning:'Achtung',info:'Nachverfolgung',pendingRequests:'offene Anfrage(n)',openPeopleAlerts:'offene Personalwarnung(en)',lowStock:'Artikel mit niedrigem Bestand',catalogEmpty:'Noch keine Verkaufsprodukte oder Services erstellt',noSalesToday:'Heute noch keine Verkäufe erfasst',docsReview:'Dokument(e) brauchen KI-Prüfung',docsExpiring:'Dokument(e) abgelaufen oder laufen bald ab',receivablesOverdue:'überfällige Forderung(en)',receivablesDueSoon:'bald fällige Forderung(en)',setupMissing:'Geschäftsdaten und Ersteinrichtung abschließen'},
+  it:{title:'Centro revisione',sub:'I segnali più importanti di ogni area per sapere cosa controllare prima.',okTitle:'Tutto in ordine',okText:'Al momento non ci sono urgenze aperte.',view:'Controlla',people:'Personale',sales:'Vendite',inventory:'Inventario',documents:'Documenti',receivables:'Crediti',settings:'Impostazioni',critical:'Critico',warning:'Attenzione',info:'Follow-up',pendingRequests:'richiesta/e in attesa',openPeopleAlerts:'avviso/i personale aperti',lowStock:'articolo/i con stock basso',catalogEmpty:'Nessun prodotto o servizio di vendita creato',noSalesToday:'Nessuna vendita registrata oggi',docsReview:'documento/i da rivedere con IA',docsExpiring:'documento/i scaduti o in scadenza',receivablesOverdue:'conto/i scaduti',receivablesDueSoon:'conto/i in scadenza',setupMissing:'Completa dati del business e configurazione iniziale'}
+};
+const hubReviewTx=()=>({...HUB_REVIEW_UI.es,...(HUB_REVIEW_UI[lang]||{})});
+function pushHubReview(items,item){
+  if(!item||!item.count)return;
+  items.push(item);
+}
+function hubReviewItems(){
+  const tx=hubReviewTx(),items=[],employees=DB.employees||[],active=employees.filter(e=>e.status==='active');
+  const pending=(DB.absences||[]).filter(a=>!a.approved).length;
+  const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
+  pushHubReview(items,{area:tx.people,icon:'team',severity:smart?'critical':'warning',count:pending,msg:`${pending} ${tx.pendingRequests}`,action:"goPage('vacations')",page:'vacations'});
+  pushHubReview(items,{area:tx.people,icon:'team',severity:'critical',count:smart,msg:`${smart} ${tx.openPeopleAlerts}`,action:"goPage('dashboard')",page:'dashboard'});
+
+  const products=sellableProducts();
+  const todaySales=salesByPeriod('today').length;
+  pushHubReview(items,{area:tx.sales,icon:'sales',severity:'info',count:products.length?0:1,msg:tx.catalogEmpty,action:"goPage('salesProducts')",page:'salesProducts'});
+  pushHubReview(items,{area:tx.sales,icon:'sales',severity:'info',count:products.length&&!todaySales?1:0,msg:tx.noSalesToday,action:"goPage('sales')",page:'sales'});
+
+  const low=lowStockItems().length;
+  pushHubReview(items,{area:tx.inventory,icon:'inventory',severity:low>2?'critical':'warning',count:low,msg:`${low} ${tx.lowStock}`,action:"goPage('inventoryStock')",page:'inventoryStock'});
+
+  const docs=DB.documents||[];
+  const reviewDocs=docs.filter(d=>['pending','review','manual_review','error'].includes(String(d.aiStatus||'').toLowerCase())).length;
+  const expiringDocs=docs.filter(d=>{const left=daysUntil(d.expiresAt);return left!==null&&left<=30;}).length;
+  pushHubReview(items,{area:tx.documents,icon:'documents',severity:'warning',count:reviewDocs,msg:`${reviewDocs} ${tx.docsReview}`,action:"goPage('documents')",page:'documents'});
+  pushHubReview(items,{area:tx.documents,icon:'documents',severity:docs.some(d=>daysUntil(d.expiresAt)<0)?'critical':'warning',count:expiringDocs,msg:`${expiringDocs} ${tx.docsExpiring}`,action:"goPage('documents')",page:'documents'});
+
+  const rs=typeof receivablesSummary==='function'?receivablesSummary():{overdue:0,dueSoon:0};
+  pushHubReview(items,{area:tx.receivables,icon:'receivables',severity:'critical',count:rs.overdue,msg:`${rs.overdue} ${tx.receivablesOverdue}`,action:"goPage('receivables')",page:'receivables'});
+  pushHubReview(items,{area:tx.receivables,icon:'receivables',severity:'warning',count:rs.dueSoon,msg:`${rs.dueSoon} ${tx.receivablesDueSoon}`,action:"goPage('receivables')",page:'receivables'});
+
+  const setupMissing=!DB.settings?.onboardingDone||!DB.settings?.businessSector||!DB.settings?.currency;
+  pushHubReview(items,{area:tx.settings,icon:'settings',severity:'info',count:setupMissing&&canPage('settings')?1:0,msg:tx.setupMissing,action:"goPage('settings')",page:'settings'});
+
+  const rank={critical:0,warning:1,info:2};
+  return items.filter(i=>!i.page||canPage(i.page)).sort((a,b)=>(rank[a.severity]??9)-(rank[b.severity]??9)||b.count-a.count).slice(0,6);
+}
+function hubReviewCenterHTML(){
+  const tx=hubReviewTx(),items=hubReviewItems();
+  const tone={critical:{color:'var(--red)',bg:'rgba(239,68,68,.08)',label:tx.critical},warning:{color:'var(--orange)',bg:'rgba(245,158,11,.10)',label:tx.warning},info:{color:'var(--brand)',bg:'rgba(37,99,235,.08)',label:tx.info}};
+  return `<section class="hub-panel" id="hub-review-center" style="margin-bottom:18px">
+    <div class="rrow" style="justify-content:flex-end;margin-bottom:10px"><span class="badge" style="background:${items.length?'rgba(239,68,68,.12)':'rgba(16,185,129,.12)'};color:${items.length?'var(--red)':'var(--green)'}">${items.length}</span></div>
+    <div class="review-grid mt12" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
+      ${items.length?items.map(item=>{const t=tone[item.severity]||tone.info;return `<button class="hub-line" style="width:100%;text-align:left;border:1px solid var(--border);border-radius:14px;background:${t.bg};padding:12px;cursor:pointer" onclick="${item.action}">
+        <div class="hub-icon" style="width:38px;height:38px;background:#fff;color:${t.color};box-shadow:none">${hubIcon(item.icon)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="fs11 fw8" style="color:${t.color};text-transform:uppercase;letter-spacing:.05em">${esc(t.label)} · ${esc(item.area)}</div>
+          <div class="fs13 fw8 mt4">${esc(item.msg)}</div>
+        </div>
+        <span class="btn btn-ghost btn-sm">${esc(tx.view)}</span>
+      </button>`}).join(''):`<div class="hub-line" style="grid-column:1/-1;border:1px solid rgba(16,185,129,.28);border-radius:14px;background:rgba(16,185,129,.08);padding:14px">
+        <div class="hub-line-dot" style="background:var(--green)"></div>
+        <div><div class="fw8">${esc(tx.okTitle)}</div><div class="fs12 muted mt4">${esc(tx.okText)}</div></div>
+      </div>`}
+    </div>
+  </section>`;
+}
 function renderHub(){
   const el=document.getElementById('hub-content');if(!el)return;
   const tx=areaTx(),active=DB.employees.filter(e=>e.status==='active'),pending=(DB.absences||[]).filter(a=>!a.approved).length;
@@ -4544,22 +4625,31 @@ function renderHub(){
   const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
   const receivableOpen=(DB.receivables||[]).filter(r=>r.status!=='paid'&&r.status!=='cancelled');
   const receivableOverdue=receivableOpen.filter(r=>new Date((r.dueDate||localDateKey(new Date()))+'T12:00:00')<todayStart()).length;
+  const activeAreas=3+(can('view_documents')?1:0)+2;
   const cards=[
-    {id:'hub-card-people',icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,action:"goPage('dashboard')",button:tx.openTeam},
+    {id:'hub-card-people',icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,primary:true,ribbon:tx.openTeam,action:"goPage('dashboard')",button:tx.openTeam},
     {id:'hub-card-sales',icon:'sales',title:tx.sales,desc:tx.salesDesc,meta:['Items','Caja','Pagos'],color:'#16a34a',soft:'#eafaf1',active:true,action:"goPage('sales')",button:tx.open},
     {id:'hub-card-inventory',icon:'inventory',title:tx.inventory,desc:tx.inventoryDesc,meta:['Stock','Compras','Proveedores'],color:'#d97706',soft:'#fff5df',active:true,action:"goPage('inventory')",button:tx.open},
     {id:'hub-card-documents',module:'documents',icon:'documents',title:tx.documents,desc:tx.documentsDesc,meta:[`${DB.documents?.length||0} ${dtx.docs}`,`${active.filter(e=>employeeFileStatus(e).level!=='complete').length} ${tx.alerts}`,dtx.files],color:'#7c3aed',soft:'#f3edff',active:can('view_documents'),action:"goPage('documents')",button:tx.open},
     {id:'hub-card-receivables',icon:'receivables',title:tx.receivables,desc:tx.receivablesDesc,meta:[`${receivableOpen.length} ${rtx.open}`,`${receivableOverdue} ${rtx.overdue}`,money(receivableOpen.reduce((a,r)=>a+(Number(r.amount)||0),0))],color:'#0f766e',soft:'#e6fffb',active:true,action:"goPage('receivables')",button:tx.open},
     {id:'hub-card-tasks',module:'tasks',icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:rm.tasks.pills,color:'#0891b2',soft:'#e6f8fc'},
-    {id:'hub-card-insights',module:'insights',icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:rm.insights.pills,color:'#be123c',soft:'#fff1f2'}
+    {id:'hub-card-insights',module:'insights',icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:rm.insights.pills,color:'#be123c',soft:'#fff1f2',active:true,action:"openManagerAssistant()",button:tx.open}
   ];
   el.innerHTML=`<section class="hub-hero" id="hub-tour-hero">
     <div class="hub-kicker">${esc(tx.eyebrow)}</div>
     <h2>${esc(tx.title)}</h2>
     <p>${esc(tx.sub)}</p>
+    <div class="hub-hero-meta">
+      <span class="hub-hero-chip">${activeAreas} ${esc(tx.active)}</span>
+      <span class="hub-hero-chip">${active.length} ${esc(tx.employees)}</span>
+      <span class="hub-hero-chip">${receivableOpen.length} ${esc(rtx.open)}</span>
+    </div>
   </section>
+  <div class="hub-section-head"><div><h3>${esc(hubReviewTx().title)}</h3><p>${esc(hubReviewTx().sub)}</p></div></div>
+  ${hubReviewCenterHTML()}
+  <div class="hub-section-head"><div><h3>${esc(tx.title)}</h3><p>${esc(tx.open)} ${esc(tx.team)}, ${esc(tx.sales)}, ${esc(tx.inventory)} ${esc(tx.documents).toLowerCase()}.</p></div></div>
   <section class="hub-grid" id="hub-area-grid">${cards.map(hubCardHTML).join('')}</section>
-  <section class="hub-side">
+  <section class="hub-side" style="display:none">
     <div class="hub-panel">
       <div class="card-header" style="margin:0">${esc(tx.today)}</div>
       <div class="kpi-grid mt12" style="grid-template-columns:repeat(3,1fr);gap:10px">
@@ -4576,13 +4666,22 @@ function renderHub(){
         <button class="btn btn-ghost btn-sm" onclick="goPage('settings')">${esc(tx.openSettings)}</button>
       </div>`:''}
     </div>
-    <div class="hub-panel" id="hub-roadmap-card">
+    <div class="hub-panel" id="hub-roadmap-card-legacy">
       <div class="card-header" style="margin:0">${esc(tx.roadmap)}</div>
       <div class="hub-timeline">
         ${[tx.p1,tx.p2,tx.p3,tx.p4].map((p,i)=>`<div class="hub-line"><div class="hub-line-dot" style="background:${['var(--brand)','var(--green)','var(--orange)','var(--purple)'][i]}"></div><div class="fs12 fw7">${esc(p)}</div></div>`).join('')}
       </div>
     </div>
   </section>`;
+  el.insertAdjacentHTML('beforeend',`<div class="hub-section-head"><div><h3>${esc(tx.roadmap)}</h3><p>${esc(tx.p4)}</p></div></div>
+    <section class="hub-journey" id="hub-roadmap-card">
+      ${[
+        {t:tx.p1,c:'#2563eb'},
+        {t:tx.p2,c:'#16a34a'},
+        {t:tx.p3,c:'#d97706'},
+        {t:tx.p4,c:'#7c3aed'}
+      ].map(step=>`<div class="hub-step" style="--step-color:${step.c}"><div class="hub-step-title">${esc(step.t.split(':')[0])}</div><div class="hub-step-text">${esc(step.t.includes(':')?step.t.split(':').slice(1).join(':').trim():step.t)}</div></div>`).join('')}
+    </section>`);
 }
 
 const RECEIVABLES_UI={
