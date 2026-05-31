@@ -2370,6 +2370,8 @@ Object.assign(SALES_UI.fr,{avgCost:'Coût moyen',stockValue:'Valeur inventaire'}
 Object.assign(SALES_UI.de,{avgCost:'Durchschnittskosten',stockValue:'Lagerwert'});
 Object.assign(SALES_UI.it,{avgCost:'Costo medio',stockValue:'Valore inventario'});
 const editLabel=()=>({es:'Editar',en:'Edit',fr:'Modifier',de:'Bearbeiten',it:'Modifica'}[lang]||'Editar');
+const deleteLabel=()=>({es:'Eliminar',en:'Delete',fr:'Supprimer',de:'Löschen',it:'Elimina'}[lang]||'Eliminar');
+const deleteSupplierConfirm=()=>({es:'¿Eliminar este proveedor?',en:'Delete this supplier?',fr:'Supprimer ce fournisseur ?',de:'Diesen Lieferanten löschen?',it:'Eliminare questo fornitore?'}[lang]||'¿Eliminar este proveedor?');
 const INVENTORY_UI={
   es:{title:'Inventario',sub:'Controla stock, compras, proveedores y consumo. Una venta puede descontar insumos y actualizar costos.',stock:'Stock',purchases:'Compras',suppliers:'Proveedores',reports:'Reportes inventario',reportsDesc:'Stock actual, bajo stock, compras, consumo por ventas y costo por producto final.',low:'Bajo stock',items:'Items con stock',value:'Valor estimado',newPurchase:'Nueva compra',newSupplier:'Nuevo proveedor',product:'Producto o insumo',supplier:'Proveedor',qty:'Cantidad',cost:'Costo total',unitCost:'Costo unit.',avgCost:'Costo prom.',stockValue:'Valor stock',costAfter:'Costo prom. nuevo',stockAfter:'Stock final',note:'Nota',savePurchase:'Guardar compra',saveSupplier:'Guardar proveedor',cancel:'Cancelar',current:'Stock actual',min:'Stock mínimo',unit:'Unidad',recipe:'Receta / consumo',noStock:'Aún no hay productos con inventario activo.',noPurchases:'Aún no hay compras registradas.',noSuppliers:'Aún no hay proveedores.',savedPurchase:'Compra guardada y stock actualizado',savedSupplier:'Proveedor guardado',needProduct:'Crea o activa inventario en un producto primero.',needSupplier:'Crea un proveedor primero.',auto:'Descuento por venta',manual:'Ajuste manual',currentStockReport:'Stock actual',lowStockReport:'Stock bajo',purchasesReport:'Compras del mes',consumptionReport:'Consumo por ventas',productCostReport:'Costo por producto final',preview:'Vista previa',exportExcel:'Exportar Excel',estimatedUnitCost:'Costo unit. estimado',estimatedMargin:'Margen estimado',noReportData:'Sin datos para este reporte.'},
   en:{title:'Inventory',sub:'Control stock, purchases, suppliers and consumption. A sale can deduct inputs and update costs.',stock:'Stock',purchases:'Purchases',suppliers:'Suppliers',reports:'Inventory reports',reportsDesc:'Current stock, low stock, purchases, sales consumption and final product cost.',low:'Low stock',items:'Stock items',value:'Estimated value',newPurchase:'New purchase',newSupplier:'New supplier',product:'Product or input',supplier:'Supplier',qty:'Quantity',cost:'Total cost',unitCost:'Unit cost',avgCost:'Avg. cost',stockValue:'Stock value',costAfter:'New avg. cost',stockAfter:'Final stock',note:'Note',savePurchase:'Save purchase',saveSupplier:'Save supplier',cancel:'Cancel',current:'Current stock',min:'Minimum stock',unit:'Unit',recipe:'Recipe / consumption',noStock:'No products with inventory enabled yet.',noPurchases:'No purchases registered yet.',noSuppliers:'No suppliers yet.',savedPurchase:'Purchase saved and stock updated',savedSupplier:'Supplier saved',needProduct:'Create or enable inventory on a product first.',needSupplier:'Create a supplier first.',auto:'Sale deduction',manual:'Manual adjustment',currentStockReport:'Current stock',lowStockReport:'Low stock',purchasesReport:'Monthly purchases',consumptionReport:'Sales consumption',productCostReport:'Final product cost',preview:'Preview',exportExcel:'Export Excel',estimatedUnitCost:'Estimated unit cost',estimatedMargin:'Estimated margin',noReportData:'No data for this report.'},
@@ -2921,6 +2923,7 @@ function receivableFollowupFromSB(x){return{id:x.id,receivableId:x.receivable_id
 async function sbSaveSalesProduct(p){if(isDemo())return;const {error}=await sb.from('sales_products').upsert({id:p.id,restaurant_id:REST_ID,name:p.name,category:p.category||'',type:p.type||'product',price:p.price||0,sku:p.sku||'',unit:p.unit||'unit',track_stock:!!p.trackStock,stock:p.stock||0,min_stock:p.minStock||0,avg_cost:p.avgCost||0,stock_value:p.stockValue||0,recipe:p.recipe||[],active:p.active!==false});if(error)console.warn('Sales product save failed',error);}
 async function sbSaveSale(s){if(isDemo())return;const {error}=await sb.from('sales').upsert({id:s.id,restaurant_id:REST_ID,product_id:s.productId||null,product_name:s.productName||'',category:s.category||'',quantity:s.qty||0,unit_price:s.unitPrice||0,total:s.total||0,cost:s.cost||0,margin:s.margin||0,payment_method:s.method||'cash',employee_id:s.employeeId||null,employee_name:s.employeeName||'',note:s.note||'',sold_at:s.ts||new Date().toISOString()});if(error)console.warn('Sale save failed',error);}
 async function sbSaveSupplier(s){if(isDemo())return;const {error}=await sb.from('inventory_suppliers').upsert({id:s.id,restaurant_id:REST_ID,name:s.name||'',phone:s.phone||'',email:s.email||'',notes:s.notes||''});if(error)console.warn('Supplier save failed',error);}
+async function sbDelSupplier(id){if(isDemo())return;const {error}=await sb.from('inventory_suppliers').delete().eq('id',id).eq('restaurant_id',REST_ID);if(error)console.warn('Supplier delete failed',error);}
 async function sbSavePurchase(p){if(isDemo())return;const {error}=await sb.from('inventory_purchases').upsert({id:p.id,restaurant_id:REST_ID,product_id:p.productId||null,product_name:p.productName||'',supplier_id:p.supplierId||null,supplier_name:p.supplierName||'',quantity:p.qty||0,total_cost:p.cost||0,unit_cost:p.unitCost||0,avg_cost_after:p.avgCostAfter||0,stock_after:p.stockAfter||0,note:p.note||'',purchased_at:p.ts||new Date().toISOString()});if(error)console.warn('Purchase save failed',error);}
 async function sbSaveReceivableClient(c){if(isDemo())return;const {error}=await sb.from('receivable_clients').upsert({id:c.id,restaurant_id:REST_ID,name:c.name||'',client_type:c.type||'company',contact_name:c.contact||'',email:c.email||'',phone:c.phone||'',responsible:c.owner||'',note:c.note||'',metadata:c.metadata||{}});if(error)console.warn('Receivable client save failed',error);}
 async function sbSaveReceivable(r){if(isDemo())return;const {error}=await sb.from('receivables').upsert({id:r.id,restaurant_id:REST_ID,client_id:r.clientId||null,reference:r.reference||'',amount:r.amount||0,currency:r.currency||DB.settings?.currency||'CHF',due_date:r.dueDate||null,status:r.status||'sent',priority:r.priority||'normal',note:r.note||'',document_ids:r.documentIds||[],paid_at:r.paidAt||null});if(error)console.warn('Receivable save failed',error);}
@@ -6122,7 +6125,7 @@ function purchaseHTML(p){
   return `<div class="sales-row"><div><div class="fw8 fs13">${esc(p.productName)}</div><div class="fs11 muted">${fmtDate(p.ts)} · ${Number(p.qty)||0} · ${esc(p.supplierName||'-')}</div><div class="fs11 muted mt4">${esc(tx.unitCost||'Costo unit.')}: ${esc(money(p.unitCost||((Number(p.cost)||0)/(Number(p.qty)||1))))} · ${esc(tx.costAfter||'Costo prom. nuevo')}: ${esc(money(p.avgCostAfter||0))}</div>${p.note?`<div class="fs11 muted mt4">${esc(p.note)}</div>`:''}</div><div class="fw8">${esc(money(p.cost))}</div></div>`;
 }
 function supplierHTML(s){
-  return `<div class="sales-product"><div class="sales-product-dot" style="background:linear-gradient(135deg,#0ea5c6,#2563eb)">${esc((s.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(s.name)}</div><div class="fs11 muted">${esc(s.phone||'-')} · ${esc(s.email||'-')}</div>${s.notes?`<div class="fs11 muted mt4">${esc(s.notes)}</div>`:''}</div></div>`;
+  return `<div class="sales-product"><div class="sales-product-dot" style="background:linear-gradient(135deg,#0ea5c6,#2563eb)">${esc((s.name||'?').slice(0,2).toUpperCase())}</div><div style="flex:1;min-width:0"><div class="fw8 fs13">${esc(s.name)}</div><div class="fs11 muted">${esc(s.phone||'-')} · ${esc(s.email||'-')}</div>${s.notes?`<div class="fs11 muted mt4">${esc(s.notes)}</div>`:''}</div><div style="display:flex;gap:8px;align-items:center"><button class="btn btn-ghost btn-sm" onclick="openSupplierModal(${jsArg(s.id)})">${esc(editLabel())}</button><button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteSupplier(${jsArg(s.id)})">${esc(deleteLabel())}</button></div></div>`;
 }
 function renderInventoryStock(){
   const el=document.getElementById('inventory-stock-content');if(!el)return;
@@ -6165,15 +6168,40 @@ function savePurchase(){
   const pur={id:uid(),productId:p.id,productName:p.name,supplierId:s.id,supplierName:s.name,qty,cost,unitCost,avgCostAfter:nextAvg,stockAfter:nextStock,note:clean(document.getElementById('purchase-note').value),ts:new Date().toISOString()};
   DB.inventoryPurchases=[pur,...(DB.inventoryPurchases||[])];saveLocal();closeModal('purchase-modal');renderInventory();renderInventoryStock();renderInventoryPurchases();toast(tx.savedPurchase);sbSaveSalesProduct(p).catch(console.error);sbSavePurchase(pur).catch(console.error);
 }
-function openSupplierModal(){
-  document.getElementById('supplier-name').value='';document.getElementById('supplier-phone').value='';document.getElementById('supplier-email').value='';document.getElementById('supplier-note').value='';
+function openSupplierModal(id=''){
+  const tx=inventoryTx(),supplier=(DB.suppliers||[]).find(s=>s.id===id);
+  const modal=document.getElementById('supplier-modal');
+  if(modal)modal.dataset.supplierId=supplier?.id||'';
+  document.getElementById('supplier-modal-title').textContent=supplier?`${editLabel()} ${tx.supplier}`:tx.newSupplier;
+  document.getElementById('supplier-save-btn').textContent=supplier?editLabel():tx.saveSupplier;
+  document.getElementById('supplier-name').value=supplier?.name||'';
+  document.getElementById('supplier-phone').value=supplier?.phone||'';
+  document.getElementById('supplier-email').value=supplier?.email||'';
+  document.getElementById('supplier-note').value=supplier?.notes||'';
   openModal('supplier-modal');
 }
 function saveSupplier(){
   const tx=inventoryTx(),name=clean(document.getElementById('supplier-name').value);
   if(!name){toast(tx.supplier,'#ef4444');return;}
-  const supplier={id:uid(),name,phone:clean(document.getElementById('supplier-phone').value),email:clean(document.getElementById('supplier-email').value),notes:clean(document.getElementById('supplier-note').value),createdAt:new Date().toISOString()};
-  DB.suppliers=[supplier,...(DB.suppliers||[])];saveLocal();closeModal('supplier-modal');renderInventory();renderInventorySuppliers();toast(tx.savedSupplier);sbSaveSupplier(supplier).catch(console.error);
+  const id=document.getElementById('supplier-modal')?.dataset?.supplierId||'';
+  const existing=(DB.suppliers||[]).find(s=>s.id===id);
+  const supplier={id:existing?.id||uid(),name,phone:clean(document.getElementById('supplier-phone').value),email:clean(document.getElementById('supplier-email').value),notes:clean(document.getElementById('supplier-note').value),createdAt:existing?.createdAt||new Date().toISOString()};
+  const touchedPurchases=[];
+  if(existing){
+    Object.assign(existing,supplier);
+    (DB.inventoryPurchases||[]).forEach(p=>{if(p.supplierId===supplier.id){p.supplierName=supplier.name;touchedPurchases.push(p);}});
+  }else{
+    DB.suppliers=[supplier,...(DB.suppliers||[])];
+  }
+  saveLocal();closeModal('supplier-modal');renderInventory();renderInventoryPurchases();renderInventorySuppliers();renderInventoryReports();toast(tx.savedSupplier);sbSaveSupplier(supplier).catch(console.error);
+  touchedPurchases.forEach(p=>sbSavePurchase(p).catch(console.error));
+}
+function deleteSupplier(id){
+  const supplier=(DB.suppliers||[]).find(s=>s.id===id);
+  if(!supplier)return;
+  if(!confirm(deleteSupplierConfirm()))return;
+  DB.suppliers=(DB.suppliers||[]).filter(s=>s.id!==id);
+  saveLocal();renderInventory();renderInventorySuppliers();renderInventoryReports();toast(deleteLabel());sbDelSupplier(id).catch(console.error);
 }
 function inventoryMonthPurchases(){
   const now=new Date(),m=now.getMonth(),y=now.getFullYear();
