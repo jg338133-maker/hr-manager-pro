@@ -254,24 +254,24 @@ input[type=date],input[type=time]{color-scheme:dark}
 @keyframes loadLine{0%{transform:translateX(-110%)}100%{transform:translateX(250%)}}
 
 /* LOGIN */
-#login-screen{position:fixed;inset:0;background:#eef2f7;color:#111827;z-index:800;display:none;padding:0;overflow-y:auto}
+#login-screen{position:fixed;inset:0;background:linear-gradient(180deg,#fffdf8 0%,#f5f1e9 42%,#eef4f2 100%);color:#111827;z-index:800;display:none;padding:0;overflow-y:auto}
 .login-shell{width:100%;min-height:100%;display:block}
-.login-topbar{height:76px;display:flex;align-items:center;justify-content:space-between;gap:22px;max-width:1280px;margin:0 auto;padding:0 34px}
+.login-topbar{position:sticky;top:0;z-index:20;height:82px;display:flex;align-items:center;justify-content:space-between;gap:22px;max-width:1360px;margin:0 auto;padding:0 34px;background:rgba(255,253,248,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(226,214,198,.72)}
 .login-brand{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:900;color:#111827}
-.login-brand-mark{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,#2563eb,#14b8a6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;box-shadow:0 12px 26px rgba(37,99,235,.22)}
-.login-nav{display:flex;gap:34px;align-items:center;color:#374151;font-weight:800;font-size:14px}
+.login-brand-mark{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#007d72,#124f49);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;box-shadow:0 14px 28px rgba(0,125,114,.2)}
+.login-nav{display:flex;gap:34px;align-items:center;color:#334155;font-weight:850;font-size:14px}
 .login-top-actions{display:flex;gap:10px;align-items:center}
 .login-lang-wrap{display:flex;align-items:center;gap:8px;margin-left:auto}
 .login-lang-label{font-size:11px;font-weight:950;color:#64748b;text-transform:uppercase;letter-spacing:.08em}
-.login-lang-select{height:40px;border:1px solid #dbe3ef;border-radius:999px;background:#fff;color:#111827;padding:0 34px 0 14px;font:900 12px inherit;box-shadow:0 8px 18px rgba(15,23,42,.06);cursor:pointer}
+.login-lang-select{height:42px;border:1px solid #e2d8c8;border-radius:999px;background:#fff;color:#111827;padding:0 34px 0 14px;font:900 12px inherit;box-shadow:0 10px 22px rgba(93,74,48,.08);cursor:pointer}
 .login-link-btn{border:0;background:transparent;color:#374151;font:800 14px inherit;padding:10px 12px;border-radius:10px;cursor:pointer}
-.login-demo-btn{border:0;background:#2563eb;color:#fff;font:900 14px inherit;padding:12px 18px;border-radius:10px;cursor:pointer;box-shadow:0 16px 34px rgba(37,99,235,.22)}
+.login-demo-btn{border:0;background:linear-gradient(135deg,#007d72,#12625b);color:#fff;font:900 14px inherit;padding:12px 18px;border-radius:10px;cursor:pointer;box-shadow:0 16px 34px rgba(0,125,114,.22)}
 .login-landing{display:block}
-.login-hero{position:relative;overflow:hidden;min-height:590px;padding:104px 34px 92px;text-align:left;background:#231b16;color:#fff}
-.login-hero::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(26,18,13,.82) 0%,rgba(26,18,13,.66) 42%,rgba(26,18,13,.24) 73%,rgba(26,18,13,.08) 100%),linear-gradient(180deg,rgba(26,18,13,.08),rgba(26,18,13,.42))}
-.login-hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:9px;background:linear-gradient(90deg,#f59e0b,#14b8a6,#2563eb);z-index:2}
+.login-hero{position:relative;overflow:hidden;min-height:auto;padding:76px 34px 58px;text-align:left;background:radial-gradient(circle at 8% 10%,rgba(245,158,11,.16),transparent 30%),radial-gradient(circle at 92% 12%,rgba(0,125,114,.14),transparent 34%);color:#111827}
+.login-hero::before{content:'';position:absolute;inset:auto -12% -120px 48%;height:310px;background:linear-gradient(135deg,rgba(247,199,95,.28),rgba(0,125,114,.12));border-radius:120px 0 0 0;transform:skewY(-10deg)}
+.login-hero::after{content:'';position:absolute;left:34px;right:34px;bottom:0;height:1px;background:linear-gradient(90deg,transparent,#e8dccb,transparent);z-index:2}
 .login-hero-photos{position:absolute;inset:0;z-index:0}
-.login-hero-photo{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:translateX(8%) scale(1.04);animation:loginPhotoSlide 32s infinite ease-in-out;filter:saturate(1.02) contrast(1.01) brightness(1.03)}
+.login-hero-photo{display:none}
 .login-hero-photo:nth-child(1){background-image:url('assets/hero-1.png'),url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=82');animation-delay:0s;background-position:center}
 .login-hero-photo:nth-child(2){background-image:url('assets/hero-2.png'),url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1800&q=82');animation-delay:8s;background-position:center}
 .login-hero-photo:nth-child(3){background-image:url('assets/hero-3.png'),url('https://images.unsplash.com/photo-1556745757-8d76bdb6984b?auto=format&fit=crop&w=1800&q=82');animation-delay:16s;background-position:center}
@@ -281,23 +281,78 @@ input[type=date],input[type=time]{color-scheme:dark}
   7%,25%{opacity:1;transform:translateX(0) scale(1.05)}
   32%,100%{opacity:0;transform:translateX(-9%) scale(1.05)}
 }
-.login-hero-inner{position:relative;z-index:1;max-width:1160px;margin:0 auto}
+.login-hero-inner{position:relative;z-index:1;max-width:1220px;margin:0 auto}
+.login-hero-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(500px,1.08fr);gap:56px;align-items:center}
+.login-hero-copy{min-width:0}
 .login-logo{display:none}
-.login-eyebrow{display:none}
-.login-title{position:relative;z-index:1;font-size:58px;font-weight:900;line-height:1.04;margin:0 0 18px;color:#fff;max-width:790px;letter-spacing:0;text-shadow:0 18px 45px rgba(0,0,0,.42)}
+.login-eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(0,125,114,.22);background:#e8f5f2;color:#007d72;border-radius:999px;padding:8px 14px;font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.12em;margin-bottom:18px}
+.login-title{position:relative;z-index:1;font-size:clamp(46px,5.4vw,74px);font-weight:950;line-height:.96;margin:0 0 22px;color:#111827;max-width:760px;letter-spacing:0;text-shadow:none}
 .login-title-accent{display:inline-block;position:relative}
-.login-title-accent::after{content:'';position:absolute;left:2%;right:1%;bottom:5px;height:13px;background:#f59e0b;border-radius:999px;z-index:-1;transform:rotate(-1.5deg);opacity:.92}
-.login-sub{position:relative;z-index:1;font-size:18px;color:#f8fafc;margin:0;line-height:1.55;max-width:680px;font-weight:750;text-shadow:0 12px 34px rgba(0,0,0,.42)}
-.login-hero-strip{display:none}
-.login-hero-chip{border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border-radius:16px;padding:11px 10px;text-align:left}
-.login-hero-chip b{display:block;font-size:12px;font-weight:950;color:#fff;margin-bottom:2px}
-.login-hero-chip span{display:block;font-size:10px;color:#cbd5e1;font-weight:750}
+.login-title-accent::after{content:'';position:absolute;left:0;right:-4px;bottom:6px;height:14px;background:#f2bf45;border-radius:999px;z-index:-1;transform:rotate(-1.2deg);opacity:.9}
+.login-sub{position:relative;z-index:1;font-size:18px;color:#52627a;margin:0;line-height:1.62;max-width:690px;font-weight:750;text-shadow:none}
+.login-hero-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:24px;max-width:620px}
+.login-hero-chip{border:1px solid #e2d8c8;background:rgba(255,255,255,.74);backdrop-filter:blur(10px);border-radius:16px;padding:12px 13px;text-align:left;box-shadow:0 14px 32px rgba(93,74,48,.08)}
+.login-hero-chip b{display:block;font-size:12px;font-weight:950;color:#111827;margin-bottom:3px}
+.login-hero-chip span{display:block;font-size:11px;color:#64748b;font-weight:750}
+.login-checks{display:grid;gap:12px;margin:24px 0 0;padding:0;list-style:none;max-width:650px}
+.login-checks li{display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,.7);border:1px solid #e8dccb;border-radius:16px;padding:12px 14px;box-shadow:0 12px 28px rgba(93,74,48,.07)}
+.login-checks li::before{content:'✓';width:24px;height:24px;border-radius:999px;background:#e8f5f2;color:#007d72;display:flex;align-items:center;justify-content:center;font-weight:950;flex-shrink:0}
+.login-checks b{display:block;font-size:13px;color:#111827;font-weight:950;margin-bottom:2px}
+.login-checks span{display:block;font-size:12px;color:#5d6b7c;font-weight:700;line-height:1.35}
+.login-human-card{display:grid;grid-template-columns:86px 1fr;gap:14px;align-items:center;margin-top:18px;max-width:570px;background:#fff;border:1px solid #e2d8c8;border-radius:18px;padding:12px;box-shadow:0 16px 36px rgba(93,74,48,.1)}
+.login-human-card img{width:86px;height:72px;object-fit:cover;border-radius:14px}
+.login-human-card b{display:block;font-size:14px;font-weight:950;color:#111827;margin-bottom:3px}
+.login-human-card span{display:block;font-size:12px;line-height:1.35;color:#64748b;font-weight:700}
 .login-kicker,.login-copy,.login-proof-grid{display:none}
 .login-cta-row{display:flex;gap:12px;justify-content:flex-start;align-items:center;margin-top:28px;flex-wrap:wrap}
 .login-cta{border:0;border-radius:12px;padding:14px 22px;font:900 15px inherit;cursor:pointer}
-.login-cta.primary{background:#fff;color:#172554;box-shadow:0 18px 42px rgba(15,23,42,.26)}
-.login-cta.secondary{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.24)}
-.login-story{max-width:1160px;margin:-46px auto 0;padding:0 24px;position:relative;z-index:2}
+.login-cta.primary{background:linear-gradient(135deg,#007d72,#125f58);color:#fff;box-shadow:0 18px 38px rgba(0,125,114,.2)}
+.login-cta.secondary{background:#fff;color:#124f49;border:1px solid #d6cbb9;box-shadow:0 12px 26px rgba(93,74,48,.08)}
+.login-hero-preview{position:relative;background:#fffdf8;color:#111827;border:1px solid #e2d8c8;border-radius:8px;padding:10px;box-shadow:0 34px 90px rgba(93,74,48,.18);backdrop-filter:blur(14px);overflow:hidden}
+.login-preview-app{display:grid;grid-template-columns:118px minmax(0,1fr);min-height:560px;background:#fff;border:1px solid #e2d8c8;border-radius:6px;overflow:hidden}
+.login-preview-side{background:#fbf7ee;border-right:1px solid #eadfd2;padding:14px 10px;display:flex;flex-direction:column;gap:8px}
+.login-preview-brand{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:950;margin-bottom:10px;color:#111827}
+.login-preview-brand span{width:16px;height:16px;border-radius:4px;background:#007d72;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px}
+.login-preview-nav{height:26px;border-radius:5px;padding:0 8px;display:flex;align-items:center;color:#111827;font-size:10px;font-weight:900}
+.login-preview-nav.active{background:#007d72;color:#fff}
+.login-preview-store{margin-top:auto;border:1px solid #eadfd2;background:#fff;border-radius:7px;padding:10px;font-size:9px;font-weight:900;color:#111827}
+.login-preview-main{padding:16px 14px 12px;background:#fff}
+.login-preview-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.login-preview-search{height:27px;border:1px solid #e2d8c8;border-radius:4px;background:#fff;color:#94a3b8;padding:0 11px;font-size:9px;font-weight:700;flex:1;max-width:300px}
+.login-preview-dots{display:flex;gap:8px}.login-preview-dots span{width:16px;height:16px;border-radius:999px;background:#e8f5f2}.login-preview-dots span:nth-child(2){background:#fff0ca}.login-preview-dots span:nth-child(3){background:#b7d8cc}
+.login-preview-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.login-preview-kicker{font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.09em;color:#0f766e;margin-bottom:4px}
+.login-preview-title{font-size:22px;font-weight:950;color:#0f172a;line-height:1.12}
+.login-preview-date{font-size:11px;color:#64748b;font-weight:800;text-align:right}
+.login-preview-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.login-preview-metric{border:1px solid #eadfd2;background:#fffdf8;border-radius:6px;padding:12px}
+.login-preview-metric b{display:block;font-size:20px;font-weight:950;color:#0f172a;line-height:1}
+.login-preview-metric span{display:block;font-size:11px;font-weight:800;color:#64748b;margin-top:7px}
+.login-preview-metric.good b{color:#059669}.login-preview-metric.warn b{color:#d97706}.login-preview-metric.bad b{color:#dc2626}
+.login-preview-alerts{background:#fff;border:1px solid #e2d8c8;border-radius:7px;padding:13px;margin-bottom:12px}
+.login-preview-section{font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:9px}
+.login-preview-alert{display:flex;align-items:center;gap:10px;padding:9px;border-radius:6px;background:#fef3c7;color:#78350f;font-size:11px;font-weight:850;margin-bottom:8px}
+.login-preview-alert:last-child{margin-bottom:0;background:#ecfdf5;color:#064e3b}
+.login-preview-dot{width:10px;height:10px;border-radius:999px;background:#f59e0b;box-shadow:0 0 0 4px rgba(245,158,11,.14);flex-shrink:0}
+.login-preview-alert:last-child .login-preview-dot{background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,.14)}
+.login-preview-modules{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.login-preview-module{min-height:86px;background:#fff;border:1px solid #eadfd2;border-radius:6px;padding:12px 8px;font-size:11px;font-weight:950;color:#111827;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.login-preview-module.active{background:#e8f5f2;border-color:#007d72}
+.login-preview-module svg{width:25px;height:25px;stroke:currentColor;stroke-width:2.1;fill:none}
+.login-preview-module small{display:block;color:#64748b;font-size:9px;font-weight:800;line-height:1.2}
+.login-preview-module:nth-child(1){color:#007d72}.login-preview-module:nth-child(2){color:#5a8c20}.login-preview-module:nth-child(3){color:#f2a31b}.login-preview-module:nth-child(4){color:#1f80cf}.login-preview-module:nth-child(5){color:#eb6a4c}.login-preview-module:nth-child(6){color:#6f55d9}
+.login-preview-bottom{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.login-preview-action{border:1px solid #e2d8c8;border-radius:7px;background:#fff;padding:12px;font-size:12px;font-weight:900;color:#124f49;min-height:94px}
+.login-preview-action.primary{background:#fff;color:#124f49;border-color:#e2d8c8;box-shadow:none}
+.login-preview-bars.alt{height:48px;align-items:center}
+.login-preview-bars.alt i{border-radius:999px;height:5px!important;min-height:5px;background:#f2bf45}
+.login-preview-bars.alt i:nth-child(1){width:92%;flex:0 0 92%;background:#007d72}.login-preview-bars.alt i:nth-child(2){width:46%;flex:0 0 46%;background:#eb6a4c}.login-preview-bars.alt i:nth-child(3){width:64%;flex:0 0 64%;background:#f2bf45}
+.login-preview-linechart{height:48px;margin-top:9px}
+.login-preview-linechart svg{width:100%;height:100%}
+.login-preview-bars{display:flex;align-items:end;gap:5px;height:42px;margin-top:8px}
+.login-preview-bars i{display:block;flex:1;border-radius:999px 999px 4px 4px;background:#dbeafe;min-height:10px}
+.login-preview-bars i:nth-child(2){height:28px}.login-preview-bars i:nth-child(3){height:18px}.login-preview-bars i:nth-child(4){height:34px;background:#2563eb}.login-preview-bars i:nth-child(5){height:14px}.login-preview-bars i:nth-child(6){height:20px}
+.login-story{max-width:1160px;margin:0 auto;padding:28px 24px 0;position:relative;z-index:2}
 .login-story-card{background:#fff;border:1px solid #dfe7f2;border-radius:24px;padding:28px;display:grid;grid-template-columns:1.2fr .8fr;gap:24px;box-shadow:0 24px 70px rgba(15,23,42,.12)}
 .login-story-kicker{font-size:12px;font-weight:950;color:#2563eb;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
 .login-story-title{font-size:28px;font-weight:950;color:#111827;margin-bottom:10px;line-height:1.12}
@@ -512,6 +567,95 @@ body.manager-theme #pg-hub{width:min(100%,1480px);margin:0 auto}
 .hub-step::before{content:'';display:block;width:14px;height:14px;border-radius:50%;background:var(--step-color,var(--brand));box-shadow:0 0 0 5px color-mix(in srgb,var(--step-color,var(--brand)) 15%,#fff);margin-bottom:12px}
 .hub-step-title{font-weight:900;font-size:13px}
 .hub-step-text{font-size:12px;color:#66728a;line-height:1.38;margin-top:4px}
+.hub-daily-layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;margin-top:18px}
+.hub-main-flow,.hub-right-rail{display:grid;gap:16px;align-content:start}
+.hub-today-hero{position:relative;overflow:hidden;border-radius:24px;padding:24px 26px;background:linear-gradient(135deg,#0f172a 0%,#164e63 70%,#365314 125%);color:#fff;box-shadow:0 24px 62px rgba(25,36,60,.14)}
+.hub-today-hero::after{content:'';position:absolute;right:-62px;bottom:-86px;width:245px;height:210px;border-radius:60px;background:rgba(255,255,255,.12);transform:rotate(-14deg)}
+.hub-today-hero h2{position:relative;margin:4px 0 8px;font-size:clamp(30px,4vw,48px);line-height:1.03;color:#fff;z-index:1}
+.hub-today-hero p{position:relative;margin:0;color:rgba(255,255,255,.82);max-width:720px;line-height:1.45;z-index:1}
+.hub-today-top{position:relative;z-index:1;display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.hub-report-btn{position:relative;z-index:1;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);color:#fff;border-radius:13px;padding:10px 13px;font:900 12px inherit;cursor:pointer;backdrop-filter:blur(10px)}
+.hub-daily-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.hub-daily-card{position:relative;overflow:hidden;border:1px solid #dbe4f1;border-radius:18px;background:#fff;padding:16px;min-height:128px;box-shadow:0 16px 38px rgba(25,36,60,.06)}
+.hub-daily-card::after{content:'';position:absolute;right:-32px;top:-34px;width:104px;height:104px;border-radius:34px;background:var(--hub-soft,#eef4ff);transform:rotate(16deg)}
+.hub-daily-label{position:relative;z-index:1;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#66728a;margin-bottom:10px}
+.hub-daily-value{position:relative;z-index:1;font-size:27px;font-weight:950;line-height:1;color:var(--hub-color,var(--brand))}
+.hub-daily-sub{position:relative;z-index:1;font-size:12px;color:#66728a;margin-top:7px;font-weight:700}
+.hub-spark{position:relative;z-index:1;margin-top:12px;height:34px}
+.hub-spark svg{width:100%;height:34px;display:block}
+.hub-combo-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:16px}
+.hub-graph-card,.hub-action-card,.hub-ai-card,.hub-events-card{border:1px solid #dbe4f1;background:#fff;border-radius:20px;padding:18px;box-shadow:0 16px 38px rgba(25,36,60,.06)}
+.hub-graph-bars{height:132px;display:flex;align-items:flex-end;gap:8px;padding:8px 2px 0}
+.hub-graph-col{flex:1;display:grid;gap:7px;justify-items:center;align-items:end;min-width:0}
+.hub-graph-bar{width:100%;max-width:24px;border-radius:9px 9px 0 0;background:#dbeafe;min-height:8px}
+.hub-graph-bar.peak{background:#2563eb}
+.hub-graph-label{font-size:10px;color:#8a96ad;font-weight:900}
+.hub-action-card h3,.hub-ai-card h3,.hub-events-card h3,.hub-graph-card h3{margin:0 0 12px;font-size:16px}
+.hub-action-list{display:grid;gap:10px}
+.hub-action-btn{display:flex;align-items:center;gap:12px;width:100%;border:1px solid #dbe4f1;background:#fff;border-radius:14px;padding:12px 13px;color:var(--text);font:900 13px inherit;cursor:pointer;transition:.16s ease;text-align:left}
+.hub-action-btn:hover{transform:translateY(-1px);border-color:#b8c9e6;background:#f8fbff}
+.hub-action-ico{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;color:#fff;background:var(--hub-color,var(--brand));flex-shrink:0}
+.hub-action-arrow{margin-left:auto;color:#8a96ad}
+.hub-ai-card{background:linear-gradient(135deg,#f0fdfa,#fff);border-color:#b7ece3}
+.hub-ai-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center;margin:13px 0}
+.hub-ai-node{border-radius:14px;background:#fff;border:1px solid #dbe4f1;padding:10px;text-align:center;font-size:11px;font-weight:900;color:#51607a}
+.hub-ai-arrow{color:#94a3b8;font-weight:900}
+.hub-event-row{display:grid;grid-template-columns:54px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid #eef2f8}
+.hub-event-row:last-child{border-bottom:0}
+.hub-event-date{border-radius:12px;background:#eff6ff;color:#2563eb;padding:8px;text-align:center;font-weight:950;font-size:12px}
+.hub-event-title{font-size:13px;font-weight:900}
+.hub-event-sub{font-size:11px;color:#66728a;margin-top:2px}
+.hub-events-list{display:grid;gap:9px}
+.hub-event-row.actionable{
+  grid-template-columns:56px minmax(0,1fr) auto;align-items:center;border:1px solid #e2e8f0;
+  border-radius:14px;background:#fff;padding:11px;width:100%;text-align:left;color:var(--text);
+  cursor:pointer;transition:.16s ease;font:inherit
+}
+.hub-event-row.actionable:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(25,36,60,.08);border-color:#c8d4e8}
+.hub-event-row.actionable:last-child{border-bottom:1px solid #e2e8f0}
+.hub-event-date{display:grid;place-items:center;min-height:46px}
+.hub-event-date span{display:block;font-size:13px;line-height:1;font-weight:950}
+.hub-event-date small{display:block;margin-top:4px;font-size:9px;line-height:1;text-transform:uppercase;letter-spacing:.06em}
+.hub-event-date.overdue{background:#fff1f2;color:#dc2626}
+.hub-event-date.today{background:#e6fffb;color:#0f766e}
+.hub-event-date.soon{background:#fff7ed;color:#d97706}
+.hub-event-date.normal{background:#eff6ff;color:#2563eb}
+.hub-event-area{font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.06em;color:#8a96ad;margin-bottom:2px}
+.hub-event-go{font-size:22px;color:#94a3b8;font-weight:900}
+.hub-event-empty{border:1px dashed #cbd5e1;border-radius:14px;padding:14px;background:#f8fafc;color:#66728a;font-size:13px;line-height:1.45}
+.hub-daily-layout{grid-template-columns:minmax(0,1fr) 350px}
+.hub-main-flow{min-width:0}
+.hub-today-hero{padding:22px 24px;background:linear-gradient(135deg,#13213f 0%,#124c5a 68%,#716c2e 140%);box-shadow:0 22px 60px rgba(24,39,75,.16)}
+.hub-today-hero::before{content:'';position:absolute;left:0;right:0;bottom:0;height:5px;background:linear-gradient(90deg,#2563eb,#14b8a6,#f59e0b)}
+.hub-today-hero h2{font-size:clamp(30px,3.2vw,42px);max-width:780px}
+.hub-today-top{align-items:center}
+.hub-report-btn{box-shadow:0 10px 24px rgba(0,0,0,.10)}
+.hub-daily-metrics{grid-template-columns:repeat(5,minmax(135px,1fr))}
+.hub-daily-card{min-height:116px;border-radius:16px}
+.hub-daily-value{font-size:25px}
+.hub-review-panel{border:1px solid #dbe4f1;background:#fff;border-radius:20px;padding:18px;box-shadow:0 16px 38px rgba(25,36,60,.06)}
+.hub-review-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.hub-review-head h3{margin:0;font-size:18px}
+.hub-review-head p{margin:3px 0 0;color:#66728a;font-size:13px}
+.hub-review-count{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;border-radius:999px;background:#fee2e2;color:#dc2626;font-weight:950}
+.hub-review-count.ok{background:#dcfce7;color:#16a34a}
+.hub-review-list{display:grid;gap:9px}
+.hub-review-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid #e2e8f0;border-radius:14px;background:#fff;padding:12px;cursor:pointer;transition:.16s ease}
+.hub-review-row:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(25,36,60,.08);border-color:#c8d4e8}
+.hub-review-row.critical{background:#fff7f7;border-color:#fecaca}
+.hub-review-row.warning{background:#fffaf0;border-color:#fde68a}
+.hub-review-row.info{background:#f7fbff;border-color:#bfdbfe}
+.hub-review-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#fff;box-shadow:0 8px 18px rgba(25,36,60,.08)}
+.hub-review-label{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.05em}
+.hub-review-msg{font-size:14px;font-weight:900;color:var(--text);margin-top:2px}
+.hub-review-go{font-size:22px;color:#94a3b8;font-weight:900}
+.hub-grid-operational{grid-template-columns:repeat(3,minmax(0,1fr))}
+.hub-grid-operational .hub-card{min-height:210px}
+.hub-grid-operational .hub-card:nth-child(n+4){min-height:190px}
+.hub-right-rail{position:sticky;top:86px}
+.hub-ai-card{box-shadow:0 18px 42px rgba(20,184,166,.11)}
+.hub-ai-node b{color:var(--text)}
+.hub-action-btn{min-height:58px}
 .sales-hero{position:relative;overflow:hidden;border:0;border-radius:24px;padding:24px;background:linear-gradient(135deg,#123026 0%,#166534 58%,#f59e0b 140%);color:#fff;box-shadow:0 20px 54px rgba(22,101,52,.16);margin-bottom:14px}
 .sales-hero::after{content:'';position:absolute;right:-70px;top:-78px;width:240px;height:240px;border-radius:80px;background:rgba(255,255,255,.13);transform:rotate(20deg)}
 .sales-hero h2{position:relative;font-size:clamp(28px,4vw,46px);line-height:1.03;margin:6px 0;color:#fff}
@@ -667,11 +811,195 @@ body.manager-theme #pg-employees .emp-row{background:#fff;border-color:#dfe5f0;b
 body.manager-theme #pg-employees .emp-row:hover{border-color:#b9c7df;background:#fbfcff;transform:translateY(-1px)}
 body.manager-theme .assistant-msg.bot{background:#fff}
 body.manager-theme .assistant-chip{background:#f4f6fb}
+
+/* MANAGER PRO WARM PRODUCT THEME */
+body.manager-theme{
+  --bg:#eef4f2; --s1:#fbf7ee; --s2:#fffdf8; --s3:#f3efe6; --s4:#ebe4d8;
+  --border:#e2d8c8; --border2:#cfc2ad;
+  --accent:#007d72; --accent2:#f2bf45; --cyan:#009ca3;
+  --green:#007d72; --red:#ef6754; --orange:#f2a81d;
+  --text:#111827; --text2:#5e6a7d; --text3:#99a0ad;
+  --brand:#007d72; --brand2:#2f63d8; --brand-light:rgba(0,125,114,.10);
+  --r:10px; --r2:8px; --r3:7px; --r4:6px;
+}
+body.manager-theme #topbar{
+  height:62px;background:rgba(255,253,248,.96);border-bottom:1px solid var(--border);
+  box-shadow:none;backdrop-filter:blur(16px)
+}
+body.manager-theme .top-title{font-size:16px;letter-spacing:0}
+body.manager-theme .menu-btn:hover,
+body.manager-theme .top-btn:hover{background:#fff;border-color:var(--border2)}
+body.manager-theme .top-btn{
+  background:#fffdf8;border-color:var(--border);color:#233044;border-radius:8px;
+  min-height:38px;box-shadow:none
+}
+body.manager-theme .top-btn.primary,
+body.manager-theme .btn-primary{
+  background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 12px 28px rgba(0,125,114,.16)
+}
+body.manager-theme .btn-success{background:#007d72;border-color:#007d72}
+body.manager-theme .btn-ghost{
+  background:#fffdf8;border-color:var(--border);color:#172033;box-shadow:none
+}
+body.manager-theme #sidebar{
+  background:#fbf7ee;border-right:1px solid var(--border);box-shadow:18px 0 44px rgba(45,36,24,.07)
+}
+body.manager-theme .sb-head,
+body.manager-theme .sb-footer{border-color:var(--border)}
+body.manager-theme .sb-logo,
+body.manager-theme .sb-resto-logo,
+body.manager-theme .sb-user-av{
+  background:#007d72;color:#fff;box-shadow:none;border-radius:8px
+}
+body.manager-theme .sb-resto{
+  background:#fffdf8;border-color:var(--border);border-radius:8px;box-shadow:0 8px 18px rgba(45,36,24,.04)
+}
+body.manager-theme .sb-app{color:#111827}
+body.manager-theme .sb-ver,
+body.manager-theme .sb-resto-plan{color:#7b6d59}
+body.manager-theme .sb-section{color:#9b927f;letter-spacing:.09em}
+body.manager-theme .sb-item{
+  border-left:0;border-radius:8px;color:#344054;font-weight:700;margin-bottom:4px
+}
+body.manager-theme .sb-item:hover{background:#fffdf8;color:#007d72}
+body.manager-theme .sb-item.active{
+  background:#007d72;color:#fff;border-left:0;box-shadow:0 10px 22px rgba(0,125,114,.16)
+}
+body.manager-theme .sb-item svg{stroke-width:2}
+body.manager-theme #main{
+  background:radial-gradient(circle at 92% 3%,rgba(0,125,114,.08),transparent 25%),linear-gradient(180deg,#eef4f2 0%,#f7f8f5 100%);
+  padding:20px
+}
+body.manager-theme .card,
+body.manager-theme .kpi,
+body.manager-theme .emp-row,
+body.manager-theme .modal,
+body.manager-theme .sales-panel,
+body.manager-theme .sales-kpi,
+body.manager-theme .sales-area-card,
+body.manager-theme .sales-report-card,
+body.manager-theme .hub-panel,
+body.manager-theme .hub-graph-card,
+body.manager-theme .hub-action-card,
+body.manager-theme .hub-ai-card,
+body.manager-theme .hub-events-card,
+body.manager-theme .hub-review-panel{
+  background:#fffdf8;border:1px solid var(--border);border-radius:8px;box-shadow:0 18px 38px rgba(45,36,24,.06)
+}
+body.manager-theme .card-header,
+body.manager-theme .hub-daily-label,
+body.manager-theme .sales-panel-sub,
+body.manager-theme .sales-kpi .kpi-sub{color:#68758a}
+body.manager-theme .tabs,
+body.manager-theme .sales-period-tabs{background:#f3efe6;border-color:var(--border)}
+body.manager-theme .tab.active,
+body.manager-theme .sales-period-tab.active{background:#007d72;color:#fff;box-shadow:none}
+body.manager-theme .fg input,
+body.manager-theme .fg select,
+body.manager-theme .fg textarea,
+body.manager-theme .search-wrap input{
+  background:#fff;border-color:var(--border);border-radius:8px;color:var(--text)
+}
+body.manager-theme .fg input:focus,
+body.manager-theme .fg select:focus,
+body.manager-theme .fg textarea:focus,
+body.manager-theme .search-wrap input:focus{
+  border-color:#007d72;box-shadow:0 0 0 3px rgba(0,125,114,.12);outline:none
+}
+body.manager-theme .hub-today-hero{
+  background:#fffdf8;color:var(--text);border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 18px 38px rgba(45,36,24,.06)
+}
+body.manager-theme .hub-today-hero::before{
+  height:0;background:none
+}
+body.manager-theme .hub-today-hero::after{
+  right:-28px;bottom:-72px;width:210px;height:190px;border-radius:58px;background:rgba(0,125,114,.10)
+}
+body.manager-theme .hub-today-hero h2{color:#111827;letter-spacing:-.02em}
+body.manager-theme .hub-today-hero p{color:#5e6a7d}
+body.manager-theme .hub-kicker{color:#007d72}
+body.manager-theme .hub-hero-chip{
+  color:#23413d;background:#eef7f4;border-color:#cfe7df;backdrop-filter:none
+}
+body.manager-theme .hub-hero-chip::before{background:#007d72;box-shadow:0 0 0 4px rgba(0,125,114,.12)}
+body.manager-theme .hub-report-btn{
+  background:#fff;border:1px solid var(--border);color:#111827;border-radius:8px;box-shadow:none
+}
+body.manager-theme .hub-daily-card{
+  min-height:118px;background:#fffdf8;border:1px solid var(--border);border-radius:8px;box-shadow:0 12px 24px rgba(45,36,24,.05)
+}
+body.manager-theme .hub-daily-card::after{
+  opacity:.85;border-radius:28px;background:var(--hub-soft,#e9f5f2)
+}
+body.manager-theme .hub-daily-value{font-size:26px}
+body.manager-theme .hub-review-row,
+body.manager-theme .hub-action-btn,
+body.manager-theme .hub-line,
+body.manager-theme .hub-event-row,
+body.manager-theme .sales-product,
+body.manager-theme .sales-config-row{
+  background:#fff;border-color:var(--border);border-radius:8px
+}
+body.manager-theme .hub-review-row:hover,
+body.manager-theme .hub-action-btn:hover,
+body.manager-theme .sales-area-card:hover{
+  border-color:#b9aa91;background:#fffaf0;box-shadow:0 14px 28px rgba(45,36,24,.08);transform:translateY(-1px)
+}
+body.manager-theme .hub-review-row.critical{background:#fff5f2;border-color:#f3c9be}
+body.manager-theme .hub-review-row.warning{background:#fff9e8;border-color:#f1d99a}
+body.manager-theme .hub-review-row.info{background:#eef7f4;border-color:#cce5dd}
+body.manager-theme .hub-review-icon,
+body.manager-theme .hub-icon,
+body.manager-theme .hub-action-ico,
+body.manager-theme .sales-area-icon,
+body.manager-theme .sales-kpi-icon,
+body.manager-theme .sales-report-icon{
+  border-radius:8px;box-shadow:none;background:var(--hub-soft,#eef7f4);color:var(--hub-color,var(--brand))
+}
+body.manager-theme .hub-action-ico{color:#fff;background:var(--hub-color,var(--brand))}
+body.manager-theme .hub-card{
+  border:1px solid var(--border);border-radius:8px;background:#fffdf8;box-shadow:0 18px 38px rgba(45,36,24,.06)
+}
+body.manager-theme .hub-card::after{opacity:.85;border-radius:42px}
+body.manager-theme .hub-card:hover{border-color:#b9aa91;box-shadow:0 22px 44px rgba(45,36,24,.09)}
+body.manager-theme .hub-card h3,
+body.manager-theme .sales-area-title,
+body.manager-theme .sales-panel-title{color:#111827}
+body.manager-theme .hub-card p,
+body.manager-theme .sales-area-desc{color:#5e6a7d}
+body.manager-theme .hub-pill{
+  background:#f1efe8;color:#536174;border-radius:999px
+}
+body.manager-theme .hub-ai-card{
+  background:linear-gradient(135deg,#f2faf7,#fffdf8);border-color:#cbe4dc
+}
+body.manager-theme .hub-ai-node{background:#fffdf8;border-color:var(--border);border-radius:8px}
+body.manager-theme .hub-event-date{background:#eef7f4;color:#007d72;border-radius:8px}
+body.manager-theme .hub-step{
+  background:#fffdf8;border-color:var(--border);border-radius:8px;box-shadow:0 12px 26px rgba(45,36,24,.05)
+}
+body.manager-theme #dash-hero{
+  background:#fffdf8!important;color:#111827;border:1px solid var(--border)!important;border-radius:8px;box-shadow:0 18px 38px rgba(45,36,24,.06)
+}
+body.manager-theme #dash-hero::before{background:rgba(0,125,114,.09)}
+body.manager-theme #dash-hero::after{display:none}
+body.manager-theme .dash-title{color:#111827}
+body.manager-theme .dash-date,
+body.manager-theme .dash-subtitle{color:#5e6a7d}
+body.manager-theme .dash-status-card{
+  background:#eef7f4;border:1px solid #cfe7df;border-radius:8px;backdrop-filter:none
+}
+body.manager-theme .dash-status-kicker,
+body.manager-theme .dash-status-note{color:#5e6a7d}
+body.manager-theme .dash-status-value{color:#007d72}
 @media(max-width:640px){
   body.manager-theme #main{padding:12px}
   .hub-hero{padding:22px;border-radius:20px}
-  .hub-grid,.hub-side,.hub-journey,.sales-grid,.sales-kpis,.sales-area-panel{grid-template-columns:1fr}
+  .hub-grid,.hub-side,.hub-journey,.hub-daily-layout,.hub-daily-metrics,.hub-combo-grid,.sales-grid,.sales-kpis,.sales-area-panel{grid-template-columns:1fr}
   .hub-card{min-height:190px}
+  .hub-today-top{display:block}
+  .hub-report-btn{margin-top:14px}
   body.manager-theme #dash-hero{display:block;min-height:auto;padding:20px}
   body.manager-theme .dash-title{font-size:25px}
   body.manager-theme .dash-status-card{min-width:0;margin-top:18px}
@@ -685,6 +1013,7 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   .login-lang-wrap{margin-left:0}
   .login-top-actions{margin-left:auto}
   .login-hero{min-height:auto;padding:42px 20px 76px}
+  .login-hero-grid{grid-template-columns:1fr;gap:24px}
   .login-title{font-size:40px}
   .login-cta-row{justify-content:flex-start}
   .login-hero-strip{grid-template-columns:1fr 1fr}
@@ -709,6 +1038,9 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
   .login-sub{font-size:15px}
   .login-title,.login-sub{margin-left:auto;margin-right:auto}
   .login-cta-row{justify-content:center}
+  .login-hero-preview{text-align:left;padding:14px;border-radius:22px}
+  .login-preview-metrics{grid-template-columns:1fr 1fr}
+  .login-preview-bottom{grid-template-columns:1fr}
   .login-hero-strip{grid-template-columns:1fr}
   .login-story{padding:0 14px}
   .login-story-card{padding:20px;border-radius:20px}
@@ -762,18 +1094,87 @@ body.manager-theme .assistant-chip{background:#f4f6fb}
         <span class="login-hero-photo"></span>
       </div>
       <div class="login-hero-inner">
-        <div class="login-eyebrow" id="login-eyebrow">Manager Pro</div>
-        <div class="login-title" id="login-landing-title">Gestiona tu equipo<br><span class="login-title-accent">sin complicarte</span></div>
-        <div class="login-sub" id="login-landing-sub">Controla fichajes, pausas, solicitudes, horarios y reportes desde una sola herramienta simple.</div>
-        <div class="login-cta-row">
-          <button class="login-cta primary" id="login-cta-demo" onclick="loginDemo()">Probar demo</button>
-          <button class="login-cta secondary" id="login-cta-session" onclick="showLoginAuth('manager')">Iniciar sesión</button>
-        </div>
-        <div class="login-hero-strip">
-          <div class="login-hero-chip"><b id="login-chip-1">Restaurantes</b><span id="login-chip-1-sub">Turnos y pausas</span></div>
-          <div class="login-hero-chip"><b id="login-chip-2">Tiendas</b><span id="login-chip-2-sub">Equipo y caja</span></div>
-          <div class="login-hero-chip"><b id="login-chip-3">Hoteles pequeños</b><span id="login-chip-3-sub">Horarios y solicitudes</span></div>
-          <div class="login-hero-chip"><b id="login-chip-4">Servicios</b><span id="login-chip-4-sub">Documentos y reportes</span></div>
+        <div class="login-hero-grid">
+          <div class="login-hero-copy">
+            <div class="login-eyebrow" id="login-eyebrow">Manager Pro</div>
+            <div class="login-title" id="login-landing-title">Gestiona tu equipo<br><span class="login-title-accent">sin complicarte</span></div>
+            <div class="login-sub" id="login-landing-sub">Controla fichajes, pausas, solicitudes, horarios y reportes desde una sola herramienta simple.</div>
+            <div class="login-cta-row">
+              <button class="login-cta primary" id="login-cta-demo" onclick="loginDemo()">Probar demo</button>
+              <button class="login-cta secondary" id="login-cta-session" onclick="showLoginAuth('manager')">Iniciar sesión</button>
+            </div>
+            <ul class="login-checks">
+              <li><div><b id="login-check-1">Empieza por lo urgente</b><span id="login-check-1-sub">Equipo, horarios, ventas del día y alertas en una sola vista.</span></div></li>
+              <li><div><b id="login-check-2">Crece por módulos</b><span id="login-check-2-sub">Activa personal, ventas, inventario, documentos y cartera cuando lo necesites.</span></div></li>
+              <li><div><b id="login-check-3">IA como apoyo real</b><span id="login-check-3-sub">Conecta señales entre áreas y ayuda al manager a decidir mejor.</span></div></li>
+            </ul>
+            <div class="login-human-card">
+              <img src="assets/business-4.png" alt="Equipo pequeño usando Manager Pro">
+              <div><b id="login-human-title">Diseñado para negocios reales</b><span id="login-human-text">Restaurantes, tiendas, servicios y oficinas pequeñas que necesitan orden sin sentirse atrapados por un sistema pesado.</span></div>
+            </div>
+            <div class="login-hero-strip">
+              <div class="login-hero-chip"><b id="login-chip-1">Restaurantes</b><span id="login-chip-1-sub">Turnos y pausas</span></div>
+              <div class="login-hero-chip"><b id="login-chip-2">Tiendas</b><span id="login-chip-2-sub">Equipo y caja</span></div>
+              <div class="login-hero-chip"><b id="login-chip-3">Hoteles pequeños</b><span id="login-chip-3-sub">Horarios y solicitudes</span></div>
+              <div class="login-hero-chip"><b id="login-chip-4">Servicios</b><span id="login-chip-4-sub">Documentos y reportes</span></div>
+            </div>
+          </div>
+          <div class="login-hero-preview">
+            <div class="login-preview-app">
+              <aside class="login-preview-side">
+                <div class="login-preview-brand"><span>M</span>Manager Pro</div>
+                <div class="login-preview-nav active">Inicio</div>
+                <div class="login-preview-nav" id="login-preview-module-1">Personal</div>
+                <div class="login-preview-nav" id="login-preview-module-2">Ventas</div>
+                <div class="login-preview-nav" id="login-preview-module-3">Inventario</div>
+                <div class="login-preview-nav" id="login-preview-module-4">Documentos</div>
+                <div class="login-preview-nav" id="login-preview-module-5">Cartera</div>
+                <div class="login-preview-nav" id="login-preview-module-6">IA</div>
+                <div class="login-preview-store">La Tienda de María<br><span>Sucursal principal</span></div>
+              </aside>
+              <div class="login-preview-main">
+                <div class="login-preview-toolbar">
+                  <div class="login-preview-search">Buscar en Manager Pro</div>
+                  <div class="login-preview-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                </div>
+                <div class="login-preview-top">
+                  <div>
+                    <div class="login-preview-title" id="login-preview-title">Hola, María</div>
+                    <div class="login-preview-date" id="login-preview-date">Resumen general · Hoy</div>
+                  </div>
+                </div>
+                <div class="login-preview-metrics">
+                  <div class="login-preview-metric good"><span id="login-preview-sales">Ventas de hoy</span><b>CHF 2.450</b></div>
+                  <div class="login-preview-metric"><span id="login-preview-team">Órdenes</span><b>24</b></div>
+                  <div class="login-preview-metric bad"><span id="login-preview-docs">Pendientes de cobro</span><b>CHF 1.320</b></div>
+                  <div class="login-preview-metric warn"><span id="login-preview-stock">Stock bajo</span><b>8</b></div>
+                </div>
+                <div class="login-preview-alerts">
+                  <div class="login-preview-section" id="login-preview-attention">Explora tu negocio</div>
+                  <div class="login-preview-modules" aria-label="Módulos de Manager Pro">
+                    <div class="login-preview-module active"><svg viewBox="0 0 24 24"><path d="M7 11a4 4 0 1 1 8 0"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M17 11a3 3 0 1 1 3 3"/><path d="M16 20a5 5 0 0 1 5-4"/></svg><span id="login-preview-tile-1">Personal</span><small id="login-preview-tile-1-sub">Equipo y horarios</small></div>
+                    <div class="login-preview-module"><svg viewBox="0 0 24 24"><path d="M5 4v14h14"/><path d="M8 15h8"/><path d="M8 11h5"/><path d="M8 7h8"/></svg><span id="login-preview-tile-2">Ventas</span><small id="login-preview-tile-2-sub">Órdenes y caja</small></div>
+                    <div class="login-preview-module"><svg viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="M12 12 4.5 7.5"/><path d="M12 12v9"/><path d="m12 12 7.5-4.5"/></svg><span id="login-preview-tile-3">Inventario</span><small id="login-preview-tile-3-sub">Stock y productos</small></div>
+                    <div class="login-preview-module"><svg viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H7z"/><path d="M15 3v5h5"/><path d="M10 13h6"/><path d="M10 17h4"/></svg><span id="login-preview-tile-4">Documentos</span><small id="login-preview-tile-4-sub">Facturas y archivos</small></div>
+                    <div class="login-preview-module"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4z"/><path d="M4 10h16"/><path d="M8 15h4"/></svg><span id="login-preview-tile-5">Cartera</span><small id="login-preview-tile-5-sub">Cobros y clientes</small></div>
+                    <div class="login-preview-module"><svg viewBox="0 0 24 24"><path d="M9 4a4 4 0 0 0-4 4v8a4 4 0 0 0 4 4"/><path d="M15 4a4 4 0 0 1 4 4v8a4 4 0 0 1-4 4"/><path d="M9 4h6"/><path d="M9 20h6"/><path d="M12 4v16"/></svg><span id="login-preview-tile-6">IA Insights</span><small id="login-preview-tile-6-sub">Análisis inteligente</small></div>
+                  </div>
+                </div>
+                <div class="login-preview-bottom">
+                  <div class="login-preview-action primary">
+                    <span id="login-preview-action-1">Actividad del equipo</span>
+                    <div class="login-preview-bars alt" aria-hidden="true"><i></i><i></i><i></i></div>
+                  </div>
+                  <div class="login-preview-action">
+                    <span id="login-preview-action-2">Ventas últimos 7 días</span>
+                    <div class="login-preview-linechart" aria-hidden="true">
+                      <svg viewBox="0 0 160 48"><path d="M5 36 C35 24 48 36 72 26 S115 12 155 8" stroke="#007d72" stroke-width="3" fill="none"/><path d="M5 14 C38 24 57 21 84 30 S126 38 155 42" stroke="#007d72" stroke-width="3" fill="none" opacity=".7"/></svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -2039,6 +2440,16 @@ Object.assign(UI.es.login,{manager:'Manager',employee:'Empleado',restaurant:'Cre
 Object.assign(UI.en.login,{manager:'Manager',employee:'Employee',restaurant:'Sign up',signin:'Log in',langLabel:'View in',nav1:'People',nav2:'Planning',nav3:'Reports',nav4:'AI',eyebrow:'Manager Pro for small businesses',landingTitle:'A simple helper<br><span class="login-title-accent">for the day-to-day of your business</span>',landingSub:'Start with your team: schedules, clock-ins, requests and documents. Add sales, purchases, cash and inventory when your business needs them.',open:'Log in',demoTop:'Try it free',ctaDemo:'Try demo',ctaSession:'Log in',storyKicker:'The idea',storyTitle:'A serious app that feels easy to adopt.',storyText:'Manager Pro starts by helping you organize your team. Step by step, it can support other business areas without becoming heavy or intimidating.',point1Title:'Today',point1Text:'Clock-ins, schedules, breaks, requests, reports and AI support.',point2Title:'Coming soon',point2Text:'Sales, purchases, documents, cash, inventory and accounting.',point3Title:'Goal',point3Text:'Help owners understand their business without admin jargon.',moduleTitle:'Business areas',moduleSub:'We are focused on HR now; these modules show the path toward a simple system for small businesses.',current:'Today',upcoming:'Coming soon',mod1:'People',mod1Desc:'Clock-ins, schedules, breaks and requests.',mod2:'Reports',mod2Desc:'Excel, PDF, estimated payroll and extra hours.',mod3:'AI assistant',mod3Desc:'Helps managers decide and communicate better.',mod4:'Sales and cash',mod4Desc:'Daily control of revenue, shifts and closing.',mod5:'Purchases and inventory',mod5Desc:'Track purchases, stock and suppliers.',mod6:'Accounting',mod6Desc:'Simple view of costs and results.'});
 Object.assign(UI.de.login,{manager:'Manager',employee:'Mitarbeiter',restaurant:'Konto erstellen',signin:'Einloggen',langLabel:'Sprache',nav1:'Personal',nav2:'Planung',nav3:'Berichte',nav4:'KI',eyebrow:'Manager Pro für kleine Betriebe',landingTitle:'Eine einfache Hilfe<br><span class="login-title-accent">für den Alltag Ihres Betriebs</span>',landingSub:'Beginnen Sie mit dem Team: Pläne, Buchungen, Anfragen und Dokumente. Später kommen Verkauf, Einkauf, Kasse und Inventar dazu, wenn Ihr Betrieb es braucht.',open:'Einloggen',demoTop:'Gratis testen',ctaDemo:'Demo testen',ctaSession:'Einloggen',storyKicker:'Die Idee',storyTitle:'Eine seriöse App, die leicht anzunehmen ist.',storyText:'Manager Pro hilft zuerst, Ihr Team zu organisieren. Schritt für Schritt kann es weitere Bereiche begleiten, ohne schwer oder einschüchternd zu werden.',point1Title:'Heute',point1Text:'Buchungen, Pläne, Pausen, Anfragen, Berichte und KI-Hilfe.',point2Title:'Demnächst',point2Text:'Verkauf, Einkauf, Dokumente, Kasse, Inventar und Buchhaltung.',point3Title:'Ziel',point3Text:'Inhaber verstehen ihr Geschäft ohne Verwaltungsjargon.',moduleTitle:'Geschäftsbereiche',moduleSub:'Aktuell fokussieren wir HR; diese Module zeigen den Weg zu einem einfachen System für kleine Betriebe.',current:'Heute',upcoming:'Demnächst',mod1:'Personal',mod1Desc:'Buchungen, Pläne, Pausen und Anfragen.',mod2:'Berichte',mod2Desc:'Excel, PDF, geschätzte Löhne und Überstunden.',mod3:'KI-Assistent',mod3Desc:'Hilft Managern beim Entscheiden und Kommunizieren.',mod4:'Verkauf und Kasse',mod4Desc:'Tägliche Kontrolle von Umsatz, Schichten und Abschluss.',mod5:'Einkauf und Inventar',mod5Desc:'Einkäufe, Lager und Lieferanten verfolgen.',mod6:'Buchhaltung',mod6Desc:'Einfache Sicht auf Kosten und Ergebnisse.'});
 Object.assign(UI.it.login,{manager:'Manager',employee:'Dipendente',restaurant:'Crea account',signin:'Accedi',langLabel:'Vedi in',nav1:'Personale',nav2:'Pianificazione',nav3:'Report',nav4:'IA',eyebrow:'Manager Pro per piccoli business',landingTitle:'Un aiuto semplice<br><span class="login-title-accent">per il quotidiano del tuo business</span>',landingSub:'Inizia dal team: orari, timbrature, richieste e documenti. Poi aggiungi vendite, acquisti, cassa e inventario quando il business ne ha bisogno.',open:'Accedi',demoTop:'Provalo gratis',ctaDemo:'Prova demo',ctaSession:'Accedi',storyKicker:'L’idea',storyTitle:'Un’app seria, ma facile da adottare.',storyText:'Manager Pro inizia aiutandoti a organizzare il team. Poco a poco può accompagnare altre aree del business, senza diventare pesante o intimidatorio.',point1Title:'Oggi',point1Text:'Timbrature, orari, pause, richieste, report e supporto IA.',point2Title:'Prossimamente',point2Text:'Vendite, acquisti, documenti, cassa, inventario e contabilità.',point3Title:'Obiettivo',point3Text:'Aiutare il titolare a capire il business senza gergo amministrativo.',moduleTitle:'Aree del business',moduleSub:'Ora siamo concentrati sulle risorse umane; questi moduli indicano il percorso verso un sistema semplice per piccoli business.',current:'Oggi',upcoming:'Prossimamente',mod1:'Personale',mod1Desc:'Timbrature, orari, pause e richieste.',mod2:'Report',mod2Desc:'Excel, PDF, salari stimati e ore extra.',mod3:'Assistente IA',mod3Desc:'Aiuta il manager a decidere e comunicare meglio.',mod4:'Vendite e cassa',mod4Desc:'Controllo quotidiano di ricavi, turni e chiusure.',mod5:'Acquisti e inventario',mod5Desc:'Acquisti, stock e fornitori sotto controllo.',mod6:'Contabilità',mod6Desc:'Vista semplice di costi e risultati.'});
+Object.assign(UI.es.login,{landingTitle:'Una app integral<br><span class="login-title-accent">pero fácil de adoptar</span>',landingSub:'Empieza viendo qué necesita atención hoy. Luego entra a personal, ventas, inventario, documentos, cartera e IA desde un solo lugar.',storyText:'Manager Pro no intenta convertir al dueño en experto administrativo. Le muestra lo importante, le ayuda a actuar y conecta las áreas del negocio paso a paso.',moduleSub:'Personal, ventas, inventario, documentos, cartera e IA ya viven en una misma experiencia modular.',mod2:'Ventas',mod2Desc:'Caja diaria, productos, pagos y reportes.',mod3:'Inventario',mod3Desc:'Stock, compras, proveedores, recetas y costos.',mod4:'Documentos',mod4Desc:'Contratos, permisos, soportes y vencimientos con IA.',mod5:'Cartera',mod5Desc:'Clientes, cuentas por cobrar, soportes y seguimientos.',mod6:'IA e insights',mod6Desc:'Señales cruzadas para entender qué está pasando.',previewKicker:'Vista diaria',previewTitle:'Hoy en tu negocio',previewDate:'Panel vivo',previewSales:'Ventas de hoy',previewTeam:'Equipo presente',previewStock:'Stock bajo',previewDocs:'Por revisar',previewAttention:'Requiere atención',previewAlert1:'Un producto clave está bajo de stock.',previewAlert2:'IA conecta ventas, equipo e inventario.',previewAction1:'Registrar venta',previewAction2:'Semana'});
+Object.assign(UI.en.login,{landingTitle:'An integrated app<br><span class="login-title-accent">that feels easy to adopt</span>',landingSub:'Start by seeing what needs attention today. Then open people, sales, inventory, documents, receivables and AI from one place.',storyText:'Manager Pro does not try to turn owners into admin experts. It shows what matters, helps them act, and connects business areas step by step.',moduleSub:'People, sales, inventory, documents, receivables and AI already live in one modular experience.',mod2:'Sales',mod2Desc:'Daily cash, products, payments and reports.',mod3:'Inventory',mod3Desc:'Stock, purchases, suppliers, recipes and costs.',mod4:'Documents',mod4Desc:'Contracts, permits, evidence and expiries with AI.',mod5:'Receivables',mod5Desc:'Clients, accounts receivable, support files and follow-up.',mod6:'AI and insights',mod6Desc:'Cross-area signals to understand what is happening.',previewKicker:'Daily view',previewTitle:'Today in your business',previewDate:'Live panel',previewSales:'Today sales',previewTeam:'Team present',previewStock:'Low stock',previewDocs:'To review',previewAttention:'Needs attention',previewAlert1:'A key product is running low.',previewAlert2:'AI connects sales, team and inventory.',previewAction1:'Register sale',previewAction2:'Week'});
+Object.assign(UI.fr.login,{landingTitle:'Une app intégrée<br><span class="login-title-accent">mais facile à adopter</span>',landingSub:'Commencez par voir ce qui demande attention aujourd’hui. Puis ouvrez personnel, ventes, inventaire, documents, créances et IA depuis un seul endroit.',storyText:'Manager Pro ne transforme pas le propriétaire en expert administratif. Il montre l’essentiel, aide à agir et connecte les zones du business peu à peu.',moduleSub:'Personnel, ventes, inventaire, documents, créances et IA vivent déjà dans une même expérience modulaire.',mod2:'Ventes',mod2Desc:'Caisse du jour, produits, paiements et rapports.',mod3:'Inventaire',mod3Desc:'Stock, achats, fournisseurs, recettes et coûts.',mod4:'Documents',mod4Desc:'Contrats, permis, justificatifs et échéances avec IA.',mod5:'Créances',mod5Desc:'Clients, comptes à recevoir, supports et suivis.',mod6:'IA et insights',mod6Desc:'Signaux croisés pour comprendre ce qui se passe.',previewKicker:'Vue du jour',previewTitle:'Aujourd’hui dans votre business',previewDate:'Panel vivant',previewSales:'Ventes du jour',previewTeam:'Équipe présente',previewStock:'Stock bas',previewDocs:'À revoir',previewAttention:'Demande attention',previewAlert1:'Un produit clé est bas en stock.',previewAlert2:'L’IA connecte ventes, équipe et inventaire.',previewAction1:'Enregistrer vente',previewAction2:'Semaine'});
+Object.assign(UI.de.login,{landingTitle:'Eine integrierte App<br><span class="login-title-accent">die leicht anzunehmen ist</span>',landingSub:'Beginnen Sie mit dem Blick auf das, was heute Aufmerksamkeit braucht. Danach öffnen Sie Personal, Verkauf, Inventar, Dokumente, Forderungen und KI an einem Ort.',storyText:'Manager Pro macht Inhaber nicht zu Verwaltungsexperten. Es zeigt, was wichtig ist, hilft beim Handeln und verbindet Geschäftsbereiche Schritt für Schritt.',moduleSub:'Personal, Verkauf, Inventar, Dokumente, Forderungen und KI leben bereits in einer modularen Erfahrung.',mod2:'Verkauf',mod2Desc:'Tageskasse, Produkte, Zahlungen und Berichte.',mod3:'Inventar',mod3Desc:'Lager, Einkäufe, Lieferanten, Rezepte und Kosten.',mod4:'Dokumente',mod4Desc:'Verträge, Bewilligungen, Belege und Fristen mit KI.',mod5:'Forderungen',mod5Desc:'Kunden, offene Beträge, Belege und Nachverfolgung.',mod6:'KI und Insights',mod6Desc:'Bereichsübergreifende Signale verstehen.',previewKicker:'Tagesansicht',previewTitle:'Heute in Ihrem Betrieb',previewDate:'Live-Panel',previewSales:'Umsatz heute',previewTeam:'Team anwesend',previewStock:'Niedriger Bestand',previewDocs:'Zu prüfen',previewAttention:'Braucht Aufmerksamkeit',previewAlert1:'Ein Schlüsselprodukt hat niedrigen Bestand.',previewAlert2:'KI verbindet Verkauf, Team und Inventar.',previewAction1:'Verkauf erfassen',previewAction2:'Woche'});
+Object.assign(UI.it.login,{landingTitle:'Un’app integrata<br><span class="login-title-accent">ma facile da adottare</span>',landingSub:'Inizia vedendo cosa richiede attenzione oggi. Poi apri personale, vendite, inventario, documenti, crediti e IA da un solo posto.',storyText:'Manager Pro non prova a trasformare il titolare in esperto amministrativo. Mostra ciò che conta, aiuta ad agire e collega le aree del business passo dopo passo.',moduleSub:'Personale, vendite, inventario, documenti, crediti e IA vivono già in un’esperienza modulare.',mod2:'Vendite',mod2Desc:'Cassa giornaliera, prodotti, pagamenti e report.',mod3:'Inventario',mod3Desc:'Stock, acquisti, fornitori, ricette e costi.',mod4:'Documenti',mod4Desc:'Contratti, permessi, supporti e scadenze con IA.',mod5:'Crediti',mod5Desc:'Clienti, conti da incassare, supporti e follow-up.',mod6:'IA e insights',mod6Desc:'Segnali incrociati per capire cosa succede.',previewKicker:'Vista giornaliera',previewTitle:'Oggi nel tuo business',previewDate:'Pannello vivo',previewSales:'Vendite di oggi',previewTeam:'Team presente',previewStock:'Stock basso',previewDocs:'Da rivedere',previewAttention:'Richiede attenzione',previewAlert1:'Un prodotto chiave ha stock basso.',previewAlert2:'L’IA collega vendite, team e inventario.',previewAction1:'Registra vendita',previewAction2:'Settimana'});
+Object.assign(UI.es.login,{check1:'Empieza por lo urgente',check1Sub:'Equipo, horarios, ventas del día y alertas en una sola vista.',check2:'Crece por módulos',check2Sub:'Activa personal, ventas, inventario, documentos y cartera cuando lo necesites.',check3:'IA como apoyo real',check3Sub:'Conecta señales entre áreas y ayuda al manager a decidir mejor.',humanTitle:'Diseñado para negocios reales',humanText:'Restaurantes, tiendas, servicios y oficinas pequeñas que necesitan orden sin sentirse atrapados por un sistema pesado.',previewTeam:'Órdenes',previewDocs:'Pendientes de cobro',previewAction1:'Actividad del equipo',previewAction2:'Ventas últimos 7 días',previewModule1:'Personal',previewModule2:'Ventas',previewModule3:'Inventario',previewModule4:'Documentos',previewModule5:'Cartera',previewModule6:'IA',previewTile1:'Personal',previewTile1Sub:'Equipo y horarios',previewTile2:'Ventas',previewTile2Sub:'Órdenes y caja',previewTile3:'Inventario',previewTile3Sub:'Stock y productos',previewTile4:'Documentos',previewTile4Sub:'Facturas y archivos',previewTile5:'Cartera',previewTile5Sub:'Cobros y clientes',previewTile6:'IA Insights',previewTile6Sub:'Análisis inteligente'});
+Object.assign(UI.en.login,{check1:'Start with what matters',check1Sub:'Team, schedules, today sales and alerts in one view.',check2:'Grow by modules',check2Sub:'Turn on people, sales, inventory, documents and receivables when you need them.',check3:'AI as real support',check3Sub:'Connects signals across areas and helps managers decide better.',humanTitle:'Designed for real businesses',humanText:'Restaurants, shops, services and small offices that need order without feeling trapped in a heavy system.',previewTeam:'Orders',previewDocs:'Receivables due',previewAction1:'Team activity',previewAction2:'Sales last 7 days',previewModule1:'People',previewModule2:'Sales',previewModule3:'Inventory',previewModule4:'Documents',previewModule5:'Receivables',previewModule6:'AI',previewTile1:'People',previewTile1Sub:'Team and schedules',previewTile2:'Sales',previewTile2Sub:'Orders and cash',previewTile3:'Inventory',previewTile3Sub:'Stock and products',previewTile4:'Documents',previewTile4Sub:'Invoices and files',previewTile5:'Receivables',previewTile5Sub:'Clients and payments',previewTile6:'AI Insights',previewTile6Sub:'Smart analysis'});
+Object.assign(UI.fr.login,{check1:'Commencez par l’urgent',check1Sub:'Équipe, horaires, ventes du jour et alertes dans une seule vue.',check2:'Grandissez par modules',check2Sub:'Activez personnel, ventes, inventaire, documents et créances quand vous en avez besoin.',check3:'L’IA comme vrai soutien',check3Sub:'Elle connecte les signaux entre zones et aide le manager à mieux décider.',humanTitle:'Pensé pour les vrais commerces',humanText:'Restaurants, boutiques, services et petits bureaux qui ont besoin d’ordre sans se sentir bloqués dans un système lourd.',previewTeam:'Commandes',previewDocs:'Créances dues',previewAction1:'Activité de l’équipe',previewAction2:'Ventes 7 derniers jours',previewModule1:'Personnel',previewModule2:'Ventes',previewModule3:'Inventaire',previewModule4:'Documents',previewModule5:'Créances',previewModule6:'IA',previewTile1:'Personnel',previewTile1Sub:'Équipe et horaires',previewTile2:'Ventes',previewTile2Sub:'Commandes et caisse',previewTile3:'Inventaire',previewTile3Sub:'Stock et produits',previewTile4:'Documents',previewTile4Sub:'Factures et fichiers',previewTile5:'Créances',previewTile5Sub:'Clients et paiements',previewTile6:'IA Insights',previewTile6Sub:'Analyse intelligente'});
+Object.assign(UI.de.login,{check1:'Mit dem Wichtigen starten',check1Sub:'Team, Pläne, Tagesumsatz und Warnungen in einer Ansicht.',check2:'Modular wachsen',check2Sub:'Personal, Verkauf, Inventar, Dokumente und Forderungen aktivieren, wenn Sie sie brauchen.',check3:'KI als echte Unterstützung',check3Sub:'Verbindet Signale aus Bereichen und hilft Managern, besser zu entscheiden.',humanTitle:'Für echte Betriebe gemacht',humanText:'Restaurants, Läden, Dienstleister und kleine Büros, die Ordnung brauchen, ohne in einem schweren System festzustecken.',previewTeam:'Bestellungen',previewDocs:'Offene Forderungen',previewAction1:'Teamaktivität',previewAction2:'Umsatz letzte 7 Tage',previewModule1:'Personal',previewModule2:'Verkauf',previewModule3:'Inventar',previewModule4:'Dokumente',previewModule5:'Forderungen',previewModule6:'KI',previewTile1:'Personal',previewTile1Sub:'Team und Pläne',previewTile2:'Verkauf',previewTile2Sub:'Bestellungen und Kasse',previewTile3:'Inventar',previewTile3Sub:'Lager und Produkte',previewTile4:'Dokumente',previewTile4Sub:'Rechnungen und Dateien',previewTile5:'Forderungen',previewTile5Sub:'Kunden und Zahlungen',previewTile6:'KI Insights',previewTile6Sub:'Intelligente Analyse'});
+Object.assign(UI.it.login,{check1:'Inizia da ciò che conta',check1Sub:'Team, orari, vendite del giorno e avvisi in una sola vista.',check2:'Cresci per moduli',check2Sub:'Attiva personale, vendite, inventario, documenti e crediti quando ti servono.',check3:'IA come supporto reale',check3Sub:'Collega segnali tra aree e aiuta il manager a decidere meglio.',humanTitle:'Pensato per business reali',humanText:'Ristoranti, negozi, servizi e piccoli uffici che hanno bisogno di ordine senza sentirsi bloccati in un sistema pesante.',previewTeam:'Ordini',previewDocs:'Crediti da incassare',previewAction1:'Attività del team',previewAction2:'Vendite ultimi 7 giorni',previewModule1:'Personale',previewModule2:'Vendite',previewModule3:'Inventario',previewModule4:'Documenti',previewModule5:'Crediti',previewModule6:'IA',previewTile1:'Personale',previewTile1Sub:'Team e orari',previewTile2:'Vendite',previewTile2Sub:'Ordini e cassa',previewTile3:'Inventario',previewTile3Sub:'Stock e prodotti',previewTile4:'Documenti',previewTile4Sub:'Fatture e file',previewTile5:'Crediti',previewTile5Sub:'Clienti e pagamenti',previewTile6:'IA Insights',previewTile6Sub:'Analisi intelligente'});
 Object.assign(UI.es.login,{businessTitle:'Pensado para negocios reales',businessText:'Restaurantes, tiendas, servicios, talleres y pequeñas oficinas comparten el mismo dolor: organizar personas, documentos, tiempo y decisiones.',biz1:'Gestión diaria',biz1Sub:'Un tablero para saber qué necesita atención.',biz2:'Comercio y servicios',biz2Sub:'Personal, turnos, solicitudes y reportes.',biz3:'Equipos pequeños',biz3Sub:'Procesos simples para managers ocupados.',biz4:'Decisiones claras',biz4Sub:'Datos e IA para entender qué está pasando.'});
 Object.assign(UI.en.login,{businessTitle:'Built for real businesses',businessText:'Restaurants, shops, services, workshops and small offices share the same pain: organizing people, documents, time and decisions.',biz1:'Daily management',biz1Sub:'One dashboard to know what needs attention.',biz2:'Commerce and services',biz2Sub:'People, shifts, requests and reports.',biz3:'Small teams',biz3Sub:'Simple processes for busy managers.',biz4:'Clear decisions',biz4Sub:'Data and AI to understand what is happening.'});
 Object.assign(UI.fr.login,{businessTitle:'Pensé pour les vrais commerces',businessText:'Restaurants, magasins, services, ateliers et petits bureaux partagent le même besoin: organiser personnes, documents, temps et décisions.',biz1:'Gestion quotidienne',biz1Sub:'Un tableau pour savoir ce qui demande attention.',biz2:'Commerce et services',biz2Sub:'Personnel, horaires, demandes et rapports.',biz3:'Petites équipes',biz3Sub:'Des processus simples pour managers occupés.',biz4:'Décisions claires',biz4Sub:'Données et IA pour comprendre la situation.'});
@@ -2222,7 +2633,11 @@ function smartAlertKey(date,empId,type){
   const d=new Date(date);
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}_${empId}_${type}`;
 }
+const stableAlertKey=(empId,type)=>`employee_${empId}_${type}`;
 function isAlertReviewed(key){return !!DB.reviewedAlerts?.[key];}
+function isAlertReviewedAny(alert){
+  return !!(isAlertReviewed(alert.key)||(alert.legacyKeys||[]).some(k=>isAlertReviewed(k)));
+}
 function markAlertReviewed(key){
   DB.reviewedAlerts=DB.reviewedAlerts||{};
   DB.reviewedAlerts[key]={reviewedAt:new Date().toISOString(),user:currentUser?.email||currentUser?.name||'manager'};
@@ -2244,15 +2659,19 @@ function employeeContractEnd(emp){
 }
 function smartEmployeeAlerts(emp,now=new Date()){
   const tx=smartTx(),out=[],y=now.getFullYear(),m=now.getMonth();
-  const push=(type,msg,color='var(--orange)',priority=1,meta={})=>out.push({key:smartAlertKey(now,emp.id,type),type,emp,msg,color,priority,meta});
-  if(!hasConfiguredPay(emp))push('missing-salary',tx.missingSalary,'var(--red)',7);
-  if(!hasBaseSchedule(emp))push('missing-schedule',tx.missingSchedule,'var(--orange)',6);
-  if(!emp.email&&!emp.phone)push('missing-contact',tx.missingContact,'var(--orange)',3);
+  const push=(type,msg,color='var(--orange)',priority=1,meta={})=>{
+    const stable=meta.stable;
+    const legacy=smartAlertKey(now,emp.id,type);
+    out.push({key:stable?stableAlertKey(emp.id,type):legacy,legacyKeys:stable?[legacy]:[],type,emp,msg,color,priority,meta});
+  };
+  if(!hasConfiguredPay(emp))push('missing-salary',tx.missingSalary,'var(--red)',7,{stable:true});
+  if(!hasBaseSchedule(emp))push('missing-schedule',tx.missingSchedule,'var(--orange)',6,{stable:true});
+  if(!emp.email&&!emp.phone)push('missing-contact',tx.missingContact,'var(--orange)',3,{stable:true});
   const end=employeeContractEnd(emp),endDays=daysUntil(end,now);
   if(endDays!==null&&endDays>=0&&endDays<=30)push('contract-ending',`${tx.contractEnding} · ${fmtDate(end)}`,'var(--orange)',6,{end});
   const docs=employeeDocs(emp.id);
   const hasContract=docs.some(d=>d.type==='contract');
-  if(!hasContract)push('no-contract-doc',tx.noContractDoc,'var(--orange)',2);
+  if(!hasContract)push('no-contract-doc',tx.noContractDoc,'var(--orange)',2,{stable:true});
   const expiring=docs.map(d=>({doc:d,days:daysUntil(d.expiresAt,now)})).filter(x=>x.days!==null&&x.days>=0&&x.days<=30).sort((a,b)=>a.days-b.days)[0];
   if(expiring)out.push({key:smartAlertKey(now,emp.id,`doc-${expiring.doc.id}`),type:'document-ending',emp,msg:`${tx.documentEnding} · ${fmtDate(expiring.doc.expiresAt)}`,color:'var(--orange)',priority:5,meta:{docId:expiring.doc.id}});
   const report=monthlyEmployeeReport(emp,y,m);
@@ -2847,6 +3266,13 @@ function applyUITexts(){
   const topDemo=document.getElementById('login-demo-top');if(topDemo)topDemo.textContent=lt.demoTop;
   const ctaDemo=document.getElementById('login-cta-demo');if(ctaDemo)ctaDemo.textContent=lt.ctaDemo;
   const ctaSession=document.getElementById('login-cta-session');if(ctaSession)ctaSession.textContent=lt.ctaSession;
+  const previewMap={kicker:'previewKicker',title:'previewTitle',date:'previewDate',sales:'previewSales',team:'previewTeam',stock:'previewStock',docs:'previewDocs',attention:'previewAttention','alert-1':'previewAlert1','alert-2':'previewAlert2','action-1':'previewAction1','action-2':'previewAction2'};
+  Object.entries(previewMap).forEach(([id,key])=>{const el=document.getElementById(`login-preview-${id}`);if(el&&lt[key])el.textContent=lt[key];});
+  for(let i=1;i<=6;i++){const pm=document.getElementById(`login-preview-module-${i}`);if(pm&&lt[`previewModule${i}`])pm.textContent=lt[`previewModule${i}`];}
+  for(let i=1;i<=6;i++){const tile=document.getElementById(`login-preview-tile-${i}`);if(tile&&lt[`previewTile${i}`])tile.textContent=lt[`previewTile${i}`];const tileSub=document.getElementById(`login-preview-tile-${i}-sub`);if(tileSub&&lt[`previewTile${i}Sub`])tileSub.textContent=lt[`previewTile${i}Sub`];}
+  for(let i=1;i<=3;i++){const chk=document.getElementById(`login-check-${i}`);if(chk&&lt[`check${i}`])chk.textContent=lt[`check${i}`];const chkSub=document.getElementById(`login-check-${i}-sub`);if(chkSub&&lt[`check${i}Sub`])chkSub.textContent=lt[`check${i}Sub`];}
+  const humanTitle=document.getElementById('login-human-title');if(humanTitle&&lt.humanTitle)humanTitle.textContent=lt.humanTitle;
+  const humanText=document.getElementById('login-human-text');if(humanText&&lt.humanText)humanText.textContent=lt.humanText;
   const businessTitle=document.getElementById('login-business-title');if(businessTitle)businessTitle.textContent=lt.businessTitle;
   const businessText=document.getElementById('login-business-text');if(businessText)businessText.textContent=lt.businessText;
   for(let i=1;i<=4;i++){const b=document.getElementById(`login-biz-${i}`);if(b)b.textContent=lt[`biz${i}`];const bs=document.getElementById(`login-biz-${i}-sub`);if(bs)bs.textContent=lt[`biz${i}Sub`];}
@@ -2857,7 +3283,7 @@ function applyUITexts(){
   for(let i=1;i<=3;i++){const title=document.getElementById(`login-point-${i}-title`);if(title)title.textContent=lt[`point${i}Title`];const text=document.getElementById(`login-point-${i}-text`);if(text)text.textContent=lt[`point${i}Text`];}
   const moduleTitle=document.getElementById('login-module-title');if(moduleTitle)moduleTitle.textContent=lt.moduleTitle;
   const moduleSub=document.getElementById('login-module-sub');if(moduleSub)moduleSub.textContent=lt.moduleSub;
-  for(let i=1;i<=6;i++){const mod=document.getElementById(`login-mod-${i}`);if(mod)mod.textContent=lt[`mod${i}`];const desc=document.getElementById(`login-mod-${i}-desc`);if(desc)desc.textContent=lt[`mod${i}Desc`];const status=document.getElementById(`login-mod-${i}-status`);if(status)status.textContent=i<=3?lt.current:lt.upcoming;}
+  for(let i=1;i<=6;i++){const mod=document.getElementById(`login-mod-${i}`);if(mod)mod.textContent=lt[`mod${i}`];const desc=document.getElementById(`login-mod-${i}-desc`);if(desc)desc.textContent=lt[`mod${i}Desc`];const status=document.getElementById(`login-mod-${i}-status`);if(status){status.textContent=lt.current;status.classList.remove('upcoming');}}
   updateLoginModeNote();
   const empSearch=document.getElementById('emp-search');if(empSearch)empSearch.placeholder=t.emp.search;
   const topNew=document.querySelector('.top-btn.primary');if(topNew)topNew.lastChild.textContent=' '+t.emp.new.split(' ')[0];
@@ -3592,7 +4018,8 @@ function dayStatus(emp,date){
   const hasRec=DB.history.some(h=>h.empId===emp.id&&sameDay(h.ts,date));
   if(hasRec)return{type:'worked'};
   if(d>today)return sch?.enabled&&sch.blocks.length?{type:'future'}:{type:'free'};
-  if(sch?.enabled&&sch.blocks.length)return{type:'missing'};
+  if(sch?.enabled&&sch.blocks.length&&shouldShowMissingClockIn(emp,date))return{type:'missing'};
+  if(sch?.enabled&&sch.blocks.length)return{type:'future'};
   return{type:'free'};
 }
 function isLate(emp,date){
@@ -3615,6 +4042,20 @@ function wouldBeLate(emp,date=new Date()){
   const b=firstRelevantBlock(emp,date);if(!b)return false;
   const exp=new Date(timeOn(date,b.start).getTime()+(DB.settings?.lateTol||10)*60000);
   return date>exp;
+}
+function shouldShowMissingClockIn(emp,date=new Date()){
+  if(!isRestaurantOpen(date))return false;
+  if(!isEmployeeScheduledOn(emp,date))return false;
+  if(getAbs(emp.id,date))return false;
+  if(DB.history.some(h=>h.empId===emp.id&&sameDay(h.ts,date)))return false;
+  const d=localDateOnly(date),today=todayStart();
+  if(!d)return false;
+  if(d<today)return true;
+  if(d>today)return false;
+  const sch=plannedDaySchedule(emp,date),b=firstRelevantBlock(emp,date)||sch?.blocks?.[0];
+  if(!b?.start)return false;
+  const due=new Date(timeOn(date,b.start).getTime()+(DB.settings?.lateTol||10)*60000);
+  return new Date(date)>due;
 }
 
 // ═══════ QR ═══════
@@ -4600,7 +5041,7 @@ function pushHubReview(items,item){
 function hubReviewItems(){
   const tx=hubReviewTx(),items=[],employees=DB.employees||[],active=employees.filter(e=>e.status==='active');
   const pending=(DB.absences||[]).filter(a=>!a.approved).length;
-  const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
+  const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewedAny(a)).length;
   pushHubReview(items,{area:tx.people,icon:'team',severity:smart?'critical':'warning',count:pending,msg:`${pending} ${tx.pendingRequests}`,action:"goPage('vacations')",page:'vacations'});
   pushHubReview(items,{area:tx.people,icon:'team',severity:'critical',count:smart,msg:`${smart} ${tx.openPeopleAlerts}`,action:"goPage('dashboard')",page:'dashboard'});
 
@@ -4631,32 +5072,152 @@ function hubReviewItems(){
 function hubReviewCenterHTML(){
   const tx=hubReviewTx(),items=hubReviewItems();
   const tone={critical:{color:'var(--red)',bg:'rgba(239,68,68,.08)',label:tx.critical},warning:{color:'var(--orange)',bg:'rgba(245,158,11,.10)',label:tx.warning},info:{color:'var(--brand)',bg:'rgba(37,99,235,.08)',label:tx.info}};
-  return `<section class="hub-panel" id="hub-review-center" style="margin-bottom:18px">
-    <div class="rrow" style="justify-content:flex-end;margin-bottom:10px"><span class="badge" style="background:${items.length?'rgba(239,68,68,.12)':'rgba(16,185,129,.12)'};color:${items.length?'var(--red)':'var(--green)'}">${items.length}</span></div>
-    <div class="review-grid mt12" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px">
-      ${items.length?items.map(item=>{const t=tone[item.severity]||tone.info;return `<button class="hub-line" style="width:100%;text-align:left;border:1px solid var(--border);border-radius:14px;background:${t.bg};padding:12px;cursor:pointer" onclick="${item.action}">
-        <div class="hub-icon" style="width:38px;height:38px;background:#fff;color:${t.color};box-shadow:none">${hubIcon(item.icon)}</div>
-        <div style="flex:1;min-width:0">
-          <div class="fs11 fw8" style="color:${t.color};text-transform:uppercase;letter-spacing:.05em">${esc(t.label)} · ${esc(item.area)}</div>
-          <div class="fs13 fw8 mt4">${esc(item.msg)}</div>
+  return `<section class="hub-review-panel" id="hub-review-center">
+    <div class="hub-review-head">
+      <div><h3>${esc(tx.title)}</h3><p>${esc(tx.sub)}</p></div>
+      <span class="hub-review-count ${items.length?'':'ok'}">${items.length}</span>
+    </div>
+    <div class="hub-review-list">
+      ${items.length?items.map(item=>{const t=tone[item.severity]||tone.info;return `<button class="hub-review-row ${esc(item.severity)}" onclick="${item.action}">
+        <div class="hub-review-icon" style="color:${t.color}">${hubIcon(item.icon)}</div>
+        <div style="min-width:0">
+          <div class="hub-review-label" style="color:${t.color}">${esc(t.label)} · ${esc(item.area)}</div>
+          <div class="hub-review-msg">${esc(item.msg)}</div>
         </div>
         <span class="btn btn-ghost btn-sm">${esc(tx.view)}</span>
-      </button>`}).join(''):`<div class="hub-line" style="grid-column:1/-1;border:1px solid rgba(16,185,129,.28);border-radius:14px;background:rgba(16,185,129,.08);padding:14px">
-        <div class="hub-line-dot" style="background:var(--green)"></div>
-        <div><div class="fw8">${esc(tx.okTitle)}</div><div class="fs12 muted mt4">${esc(tx.okText)}</div></div>
+        <span class="hub-review-go">›</span>
+      </button>`}).join(''):`<div class="hub-review-row info" style="cursor:default;grid-template-columns:auto minmax(0,1fr)">
+        <div class="hub-review-icon" style="color:var(--green)"><span style="font-weight:950">✓</span></div>
+        <div><div class="hub-review-msg">${esc(tx.okTitle)}</div><div class="fs12 muted mt4">${esc(tx.okText)}</div></div>
       </div>`}
+    </div>
+  </section>`;
+}
+const HUB_DAILY_UI={
+  es:{today:'Hoy en tu negocio',summary:'Resumen general de lo que pasó hoy y lo que viene.',fullReport:'Ver reporte completo',salesToday:'Ventas de hoy',teamPresent:'Equipo presente',stockLow:'Stock bajo',receivablesDue:'Cartera vencida',docsDue:'Docs por vencer',quick:'Acciones rápidas',registerSale:'Registrar venta',addEmployee:'Añadir empleado',createPurchase:'Crear compra',uploadDocument:'Subir documento',registerReceivable:'Registrar cobro',salesTrend:'Tendencia de ventas',week:'Últimos 7 días',aiTitle:'IA conectó estas señales',aiText:'Cruza personal, ventas, inventario, documentos y cartera para mostrar relaciones antes de que se vuelvan problema.',next:'Próximos eventos',payroll:'Pago de nómina',reviewInventory:'Revisar inventario',reviewPeople:'Ver asistencia',reviewReceivables:'Ver cartera',todayLabel:'Hoy',overdueLabel:'Vencido',soonLabel:'Pronto',eventEmptyTitle:'Sin eventos críticos',eventEmptyText:'No hay vencimientos ni tareas urgentes en este momento.',eventRequests:'Solicitudes pendientes',eventRequestsSub:'Revisar permisos y correcciones',eventAttendance:'Alertas de asistencia',eventAttendanceSub:'Llegadas tarde, entradas faltantes o pausas abiertas',eventDocsDue:'Documento por vencer',eventDocsSub:'Revisar archivo y responsable',eventReceivableOverdue:'Cobro vencido',eventReceivableDue:'Cobro por vencer',eventReceivableSub:'Seguimiento de cartera',eventStockLow:'Stock bajo',eventStockSub:'Revisar compra o reposición',eventPayrollSub:'Preparar cierre y pagos del mes'},
+  en:{today:'Today in your business',summary:'A clear snapshot of what happened today and what is coming next.',fullReport:'View full report',salesToday:'Today sales',teamPresent:'Team present',stockLow:'Low stock',receivablesDue:'Overdue receivables',docsDue:'Docs due',quick:'Quick actions',registerSale:'Register sale',addEmployee:'Add employee',createPurchase:'Create purchase',uploadDocument:'Upload document',registerReceivable:'Register payment',salesTrend:'Sales trend',week:'Last 7 days',aiTitle:'AI connected these signals',aiText:'It connects people, sales, inventory, documents and receivables so issues are visible before they grow.',next:'Upcoming events',payroll:'Payroll payment',reviewInventory:'Review inventory',reviewPeople:'View attendance',reviewReceivables:'View receivables',todayLabel:'Today',overdueLabel:'Overdue',soonLabel:'Soon',eventEmptyTitle:'No critical events',eventEmptyText:'There are no urgent deadlines or tasks right now.',eventRequests:'Pending requests',eventRequestsSub:'Review absences and corrections',eventAttendance:'Attendance alerts',eventAttendanceSub:'Late arrivals, missing clock-ins or open breaks',eventDocsDue:'Document due soon',eventDocsSub:'Review file and owner',eventReceivableOverdue:'Overdue payment',eventReceivableDue:'Payment due soon',eventReceivableSub:'Receivables follow-up',eventStockLow:'Low stock',eventStockSub:'Review purchase or restock',eventPayrollSub:'Prepare month-end payroll'},
+  fr:{today:'Aujourd’hui dans votre commerce',summary:'Résumé clair de ce qui s’est passé aujourd’hui et de ce qui arrive.',fullReport:'Voir rapport complet',salesToday:'Ventes du jour',teamPresent:'Équipe présente',stockLow:'Stock bas',receivablesDue:'Créances échues',docsDue:'Docs à échéance',quick:'Actions rapides',registerSale:'Enregistrer vente',addEmployee:'Ajouter employé',createPurchase:'Créer achat',uploadDocument:'Déposer document',registerReceivable:'Enregistrer paiement',salesTrend:'Tendance ventes',week:'7 derniers jours',aiTitle:'L’IA a relié ces signaux',aiText:'Elle relie personnel, ventes, inventaire, documents et créances pour voir les problèmes avant qu’ils grandissent.',next:'Prochains événements',payroll:'Paiement salaires',reviewInventory:'Voir inventaire',reviewPeople:'Voir présence',reviewReceivables:'Voir créances',todayLabel:'Aujourd’hui',overdueLabel:'Échu',soonLabel:'Bientôt',eventEmptyTitle:'Aucun événement critique',eventEmptyText:'Aucune échéance ou tâche urgente pour le moment.',eventRequests:'Demandes en attente',eventRequestsSub:'Vérifier absences et corrections',eventAttendance:'Alertes de présence',eventAttendanceSub:'Retards, entrées manquantes ou pauses ouvertes',eventDocsDue:'Document bientôt échu',eventDocsSub:'Vérifier fichier et responsable',eventReceivableOverdue:'Paiement échu',eventReceivableDue:'Paiement bientôt échu',eventReceivableSub:'Suivi des créances',eventStockLow:'Stock bas',eventStockSub:'Vérifier achat ou réassort',eventPayrollSub:'Préparer clôture et salaires'},
+  de:{today:'Heute in Ihrem Geschäft',summary:'Klarer Überblick darüber, was heute passiert ist und was als Nächstes kommt.',fullReport:'Vollständigen Bericht ansehen',salesToday:'Umsatz heute',teamPresent:'Team anwesend',stockLow:'Niedriger Bestand',receivablesDue:'Überfällige Forderungen',docsDue:'Dokumente fällig',quick:'Schnellaktionen',registerSale:'Verkauf erfassen',addEmployee:'Mitarbeiter hinzufügen',createPurchase:'Einkauf erstellen',uploadDocument:'Dokument hochladen',registerReceivable:'Zahlung erfassen',salesTrend:'Verkaufstrend',week:'Letzte 7 Tage',aiTitle:'KI hat diese Signale verbunden',aiText:'Sie verbindet Personal, Verkauf, Inventar, Dokumente und Forderungen, damit Probleme früh sichtbar werden.',next:'Nächste Termine',payroll:'Lohnzahlung',reviewInventory:'Inventar prüfen',reviewPeople:'Anwesenheit ansehen',reviewReceivables:'Forderungen ansehen',todayLabel:'Heute',overdueLabel:'Überfällig',soonLabel:'Bald',eventEmptyTitle:'Keine kritischen Termine',eventEmptyText:'Aktuell gibt es keine dringenden Fristen oder Aufgaben.',eventRequests:'Offene Anfragen',eventRequestsSub:'Absenzen und Korrekturen prüfen',eventAttendance:'Anwesenheitswarnungen',eventAttendanceSub:'Verspätungen, fehlende Einstempelungen oder offene Pausen',eventDocsDue:'Dokument bald fällig',eventDocsSub:'Datei und Verantwortliche prüfen',eventReceivableOverdue:'Zahlung überfällig',eventReceivableDue:'Zahlung bald fällig',eventReceivableSub:'Forderungen nachverfolgen',eventStockLow:'Niedriger Bestand',eventStockSub:'Einkauf oder Auffüllung prüfen',eventPayrollSub:'Monatsabschluss und Löhne vorbereiten'},
+  it:{today:'Oggi nel tuo business',summary:'Riepilogo chiaro di cosa è successo oggi e cosa arriva dopo.',fullReport:'Vedi report completo',salesToday:'Vendite di oggi',teamPresent:'Team presente',stockLow:'Stock basso',receivablesDue:'Crediti scaduti',docsDue:'Doc in scadenza',quick:'Azioni rapide',registerSale:'Registra vendita',addEmployee:'Aggiungi dipendente',createPurchase:'Crea acquisto',uploadDocument:'Carica documento',registerReceivable:'Registra incasso',salesTrend:'Trend vendite',week:'Ultimi 7 giorni',aiTitle:'L’IA ha collegato questi segnali',aiText:'Collega personale, vendite, inventario, documenti e crediti per vedere i problemi prima che crescano.',next:'Prossimi eventi',payroll:'Pagamento stipendi',reviewInventory:'Controlla inventario',reviewPeople:'Vedi presenze',reviewReceivables:'Vedi crediti',todayLabel:'Oggi',overdueLabel:'Scaduto',soonLabel:'Presto',eventEmptyTitle:'Nessun evento critico',eventEmptyText:'Non ci sono scadenze o attività urgenti al momento.',eventRequests:'Richieste in attesa',eventRequestsSub:'Controlla assenze e correzioni',eventAttendance:'Avvisi presenze',eventAttendanceSub:'Ritardi, entrate mancanti o pause aperte',eventDocsDue:'Documento in scadenza',eventDocsSub:'Controlla file e responsabile',eventReceivableOverdue:'Incasso scaduto',eventReceivableDue:'Incasso in scadenza',eventReceivableSub:'Follow-up crediti',eventStockLow:'Stock basso',eventStockSub:'Controlla acquisto o riordino',eventPayrollSub:'Prepara chiusura e stipendi'}
+};
+const hubDailyTx=()=>({...HUB_DAILY_UI.es,...(HUB_DAILY_UI[lang]||{})});
+function hubSalesLastDays(){
+  const base=startOfDay(new Date());
+  return Array.from({length:7},(_,i)=>{
+    const d=new Date(base);d.setDate(base.getDate()-(6-i));
+    const total=(DB.sales||[]).filter(s=>startOfDay(new Date(s.ts)).getTime()===d.getTime()).reduce((a,s)=>a+(Number(s.total)||0),0);
+    return{date:d,total,label:d.toLocaleDateString(undefined,{weekday:'short'}).slice(0,3)};
+  });
+}
+function hubSparkline(points,color='#2563eb'){
+  const values=points.map(p=>Number(p.total)||0),max=Math.max(...values,1),w=160,h=34;
+  const coords=values.map((v,i)=>`${(i/(Math.max(values.length-1,1))*w).toFixed(1)},${(h-(v/max*(h-6))-3).toFixed(1)}`).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${coords}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><polyline points="${coords} ${w},${h} 0,${h}" fill="${color}" opacity=".08"/></svg>`;
+}
+function hubDailyMetric({label,value,sub,color,soft,chart}){
+  return `<div class="hub-daily-card" style="--hub-color:${color};--hub-soft:${soft}">
+    <div class="hub-daily-label">${esc(label)}</div>
+    <div class="hub-daily-value">${esc(value)}</div>
+    <div class="hub-daily-sub">${esc(sub||'')}</div>
+    ${chart?`<div class="hub-spark">${chart}</div>`:''}
+  </div>`;
+}
+function hubSalesBars(points){
+  const max=Math.max(...points.map(p=>p.total),1);
+  return `<div class="hub-graph-bars">${points.map((p,i)=>`<div class="hub-graph-col"><div class="hub-graph-bar ${p.total===max&&max>0?'peak':''}" style="height:${Math.max(8,Math.round((p.total/max)*100))}%"></div><div class="hub-graph-label">${esc(p.label)}</div></div>`).join('')}</div>`;
+}
+function hubEventDate(value){
+  if(!value)return new Date();
+  const raw=String(value);
+  const d=new Date(raw.includes('T')?raw:`${raw}T12:00:00`);
+  return Number.isNaN(d.getTime())?new Date():d;
+}
+function hubEventMonth(d){
+  return d.toLocaleDateString(lang||undefined,{month:'short'}).replace('.','').slice(0,3);
+}
+function hubEventBadge(evt){
+  const h=hubDailyTx(),d=hubEventDate(evt.date),left=Math.round((startOfDay(d)-todayStart())/86400000);
+  if(evt.urgency==='overdue'||left<0)return{tone:'overdue',top:h.overdueLabel,bottom:''};
+  if(evt.urgency==='today'||left===0)return{tone:'today',top:h.todayLabel,bottom:''};
+  if(left<=7)return{tone:'soon',top:String(d.getDate()),bottom:hubEventMonth(d)};
+  return{tone:'normal',top:String(d.getDate()),bottom:hubEventMonth(d)};
+}
+function hubBusinessEvents(){
+  const h=hubDailyTx(),tx=areaTx(),rtx=receivablesTx(),events=[],now=new Date(),today=localDateKey(now);
+  const push=evt=>{if(evt&&evt.title)events.push(evt);};
+  const active=(DB.employees||[]).filter(e=>e.status==='active');
+  const pendingAbs=(DB.absences||[]).filter(a=>!a.approved);
+  if(pendingAbs.length)push({
+    id:'pending-requests',area:tx.team,icon:'team',title:`${h.eventRequests}: ${pendingAbs.length}`,
+    sub:h.eventRequestsSub,date:pendingAbs.map(a=>a.start||today).sort()[0]||today,urgency:'today',action:"goPage('vacations')"
+  });
+  const attendance=active.flatMap(e=>smartEmployeeAlerts(e).filter(a=>!isAlertReviewedAny(a)).map(a=>({emp:e,alert:a})));
+  if(attendance.length)push({
+    id:'attendance-alerts',area:tx.team,icon:'team',title:`${h.eventAttendance}: ${attendance.length}`,
+    sub:`${fullName(attendance[0].emp)} · ${attendance[0].alert.msg||h.eventAttendanceSub}`,date:today,urgency:'today',action:"goPage('dashboard')"
+  });
+  const low=lowStockItems();
+  if(low.length)push({
+    id:'low-stock',area:tx.inventory,icon:'inventory',title:`${h.eventStockLow}: ${low.length}`,
+    sub:low.slice(0,2).map(p=>p.name).join(', ')||h.eventStockSub,date:today,urgency:low.length>2?'today':'soon',action:"goPage('inventoryStock')"
+  });
+  const docs=(DB.documents||[]).map(d=>({...d,left:daysUntil(d.expiresAt)})).filter(d=>d.left!==null&&d.left<=30).sort((a,b)=>a.left-b.left);
+  docs.slice(0,2).forEach((d,i)=>push({
+    id:`doc-${d.id||i}`,area:tx.documents,icon:'documents',title:h.eventDocsDue,
+    sub:`${d.name||d.fileName||d.title||h.eventDocsSub}${d.left<0?` · ${h.overdueLabel}`:''}`,date:d.expiresAt,urgency:d.left<0?'overdue':d.left<=7?'soon':'normal',action:"goPage('documents')"
+  }));
+  const receivables=(DB.receivables||[]).filter(r=>r.status!=='paid'&&r.status!=='cancelled').map(r=>({...r,left:Math.round((hubEventDate(r.dueDate)-todayStart())/86400000)})).sort((a,b)=>a.left-b.left);
+  receivables.filter(r=>r.left<0).slice(0,1).forEach(r=>push({
+    id:`recv-overdue-${r.id}`,area:tx.receivables,icon:'receivables',title:h.eventReceivableOverdue,
+    sub:`${receivableClientName(r.clientId)} · ${money(r.amount||0)}`,date:r.dueDate,urgency:'overdue',action:"goPage('receivables')"
+  }));
+  receivables.filter(r=>r.left>=0&&r.left<=7).slice(0,1).forEach(r=>push({
+    id:`recv-due-${r.id}`,area:tx.receivables,icon:'receivables',title:h.eventReceivableDue,
+    sub:`${receivableClientName(r.clientId)} · ${money(r.amount||0)}`,date:r.dueDate,urgency:r.left===0?'today':'soon',action:"goPage('receivables')"
+  }));
+  if(active.length&&canPage('payroll')){
+    const lastDay=new Date(now.getFullYear(),now.getMonth()+1,0);
+    const left=Math.round((startOfDay(lastDay)-todayStart())/86400000);
+    if(left<=10)push({
+      id:'payroll-close',area:tx.team,icon:'team',title:h.payroll,sub:h.eventPayrollSub,date:localDateKey(lastDay),urgency:left<=2?'soon':'normal',action:"goPage('payroll')"
+    });
+  }
+  const rank={overdue:0,today:1,soon:2,normal:3};
+  return events.sort((a,b)=>(rank[a.urgency]??9)-(rank[b.urgency]??9)||hubEventDate(a.date)-hubEventDate(b.date)).slice(0,6);
+}
+function hubEventsHTML(events){
+  const h=hubDailyTx();
+  return `<section class="hub-events-card">
+    <h3>${esc(h.next)}</h3>
+    <div class="hub-events-list">
+      ${events.length?events.map(evt=>{const b=hubEventBadge(evt);return `<button class="hub-event-row actionable" onclick="${evt.action}">
+        <div class="hub-event-date ${b.tone}"><span>${esc(b.top)}</span>${b.bottom?`<small>${esc(b.bottom)}</small>`:''}</div>
+        <div style="min-width:0">
+          <div class="hub-event-area">${esc(evt.area||'')}</div>
+          <div class="hub-event-title">${esc(evt.title)}</div>
+          <div class="hub-event-sub">${esc(evt.sub||'')}</div>
+        </div>
+        <span class="hub-event-go">›</span>
+      </button>`}).join(''):`<div class="hub-event-empty"><strong>${esc(h.eventEmptyTitle)}</strong><br>${esc(h.eventEmptyText)}</div>`}
     </div>
   </section>`;
 }
 function renderHub(){
   const el=document.getElementById('hub-content');if(!el)return;
-  const tx=areaTx(),active=DB.employees.filter(e=>e.status==='active'),pending=(DB.absences||[]).filter(a=>!a.approved).length;
-  const dtx=documentsPageTx();
-  const rm=roadmapTx();
-  const rtx=receivablesTx();
-  const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewed(a.key)).length;
+  const tx=areaTx(),dtx=documentsPageTx(),rm=roadmapTx(),rtx=receivablesTx(),h=hubDailyTx();
+  const active=DB.employees.filter(e=>e.status==='active'),pending=(DB.absences||[]).filter(a=>!a.approved).length;
+  const now=new Date();
+  const present=active.filter(e=>isClockedIn(e.id,now)).length;
+  const scheduled=active.filter(e=>isEmployeeScheduledOn(e,now)).length||active.length;
+  const smart=active.flatMap(e=>smartEmployeeAlerts(e)).filter(a=>!isAlertReviewedAny(a)).length;
+  const todaySales=salesByPeriod('today'),todaySalesSum=salesSummary(todaySales);
+  const sales7=hubSalesLastDays();
+  const lowStock=lowStockItems();
+  const docs=DB.documents||[];
+  const docsDue=docs.filter(d=>{const left=daysUntil(d.expiresAt);return left!==null&&left<=30;}).length;
   const receivableOpen=(DB.receivables||[]).filter(r=>r.status!=='paid'&&r.status!=='cancelled');
   const receivableOverdue=receivableOpen.filter(r=>new Date((r.dueDate||localDateKey(new Date()))+'T12:00:00')<todayStart()).length;
+  const receivableAmount=receivableOpen.filter(r=>new Date((r.dueDate||localDateKey(new Date()))+'T12:00:00')<todayStart()).reduce((a,r)=>a+(Number(r.amount)||0),0);
   const activeAreas=3+(can('view_documents')?1:0)+2;
   const cards=[
     {id:'hub-card-people',icon:'team',title:tx.team,desc:tx.teamDesc,meta:[`${active.length} ${tx.employees}`,`${pending} ${tx.pending}`,`${smart} ${tx.alerts}`],color:'#2563eb',soft:'#eaf0ff',active:true,primary:true,ribbon:tx.openTeam,action:"goPage('dashboard')",button:tx.openTeam},
@@ -4667,53 +5228,93 @@ function renderHub(){
     {id:'hub-card-tasks',module:'tasks',icon:'tasks',title:tx.tasks,desc:tx.tasksDesc,meta:rm.tasks.pills,color:'#0891b2',soft:'#e6f8fc'},
     {id:'hub-card-insights',module:'insights',icon:'insights',title:tx.insights,desc:tx.insightsDesc,meta:rm.insights.pills,color:'#be123c',soft:'#fff1f2',active:true,action:"openManagerAssistant()",button:tx.open}
   ];
-  el.innerHTML=`<section class="hub-hero" id="hub-tour-hero">
-    <div class="hub-kicker">${esc(tx.eyebrow)}</div>
-    <h2>${esc(tx.title)}</h2>
-    <p>${esc(tx.sub)}</p>
+  const metrics=[
+    {label:h.salesToday,value:money(todaySalesSum.total),sub:`${todaySales.length} ${salesTx().sales}`,color:'#0f766e',soft:'#e6fffb',chart:hubSparkline(sales7,'#0f766e')},
+    {label:h.teamPresent,value:`${present}/${scheduled}`,sub:`${Math.round((present/Math.max(scheduled,1))*100)}% ${tx.employees}`,color:'#2563eb',soft:'#eaf0ff'},
+    {label:h.stockLow,value:String(lowStock.length),sub:lowStock.slice(0,2).map(p=>p.name).join(', ')||tx.inventory,color:'#d97706',soft:'#fff5df'},
+    {label:h.receivablesDue,value:money(receivableAmount),sub:`${receivableOverdue} ${rtx.overdue}`,color:'#dc2626',soft:'#fff1f2'},
+    {label:h.docsDue,value:String(docsDue),sub:dtx.total,color:'#7c3aed',soft:'#f3edff'}
+  ];
+  const quick=[
+    {label:h.registerSale,ico:'$',color:'#16a34a',action:'openSaleModal()'},
+    {label:h.addEmployee,ico:'+ ',color:'#2563eb',action:'openEmpModal(null)'},
+    {label:h.createPurchase,ico:'□',color:'#d97706',action:'openPurchaseModal()'},
+    {label:h.uploadDocument,ico:'↥',color:'#7c3aed',action:"goPage('documents')"},
+    {label:h.registerReceivable,ico:'₣',color:'#0f766e',action:"goPage('receivables')"}
+  ];
+  const events=hubBusinessEvents();
+  el.innerHTML=`<section class="hub-today-hero" id="hub-tour-hero">
+    <div class="hub-today-top">
+      <div>
+        <div class="hub-kicker">${esc(tx.eyebrow)}</div>
+        <h2>${esc(h.today)}</h2>
+        <p>${esc(h.summary)}</p>
+      </div>
+      <button class="hub-report-btn" onclick="${canPage('reports')?`goPage('reports')`:`openManagerAssistant()`}">${esc(h.fullReport)}</button>
+    </div>
     <div class="hub-hero-meta">
       <span class="hub-hero-chip">${activeAreas} ${esc(tx.active)}</span>
       <span class="hub-hero-chip">${active.length} ${esc(tx.employees)}</span>
       <span class="hub-hero-chip">${receivableOpen.length} ${esc(rtx.open)}</span>
     </div>
   </section>
-  <div class="hub-section-head"><div><h3>${esc(hubReviewTx().title)}</h3><p>${esc(hubReviewTx().sub)}</p></div></div>
-  ${hubReviewCenterHTML()}
-  <div class="hub-section-head"><div><h3>${esc(tx.title)}</h3><p>${esc(tx.open)} ${esc(tx.team)}, ${esc(tx.sales)}, ${esc(tx.inventory)} ${esc(tx.documents).toLowerCase()}.</p></div></div>
-  <section class="hub-grid" id="hub-area-grid">${cards.map(hubCardHTML).join('')}</section>
-  <section class="hub-side" style="display:none">
-    <div class="hub-panel">
-      <div class="card-header" style="margin:0">${esc(tx.today)}</div>
-      <div class="kpi-grid mt12" style="grid-template-columns:repeat(3,1fr);gap:10px">
-        <div class="kpi"><div class="kpi-val" style="color:var(--brand)">${active.length}</div><div class="kpi-sub">${esc(tx.employees)}</div></div>
-        <div class="kpi"><div class="kpi-val" style="color:var(--orange)">${pending}</div><div class="kpi-sub">${esc(tx.pending)}</div></div>
-        <div class="kpi"><div class="kpi-val" style="color:var(--red)">${smart}</div><div class="kpi-sub">${esc(tx.alerts)}</div></div>
-      </div>
-      ${canPage('settings')?`<div class="hub-line" id="hub-settings-card" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-        <div class="hub-icon" style="width:42px;height:42px;color:var(--brand);background:var(--brand-light);box-shadow:none">${hubIcon('settings')}</div>
-        <div style="flex:1;min-width:0">
-          <div class="fs14 fw8">${esc(tx.settings)}</div>
-          <div class="fs12 muted mt4">${esc(tx.settingsDesc)}</div>
+  <section class="hub-daily-layout">
+    <div class="hub-main-flow">
+      <div class="hub-daily-metrics">${metrics.map(hubDailyMetric).join('')}</div>
+      <div class="hub-combo-grid">
+        <div>
+          ${hubReviewCenterHTML()}
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="goPage('settings')">${esc(tx.openSettings)}</button>
-      </div>`:''}
-    </div>
-    <div class="hub-panel" id="hub-roadmap-card-legacy">
-      <div class="card-header" style="margin:0">${esc(tx.roadmap)}</div>
-      <div class="hub-timeline">
-        ${[tx.p1,tx.p2,tx.p3,tx.p4].map((p,i)=>`<div class="hub-line"><div class="hub-line-dot" style="background:${['var(--brand)','var(--green)','var(--orange)','var(--purple)'][i]}"></div><div class="fs12 fw7">${esc(p)}</div></div>`).join('')}
+        <div class="hub-graph-card">
+          <h3>${esc(h.salesTrend)}</h3>
+          <div class="sales-panel-sub">${esc(h.week)}</div>
+          ${hubSalesBars(sales7)}
+        </div>
       </div>
+      <div class="hub-section-head"><div><h3>${esc(tx.title)}</h3><p>${esc(tx.open)} ${esc(tx.team)}, ${esc(tx.sales)}, ${esc(tx.inventory)} ${esc(tx.documents).toLowerCase()}.</p></div></div>
+      <section class="hub-grid hub-grid-operational" id="hub-area-grid">${cards.map(hubCardHTML).join('')}</section>
     </div>
+    <aside class="hub-right-rail">
+      <section class="hub-action-card">
+        <h3>${esc(h.quick)}</h3>
+        <div class="hub-action-list">
+          ${quick.filter(q=>q.label).map(q=>`<button class="hub-action-btn" onclick="${q.action}"><span class="hub-action-ico" style="--hub-color:${q.color}">${esc(q.ico)}</span><span>${esc(q.label)}</span><span class="hub-action-arrow">›</span></button>`).join('')}
+        </div>
+      </section>
+      <section class="hub-ai-card">
+        <h3>${esc(h.aiTitle)}</h3>
+        <p class="fs13 muted" style="line-height:1.45">${esc(h.aiText)}</p>
+        <div class="hub-ai-flow">
+          <div class="hub-ai-node">${esc(tx.sales)}<br><b>${esc(money(todaySalesSum.total))}</b></div>
+          <div class="hub-ai-arrow">→</div>
+          <div class="hub-ai-node">${esc(tx.team)}<br><b>${present}/${scheduled}</b></div>
+          <div class="hub-ai-arrow">→</div>
+          <div class="hub-ai-node">${esc(tx.inventory)}<br><b>${lowStock.length}</b></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="openManagerAssistant()">${esc(tx.insights)}</button>
+      </section>
+      ${hubEventsHTML(events)}
+      ${canPage('settings')?`<section class="hub-action-card" id="hub-settings-card">
+        <div class="hub-line" style="border:0;background:transparent;padding:0">
+          <div class="hub-icon" style="width:42px;height:42px;color:var(--brand);background:var(--brand-light);box-shadow:none">${hubIcon('settings')}</div>
+          <div style="flex:1;min-width:0">
+            <div class="fs14 fw8">${esc(tx.settings)}</div>
+            <div class="fs12 muted mt4">${esc(tx.settingsDesc)}</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost mt12" onclick="goPage('settings')" style="width:100%">${esc(tx.openSettings)}</button>
+      </section>`:''}
+    </aside>
+  </section>
+  <div class="hub-section-head"><div><h3>${esc(tx.roadmap)}</h3><p>${esc(tx.p4)}</p></div></div>
+  <section class="hub-journey" id="hub-roadmap-card">
+    ${[
+      {t:tx.p1,c:'#2563eb'},
+      {t:tx.p2,c:'#16a34a'},
+      {t:tx.p3,c:'#d97706'},
+      {t:tx.p4,c:'#7c3aed'}
+    ].map(step=>`<div class="hub-step" style="--step-color:${step.c}"><div class="hub-step-title">${esc(step.t.split(':')[0])}</div><div class="hub-step-text">${esc(step.t.includes(':')?step.t.split(':').slice(1).join(':').trim():step.t)}</div></div>`).join('')}
   </section>`;
-  el.insertAdjacentHTML('beforeend',`<div class="hub-section-head"><div><h3>${esc(tx.roadmap)}</h3><p>${esc(tx.p4)}</p></div></div>
-    <section class="hub-journey" id="hub-roadmap-card">
-      ${[
-        {t:tx.p1,c:'#2563eb'},
-        {t:tx.p2,c:'#16a34a'},
-        {t:tx.p3,c:'#d97706'},
-        {t:tx.p4,c:'#7c3aed'}
-      ].map(step=>`<div class="hub-step" style="--step-color:${step.c}"><div class="hub-step-title">${esc(step.t.split(':')[0])}</div><div class="hub-step-text">${esc(step.t.includes(':')?step.t.split(':').slice(1).join(':').trim():step.t)}</div></div>`).join('')}
-    </section>`);
 }
 
 const RECEIVABLES_UI={
@@ -6102,7 +6703,7 @@ function renderDash(){
   const active=DB.employees.filter(e=>e.status==='active');
   const present=active.filter(e=>isClockedIn(e.id,now));
   const scheduled=isRestaurantOpen(now)?active.filter(e=>isEmployeeScheduledOn(e,now)):[];
-  const missing=scheduled.filter(e=>!present.some(p=>p.id===e.id)&&!getAbs(e.id,now));
+  const missing=scheduled.filter(e=>shouldShowMissingClockIn(e,now));
   const onVac=active.filter(e=>getAbs(e.id,now)?.type==='vacation');
 
   document.getElementById('dash-hero').innerHTML=`
@@ -6148,7 +6749,7 @@ function renderDash(){
     alerts.push({key:alertKey(a.start||now,`request-${a.id}`,a.type||'absence'),type:'pending-request',absId:a.id,emp,msg:`${msg} · ${fmtDate(a.start)}`,color:'var(--orange)',priority:11});
   });
   const visibleAlerts=alerts
-    .filter(a=>!isAlertReviewed(a.key))
+    .filter(a=>!isAlertReviewedAny(a))
     .sort((a,b)=>(b.priority||0)-(a.priority||0));
 
   const attentionRows=visibleAlerts.length?visibleAlerts.slice(0,4).map(a=>`
