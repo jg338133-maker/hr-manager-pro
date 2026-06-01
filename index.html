@@ -3088,7 +3088,8 @@ const empColor=e=>e.color||EMP_COLORS[Math.abs((e.id||'').charCodeAt(3)||0)%EMP_
 function mkAv(emp,sz='av-44'){
   const c=empColor(emp);
   const photo=safeImgSrc(emp.photo);
-  return `<div class="av ${esc(sz)}" style="background:linear-gradient(135deg,${esc(c)},${esc(c)}bb)">${photo?`<img src="${esc(photo)}" alt="">`:esc(initials(fullName(emp)))}</div>`;
+  const sizeClass=sz||'av-44';
+  return `<div class="av ${esc(sizeClass)}" style="background:linear-gradient(135deg,${esc(c)},${esc(c)}bb)">${photo?`<img src="${esc(photo)}" alt="">`:esc(initials(fullName(emp)))}</div>`;
 }
 
 let toastT;
