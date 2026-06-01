@@ -1617,7 +1617,10 @@ body.manager-theme .dash-status-value{color:#007d72}
     <div class="pay-lbl" id="pay-msub"></div>
   </div>
   <div id="pay-list"></div>
-  <button class="btn btn-ghost mt12" onclick="exportPayCSV()">⬇️ Exporter CSV</button>
+  <div style="display:flex;gap:8px;flex-wrap:wrap" class="mt12">
+    <button class="btn btn-ghost" onclick="exportPayCSV()">⬇️ Excel</button>
+    <button class="btn btn-ghost" onclick="exportPayPDF()">PDF</button>
+  </div>
 </div>
 
 <div class="page" id="pg-reports">
@@ -1630,7 +1633,10 @@ body.manager-theme .dash-status-value{color:#007d72}
     </div>
   </div>
   <div id="rep-content"></div>
-  <button class="btn btn-ghost mt12" onclick="exportRepCSV()">⬇️ Exporter CSV</button>
+  <div style="display:flex;gap:8px;flex-wrap:wrap" class="mt12">
+    <button class="btn btn-ghost" onclick="exportRepCSV()">⬇️ Excel</button>
+    <button class="btn btn-ghost" onclick="exportRepPDF()">PDF</button>
+  </div>
 </div>
 
 <div class="page" id="pg-history">
@@ -5944,9 +5950,23 @@ function salesReportRows(type,list){
   if(type==='inventory')return inventoryImpact(list).map(([label,v])=>({label,sub:v.unit,qty:round1(v.qty),total:''}));
   return list.map(s=>({label:s.productName,sub:`${fmtDate(s.ts)} ${fmtTime(s.ts)} · ${salesMethodLabel(s.method)}`,qty:Number(s.qty)||0,total:Number(s.total)||0,raw:s}));
 }
+function salesReportData(type='daily'){
+  const rt=salesReportText(),tx=salesTx(),w=salesWidgetText(),period=salesReportPeriod(type),list=salesByPeriod(period),sum=salesSummary(list);
+  const title={daily:rt.dailyClose,monthly:rt.monthlySales,product:rt.byProduct,payment:rt.byPayment,employee:rt.byEmployee,inventory:rt.inventory}[type]||rt.dailyClose;
+  const subtitle=`${rt.period} · ${salesReportPeriodLabel(period)} · ${DB.settings?.company||'Manager Pro'}`;
+  let headers=[rt.date,'Hora',rt.product,rt.category,rt.qty,rt.unitPrice,rt.total,rt.method,rt.employee,tx.note];
+  let rows=list.map(s=>[fmtDate(s.ts),fmtTime(s.ts),s.productName||'',s.category||'',Number(s.qty)||0,money(s.unitPrice),money(s.total),salesMethodLabel(s.method),s.employeeName||w.unassigned,s.note||'']);
+  if(type==='product'){headers=[rt.product,rt.category,rt.qty,rt.total];rows=salesReportRows('product',list).map(r=>[r.label,r.sub,r.qty,money(r.total)]);}
+  if(type==='payment'){headers=[rt.method,'N°',rt.total,'%'];rows=salesReportRows('payment',list).map(r=>[r.label,r.qty,money(r.total),sum.total?`${Math.round(r.total/sum.total*100)}%`:'0%']);}
+  if(type==='employee'){headers=[rt.employee,'N°',rt.total];rows=salesReportRows('employee',list).map(r=>[r.label,r.qty,money(r.total)]);}
+  if(type==='inventory'){headers=[rt.product,'Unidad',rt.qty];rows=salesReportRows('inventory',list).map(r=>[r.label,r.sub,r.qty]);}
+  const summaryHeaders=[tx.revenue,rt.detail,tx.ticket,salesWidgetText().productsSold];
+  const summaryRows=[[money(sum.total),sum.count,money(sum.ticket),sum.qty]];
+  return {type,title,subtitle,period,periodLabel:salesReportPeriodLabel(period),headers,rows,summaryHeaders,summaryRows,empty:rt.noData};
+}
 function salesReportCard(type,title,desc,icon){
   const rt=salesReportText();
-  return `<div class="sales-report-card"><div class="sales-report-icon">${esc(icon)}</div><h3>${esc(title)}</h3><p>${esc(desc)}</p><div class="sales-report-actions"><button class="btn btn-primary btn-sm" onclick="exportSalesExcel('${type}')">${esc(rt.excel)}</button><button class="btn btn-ghost btn-sm" onclick="previewSalesReport('${type}')">${esc(rt.preview)}</button></div></div>`;
+  return `<div class="sales-report-card"><div class="sales-report-icon">${esc(icon)}</div><h3>${esc(title)}</h3><p>${esc(desc)}</p><div class="sales-report-actions"><button class="btn btn-primary btn-sm" onclick="exportSalesExcel('${type}')">${esc(rt.excel)}</button><button class="btn btn-ghost btn-sm" onclick="exportSalesPDF('${type}')">PDF</button><button class="btn btn-ghost btn-sm" onclick="previewSalesReport('${type}',true)">${esc(rt.preview)}</button></div></div>`;
 }
 function renderSalesReports(){
   const el=document.getElementById('sales-reports-content');if(!el)return;
@@ -5974,12 +5994,12 @@ function renderSalesReports(){
   <section class="sales-panel" id="sales-report-preview"></section>`;
   previewSalesReport('daily');
 }
-function previewSalesReport(type='daily'){
+function previewSalesReport(type='daily',scroll=false){
   const box=document.getElementById('sales-report-preview');if(!box)return;
-  const rt=salesReportText(),period=salesReportPeriod(type),list=salesByPeriod(period),rows=salesReportRows(type,list).slice(0,12);
-  const title={daily:rt.dailyClose,monthly:rt.monthlySales,product:rt.byProduct,payment:rt.byPayment,employee:rt.byEmployee,inventory:rt.inventory}[type]||rt.dailyClose;
-  box.innerHTML=`<div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(title)}</h3><div class="sales-panel-sub">${esc(rt.period)} · ${esc(salesReportPeriodLabel(period))}</div></div><button class="btn btn-primary btn-sm" onclick="exportSalesExcel('${type}')">${esc(rt.excel)}</button></div>
-  ${rows.length?`<table class="sales-preview-table"><thead><tr><th>${esc(type==='inventory'?rt.product:rt.product)}</th><th>${esc(type==='daily'||type==='monthly'?rt.category:rt.summary)}</th><th class="num">${esc(rt.qty)}</th><th class="num">${esc(rt.total)}</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.label)}</td><td>${esc(r.sub||'-')}</td><td class="num">${esc(r.qty)}</td><td class="num">${typeof r.total==='number'?esc(money(r.total)):esc(r.total||'-')}</td></tr>`).join('')}</tbody></table>`:`<div class="sales-empty">${esc(rt.noData)}</div>`}`;
+  const rt=salesReportText(),data=salesReportData(type),previewRows=data.rows.slice(0,18);
+  box.innerHTML=`<div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(data.title)}</h3><div class="sales-panel-sub">${esc(data.subtitle)}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="exportSalesExcel('${type}')">${esc(rt.excel)}</button><button class="btn btn-ghost btn-sm" onclick="exportSalesPDF('${type}')">PDF</button></div></div>
+  ${previewRows.length?reportTableHTML(data.headers,previewRows):`<div class="sales-empty">${esc(data.empty)}</div>`}`;
+  if(scroll)box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function salesExcelTable(title,headers,rows){
   return `<h2>${xlsCell(title)}</h2><table><tr>${headers.map(h=>`<th>${xlsCell(h)}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(c=>`<td>${xlsCell(c)}</td>`).join('')}</tr>`).join('')}</table>`;
@@ -5992,18 +6012,15 @@ function salesReportPeriodLabel(period){
   return wt[key]||period;
 }
 function exportSalesExcel(type='daily'){
-  const rt=salesReportText(),tx=salesTx(),w=salesWidgetText(),period=salesReportPeriod(type),list=salesByPeriod(period),sum=salesSummary(list),periodLabel=salesReportPeriodLabel(period);
-  const header=`<h1>${xlsCell(rt.reports)} · ${xlsCell(type)}</h1><div class="muted">${xlsCell(DB.settings?.company||'Manager Pro')} · ${xlsCell(rt.period)}: ${xlsCell(periodLabel)} · ${xlsCell(fmtDate(new Date()))}</div>`;
-  const summary=salesExcelTable(rt.summary,[tx.revenue,rt.detail,tx.ticket,salesWidgetText().productsSold],[[money(sum.total),sum.count,money(sum.ticket),sum.qty]]);
-  const detailRows=list.map(s=>[fmtDate(s.ts),fmtTime(s.ts),s.productName||'',s.category||'',Number(s.qty)||0,money(s.unitPrice),money(s.total),salesMethodLabel(s.method),s.employeeName||w.unassigned,s.note||'']);
-  let body=header+summary;
-  if(['daily','monthly'].includes(type))body+=salesExcelTable(rt.detail,[rt.date,'Hora',rt.product,rt.category,rt.qty,rt.unitPrice,rt.total,rt.method,rt.employee,tx.note],detailRows);
-  if(type==='product')body+=salesExcelTable(rt.byProduct,[rt.product,rt.category,rt.qty,rt.total],salesReportRows('product',list).map(r=>[r.label,r.sub,r.qty,money(r.total)]));
-  if(type==='payment')body+=salesExcelTable(rt.byPayment,[rt.method,'N°',rt.total,'%'],salesReportRows('payment',list).map(r=>[r.label,r.qty,money(r.total),sum.total?`${Math.round(r.total/sum.total*100)}%`:'0%']));
-  if(type==='employee')body+=salesExcelTable(rt.byEmployee,[rt.employee,'N°',rt.total],salesReportRows('employee',list).map(r=>[r.label,r.qty,money(r.total)]));
-  if(type==='inventory')body+=salesExcelTable(rt.inventory,[rt.product,'Unidad',rt.qty],salesReportRows('inventory',list).map(r=>[r.label,r.sub,r.qty]));
-  const cleanPeriod=String(periodLabel).replace(/\s+/g,'_').replace(/[^\w-]/g,'');
+  const rt=salesReportText(),data=salesReportData(type);
+  const header=`<h1>${xlsCell(rt.reports)} · ${xlsCell(data.title)}</h1><div class="muted">${xlsCell(data.subtitle)} · ${xlsCell(fmtDate(new Date()))}</div>`;
+  const body=header+salesExcelTable(rt.summary,data.summaryHeaders,data.summaryRows)+salesExcelTable(data.title,data.headers,data.rows);
+  const cleanPeriod=String(data.periodLabel).replace(/\s+/g,'_').replace(/[^\w-]/g,'');
   xlsDownload(body,`ventas_${type}_${cleanPeriod||'periodo'}.xls`);
+}
+function exportSalesPDF(type='daily'){
+  const data=salesReportData(type);
+  openReportPreviewWindow(data.title,`${data.subtitle} · ${fmtDate(new Date())}`,data.headers,data.rows,data.empty);
 }
 function openSaleModal(){
   const tx=salesTx(),products=sellableProducts();
@@ -6232,9 +6249,20 @@ function inventoryReportHeaders(type){
   if(type==='productCost')return [tx.product,salesTx().type,salesTx().category,salesTx().price,tx.estimatedUnitCost,tx.estimatedMargin,tx.recipe];
   return [tx.product,salesTx().category,salesTx().type,tx.current,tx.unit,tx.min,tx.avgCost,tx.stockValue];
 }
+function inventoryReportData(type='stock'){
+  const tx=inventoryTx(),def=inventoryReportDefs().find(d=>d.type===type)||inventoryReportDefs()[0];
+  return {
+    type,
+    title:def.title,
+    subtitle:`${tx.reportsDesc} · ${DB.settings?.company||'Manager Pro'}`,
+    headers:inventoryReportHeaders(type),
+    rows:inventoryReportRows(type),
+    empty:tx.noReportData
+  };
+}
 function inventoryReportCard(def){
   const tx=inventoryTx();
-  return `<div class="sales-report-card"><div class="sales-report-icon">${esc(def.icon)}</div><h3>${esc(def.title)}</h3><p>${esc(def.desc)}</p><div class="sales-report-actions"><button class="btn btn-primary btn-sm" onclick="exportInventoryExcel('${def.type}')">${esc(tx.exportExcel)}</button><button class="btn btn-ghost btn-sm" onclick="previewInventoryReport('${def.type}')">${esc(tx.preview)}</button></div></div>`;
+  return `<div class="sales-report-card"><div class="sales-report-icon">${esc(def.icon)}</div><h3>${esc(def.title)}</h3><p>${esc(def.desc)}</p><div class="sales-report-actions"><button class="btn btn-primary btn-sm" onclick="exportInventoryExcel('${def.type}')">${esc(tx.exportExcel)}</button><button class="btn btn-ghost btn-sm" onclick="exportInventoryPDF('${def.type}')">PDF</button><button class="btn btn-ghost btn-sm" onclick="previewInventoryReport('${def.type}',true)">${esc(tx.preview)}</button></div></div>`;
 }
 function renderInventoryReports(){
   const el=document.getElementById('inventory-reports-content');if(!el)return;
@@ -6254,17 +6282,22 @@ function renderInventoryReports(){
   <section class="sales-panel" id="inventory-report-preview"></section>`;
   previewInventoryReport('stock');
 }
-function previewInventoryReport(type='stock'){
+function previewInventoryReport(type='stock',scroll=false){
   const box=document.getElementById('inventory-report-preview');if(!box)return;
-  const tx=inventoryTx(),def=inventoryReportDefs().find(d=>d.type===type)||inventoryReportDefs()[0],headers=inventoryReportHeaders(type),rows=inventoryReportRows(type).slice(0,18);
-  box.innerHTML=`<div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(def.title)}</h3><div class="sales-panel-sub">${esc(tx.reportsDesc)}</div></div><button class="btn btn-primary btn-sm" onclick="exportInventoryExcel('${type}')">${esc(tx.exportExcel)}</button></div>
-  ${rows.length?`<table class="sales-preview-table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`:`<div class="sales-empty">${esc(tx.noReportData)}</div>`}`;
+  const tx=inventoryTx(),data=inventoryReportData(type),rows=data.rows.slice(0,18);
+  box.innerHTML=`<div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(data.title)}</h3><div class="sales-panel-sub">${esc(data.subtitle)}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="exportInventoryExcel('${type}')">${esc(tx.exportExcel)}</button><button class="btn btn-ghost btn-sm" onclick="exportInventoryPDF('${type}')">PDF</button></div></div>
+  ${rows.length?reportTableHTML(data.headers,rows):`<div class="sales-empty">${esc(data.empty)}</div>`}`;
+  if(scroll)box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function exportInventoryExcel(type='stock'){
-  const tx=inventoryTx(),def=inventoryReportDefs().find(d=>d.type===type)||inventoryReportDefs()[0];
-  const header=`<h1>${xlsCell(tx.reports)} · ${xlsCell(def.title)}</h1><div class="muted">${xlsCell(DB.settings?.company||'Manager Pro')} · ${xlsCell(fmtDate(new Date()))}</div>`;
-  const body=header+salesExcelTable(def.title,inventoryReportHeaders(type),inventoryReportRows(type));
+  const tx=inventoryTx(),data=inventoryReportData(type);
+  const header=`<h1>${xlsCell(tx.reports)} · ${xlsCell(data.title)}</h1><div class="muted">${xlsCell(data.subtitle)} · ${xlsCell(fmtDate(new Date()))}</div>`;
+  const body=header+salesExcelTable(data.title,data.headers,data.rows);
   xlsDownload(body,`inventario_${type}_${new Date().toISOString().slice(0,10)}.xls`);
+}
+function exportInventoryPDF(type='stock'){
+  const data=inventoryReportData(type);
+  openReportPreviewWindow(data.title,`${data.subtitle} · ${fmtDate(new Date())}`,data.headers,data.rows,data.empty);
 }
 
 function tickEmpPortal(){
@@ -8558,6 +8591,39 @@ function xlsDownload(html,name){
   </style></head><body>${html}</body></html>`;
   dl('\ufeff'+doc,name,'application/vnd.ms-excel;charset=utf-8');
 }
+function reportTableHTML(headers,rows){
+  return rows.length?`<table class="sales-preview-table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`:'';
+}
+function reportPrintTx(){
+  return ({
+    fr:{save:'Enregistrer / imprimer PDF',close:'Fermer',empty:'Aucune donnée',popup:'Autorisez les fenêtres contextuelles pour voir le PDF'},
+    es:{save:'Guardar / imprimir PDF',close:'Cerrar',empty:'Sin datos',popup:'Permite ventanas emergentes para ver el PDF'},
+    en:{save:'Save / print PDF',close:'Close',empty:'No data',popup:'Allow pop-ups to view the PDF'},
+    de:{save:'PDF speichern / drucken',close:'Schließen',empty:'Keine Daten',popup:'Pop-ups erlauben, um das PDF zu sehen'},
+    it:{save:'Salva / stampa PDF',close:'Chiudi',empty:'Nessun dato',popup:'Consenti i popup per vedere il PDF'}
+  })[lang]||{};
+}
+function reportPrintHTML(title,subtitle,headers,rows,empty){
+  const tx=reportPrintTx();
+  const table=rows.length?`<table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`:`<div class="empty">${esc(empty||tx.empty||'Sin datos')}</div>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title><style>
+    body{font-family:Arial,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#0f172a;margin:0;background:#f8fafc}
+    .wrap{max-width:1000px;margin:0 auto;padding:28px}
+    .paper{background:#fff;border:1px solid #dbe4f1;border-radius:18px;padding:28px;box-shadow:0 18px 50px rgba(15,23,42,.08)}
+    h1{margin:0;font-size:26px;color:#0f172a}.sub{margin:6px 0 22px;color:#64748b;font-size:13px}
+    table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #e2e8f0;padding:10px;text-align:left;vertical-align:top}
+    th{background:#f1f5f9;color:#475569;text-transform:uppercase;font-size:10px;letter-spacing:.6px}.empty{padding:22px;border:1px dashed #cbd5e1;border-radius:12px;color:#64748b}
+    .actions{display:flex;gap:10px;margin-bottom:16px}.btn{border:1px solid #cbd5e1;background:#fff;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}.primary{background:#2563eb;color:#fff;border-color:#2563eb}
+    @media print{body{background:#fff}.wrap{padding:0}.paper{box-shadow:none;border:0;border-radius:0}.actions{display:none}}
+  </style></head><body><div class="wrap"><div class="actions"><button class="btn primary" onclick="window.print()">${esc(tx.save||'PDF')}</button><button class="btn" onclick="window.close()">${esc(tx.close||'Close')}</button></div><div class="paper"><h1>${esc(title)}</h1><div class="sub">${esc(subtitle)}</div>${table}</div></div></body></html>`;
+}
+function openReportPreviewWindow(title,subtitle,headers,rows,empty){
+  const w=window.open('','_blank');
+  if(!w){toast(reportPrintTx().popup||'Allow pop-ups to view the PDF','#f59e0b');return;}
+  w.document.open();
+  w.document.write(reportPrintHTML(title,subtitle,headers,rows,empty));
+  w.document.close();
+}
 function exportPayCSV(){
   if(!requirePerm('view_payroll'))return;
   const y=payMD.getFullYear(),m=payMD.getMonth(),rows=DB.employees.map(emp=>({emp,...calcPay(emp,y,m)}));
@@ -8567,6 +8633,13 @@ function exportPayCSV(){
   <h2>Detalle de salarios</h2><table><tr>${['Empleado','Puesto','Contrato','Tipo salario','Base salario','Horas','H.Supp','Salario estimado'].map(h=>`<th>${h}</th>`).join('')}</tr>
   ${rows.map(r=>`<tr><td>${xlsCell(fullName(r.emp))}</td><td>${xlsCell(r.emp.position)}</td><td>${xlsCell(r.emp.contract)}</td><td>${xlsCell(payModeLabel(r.emp))}</td><td>${xlsCell(payBaseLabel(r.emp))}</td><td>${r.hrs.toFixed(2)}</td><td>${r.ot.toFixed(2)}</td><td class="money">${moneyPlain(r.pay)}</td></tr>`).join('')}</table>`;
   xlsDownload(body,`salarios_${fmtMonth(payMD).replace(' ','_')}.xls`);
+}
+function exportPayPDF(){
+  if(!requirePerm('view_payroll'))return;
+  const y=payMD.getFullYear(),m=payMD.getMonth(),rows=DB.employees.map(emp=>({emp,...calcPay(emp,y,m)}));
+  const headers=['Empleado','Puesto','Contrato','Tipo salario','Base salario','Horas','H. supp.','Salario estimado'];
+  const data=rows.map(r=>[fullName(r.emp),r.emp.position||'',r.emp.contract||'',payModeLabel(r.emp),payBaseLabel(r.emp),r.hrs.toFixed(2),r.ot.toFixed(2),moneyPlain(r.pay)]);
+  openReportPreviewWindow(`Salarios · ${fmtMonth(payMD)}`,`${DB.settings?.company||'Manager Pro'} · ${fmtDate(new Date())}`,headers,data,'Sin datos de salarios');
 }
 function exportRepCSV(){
   if(!requirePerm('view_reports'))return;
@@ -8594,6 +8667,13 @@ function exportRepCSV(){
   <h2>${rx.detail}</h2><table><tr>${[rx.employee,rx.position,rx.contract,rx.salaryType,rx.salaryBase,tx.workedDays,tx.netHours,tx.breaks,tx.late,tx.absences,rx.absenceDays,rx.attendancePct,tx.monthOvertime,rx.estimatedSalary,tx.vacLeft,tx.annualExtra,rx.restEquivalent,rx.lateComments].map(h=>`<th>${h}</th>`).join('')}</tr>
   ${rows.map(r=>`<tr><td>${xlsCell(fullName(r.emp))}</td><td>${xlsCell(r.emp.position)}</td><td>${xlsCell(r.emp.contract)}</td><td>${xlsCell(payModeLabel(r.emp))}</td><td>${xlsCell(payBaseLabel(r.emp))}</td><td>${r.days}</td><td>${r.hrs.toFixed(2)}</td><td>${r.breaks.toFixed(2)}</td><td class="${r.late>0?'warn':''}">${r.late}</td><td class="${r.abs>0?'bad':''}">${r.abs}</td><td>${xlsCell(r.absentDates.join(' | '))}</td><td>${r.att.toFixed(0)}%</td><td>${r.ot.toFixed(2)}</td><td class="money">${moneyPlain(r.pay)}</td><td>${r.vacLeft}</td><td>${r.annual.toFixed(2)}</td><td>${(r.annual/8.4).toFixed(2)}</td><td>${xlsCell(r.lateNotes.join(' | '))}</td></tr>`).join('')}</table>`;
   xlsDownload(body,`reporte_mensual_${fmtMonth(repMD).replace(' ','_')}.xls`);
+}
+function exportRepPDF(){
+  if(!requirePerm('view_reports'))return;
+  const tx=TL('rep'),y=repMD.getFullYear(),m=repMD.getMonth(),rows=DB.employees.map(emp=>monthlyEmployeeReport(emp,y,m));
+  const headers=['Empleado','Puesto','Contrato','Tipo salario','Base salario',tx.workedDays,tx.netHours,tx.breaks,tx.late,tx.absences,'Días ausencia','Presencia %',tx.monthOvertime,'Salario estimado',tx.vacLeft,tx.annualExtra,'Reposo equiv. días','Comentarios retardo'];
+  const data=rows.map(r=>[fullName(r.emp),r.emp.position||'',r.emp.contract||'',payModeLabel(r.emp),payBaseLabel(r.emp),r.days,r.hrs.toFixed(2),r.breaks.toFixed(2),r.late,r.abs,r.absentDates.join(' | '),`${r.att.toFixed(0)}%`,r.ot.toFixed(2),moneyPlain(r.pay),r.vacLeft,r.annual.toFixed(2),(r.annual/8.4).toFixed(2),r.lateNotes.join(' | ')]);
+  openReportPreviewWindow(`${tx.monthlyPackage||'Reporte mensual'} · ${fmtMonth(repMD)}`,`${DB.settings?.company||'Manager Pro'} · ${fmtDate(new Date())}`,headers,data,'Sin datos para este reporte');
 }
 function exportAllJSON(){dl(JSON.stringify(DB,null,2),'hrmanagerpro_backup.json','application/json');}
 async function exportMasterJSON(){
