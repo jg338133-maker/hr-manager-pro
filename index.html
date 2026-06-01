@@ -2963,7 +2963,7 @@ async function sbSetRestaurantStatus(id,status){
 }
 async function sbCreateManagerInvite(email,role){
   if(isDemo())throw new Error('Demo mode');
-  const {data,error}=await sb.rpc('create_manager_invite',{p_email:email,p_role:role});
+  const {data,error}=await sb.rpc('create_manager_invite',{p_email:email,p_role:role,p_restaurant_id:REST_ID});
   if(error)throw error;
   return data;
 }
@@ -2980,13 +2980,13 @@ async function sbListBusinessProfiles(){
 }
 async function sbUpdateManagerAccess(email,role){
   if(isDemo())throw new Error('Demo mode');
-  const {data,error}=await sb.rpc('update_manager_access',{p_email:email,p_role:role});
+  const {data,error}=await sb.rpc('update_manager_access',{p_email:email,p_role:role,p_restaurant_id:REST_ID});
   if(error)throw error;
   return data;
 }
 async function sbRevokeManagerAccess(email){
   if(isDemo())throw new Error('Demo mode');
-  const {data,error}=await sb.rpc('revoke_manager_access',{p_email:email});
+  const {data,error}=await sb.rpc('revoke_manager_access',{p_email:email,p_restaurant_id:REST_ID});
   if(error)throw error;
   return data;
 }

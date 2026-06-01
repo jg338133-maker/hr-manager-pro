@@ -411,7 +411,7 @@ with check (
   )
 );
 
-create or replace function public.create_manager_invite(p_email text, p_role text default 'restaurant_manager')
+create or replace function public.create_manager_invite(p_email text, p_role text default 'restaurant_manager', p_restaurant_id uuid default null)
 returns text
 language plpgsql
 security definer
@@ -431,6 +431,10 @@ begin
   where user_id = auth.uid()
     and role in ('restaurant_admin','super_admin')
   limit 1;
+
+  if public.is_super_admin() and p_restaurant_id is not null then
+    v_restaurant_id := p_restaurant_id;
+  end if;
 
   if v_restaurant_id is null and not public.is_super_admin() then
     raise exception 'Not allowed';
@@ -503,6 +507,9 @@ begin
   return v_profile;
 end;
 $$;
+
+grant execute on function public.create_manager_invite(text,text,uuid) to authenticated;
+grant execute on function public.accept_manager_invite(text) to authenticated;
 
 -- Self-service signup: create an independent business for the logged-in user.
 -- Used after email confirmation, so the business is not lost when Supabase
@@ -612,7 +619,7 @@ $$;
 
 grant execute on function public.create_business_for_current_user(text,text,text,text) to authenticated;
 
-create or replace function public.update_manager_access(p_email text, p_role text)
+create or replace function public.update_manager_access(p_email text, p_role text, p_restaurant_id uuid default null)
 returns public.profiles
 language plpgsql
 security definer
@@ -633,6 +640,10 @@ begin
     and role in ('restaurant_admin','super_admin')
   limit 1;
 
+  if public.is_super_admin() and p_restaurant_id is not null then
+    v_restaurant_id := p_restaurant_id;
+  end if;
+
   if v_restaurant_id is null then
     raise exception 'Not allowed';
   end if;
@@ -652,7 +663,7 @@ begin
 end;
 $$;
 
-create or replace function public.revoke_manager_access(p_email text)
+create or replace function public.revoke_manager_access(p_email text, p_restaurant_id uuid default null)
 returns boolean
 language plpgsql
 security definer
@@ -669,6 +680,10 @@ begin
     and role in ('restaurant_admin','super_admin')
   limit 1;
 
+  if public.is_super_admin() and p_restaurant_id is not null then
+    v_restaurant_id := p_restaurant_id;
+  end if;
+
   if v_restaurant_id is null then
     raise exception 'Not allowed';
   end if;
@@ -683,6 +698,9 @@ begin
   return v_count > 0;
 end;
 $$;
+
+grant execute on function public.update_manager_access(text,text,uuid) to authenticated;
+grant execute on function public.revoke_manager_access(text,uuid) to authenticated;
 
 -- Promote your own account to master after it exists in Supabase Auth.
 -- Replace jg338133@gmail.com with your email.
