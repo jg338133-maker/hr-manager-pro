@@ -3601,15 +3601,48 @@ async function recoverPassword(){
   const oldBtn=btn?.textContent;
   if(btn){btn.disabled=true;btn.textContent=passwordResetText().sending;}
   try{
-    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:APP_PUBLIC_URL});
+    localStorage.setItem('manager_pro_pending_password_recovery','1');
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:passwordResetRedirectUrl()});
     if(error)throw error;
     toast(passwordResetText().sent);
   }catch(e){
     console.error(e);
+    localStorage.removeItem('manager_pro_pending_password_recovery');
     toast(passwordRecoveryError(e),'#ef4444');
   }finally{
     if(btn){btn.disabled=false;btn.textContent=oldBtn;}
   }
+}
+
+function passwordResetRedirectUrl(){
+  const u=new URL(APP_PUBLIC_URL);
+  u.searchParams.set('reset_password','1');
+  return u.toString();
+}
+
+function hasPasswordRecoverySignal(){
+  const qs=new URLSearchParams(location.search||'');
+  const hs=new URLSearchParams((location.hash||'').replace(/^#/,''));
+  return qs.get('reset_password')==='1'
+    || qs.get('type')==='recovery'
+    || hs.get('type')==='recovery'
+    || (localStorage.getItem('manager_pro_pending_password_recovery')==='1'&&qs.has('code'));
+}
+
+async function handlePasswordRecoverySignal(){
+  if(!hasPasswordRecoverySignal())return false;
+  const qs=new URLSearchParams(location.search||'');
+  const code=qs.get('code');
+  if(code){
+    try{
+      const {error}=await sb.auth.exchangeCodeForSession(code);
+      if(error)console.warn('Password recovery code exchange failed:',error);
+    }catch(e){console.warn('Password recovery exchange skipped:',e);}
+  }
+  localStorage.removeItem('manager_pro_pending_password_recovery');
+  showPasswordResetModal();
+  try{history.replaceState(null,'',location.pathname);}catch(e){}
+  return true;
 }
 
 function passwordResetText(){
@@ -3672,6 +3705,7 @@ async function saveRecoveredPassword(){
 
 function cancelPasswordReset(){
   closeModal('password-reset-modal');
+  localStorage.removeItem('manager_pro_pending_password_recovery');
   sb.auth.signOut().catch(()=>{});
 }
 
@@ -8783,7 +8817,8 @@ sb.auth.onAuthStateChange((event)=>{
 });
 
 async function init(){
-  setAppHistoryState('landing','replace');
+  const passwordRecoveryBoot=hasPasswordRecoverySignal();
+  if(!passwordRecoveryBoot)setAppHistoryState('landing','replace');
   const publicLang=localStorage.getItem('hrm_public_lang');
   if(publicLang&&LANGS[publicLang])lang=publicLang;
   const loadingCopy=LOADING_UI[lang]||LOADING_UI.es;
@@ -8804,6 +8839,7 @@ async function init(){
   document.getElementById('login-screen').classList.remove('auth-open');
   applyEmployeeAccessLink();
   applyInviteLanding();
+  if(passwordRecoveryBoot)await handlePasswordRecoverySignal();
 }
 init();
 </script>
