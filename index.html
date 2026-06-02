@@ -3639,7 +3639,7 @@ function hasAuthCallbackSignal(){
 function hasPasswordRecoverySignal(){
   const {qs,hs}=authCallbackParams();
   const pendingRecovery=localStorage.getItem('manager_pro_pending_password_recovery')==='1';
-  const pendingSignup=!!getPendingRegistration();
+  const pendingSignup=!!pendingRegistration();
   return qs.get('reset_password')==='1'
     || qs.get('type')==='recovery'
     || hs.get('type')==='recovery'
@@ -8844,8 +8844,9 @@ async function init(){
   const loadingSub=document.getElementById('loading-sub');
   if(loadingSub)loadingSub.textContent=loadingCopy.sub;
   document.getElementById('loading-msg').textContent=loadingCopy.connect;
+  if(passwordRecoveryBoot)await handlePasswordRecoverySignal();
   try{
-    const ok=await loadSB();
+    const ok=await withTimeout(loadSB(),8000,'Initial load timeout');
     if(ok){document.getElementById('loading-msg').textContent=loadingCopy.ready;await new Promise(r=>setTimeout(r,400));}
   }catch(e){console.warn('Local mode');}
   const lo=document.getElementById('loading-overlay');
@@ -8855,10 +8856,9 @@ async function init(){
   applyBrand();
   applyUITexts();
   document.getElementById('login-screen').style.display='block';
-  document.getElementById('login-screen').classList.remove('auth-open');
+  if(!passwordRecoveryBoot)document.getElementById('login-screen').classList.remove('auth-open');
   applyEmployeeAccessLink();
   applyInviteLanding();
-  if(passwordRecoveryBoot)await handlePasswordRecoverySignal();
 }
 init();
 </script>
