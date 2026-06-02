@@ -398,6 +398,10 @@ input[type=date],input[type=time]{color-scheme:dark}
 #login-screen.auth-open .login-landing{display:none}
 #login-screen.auth-open .login-card{display:block}
 #login-screen.auth-open .login-topbar{border-bottom:1px solid #e5e7eb;background:#fff}
+#login-screen.recovery-open .login-landing,
+#login-screen.recovery-open .login-card{display:none}
+#password-reset-modal{z-index:1000;align-items:center}
+#password-reset-modal .modal{border-radius:22px;max-height:min(92vh,620px)}
 .login-card-head{display:none;margin-bottom:18px}
 .login-card-title{font-size:22px;font-weight:900}
 .login-card-sub{font-size:12px;color:#6b7280;margin-top:4px}
@@ -3665,13 +3669,13 @@ async function handlePasswordRecoverySignal(){
 
 function passwordResetText(){
   return ({
-    es:{title:'Nueva contraseña',sub:'Crea una contraseña nueva para volver a entrar.',pass:'Contraseña nueva',repeat:'Repetir contraseña',save:'Guardar contraseña',cancel:'Cancelar',short:'La contraseña debe tener al menos 6 caracteres',mismatch:'Las contraseñas no coinciden',saved:'Contraseña actualizada. Inicia sesión de nuevo.',sent:'Te enviamos un correo para recuperar la contraseña.',sending:'Enviando...',email:'Escribe tu email primero',rate:'Límite de correos alcanzado. Espera unos minutos o revisa SMTP en Supabase.',failed:'No se pudo enviar el correo de recuperación.'},
-    fr:{title:'Nouveau mot de passe',sub:'Créez un nouveau mot de passe pour vous reconnecter.',pass:'Nouveau mot de passe',repeat:'Répéter le mot de passe',save:'Enregistrer',cancel:'Annuler',short:'Le mot de passe doit contenir au moins 6 caractères',mismatch:'Les mots de passe ne correspondent pas',saved:'Mot de passe mis à jour. Connectez-vous à nouveau.',sent:'Email de récupération envoyé.',sending:'Envoi...',email:'Entrez votre email',rate:'Limite d’emails atteinte. Attendez quelques minutes ou vérifiez SMTP dans Supabase.',failed:'Impossible d’envoyer la récupération.'},
-    en:{title:'New password',sub:'Create a new password to sign in again.',pass:'New password',repeat:'Repeat password',save:'Save password',cancel:'Cancel',short:'Password must be at least 6 characters',mismatch:'Passwords do not match',saved:'Password updated. Sign in again.',sent:'Password recovery email sent.',sending:'Sending...',email:'Enter your email first',rate:'Email limit reached. Wait a few minutes or check SMTP in Supabase.',failed:'Could not send the recovery email.'},
-    de:{title:'Neues Passwort',sub:'Erstelle ein neues Passwort, um dich erneut anzumelden.',pass:'Neues Passwort',repeat:'Passwort wiederholen',save:'Passwort speichern',cancel:'Abbrechen',short:'Das Passwort muss mindestens 6 Zeichen haben',mismatch:'Die Passwörter stimmen nicht überein',saved:'Passwort aktualisiert. Melde dich erneut an.',sent:'E-Mail zur Wiederherstellung gesendet.',sending:'Senden...',email:'Gib zuerst deine E-Mail ein',rate:'E-Mail-Limit erreicht. Warte kurz oder prüfe SMTP in Supabase.',failed:'Wiederherstellungs-E-Mail konnte nicht gesendet werden.'},
-    it:{title:'Nuova password',sub:'Crea una nuova password per accedere di nuovo.',pass:'Nuova password',repeat:'Ripeti password',save:'Salva password',cancel:'Annulla',short:'La password deve avere almeno 6 caratteri',mismatch:'Le password non coincidono',saved:'Password aggiornata. Accedi di nuovo.',sent:'Email di recupero inviata.',sending:'Invio...',email:'Inserisci prima la tua email',rate:'Limite email raggiunto. Attendi qualche minuto o verifica SMTP in Supabase.',failed:'Impossibile inviare il recupero.'}
+    es:{title:'Nueva contraseña',sub:'Crea una contraseña nueva para volver a entrar.',pass:'Contraseña nueva',repeat:'Repetir contraseña',save:'Guardar contraseña',cancel:'Cancelar',short:'La contraseña debe tener al menos 6 caracteres',mismatch:'Las contraseñas no coinciden',saved:'Contraseña actualizada. Inicia sesión de nuevo.',sent:'Te enviamos un correo para recuperar la contraseña.',sending:'Enviando...',saving:'Guardando...',email:'Escribe tu email primero',rate:'Límite de correos alcanzado. Espera unos minutos o revisa SMTP en Supabase.',failed:'No se pudo enviar el correo de recuperación.',expired:'Este enlace de recuperación ya no está activo. Pide uno nuevo.'},
+    fr:{title:'Nouveau mot de passe',sub:'Créez un nouveau mot de passe pour vous reconnecter.',pass:'Nouveau mot de passe',repeat:'Répéter le mot de passe',save:'Enregistrer',cancel:'Annuler',short:'Le mot de passe doit contenir au moins 6 caractères',mismatch:'Les mots de passe ne correspondent pas',saved:'Mot de passe mis à jour. Connectez-vous à nouveau.',sent:'Email de récupération envoyé.',sending:'Envoi...',saving:'Enregistrement...',email:'Entrez votre email',rate:'Limite d’emails atteinte. Attendez quelques minutes ou vérifiez SMTP dans Supabase.',failed:'Impossible d’envoyer la récupération.',expired:'Ce lien de récupération n’est plus actif. Demandez-en un nouveau.'},
+    en:{title:'New password',sub:'Create a new password to sign in again.',pass:'New password',repeat:'Repeat password',save:'Save password',cancel:'Cancel',short:'Password must be at least 6 characters',mismatch:'Passwords do not match',saved:'Password updated. Sign in again.',sent:'Password recovery email sent.',sending:'Sending...',saving:'Saving...',email:'Enter your email first',rate:'Email limit reached. Wait a few minutes or check SMTP in Supabase.',failed:'Could not send the recovery email.',expired:'This recovery link is no longer active. Request a new one.'},
+    de:{title:'Neues Passwort',sub:'Erstelle ein neues Passwort, um dich erneut anzumelden.',pass:'Neues Passwort',repeat:'Passwort wiederholen',save:'Passwort speichern',cancel:'Abbrechen',short:'Das Passwort muss mindestens 6 Zeichen haben',mismatch:'Die Passwörter stimmen nicht überein',saved:'Passwort aktualisiert. Melde dich erneut an.',sent:'E-Mail zur Wiederherstellung gesendet.',sending:'Senden...',saving:'Speichern...',email:'Gib zuerst deine E-Mail ein',rate:'E-Mail-Limit erreicht. Warte kurz oder prüfe SMTP in Supabase.',failed:'Wiederherstellungs-E-Mail konnte nicht gesendet werden.',expired:'Dieser Wiederherstellungslink ist nicht mehr aktiv. Fordere einen neuen an.'},
+    it:{title:'Nuova password',sub:'Crea una nuova password per accedere di nuovo.',pass:'Nuova password',repeat:'Ripeti password',save:'Salva password',cancel:'Annulla',short:'La password deve avere almeno 6 caratteri',mismatch:'Le password non coincidono',saved:'Password aggiornata. Accedi di nuovo.',sent:'Email di recupero inviata.',sending:'Invio...',saving:'Salvataggio...',email:'Inserisci prima la tua email',rate:'Limite email raggiunto. Attendi qualche minuto o verifica SMTP in Supabase.',failed:'Impossibile inviare il recupero.',expired:'Questo link di recupero non è più attivo. Richiedine uno nuovo.'}
   })[lang]||({
-    title:'Nueva contraseña',sub:'Crea una contraseña nueva para volver a entrar.',pass:'Contraseña nueva',repeat:'Repetir contraseña',save:'Guardar contraseña',cancel:'Cancelar',short:'La contraseña debe tener al menos 6 caracteres',mismatch:'Las contraseñas no coinciden',saved:'Contraseña actualizada. Inicia sesión de nuevo.',sent:'Te enviamos un correo para recuperar la contraseña.',sending:'Enviando...',email:'Escribe tu email primero',rate:'Límite de correos alcanzado. Espera unos minutos o revisa SMTP en Supabase.',failed:'No se pudo enviar el correo de recuperación.'
+    title:'Nueva contraseña',sub:'Crea una contraseña nueva para volver a entrar.',pass:'Contraseña nueva',repeat:'Repetir contraseña',save:'Guardar contraseña',cancel:'Cancelar',short:'La contraseña debe tener al menos 6 caracteres',mismatch:'Las contraseñas no coinciden',saved:'Contraseña actualizada. Inicia sesión de nuevo.',sent:'Te enviamos un correo para recuperar la contraseña.',sending:'Enviando...',saving:'Guardando...',email:'Escribe tu email primero',rate:'Límite de correos alcanzado. Espera unos minutos o revisa SMTP en Supabase.',failed:'No se pudo enviar el correo de recuperación.',expired:'Este enlace de recuperación ya no está activo. Pide uno nuevo.'
   });
 }
 
@@ -3689,8 +3693,12 @@ function applyPasswordResetTexts(){
 
 function showPasswordResetModal(){
   applyPasswordResetTexts();
-  document.getElementById('login-screen').style.display='block';
-  document.getElementById('login-screen').classList.add('auth-open');
+  const screen=document.getElementById('login-screen');
+  if(screen){
+    screen.style.display='block';
+    screen.classList.remove('auth-open');
+    screen.classList.add('recovery-open');
+  }
   document.getElementById('password-reset-1').value='';
   document.getElementById('password-reset-2').value='';
   openModal('password-reset-modal');
@@ -3704,11 +3712,14 @@ async function saveRecoveredPassword(){
   if(pass.length<6){toast(tx.short,'#ef4444');return;}
   if(pass!==pass2){toast(tx.mismatch,'#ef4444');return;}
   const btn=document.getElementById('password-reset-save'),old=btn?.textContent;
-  if(btn){btn.disabled=true;btn.textContent=tx.sending;}
+  if(btn){btn.disabled=true;btn.textContent=tx.saving||tx.sending;}
   try{
+    const {data:sessionData}=await sb.auth.getSession();
+    if(!sessionData?.session)throw new Error(tx.expired);
     const {error}=await sb.auth.updateUser({password:pass});
     if(error)throw error;
     closeModal('password-reset-modal');
+    document.getElementById('login-screen')?.classList.remove('recovery-open');
     await sb.auth.signOut();
     currentUser=null;
     history.replaceState(null,'',location.pathname);
@@ -3724,6 +3735,7 @@ async function saveRecoveredPassword(){
 function cancelPasswordReset(){
   closeModal('password-reset-modal');
   localStorage.removeItem('manager_pro_pending_password_recovery');
+  document.getElementById('login-screen')?.classList.remove('recovery-open');
   sb.auth.signOut().catch(()=>{});
 }
 
