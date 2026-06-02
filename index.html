@@ -2147,7 +2147,14 @@ const MAINTENANCE_LINKS={
   supabase:'https://supabase.com/dashboard/project/grztncvdsvtrwekekpss'
 };
 let REST_ID=localStorage.getItem('hrm_restaurant_id')||'3f99dc38-0771-4bb6-b307-474ccc80f86e';
-const sb=supabase.createClient(SB_URL,SB_KEY);
+const sb=supabase.createClient(SB_URL,SB_KEY,{
+  auth:{
+    flowType:'implicit',
+    detectSessionInUrl:true,
+    persistSession:true,
+    autoRefreshToken:true
+  }
+});
 
 // ═══════ LANGS ═══════
 const LANGS={
@@ -3655,11 +3662,14 @@ async function handlePasswordRecoverySignal(){
   if(!hasPasswordRecoverySignal())return false;
   const {qs}=authCallbackParams();
   const code=qs.get('code');
-  if(code){
+  const hasCodeVerifier=Object.keys(localStorage).some(k=>k.toLowerCase().includes('code-verifier'));
+  if(code&&hasCodeVerifier){
     try{
       const {error}=await sb.auth.exchangeCodeForSession(code);
       if(error)console.warn('Password recovery code exchange failed:',error);
     }catch(e){console.warn('Password recovery exchange skipped:',e);}
+  }else if(code){
+    console.warn('Password recovery code verifier missing. Ask for a fresh recovery link from this browser.');
   }
   localStorage.removeItem('manager_pro_pending_password_recovery');
   showPasswordResetModal();
@@ -3714,9 +3724,9 @@ async function saveRecoveredPassword(){
   const btn=document.getElementById('password-reset-save'),old=btn?.textContent;
   if(btn){btn.disabled=true;btn.textContent=tx.saving||tx.sending;}
   try{
-    const {data:sessionData}=await sb.auth.getSession();
+    const {data:sessionData}=await withTimeout(sb.auth.getSession(),8000,tx.expired);
     if(!sessionData?.session)throw new Error(tx.expired);
-    const {error}=await sb.auth.updateUser({password:pass});
+    const {error}=await withTimeout(sb.auth.updateUser({password:pass}),10000,tx.expired);
     if(error)throw error;
     closeModal('password-reset-modal');
     document.getElementById('login-screen')?.classList.remove('recovery-open');
