@@ -3620,18 +3620,36 @@ function passwordResetRedirectUrl(){
   return u.toString();
 }
 
-function hasPasswordRecoverySignal(){
+function authCallbackParams(){
   const qs=new URLSearchParams(location.search||'');
   const hs=new URLSearchParams((location.hash||'').replace(/^#/,''));
+  return {qs,hs};
+}
+
+function hasAuthCallbackSignal(){
+  const {qs,hs}=authCallbackParams();
+  return qs.has('code')
+    || qs.has('error')
+    || hs.has('access_token')
+    || hs.has('refresh_token')
+    || hs.has('error')
+    || hs.has('type');
+}
+
+function hasPasswordRecoverySignal(){
+  const {qs,hs}=authCallbackParams();
+  const pendingRecovery=localStorage.getItem('manager_pro_pending_password_recovery')==='1';
+  const pendingSignup=!!getPendingRegistration();
   return qs.get('reset_password')==='1'
     || qs.get('type')==='recovery'
     || hs.get('type')==='recovery'
-    || (localStorage.getItem('manager_pro_pending_password_recovery')==='1'&&qs.has('code'));
+    || (pendingRecovery&&qs.has('code'))
+    || (qs.has('code')&&!inviteToken()&&!pendingSignup);
 }
 
 async function handlePasswordRecoverySignal(){
   if(!hasPasswordRecoverySignal())return false;
-  const qs=new URLSearchParams(location.search||'');
+  const {qs}=authCallbackParams();
   const code=qs.get('code');
   if(code){
     try{
@@ -8817,8 +8835,9 @@ sb.auth.onAuthStateChange((event)=>{
 });
 
 async function init(){
+  const authCallbackBoot=hasAuthCallbackSignal();
   const passwordRecoveryBoot=hasPasswordRecoverySignal();
-  if(!passwordRecoveryBoot)setAppHistoryState('landing','replace');
+  if(!passwordRecoveryBoot&&!authCallbackBoot)setAppHistoryState('landing','replace');
   const publicLang=localStorage.getItem('hrm_public_lang');
   if(publicLang&&LANGS[publicLang])lang=publicLang;
   const loadingCopy=LOADING_UI[lang]||LOADING_UI.es;
