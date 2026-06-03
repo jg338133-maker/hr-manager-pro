@@ -4234,6 +4234,41 @@ function workedOn(empId,date){
   if(total<=0)return null;
   return Math.max(0,total-breakMinutesOn(empId,date)/60);
 }
+function attendanceIntervalsOn(empId,date){
+  const r=DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,date)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+  let open=null;
+  const intervals=[];
+  r.forEach(h=>{
+    if(h.type==='in')open=new Date(h.ts);
+    if(h.type==='out'&&open){
+      const end=new Date(h.ts);
+      if(end>open)intervals.push({start:open,end});
+      open=null;
+    }
+  });
+  return intervals;
+}
+function plannedIntervalsOn(emp,date){
+  const sch=plannedDaySchedule(emp,date);
+  if(!sch?.enabled||!sch.blocks.length)return [];
+  return sch.blocks.map(b=>{
+    const start=timeOn(date,b.start),end=timeOn(date,b.end);
+    if(end<=start)end.setDate(end.getDate()+1);
+    return{start,end};
+  });
+}
+function intervalOverlapMs(a,b){return Math.max(0,Math.min(a.end,b.end)-Math.max(a.start,b.start));}
+function hoursOutsidePlanningOn(emp,date){
+  if(isBeforeEmployeeStart(emp,date))return 0;
+  const actual=attendanceIntervalsOn(emp.id,date);
+  if(!actual.length)return 0;
+  const planned=plannedIntervalsOn(emp,date);
+  if(!planned.length)return actual.reduce((sum,i)=>sum+(i.end-i.start),0)/3600000;
+  return actual.reduce((sum,a)=>{
+    const inside=planned.reduce((s,p)=>s+intervalOverlapMs(a,p),0);
+    return sum+Math.max(0,(a.end-a.start)-inside);
+  },0)/3600000;
+}
 function getAbs(empId,date){
   const d=new Date(date);d.setHours(0,0,0,0);
   return DB.absences.find(a=>{
@@ -8411,16 +8446,13 @@ function payMN(dir){payMD=new Date(payMD.getFullYear(),payMD.getMonth()+dir,1);r
 function calcPay(emp,y,m){
   const recs=DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===y&&d.getMonth()===m&&!isBeforeEmployeeStart(emp,d);});
   const days=new Set(recs.map(h=>new Date(h.ts).toDateString()));
-  const weekHours={};let hrs=0;
+  let hrs=0,ot=0;
   for(const ds of days){
     const date=new Date(ds),w=workedOn(emp.id,date);
     if(!w)continue;
     hrs+=w;
-    const wk=localDateKey(getMonday(date));
-    weekHours[wk]=(weekHours[wk]||0)+w;
+    ot+=hoursOutsidePlanningOn(emp,date);
   }
-  const maxW=DB.settings?.maxHours||45;
-  const ot=Object.values(weekHours).reduce((sum,h)=>sum+Math.max(0,h-maxW),0);
   const regular=Math.max(0,hrs-ot);
   const pay=emp.payType==='hourly'?regular*(emp.rate||0)+ot*(emp.rate||0)*1.25:(emp.salary||0);
   return{hrs,ot,pay,days:days.size};
@@ -8436,9 +8468,9 @@ function scheduledHoursOn(emp,date){
   return sch.blocks.reduce((sum,b)=>sum+blockHours(date,b),0);
 }
 function annualExtraHours(emp,year=new Date().getFullYear()){
-  const days=new Set(DB.history.filter(h=>h.empId===emp.id&&new Date(h.ts).getFullYear()===year).map(h=>new Date(h.ts).toDateString()));
+  const days=new Set(DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===year&&!isBeforeEmployeeStart(emp,d);}).map(h=>new Date(h.ts).toDateString()));
   let extra=0;
-  days.forEach(ds=>{const d=new Date(ds),worked=workedOn(emp.id,d)||0,planned=scheduledHoursOn(emp,d);extra+=Math.max(0,worked-planned);});
+  days.forEach(ds=>{const d=new Date(ds);extra+=hoursOutsidePlanningOn(emp,d);});
   return extra;
 }
 function renderPayroll(){
