@@ -3654,16 +3654,28 @@ function hasPasswordRecoverySignal(){
   return qs.get('reset_password')==='1'
     || qs.get('type')==='recovery'
     || hs.get('type')==='recovery'
+    || qs.has('token_hash')
+    || hs.has('token_hash')
     || (pendingRecovery&&qs.has('code'))
     || (qs.has('code')&&!inviteToken()&&!pendingSignup);
 }
 
 async function handlePasswordRecoverySignal(){
   if(!hasPasswordRecoverySignal())return false;
-  const {qs}=authCallbackParams();
+  const {qs,hs}=authCallbackParams();
+  const tokenHash=qs.get('token_hash')||hs.get('token_hash');
+  const recoveryType=qs.get('type')||hs.get('type')||'recovery';
   const code=qs.get('code');
   const hasCodeVerifier=Object.keys(localStorage).some(k=>k.toLowerCase().includes('code-verifier'));
-  if(code&&hasCodeVerifier){
+  if(tokenHash){
+    try{
+      const {error}=await sb.auth.verifyOtp({type:recoveryType,token_hash:tokenHash});
+      if(error)throw error;
+    }catch(e){
+      console.warn('Password recovery token verification failed:',e);
+      setTimeout(()=>toast(passwordResetText().expired,'#ef4444'),250);
+    }
+  }else if(code&&hasCodeVerifier){
     try{
       const {error}=await sb.auth.exchangeCodeForSession(code);
       if(error)console.warn('Password recovery code exchange failed:',error);
