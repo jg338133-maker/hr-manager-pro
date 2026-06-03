@@ -1975,9 +1975,11 @@ body.manager-theme .dash-status-value{color:#007d72}
   <div class="modal-title" id="sale-modal-title">Nueva venta</div>
   <div class="fg"><label id="sale-product-label">Producto o servicio</label><select id="sale-product" onchange="syncSaleProductPrice()"></select></div>
   <div class="frow">
-    <div class="fg"><label id="sale-qty-label">Cantidad</label><input type="number" id="sale-qty" min="1" value="1" step="1" oninput="updateSaleTotal()"></div>
+    <div class="fg"><label id="sale-qty-label">Cantidad</label><input type="number" id="sale-qty" min="0" value="1" step="1" oninput="updateSaleTotal()"></div>
     <div class="fg"><label id="sale-price-label">Precio</label><input type="number" id="sale-price" min="0" value="0" step="0.05" oninput="updateSaleTotal()"></div>
   </div>
+  <button class="btn btn-ghost" type="button" id="sale-add-item-btn" onclick="addSaleItem()">+ Agregar producto a la orden</button>
+  <div id="sale-items-list" style="margin:10px 0"></div>
   <div class="fg"><label id="sale-method-label">Método de pago</label><select id="sale-method"><option value="cash">Cash</option><option value="card">Card</option><option value="twint">TWINT</option><option value="transfer">Transfer</option></select></div>
   <div class="fg"><label id="sale-employee-label">Empleado responsable</label><select id="sale-employee"></select></div>
   <div class="fg"><label id="sale-note-label">Nota</label><input id="sale-note" placeholder="-"></div>
@@ -5782,6 +5784,13 @@ function stockItems(){return (DB.salesProducts||[]).filter(p=>p.active!==false&&
 function lowStockItems(){return stockItems().filter(p=>Number(p.stock)<=Number(p.minStock));}
 function productById(id){return (DB.salesProducts||[]).find(p=>p.id===id);}
 function roundMoneyValue(v){return Math.round((Number(v)||0)*100)/100;}
+function saleQtyValue(s){return Number(s?.qty??s?.quantity)||0;}
+function saleUnitPriceValue(s){return Number(s?.unitPrice??s?.unit_price??s?.price)||0;}
+function saleLineTotal(s){
+  const direct=Number(s?.total??s?.total_amount??s?.amount);
+  if(Number.isFinite(direct)&&direct>0)return roundMoneyValue(direct);
+  return roundMoneyValue(saleQtyValue(s)*saleUnitPriceValue(s));
+}
 function productAvgCost(p){return Number(p?.avgCost??p?.avg_cost)||0;}
 function productStockValue(p){
   const stock=Number(p?.stock)||0,explicit=Number(p?.stockValue??p?.stock_value);
@@ -5937,7 +5946,7 @@ function saleMonthList(){
   const d=new Date(),y=d.getFullYear(),m=d.getMonth();
   return (DB.sales||[]).filter(s=>{const x=new Date(s.ts);return x.getFullYear()===y&&x.getMonth()===m;});
 }
-function groupSales(list,keyFn,valueFn=s=>Number(s.total)||0){
+function groupSales(list,keyFn,valueFn=s=>saleLineTotal(s)){
   const out={};list.forEach(s=>{const k=keyFn(s)||'-';out[k]=(out[k]||0)+valueFn(s);});
   return Object.entries(out).sort((a,b)=>b[1]-a[1]);
 }
@@ -5975,7 +5984,7 @@ function salesKpiHTML(key,label,value){
 function salesWidgetCard(key,list,sum){
   const tx=salesTx(),w=salesWidgetText(),month=saleMonthList();
   if(key==='revenueToday')return salesKpiHTML(key,w.revenueToday,money(sum.total));
-  if(key==='revenueMonth')return salesKpiHTML(key,w.revenueMonth,money(month.reduce((a,s)=>a+(Number(s.total)||0),0)));
+  if(key==='revenueMonth')return salesKpiHTML(key,w.revenueMonth,money(month.reduce((a,s)=>a+saleLineTotal(s),0)));
   if(key==='salesCount')return salesKpiHTML(key,w.salesCount,sum.count);
   if(key==='avgTicket')return salesKpiHTML(key,w.avgTicket,money(sum.ticket));
   if(key==='productsSold')return salesKpiHTML(key,w.productsSold,sum.qty);
@@ -6013,9 +6022,9 @@ function saveSalesPanelConfig(){
   saveLocal();closeModal('sales-config-modal');renderSales();toast(salesWidgetText().save);sbSaveSettings(DB.settings).catch(console.error);
 }
 function salesSummary(list=salesToday()){
-  const total=list.reduce((a,s)=>a+(Number(s.total)||0),0),qty=list.reduce((a,s)=>a+(Number(s.qty)||0),0);
+  const total=list.reduce((a,s)=>a+saleLineTotal(s),0),qty=list.reduce((a,s)=>a+saleQtyValue(s),0);
   const byMethod={};const byProduct={};
-  list.forEach(s=>{byMethod[s.method||'cash']=(byMethod[s.method||'cash']||0)+(Number(s.total)||0);byProduct[s.productName||'?']=(byProduct[s.productName||'?']||0)+(Number(s.qty)||0);});
+  list.forEach(s=>{byMethod[s.method||'cash']=(byMethod[s.method||'cash']||0)+saleLineTotal(s);byProduct[s.productName||'?']=(byProduct[s.productName||'?']||0)+saleQtyValue(s);});
   const top=Object.entries(byProduct).sort((a,b)=>b[1]-a[1])[0];
   return{total,count:list.length,qty,ticket:list.length?total/list.length:0,byMethod,top};
 }
@@ -6166,22 +6175,23 @@ function renderSalesProducts(){
 }
 function salesReportRows(type,list){
   const w=salesWidgetText();
-  if(type==='product')return groupSales(list,s=>s.productName,s=>Number(s.total)||0).map(([label,total])=>{
-    const qty=list.filter(s=>s.productName===label).reduce((a,s)=>a+(Number(s.qty)||0),0);
+  if(type==='product')return groupSales(list,s=>s.productName,s=>saleLineTotal(s)).map(([label,total])=>{
+    const qty=list.filter(s=>s.productName===label).reduce((a,s)=>a+saleQtyValue(s),0);
     const cat=(list.find(s=>s.productName===label)?.category)||'-';
     return {label,sub:cat,qty,total};
   });
   if(type==='payment')return groupSales(list,s=>salesMethodLabel(s.method)).map(([label,total])=>({label,sub:w.cash,qty:list.filter(s=>salesMethodLabel(s.method)===label).length,total}));
   if(type==='employee')return groupSales(list,s=>s.employeeName||w.unassigned).map(([label,total])=>({label,sub:w.team,qty:list.filter(s=>(s.employeeName||w.unassigned)===label).length,total}));
   if(type==='inventory')return inventoryImpact(list).map(([label,v])=>({label,sub:v.unit,qty:round1(v.qty),total:''}));
-  return list.map(s=>({label:s.productName,sub:`${fmtDate(s.ts)} ${fmtTime(s.ts)} · ${salesMethodLabel(s.method)}`,qty:Number(s.qty)||0,total:Number(s.total)||0,raw:s}));
+  return list.map(s=>({label:s.productName,sub:`${fmtDate(s.ts)} ${fmtTime(s.ts)} · ${salesMethodLabel(s.method)}`,qty:saleQtyValue(s),total:saleLineTotal(s),raw:s}));
 }
 function salesReportData(type='daily'){
   const rt=salesReportText(),tx=salesTx(),w=salesWidgetText(),period=salesReportPeriod(type),list=salesByPeriod(period),sum=salesSummary(list);
   const title={daily:rt.dailyClose,monthly:rt.monthlySales,product:rt.byProduct,payment:rt.byPayment,employee:rt.byEmployee,inventory:rt.inventory}[type]||rt.dailyClose;
   const subtitle=`${rt.period} · ${salesReportPeriodLabel(period)} · ${DB.settings?.company||'Manager Pro'}`;
   let headers=[rt.date,'Hora',rt.product,rt.category,rt.qty,rt.unitPrice,rt.total,rt.method,rt.employee,tx.note];
-  let rows=list.map(s=>[fmtDate(s.ts),fmtTime(s.ts),s.productName||'',s.category||'',Number(s.qty)||0,money(s.unitPrice),money(s.total),salesMethodLabel(s.method),s.employeeName||w.unassigned,s.note||'']);
+  let rows=list.map(s=>[fmtDate(s.ts),fmtTime(s.ts),s.productName||'',s.category||'',saleQtyValue(s),money(saleUnitPriceValue(s)),money(saleLineTotal(s)),salesMethodLabel(s.method),s.employeeName||w.unassigned,s.note||'']);
+  if((type==='daily'||type==='monthly')&&rows.length)rows.push(['','','','TOTAL',sum.qty,'',money(sum.total),'','','']);
   if(type==='product'){headers=[rt.product,rt.category,rt.qty,rt.total];rows=salesReportRows('product',list).map(r=>[r.label,r.sub,r.qty,money(r.total)]);}
   if(type==='payment'){headers=[rt.method,'N°',rt.total,'%'];rows=salesReportRows('payment',list).map(r=>[r.label,r.qty,money(r.total),sum.total?`${Math.round(r.total/sum.total*100)}%`:'0%']);}
   if(type==='employee'){headers=[rt.employee,'N°',rt.total];rows=salesReportRows('employee',list).map(r=>[r.label,r.qty,money(r.total)]);}
@@ -6222,7 +6232,8 @@ function renderSalesReports(){
 }
 function previewSalesReport(type='daily',scroll=false){
   const box=document.getElementById('sales-report-preview');if(!box)return;
-  const rt=salesReportText(),data=salesReportData(type),previewRows=data.rows.slice(0,18);
+  const rt=salesReportText(),data=salesReportData(type);
+  const previewRows=data.rows.length>18?[...data.rows.slice(0,17),data.rows[data.rows.length-1]]:data.rows;
   box.innerHTML=`<div class="flex-b mb12"><div><h3 class="sales-panel-title">${esc(data.title)}</h3><div class="sales-panel-sub">${esc(data.subtitle)}</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="exportSalesExcel('${type}')">${esc(rt.excel)}</button><button class="btn btn-ghost btn-sm" onclick="exportSalesPDF('${type}')">PDF</button></div></div>
   ${previewRows.length?reportTableHTML(data.headers,previewRows):`<div class="sales-empty">${esc(data.empty)}</div>`}`;
   if(scroll)box.scrollIntoView({behavior:'smooth',block:'start'});
@@ -6248,9 +6259,11 @@ function exportSalesPDF(type='daily'){
   const data=salesReportData(type);
   openReportPreviewWindow(data.title,`${data.subtitle} · ${fmtDate(new Date())}`,data.headers,data.rows,data.empty);
 }
+let saleDraftItems=[];
 function openSaleModal(){
   const tx=salesTx(),products=sellableProducts();
   if(!products.length){toast(tx.missingProduct,'#f59e0b');openProductModal('sales');return;}
+  saleDraftItems=[];
   updateSalesModalTexts();
   document.getElementById('sale-product').innerHTML=products.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} · ${esc(money(p.price))}</option>`).join('');
   const employees=(DB.employees||[]).filter(e=>e.status==='active');
@@ -6259,6 +6272,7 @@ function openSaleModal(){
   document.getElementById('sale-qty').value=1;
   document.getElementById('sale-method').value='cash';
   document.getElementById('sale-note').value='';
+  renderSaleItems();
   syncSaleProductPrice();
   openModal('sale-modal');
 }
@@ -6268,18 +6282,50 @@ function syncSaleProductPrice(){
   updateSaleTotal();
 }
 function updateSaleTotal(){
-  const qty=Number(document.getElementById('sale-qty')?.value)||0,price=Number(document.getElementById('sale-price')?.value)||0;
-  const el=document.getElementById('sale-total');if(el)el.textContent=money(qty*price);
+  const draftTotal=saleDraftItems.reduce((a,x)=>a+saleLineTotal(x),0);
+  const current=currentSaleDraftLine();
+  const el=document.getElementById('sale-total');if(el)el.textContent=money(draftTotal+(current?saleLineTotal(current):0));
+}
+function currentSaleDraftLine(){
+  const id=document.getElementById('sale-product')?.value,p=(DB.salesProducts||[]).find(x=>x.id===id);
+  if(!p)return null;
+  const qty=Number(document.getElementById('sale-qty')?.value)||0;
+  if(qty<=0)return null;
+  const unitPrice=Math.max(0,Number(document.getElementById('sale-price')?.value)||0);
+  return {productId:p.id,productName:p.name,category:p.category||'',qty,unitPrice,total:roundMoneyValue(qty*unitPrice)};
+}
+function renderSaleItems(){
+  const box=document.getElementById('sale-items-list');if(!box)return;
+  box.innerHTML=saleDraftItems.length?`<div class="sales-panel" style="padding:10px;margin:0">${saleDraftItems.map((x,i)=>`<div class="sales-row"><div><div class="fw8 fs13">${esc(x.productName)}</div><div class="fs11 muted">${saleQtyValue(x)} × ${esc(money(saleUnitPriceValue(x)))}</div></div><div style="display:flex;align-items:center;gap:8px"><div class="fw8">${esc(money(saleLineTotal(x)))}</div><button class="btn btn-ghost btn-sm" type="button" onclick="removeSaleItem(${i})">×</button></div></div>`).join('')}</div>`:'';
+  updateSaleTotal();
+}
+function addSaleItem(){
+  const tx=salesTx(),line=currentSaleDraftLine();
+  if(!line){toast(tx.missingProduct,'#ef4444');return;}
+  saleDraftItems.push(line);
+  document.getElementById('sale-qty').value=0;
+  syncSaleProductPrice();
+  renderSaleItems();
+}
+function removeSaleItem(i){
+  saleDraftItems.splice(i,1);
+  renderSaleItems();
 }
 function saveSale(){
   const tx=salesTx(),id=document.getElementById('sale-product').value,p=(DB.salesProducts||[]).find(x=>x.id===id);
   if(!p){toast(tx.missingProduct,'#ef4444');return;}
-  const qty=Math.max(1,Number(document.getElementById('sale-qty').value)||1),unitPrice=Math.max(0,Number(document.getElementById('sale-price').value)||0);
+  const currentLine=currentSaleDraftLine();
+  const lines=[...saleDraftItems,...(currentLine?[currentLine]:[])];
+  if(!lines.length){toast(tx.missingProduct,'#ef4444');return;}
   const empId=document.getElementById('sale-employee')?.value||'',emp=(DB.employees||[]).find(e=>e.id===empId);
-  const total=qty*unitPrice,cost=saleCostValue({productId:p.id,qty,total});
-  const sale={id:uid(),productId:p.id,productName:p.name,category:p.category||'',qty,unitPrice,total,cost,margin:roundMoneyValue(total-cost),method:document.getElementById('sale-method').value||'cash',employeeId:emp?.id||'',employeeName:emp?fullName(emp):'',note:clean(document.getElementById('sale-note').value),ts:new Date().toISOString()};
-  const touched=applySaleStock(p,qty);
-  DB.sales=[sale,...(DB.sales||[])];saveLocal();closeModal('sale-modal');renderSales();renderInventory();renderInventoryStock();renderHub();toast(tx.saved);sbSaveSale(sale).catch(console.error);touched.forEach(x=>sbSaveSalesProduct(x).catch(console.error));
+  const method=document.getElementById('sale-method').value||'cash',note=clean(document.getElementById('sale-note').value),ts=new Date().toISOString(),orderId=uid();
+  const touched=[];
+  const sales=lines.map(line=>{
+    const product=productById(line.productId),qty=saleQtyValue(line),unitPrice=saleUnitPriceValue(line),total=saleLineTotal(line),cost=saleCostValue({productId:line.productId,qty,total});
+    touched.push(...applySaleStock(product,qty));
+    return {id:uid(),orderId,productId:line.productId,productName:line.productName,category:line.category||'',qty,unitPrice,total,cost,margin:roundMoneyValue(total-cost),method,employeeId:emp?.id||'',employeeName:emp?fullName(emp):'',note,ts};
+  });
+  DB.sales=[...sales,...(DB.sales||[])];saveLocal();closeModal('sale-modal');renderSales();renderInventory();renderInventoryStock();renderHub();toast(tx.saved);sales.forEach(s=>sbSaveSale(s).catch(console.error));[...new Map(touched.map(x=>[x.id,x])).values()].forEach(x=>sbSaveSalesProduct(x).catch(console.error));
 }
 function productTypeOptions(scope,currentType){
   const tx=salesTx();updateSalesModalTexts();
