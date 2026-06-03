@@ -2621,7 +2621,20 @@ const INVITE_TX={
   it:{email:'Email manager',role:'Ruolo',admin:'Proprietario/admin',manager:'Manager operativo',create:'Crea link invito',copy:'Copia link',copied:'Link copiato',users:'Accessi attuali',noUsers:'Nessun altro accesso visibile per ora.',expires:'Il link scade tra 14 giorni.',sqlMissing:'Esegui l’SQL del passo 8 in Supabase per attivare questa azione.',change:'Cambia ruolo',revoke:'Rimuovi accesso',self:'Il tuo account',updated:'Ruolo aggiornato',revoked:'Accesso rimosso',confirmRevoke:'Rimuovere l’accesso a questo utente?'}
 };
 const inviteTx=()=>INVITE_TX[lang]||INVITE_TX.es;
-const inviteToken=()=>new URLSearchParams(location.search).get('invite')||'';
+const inviteToken=()=>{
+  const qs=new URLSearchParams(location.search||'');
+  const hs=new URLSearchParams((location.hash||'').replace(/^#/,''));
+  return qs.get('invite')||hs.get('invite')||localStorage.getItem('managerpro_pending_invite')||'';
+};
+function inviteReturnUrl(token){
+  const u=new URL(APP_PUBLIC_URL);
+  if(token)u.searchParams.set('invite',token);
+  return u.toString();
+}
+function savePendingInvite(token){
+  if(token)localStorage.setItem('managerpro_pending_invite',token);
+}
+function clearPendingInvite(){localStorage.removeItem('managerpro_pending_invite');}
 function roleLevel(){
   const r=currentUser?.role||'';
   if(r==='super_admin')return'master';
@@ -3496,6 +3509,7 @@ function showLoginAuth(type='manager'){
 }
 function applyInviteLanding(){
   const token=inviteToken();
+  if(token)savePendingInvite(token);
   const restField=document.getElementById('reg-rest-name')?.closest('.fg');
   if(restField)restField.style.display=token?'none':'';
   const bizFields=document.getElementById('reg-business-fields');
@@ -3571,7 +3585,7 @@ async function loginManager(){
     let profile=null;
     const token=inviteToken();
     if(token){
-      try{profile=await sbAcceptManagerInvite(token);toast('✅ Invitación aceptada');}
+      try{profile=await sbAcceptManagerInvite(token);clearPendingInvite();toast('✅ Invitación aceptada');}
       catch(invErr){console.warn('Invite accept error:',invErr);}
     }
     if(!profile)profile=await completePendingRegistration(data.user);
@@ -3603,6 +3617,33 @@ async function loginManager(){
   }finally{
     if(btn){btn.disabled=false;btn.innerHTML=oldBtn;}
   }
+}
+
+async function finishInviteSessionIfReady(){
+  const token=inviteToken();
+  if(!token||passwordRecoveryTextActive())return false;
+  try{
+    const {data:sessionData}=await withTimeout(sb.auth.getSession(),8000,'Auth session timeout');
+    const user=sessionData?.session?.user;
+    if(!user)return false;
+    const profile=await sbAcceptManagerInvite(token);
+    clearPendingInvite();
+    currentUser={role:profile.role||'restaurant_manager',name:profile.name||user.email?.split('@')[0]||'Manager',email:user.email,restaurant_id:profile.restaurant_id,profile};
+    if(currentUser.restaurant_id)setRestaurantId(currentUser.restaurant_id);
+    await withTimeout(loadSB(),10000,'Restaurant load timeout');
+    showManagerUI();
+    toast('✅ Invitación aceptada');
+    try{history.replaceState(null,'',location.pathname);}catch(e){}
+    return true;
+  }catch(e){
+    console.warn('Invite session completion skipped:',e);
+    return false;
+  }
+}
+
+function passwordRecoveryTextActive(){
+  const modal=document.getElementById('password-reset-modal');
+  return modal&&modal.style.display==='flex';
 }
 
 async function recoverPassword(){
@@ -3769,6 +3810,7 @@ async function registerRestaurant(){
   const pass=document.getElementById('reg-password').value;
   const pass2=document.getElementById('reg-password2').value;
   const token=inviteToken();
+  if(token)savePendingInvite(token);
   if((!token&&!restName)||!email||pass.length<6){toast('Negocio, email y contraseña requeridos','#ef4444');return;}
   if(pass!==pass2){toast((T().login?.passwordMismatch)||UI.fr.login.passwordMismatch,'#ef4444');return;}
   const btn=document.querySelector('[onclick="registerRestaurant()"]');
@@ -3780,7 +3822,10 @@ async function registerRestaurant(){
     const {data,error}=await sb.auth.signUp({
       email,
       password:pass,
-      options:{data:{pending_business:setup}}
+      options:{
+        data:token?{pending_invite:token}:{pending_business:setup},
+        emailRedirectTo:token?inviteReturnUrl(token):APP_PUBLIC_URL
+      }
     });
     if(error)throw error;
     if(!data.user)throw new Error('Utilisateur non créé');
@@ -3793,6 +3838,7 @@ async function registerRestaurant(){
     if(token){
       try{
         const profile=await sbAcceptManagerInvite(token);
+        clearPendingInvite();
         toast('✅ Cuenta creada y conectada al negocio. Ya puedes iniciar sesión.');
         setLoginTab('manager',document.querySelector('.login-tab'));
         return;
@@ -8871,7 +8917,8 @@ sb.auth.onAuthStateChange((event)=>{
 async function init(){
   const authCallbackBoot=hasAuthCallbackSignal();
   const passwordRecoveryBoot=hasPasswordRecoverySignal();
-  if(!passwordRecoveryBoot&&!authCallbackBoot)setAppHistoryState('landing','replace');
+  const inviteBoot=!!inviteToken();
+  if(!passwordRecoveryBoot&&!authCallbackBoot&&!inviteBoot)setAppHistoryState('landing','replace');
   const publicLang=localStorage.getItem('hrm_public_lang');
   if(publicLang&&LANGS[publicLang])lang=publicLang;
   const loadingCopy=LOADING_UI[lang]||LOADING_UI.es;
@@ -8879,8 +8926,9 @@ async function init(){
   if(loadingSub)loadingSub.textContent=loadingCopy.sub;
   document.getElementById('loading-msg').textContent=loadingCopy.connect;
   if(passwordRecoveryBoot)await handlePasswordRecoverySignal();
+  const inviteCompleted=!passwordRecoveryBoot&&inviteBoot&&await finishInviteSessionIfReady();
   try{
-    const ok=await withTimeout(loadSB(),8000,'Initial load timeout');
+    const ok=inviteCompleted?true:await withTimeout(loadSB(),8000,'Initial load timeout');
     if(ok){document.getElementById('loading-msg').textContent=loadingCopy.ready;await new Promise(r=>setTimeout(r,400));}
   }catch(e){console.warn('Local mode');}
   const lo=document.getElementById('loading-overlay');
@@ -8889,10 +8937,10 @@ async function init(){
   document.documentElement.lang=lang;
   applyBrand();
   applyUITexts();
-  document.getElementById('login-screen').style.display='block';
+  if(!inviteCompleted)document.getElementById('login-screen').style.display='block';
   if(!passwordRecoveryBoot)document.getElementById('login-screen').classList.remove('auth-open');
   applyEmployeeAccessLink();
-  applyInviteLanding();
+  if(!inviteCompleted)applyInviteLanding();
 }
 init();
 </script>
