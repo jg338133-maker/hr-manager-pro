@@ -1923,8 +1923,12 @@ body.manager-theme .dash-status-value{color:#007d72}
   <div class="fg"><label>Employé</label><select id="man-emp"></select></div>
   <div class="fg"><label>Date</label><input type="date" id="man-date"></div>
   <div class="frow">
-    <div class="fg"><label>Entrée</label><input type="time" id="man-in" value="09:00"></div>
-    <div class="fg"><label>Sortie</label><input type="time" id="man-out" value="17:00"></div>
+    <div class="fg"><label id="man-in-label">Entrée</label><input type="time" id="man-in" value="09:00"></div>
+    <div class="fg"><label id="man-out-label">Sortie</label><input type="time" id="man-out" value="17:00"></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label id="man-in2-label">Entrée 2</label><input type="time" id="man-in-2"></div>
+    <div class="fg"><label id="man-out2-label">Sortie 2</label><input type="time" id="man-out-2"></div>
   </div>
   <div class="fg"><label>Pause non rémunérée</label>
     <select id="man-break">
@@ -3359,7 +3363,10 @@ function applyUITexts(){
   const vacTabs=document.querySelectorAll('#pg-vacations .tab');if(vacTabs[0])vacTabs[0].textContent=vc.pending;if(vacTabs[1])vacTabs[1].textContent=vc.approved;if(vacTabs[2])vacTabs[2].textContent=vc.balance;
   const vacBtn=document.querySelector('#pg-vacations .btn-ghost.mt12');if(vacBtn)vacBtn.textContent=vc.new;
   const manTitle=document.querySelector('#manual-modal .modal-title');if(manTitle)manTitle.textContent=at.manualTitle;
-  const manLabels=document.querySelectorAll('#manual-modal label');if(manLabels[0])manLabels[0].textContent=at.employee;if(manLabels[1])manLabels[1].textContent=at.date;if(manLabels[2])manLabels[2].textContent=t.emp.in;if(manLabels[3])manLabels[3].textContent=t.emp.out;if(manLabels[4])manLabels[4].textContent=at.reason;
+  const manLabels=document.querySelectorAll('#manual-modal label');if(manLabels[0])manLabels[0].textContent=at.employee;if(manLabels[1])manLabels[1].textContent=at.date;
+  const manInLabel=document.getElementById('man-in-label'),manOutLabel=document.getElementById('man-out-label'),manIn2Label=document.getElementById('man-in2-label'),manOut2Label=document.getElementById('man-out2-label');
+  if(manInLabel)manInLabel.textContent=t.emp.in;if(manOutLabel)manOutLabel.textContent=t.emp.out;if(manIn2Label)manIn2Label.textContent=t.emp.in+' 2';if(manOut2Label)manOut2Label.textContent=t.emp.out+' 2';
+  if(manLabels[7])manLabels[7].textContent=at.reason;
   const manButtons=document.querySelectorAll('#manual-modal .modal-actions .btn');if(manButtons[0])manButtons[0].textContent=at.cancel;if(manButtons[1])manButtons[1].textContent=at.save;
   const absTitle=document.querySelector('#abs-modal .modal-title');if(absTitle)absTitle.textContent=vc.title;
   const absButtons=document.querySelectorAll('#abs-modal .modal-actions .btn');if(absButtons[0])absButtons[0].textContent=at.cancel;if(absButtons[1])absButtons[1].textContent=at.save;
@@ -4100,6 +4107,8 @@ function openManualModal(empId=null,opts={}){
   document.getElementById('man-date').value=opts.date||localDateKey(new Date());
   document.getElementById('man-in').value=opts.in||'09:00';
   document.getElementById('man-out').value=opts.out||'17:00';
+  document.getElementById('man-in-2').value=opts.in2||'';
+  document.getElementById('man-out-2').value=opts.out2||'';
   document.getElementById('man-note').value=opts.note||'Correction manager';
   document.getElementById('man-break').value=String(opts.breakMin||0);
   applyUITexts();
@@ -4108,20 +4117,27 @@ function openManualModal(empId=null,opts={}){
 async function saveManualAttendance(){
   if(!requirePerm('attendance_write'))return;
   const empId=document.getElementById('man-emp').value,date=document.getElementById('man-date').value;
-  const tin=document.getElementById('man-in').value,tout=document.getElementById('man-out').value,note=clean(document.getElementById('man-note').value)||'Correction manager';
+  const tin=document.getElementById('man-in').value,tout=document.getElementById('man-out').value,tin2=document.getElementById('man-in-2').value,tout2=document.getElementById('man-out-2').value,note=clean(document.getElementById('man-note').value)||'Correction manager';
   const breakMin=parseInt(document.getElementById('man-break').value,10)||0;
   const emp=DB.employees.find(e=>e.id===empId);
   if(!emp||!date||!tin||!tout){toast('Complétez employé, date et heures','#ef4444');return;}
-  const inTs=localDateTimeISO(date,tin),outTs=localDateTimeISO(date,tout);
-  if(new Date(outTs)<=new Date(inTs)){toast('La sortie doit être après l’entrée','#ef4444');return;}
-  if(breakMin&&new Date(outTs)-new Date(inTs)<=breakMin*60000){toast('La pause dépasse la durée travaillée','#ef4444');return;}
+  if((tin2&&!tout2)||(!tin2&&tout2)){toast('Complétez entrada 2 y salida 2, o déjalas vacías','#ef4444');return;}
+  const blocks=[{in:tin,out:tout}];
+  if(tin2&&tout2)blocks.push({in:tin2,out:tout2});
+  const ranges=blocks.map(b=>({in:b.in,out:b.out,inTs:localDateTimeISO(date,b.in),outTs:localDateTimeISO(date,b.out)}));
+  for(const r of ranges){if(new Date(r.outTs)<=new Date(r.inTs)){toast('La salida debe ser después de la entrada en cada bloque','#ef4444');return;}}
+  if(ranges[1]&&new Date(ranges[1].inTs)<new Date(ranges[0].outTs)){toast('El segundo bloque debe empezar después de terminar el primero','#ef4444');return;}
+  const workedMs=ranges.reduce((a,r)=>a+(new Date(r.outTs)-new Date(r.inTs)),0);
+  if(breakMin&&workedMs<=breakMin*60000){toast('La pause dépasse la durée travaillée','#ef4444');return;}
   const oldLen=DB.history.length;
-  DB.history=DB.history.filter(h=>!(h.empId===empId&&sameDay(h.ts,new Date(inTs))&&['in','out','break_start','break_end'].includes(h.type)));
-  const recIn={id:uid(),empId,empName:fullName(emp),type:'in',ts:inTs,manual:true,note};
-  const recOut={id:uid(),empId,empName:fullName(emp),type:'out',ts:outTs,manual:true,note};
-  const recs=[recOut,recIn];
+  DB.history=DB.history.filter(h=>!(h.empId===empId&&sameDay(h.ts,new Date(ranges[0].inTs))&&['in','out','break_start','break_end'].includes(h.type)));
+  const recs=ranges.flatMap(r=>[
+    {id:uid(),empId,empName:fullName(emp),type:'out',ts:r.outTs,manual:true,note},
+    {id:uid(),empId,empName:fullName(emp),type:'in',ts:r.inTs,manual:true,note}
+  ]);
   if(breakMin){
-    const mid=(new Date(inTs).getTime()+new Date(outTs).getTime())/2,start=new Date(mid-(breakMin*60000/2)),end=new Date(mid+(breakMin*60000/2));
+    const longest=ranges.reduce((a,r)=>(new Date(r.outTs)-new Date(r.inTs))>(new Date(a.outTs)-new Date(a.inTs))?r:a,ranges[0]);
+    const mid=(new Date(longest.inTs).getTime()+new Date(longest.outTs).getTime())/2,start=new Date(mid-(breakMin*60000/2)),end=new Date(mid+(breakMin*60000/2));
     recs.unshift({id:uid(),empId,empName:fullName(emp),type:'break_end',ts:end.toISOString(),manual:true,note},{id:uid(),empId,empName:fullName(emp),type:'break_start',ts:start.toISOString(),manual:true,note});
   }
   if(pendingCorrectionId){
@@ -4129,10 +4145,11 @@ async function saveManualAttendance(){
     sbUpdateAbsApproved(pendingCorrectionId,true).catch(console.error);
   }
   const appliedCorrectionId=pendingCorrectionId;
-  DB.history.unshift(...recs);auditAction('attendance',`Fichaje corregido: ${fullName(emp)} · ${date} ${tin}-${tout}`,{empId,date,breakMin,correctionId:appliedCorrectionId});saveLocal();closeModal('manual-modal');renderPage(currentPage);
+  const blocksLabel=ranges.map(r=>`${r.in}-${r.out}`).join(' / ');
+  DB.history.unshift(...recs);auditAction('attendance',`Fichaje corregido: ${fullName(emp)} · ${date} ${blocksLabel}`,{empId,date,breakMin,blocks:ranges.map(r=>({in:r.in,out:r.out})),correctionId:appliedCorrectionId});saveLocal();closeModal('manual-modal');renderPage(currentPage);
   toast(appliedCorrectionId?'✅ '+correctionTx().approved:`✅ Heures enregistrées (${oldLen-DB.history.length+recs.length} pointages)`);
   pendingCorrectionId=null;
-  sbDelAttendanceDay(empId,date).then(()=>Promise.all(recs.map(r=>sbRegAt(empId,fullName(emp),r.type,r.ts)))).catch(console.error);
+  sbDelAttendanceDay(empId,date).then(()=>Promise.all(recs.map(r=>sbRegAt(empId,fullName(emp),r.type,r.ts,r.note)))).catch(console.error);
 }
 const lastAction=empId=>DB.history.find(h=>h.empId===empId&&['in','out'].includes(h.type));
 function dayPunches(empId,date=new Date()){return DB.history.filter(h=>h.empId===empId&&sameDay(h.ts,date)&&['in','out'].includes(h.type)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));}
