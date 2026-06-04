@@ -7464,7 +7464,17 @@ async function extractPdfText(file){
   for(let i=1;i<=pdf.numPages;i++){
     const page=await pdf.getPage(i);
     const content=await page.getTextContent();
-    pages.push(content.items.map(item=>item.str||'').join(' '));
+    const text=content.items.map(item=>item.str||'').join(' ');
+    const annotations=await page.getAnnotations().catch(()=>[]);
+    const fields=(annotations||[])
+      .map(a=>{
+        const name=String(a.fieldName||a.alternativeText||a.id||'').trim();
+        const value=Array.isArray(a.fieldValue)?a.fieldValue.join(', '):String(a.fieldValue||a.buttonValue||'').trim();
+        if(!name||!value||value==='Off')return '';
+        return `${name}: ${value}`;
+      })
+      .filter(Boolean);
+    pages.push([text,fields.length?`Campos PDF:\n${fields.join('\n')}`:''].filter(Boolean).join('\n'));
   }
   return pages.join('\n\n').trim();
 }
@@ -7525,6 +7535,22 @@ async function extractBusinessDocumentText(file){
     }
   }
   return extractContractText(file);
+}
+function dataUrlToBase64(dataUrl){
+  const raw=String(dataUrl||'');
+  const idx=raw.indexOf(',');
+  return idx>=0?raw.slice(idx+1):raw;
+}
+function documentAIRequestBody(doc,text){
+  const fileBase64=dataUrlToBase64(doc?.data);
+  return {
+    text:String(text||'').slice(0,18000),
+    fileName:doc?.fileName||doc?.name||'documento',
+    documentType:doc?.type||'other',
+    folder:doc?.folder||'business',
+    mimeType:doc?.mimeType||'',
+    fileBase64:fileBase64&&fileBase64.length<8_000_000?fileBase64:'',
+  };
 }
 async function handleContractAssist(ev){
   const file=ev.target.files?.[0];if(!file)return;
@@ -7783,7 +7809,7 @@ async function analyzeEmployeeDocumentWithAI(doc,text){
   doc.aiStatus='analyzing';
   await saveAndRefresh();
   try{
-    const {data,error}=await sb.functions.invoke('analyze-document',{body:{text:cleanText.slice(0,18000),fileName:doc.fileName||doc.name||'documento',documentType:doc.type||'other',folder:doc.folder||'employees'}});
+    const {data,error}=await sb.functions.invoke('analyze-document',{body:documentAIRequestBody(doc,cleanText)});
     if(error)throw error;
     const result=data||{};
     doc.aiSummary=result.summary||'';

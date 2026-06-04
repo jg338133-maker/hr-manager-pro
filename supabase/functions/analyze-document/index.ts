@@ -107,7 +107,12 @@ async function callOpenAICompatible(apiKey: string, model: string, system: strin
   return payload?.choices?.[0]?.message?.content || "{}";
 }
 
-async function callAnthropic(apiKey: string, model: string, system: string, user: string) {
+type AnthropicMessagePart =
+  | { type: "text"; text: string }
+  | { type: "document"; source: { type: "base64"; media_type: string; data: string } }
+  | { type: "image"; source: { type: "base64"; media_type: string; data: string } };
+
+async function callAnthropic(apiKey: string, model: string, system: string, user: string | AnthropicMessagePart[]) {
   const baseUrl = (Deno.env.get("AI_BASE_URL") || "https://api.anthropic.com/v1").replace(/\/$/, "");
   const aiRes = await fetch(`${baseUrl}/messages`, {
     method: "POST",
@@ -132,6 +137,24 @@ async function callAnthropic(apiKey: string, model: string, system: string, user
     .join("\n") || "{}";
 }
 
+function cleanBase64(value: unknown) {
+  const raw = String(value || "").trim();
+  const comma = raw.indexOf(",");
+  return comma >= 0 ? raw.slice(comma + 1) : raw;
+}
+
+function supportedAnthropicMediaType(mimeType: string, fileName: string) {
+  const lowerName = fileName.toLowerCase();
+  const lowerMime = mimeType.toLowerCase();
+  if (lowerMime === "application/pdf" || lowerName.endsWith(".pdf")) return "application/pdf";
+  if (["image/jpeg", "image/png", "image/gif", "image/webp"].includes(lowerMime)) return lowerMime;
+  if (lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg")) return "image/jpeg";
+  if (lowerName.endsWith(".png")) return "image/png";
+  if (lowerName.endsWith(".gif")) return "image/gif";
+  if (lowerName.endsWith(".webp")) return "image/webp";
+  return "";
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405);
@@ -142,9 +165,12 @@ Deno.serve(async (req) => {
 
     const provider = (Deno.env.get("AI_PROVIDER") || (apiKey.startsWith("sk-ant-") ? "anthropic" : "openai")).toLowerCase();
     const model = Deno.env.get("AI_MODEL") || Deno.env.get("OPENAI_MODEL") || (provider === "anthropic" ? "claude-sonnet-4-20250514" : "gpt-4o-mini");
-    const { text = "", fileName = "document", documentType = "other", folder = "business" } = await req.json();
+    const { text = "", fileName = "document", documentType = "other", folder = "business", fileBase64 = "", mimeType = "" } = await req.json();
     const documentText = String(text || "").slice(0, 18000);
-    if (!documentText.trim()) return jsonResponse({
+    const cleanFileBase64 = cleanBase64(fileBase64);
+    const mediaType = supportedAnthropicMediaType(String(mimeType || ""), String(fileName || ""));
+    const canReadAttachedFile = provider === "anthropic" && cleanFileBase64 && mediaType;
+    if (!documentText.trim() && !canReadAttachedFile) return jsonResponse({
       ...emptyResult(),
       summary: "No pude leer texto suficiente del archivo. Revisa el documento manualmente.",
       documentType: String(documentType || "other"),
@@ -198,11 +224,21 @@ Guidance:
 - warnings: risks, missing signatures, ambiguous dates, missing responsible person, missing expiry, or unclear pages.
 - suggestedExpiry: the most important expiry/review date if present, else null.
 
-DOCUMENT:
-${documentText}`;
+${canReadAttachedFile ? "Read the attached PDF/image. If extracted text is also provided below, use it as a fallback and pay special attention to PDF form fields." : ""}
+
+${documentText.trim() ? `EXTRACTED TEXT:\n${documentText}` : "EXTRACTED TEXT: not available. Use the attached file."}`;
+
+    const anthropicUser: AnthropicMessagePart[] = canReadAttachedFile
+      ? [
+          mediaType === "application/pdf"
+            ? { type: "document", source: { type: "base64", media_type: mediaType, data: cleanFileBase64 } }
+            : { type: "image", source: { type: "base64", media_type: mediaType, data: cleanFileBase64 } },
+          { type: "text", text: user },
+        ]
+      : [{ type: "text", text: user }];
 
     const content = provider === "anthropic"
-      ? await callAnthropic(apiKey, model, system, user)
+      ? await callAnthropic(apiKey, model, system, anthropicUser)
       : await callOpenAICompatible(apiKey, model, system, user);
     return jsonResponse(normalizeResult(extractJson(content)));
   } catch (error) {
