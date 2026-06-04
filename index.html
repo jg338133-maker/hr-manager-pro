@@ -1939,6 +1939,7 @@ body.manager-theme .dash-status-value{color:#007d72}
   </div>
   <div class="fg"><label>Motif</label><input id="man-note" placeholder="Correction manager"></div>
   <div class="modal-actions">
+    <button class="btn btn-ghost" id="man-clear-day-btn" style="color:var(--red);border-color:rgba(239,68,68,.3)" onclick="clearManualAttendanceDay()">Día no trabajado / quitar horas</button>
     <button class="btn btn-ghost" onclick="pendingCorrectionId=null;closeModal('manual-modal')">Annuler</button>
     <button class="btn btn-primary" onclick="saveManualAttendance()">Enregistrer</button>
   </div>
@@ -3367,7 +3368,15 @@ function applyUITexts(){
   const manInLabel=document.getElementById('man-in-label'),manOutLabel=document.getElementById('man-out-label'),manIn2Label=document.getElementById('man-in2-label'),manOut2Label=document.getElementById('man-out2-label');
   if(manInLabel)manInLabel.textContent=t.emp.in;if(manOutLabel)manOutLabel.textContent=t.emp.out;if(manIn2Label)manIn2Label.textContent=t.emp.in+' 2';if(manOut2Label)manOut2Label.textContent=t.emp.out+' 2';
   if(manLabels[7])manLabels[7].textContent=at.reason;
-  const manButtons=document.querySelectorAll('#manual-modal .modal-actions .btn');if(manButtons[0])manButtons[0].textContent=at.cancel;if(manButtons[1])manButtons[1].textContent=at.save;
+  const manClear=document.getElementById('man-clear-day-btn');
+  if(manClear)manClear.textContent={
+    es:'Día no trabajado / quitar horas',
+    fr:'Jour non travaillé / retirer les heures',
+    en:'Non-working day / remove hours',
+    de:'Nicht gearbeitet / Stunden entfernen',
+    it:'Giorno non lavorato / rimuovi ore'
+  }[lang]||'Día no trabajado / quitar horas';
+  const manButtons=document.querySelectorAll('#manual-modal .modal-actions .btn');if(manButtons[1])manButtons[1].textContent=at.cancel;if(manButtons[2])manButtons[2].textContent=at.save;
   const absTitle=document.querySelector('#abs-modal .modal-title');if(absTitle)absTitle.textContent=vc.title;
   const absButtons=document.querySelectorAll('#abs-modal .modal-actions .btn');if(absButtons[0])absButtons[0].textContent=at.cancel;if(absButtons[1])absButtons[1].textContent=at.save;
   const shiftButtons=document.querySelectorAll('#shift-modal .modal-actions .btn');if(shiftButtons[0])shiftButtons[0].textContent=at.cancel;if(shiftButtons[1])shiftButtons[1].textContent=at.save;
@@ -4113,6 +4122,34 @@ function openManualModal(empId=null,opts={}){
   document.getElementById('man-break').value=String(opts.breakMin||0);
   applyUITexts();
   openModal('manual-modal');
+}
+async function clearManualAttendanceDay(){
+  if(!requirePerm('attendance_write'))return;
+  const tx={
+    es:{missing:'Selecciona empleado y fecha',confirm:'Esto quitará todos los fichajes y pausas de este empleado en esta fecha. ¿Continuar?',done:'Día marcado como no trabajado',note:'Día no trabajado / corrección manager'},
+    fr:{missing:'Sélectionnez employé et date',confirm:'Cela retirera tous les pointages et pauses de cet employé à cette date. Continuer ?',done:'Jour marqué comme non travaillé',note:'Jour non travaillé / correction manager'},
+    en:{missing:'Select employee and date',confirm:'This will remove all clock-ins, clock-outs, and breaks for this employee on this date. Continue?',done:'Day marked as non-working',note:'Non-working day / manager correction'},
+    de:{missing:'Mitarbeiter und Datum auswählen',confirm:'Dadurch werden alle Buchungen und Pausen dieses Mitarbeiters an diesem Datum entfernt. Fortfahren?',done:'Tag als nicht gearbeitet markiert',note:'Nicht gearbeitet / Manager-Korrektur'},
+    it:{missing:'Seleziona dipendente e data',confirm:'Questo rimuoverà tutte le timbrature e le pause di questo dipendente in questa data. Continuare?',done:'Giorno segnato come non lavorato',note:'Giorno non lavorato / correzione manager'}
+  }[lang]||{};
+  const empId=document.getElementById('man-emp').value,date=document.getElementById('man-date').value;
+  const emp=DB.employees.find(e=>e.id===empId);
+  if(!emp||!date){toast(tx.missing||'Selecciona empleado y fecha','#ef4444');return;}
+  if(!confirm(tx.confirm||'Esto quitará todos los fichajes y pausas de este empleado en esta fecha. ¿Continuar?'))return;
+  const day=localDateOnly(date);
+  const oldLen=DB.history.length;
+  DB.history=DB.history.filter(h=>!(h.empId===empId&&sameDay(h.ts,day)&&['in','out','break_start','break_end'].includes(h.type)));
+  if(pendingCorrectionId){
+    DB.absences=DB.absences.map(a=>a.id===pendingCorrectionId?{...a,approved:true,reviewedAt:new Date().toISOString(),resolution:'manual_attendance_cleared'}:a);
+    sbUpdateAbsApproved(pendingCorrectionId,true).catch(console.error);
+  }
+  const appliedCorrectionId=pendingCorrectionId;
+  const removed=oldLen-DB.history.length;
+  auditAction('attendance',`Día no trabajado: ${fullName(emp)} · ${date}`,{empId,date,removed,correctionId:appliedCorrectionId});
+  saveLocal();closeModal('manual-modal');renderPage(currentPage);
+  toast(`✅ ${tx.done||'Día marcado como no trabajado'} (${removed})`);
+  pendingCorrectionId=null;
+  sbDelAttendanceDay(empId,date).catch(console.error);
 }
 async function saveManualAttendance(){
   if(!requirePerm('attendance_write'))return;
