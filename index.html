@@ -2476,6 +2476,11 @@ Object.assign(UI.es.rep,{monthlyPackage:'Paquete mensual',payroll:'Salarios',net
 Object.assign(UI.en.rep,{monthlyPackage:'Monthly package',payroll:'Payroll',netHours:'Net hours',breaksDiscounted:'Deducted breaks',monthOvertime:'Monthly overtime',avgPresence:'Average attendance',employees:'Employees',summaryNote:'Includes estimated payroll, attendance, unpaid breaks, late arrivals, absences and hour bank.',annualBank:'Annual overtime bank',reference:'Reference: 1 day = 8.4h. Unpaid breaks are already deducted.',breaks:'Breaks',annualExtra:'Annual extra',viewAbsenceDays:'View absence days',daySuffix:'d'});
 Object.assign(UI.de.rep,{monthlyPackage:'Monatspaket',payroll:'Löhne',netHours:'Nettostunden',breaksDiscounted:'Abgezogene Pausen',monthOvertime:'Überstunden Monat',avgPresence:'Durchschnittliche Anwesenheit',employees:'Mitarbeiter',summaryNote:'Enthält geschätzte Löhne, Anwesenheit, unbezahlte Pausen, Verspätungen, Abwesenheiten und Stundenbank.',annualBank:'Jährliche Überstundenbank',reference:'Referenz: 1 Tag = 8.4h. Unbezahlte Pausen sind bereits abgezogen.',breaks:'Pausen',annualExtra:'Jährliche Extra',viewAbsenceDays:'Abwesenheitstage anzeigen',daySuffix:'T'});
 Object.assign(UI.it.rep,{monthlyPackage:'Pacchetto mensile',payroll:'Stipendi',netHours:'Ore nette',breaksDiscounted:'Pause detratte',monthOvertime:'Straord. mese',avgPresence:'Presenza media',employees:'Dipendenti',summaryNote:'Include stipendi stimati, presenze, pause non retribuite, ritardi, assenze e banca ore.',annualBank:'Banca annuale ore extra',reference:'Riferimento: 1 giorno = 8.4h. Le pause non retribuite sono già detratte.',breaks:'Pause',annualExtra:'Extra annuale',viewAbsenceDays:'Vedi giorni di assenza',daySuffix:'g'});
+Object.assign(UI.fr.rep,{workedDetail:'Voir les jours travaillés',workedEmpty:'Aucune heure enregistrée',corrections:'Corrections manager',blocks:'Blocs',pause:'Pause',net:'Net',notes:'Notes'});
+Object.assign(UI.es.rep,{workedDetail:'Ver días trabajados',workedEmpty:'Sin horas registradas',corrections:'Correcciones manuales',blocks:'Bloques',pause:'Pausa',net:'Neto',notes:'Notas'});
+Object.assign(UI.en.rep,{workedDetail:'View worked days',workedEmpty:'No hours registered',corrections:'Manager corrections',blocks:'Blocks',pause:'Break',net:'Net',notes:'Notes'});
+Object.assign(UI.de.rep,{workedDetail:'Arbeitstage anzeigen',workedEmpty:'Keine Stunden erfasst',corrections:'Manager-Korrekturen',blocks:'Blöcke',pause:'Pause',net:'Netto',notes:'Notizen'});
+Object.assign(UI.it.rep,{workedDetail:'Vedi giorni lavorati',workedEmpty:'Nessuna ora registrata',corrections:'Correzioni manager',blocks:'Blocchi',pause:'Pausa',net:'Netto',notes:'Note'});
 Object.assign(UI.fr.pages,{vacations:'Demandes'});Object.assign(UI.fr.vac,{new:'+ Nouvelle demande',title:'Nouvelle demande',noneApproved:'Aucune demande approuvée'});
 Object.assign(UI.es.pages,{vacations:'Solicitudes'});Object.assign(UI.es.vac,{new:'+ Nueva solicitud',title:'Nueva solicitud',noneApproved:'Ninguna solicitud aprobada'});
 Object.assign(UI.en.pages,{vacations:'Requests'});Object.assign(UI.en.vac,{new:'+ New request',title:'New request',noneApproved:'No approved requests'});
@@ -2597,11 +2602,11 @@ const CORRECTION_TX={
 };
 const correctionTx=()=>CORRECTION_TX[lang]||CORRECTION_TX.fr;
 const CLOSE_TX={
-  fr:{title:'Clôture mensuelle guidée',ready:'Prêt à exporter',review:'À vérifier avant clôture',closed:'Mois marqué comme révisé',mark:'Marquer comme révisé',reopen:'Marquer comme non révisé',pending:'Demandes en attente',salary:'Salaires manquants',missing:'Absences détectées',late:'Retards',breaks:'Pauses ouvertes',ok:'Tout est en ordre pour générer le rapport.',goRequests:'Voir demandes',goEmployees:'Voir employés',goAttendance:'Corriger fichage'},
-  es:{title:'Cierre mensual guiado',ready:'Listo para exportar',review:'Revisar antes de cerrar',closed:'Mes marcado como revisado',mark:'Marcar mes como revisado',reopen:'Marcar como no revisado',pending:'Solicitudes pendientes',salary:'Salarios faltantes',missing:'Ausencias detectadas',late:'Retardos',breaks:'Pausas abiertas',ok:'Todo está en orden para generar el reporte.',goRequests:'Ver solicitudes',goEmployees:'Ver empleados',goAttendance:'Corregir fichaje'},
-  en:{title:'Guided monthly close',ready:'Ready to export',review:'Review before closing',closed:'Month marked as reviewed',mark:'Mark month as reviewed',reopen:'Mark as not reviewed',pending:'Pending requests',salary:'Missing pay data',missing:'Detected absences',late:'Late arrivals',breaks:'Open breaks',ok:'Everything is ready to generate the report.',goRequests:'View requests',goEmployees:'View employees',goAttendance:'Fix punch'},
-  de:{title:'Geführter Monatsabschluss',ready:'Bereit zum Export',review:'Vor Abschluss prüfen',closed:'Monat als geprüft markiert',mark:'Monat als geprüft markieren',reopen:'Als ungeprüft markieren',pending:'Offene Anfragen',salary:'Fehlende Lohndaten',missing:'Erkannte Abwesenheiten',late:'Verspätungen',breaks:'Offene Pausen',ok:'Alles ist bereit für den Bericht.',goRequests:'Anfragen ansehen',goEmployees:'Mitarbeiter ansehen',goAttendance:'Buchung korrigieren'},
-  it:{title:'Chiusura mensile guidata',ready:'Pronto per esportare',review:'Da controllare prima della chiusura',closed:'Mese segnato come revisionato',mark:'Segna mese come revisionato',reopen:'Segna come non revisionato',pending:'Richieste in attesa',salary:'Dati salario mancanti',missing:'Assenze rilevate',late:'Ritardi',breaks:'Pause aperte',ok:'Tutto è pronto per generare il report.',goRequests:'Vedi richieste',goEmployees:'Vedi dipendenti',goAttendance:'Correggi timbratura'}
+  fr:{title:'Clôture mensuelle guidée',ready:'Prêt à exporter',review:'À vérifier avant clôture',closed:'Mois marqué comme révisé',mark:'Marquer comme révisé',reopen:'Marquer comme non révisé',pending:'Demandes en attente',salary:'Salaires manquants',missing:'Absences détectées',late:'Retards',breaks:'Pauses ouvertes',ok:'Tout est en ordre pour générer le rapport.',goRequests:'Voir demandes',goEmployees:'Voir employés',goAttendance:'Corriger fichage',issuesTitle:'Fichages à corriger',employee:'Employé',date:'Date',problem:'Problème',absenceProblem:'Entrée non enregistrée',openManual:'Corriger'},
+  es:{title:'Cierre mensual guiado',ready:'Listo para exportar',review:'Revisar antes de cerrar',closed:'Mes marcado como revisado',mark:'Marcar mes como revisado',reopen:'Marcar como no revisado',pending:'Solicitudes pendientes',salary:'Salarios faltantes',missing:'Ausencias detectadas',late:'Retardos',breaks:'Pausas abiertas',ok:'Todo está en orden para generar el reporte.',goRequests:'Ver solicitudes',goEmployees:'Ver empleados',goAttendance:'Corregir fichaje',issuesTitle:'Fichajes por corregir',employee:'Empleado',date:'Fecha',problem:'Problema',absenceProblem:'Entrada no registrada',openManual:'Corregir'},
+  en:{title:'Guided monthly close',ready:'Ready to export',review:'Review before closing',closed:'Month marked as reviewed',mark:'Mark month as reviewed',reopen:'Mark as not reviewed',pending:'Pending requests',salary:'Missing pay data',missing:'Detected absences',late:'Late arrivals',breaks:'Open breaks',ok:'Everything is ready to generate the report.',goRequests:'View requests',goEmployees:'View employees',goAttendance:'Fix punch',issuesTitle:'Punches to fix',employee:'Employee',date:'Date',problem:'Issue',absenceProblem:'Missing clock-in',openManual:'Fix'},
+  de:{title:'Geführter Monatsabschluss',ready:'Bereit zum Export',review:'Vor Abschluss prüfen',closed:'Monat als geprüft markiert',mark:'Monat als geprüft markieren',reopen:'Als ungeprüft markieren',pending:'Offene Anfragen',salary:'Fehlende Lohndaten',missing:'Erkannte Abwesenheiten',late:'Verspätungen',breaks:'Offene Pausen',ok:'Alles ist bereit für den Bericht.',goRequests:'Anfragen ansehen',goEmployees:'Mitarbeiter ansehen',goAttendance:'Buchung korrigieren',issuesTitle:'Zu korrigierende Buchungen',employee:'Mitarbeiter',date:'Datum',problem:'Problem',absenceProblem:'Einstempeln fehlt',openManual:'Korrigieren'},
+  it:{title:'Chiusura mensile guidata',ready:'Pronto per esportare',review:'Da controllare prima della chiusura',closed:'Mese segnato come revisionato',mark:'Segna mese come revisionato',reopen:'Segna come non revisionato',pending:'Richieste in attesa',salary:'Dati salario mancanti',missing:'Assenze rilevate',late:'Ritardi',breaks:'Pause aperte',ok:'Tutto è pronto per generare il report.',goRequests:'Vedi richieste',goEmployees:'Vedi dipendenti',goAttendance:'Correggi timbratura',issuesTitle:'Timbrature da correggere',employee:'Dipendente',date:'Data',problem:'Problema',absenceProblem:'Entrata non registrata',openManual:'Correggi'}
 };
 const closeTx=()=>CLOSE_TX[lang]||CLOSE_TX.fr;
 const SMART_ALERT_TX={
@@ -8550,7 +8555,8 @@ function renderPayroll(){
 
 // ═══════ REPORTS ═══════
 let repMD=new Date();
-function repMN(dir){repMD=new Date(repMD.getFullYear(),repMD.getMonth()+dir,1);renderReports();}
+let closeMonthDetail=null;
+function repMN(dir){repMD=new Date(repMD.getFullYear(),repMD.getMonth()+dir,1);closeMonthDetail=null;renderReports();}
 function monthOpenBreaks(y,m){
   const starts=DB.history.filter(h=>h.type==='break_start'&&new Date(h.ts).getFullYear()===y&&new Date(h.ts).getMonth()===m);
   return starts.filter(s=>!DB.history.some(h=>h.empId===s.empId&&h.type==='break_end'&&sameDay(h.ts,s.ts)&&new Date(h.ts)>new Date(s.ts)));
@@ -8570,10 +8576,47 @@ function monthCloseChecklist(rows,y,m){
   return {items,hasBlocking:items.some(i=>i.bad)};
 }
 function closeMonthAction(key){
-  const [kind]=key.split(':');
+  const [kind,month]=key.split(':');
   if(kind==='pending')goPage('vacations');
   else if(kind==='salary')goPage('employees');
-  else if(kind==='missing'||kind==='breaks')goPage('attendance');
+  else if(kind==='missing'){
+    closeMonthDetail=closeMonthDetail===key?null:key;
+    renderReports();
+    setTimeout(()=>document.getElementById('close-month-issues')?.scrollIntoView({behavior:'smooth',block:'nearest'}),60);
+  }
+  else if(kind==='breaks')goPage('attendance');
+}
+function openCloseMonthManual(empId,dateKey){
+  goPage('attendance');
+  setTimeout(()=>openManualModal(empId,{date:dateKey,note:'Correction manager'}),80);
+}
+function closeMonthIssuesHTML(rows,key,tx){
+  if(closeMonthDetail!==`missing:${key}`)return '';
+  const issues=rows.flatMap(r=>(r.absenceIssues||[]).map(i=>({emp:r.emp,...i})));
+  const title=tx.issuesTitle||'Fichajes por corregir';
+  const empty=tx.ok||'Todo en orden.';
+  if(!issues.length)return `<div id="close-month-issues" class="fs11 muted" style="margin:0 0 12px;padding:10px;border:1px solid var(--border);border-radius:var(--r3)">${esc(empty)}</div>`;
+  return `<div id="close-month-issues" style="margin:0 0 12px;background:var(--s2);border:1px solid rgba(79,109,245,.22);border-radius:var(--r3);overflow:hidden">
+    <div class="card-header" style="padding:10px 12px;margin:0;justify-content:space-between">
+      <span>${esc(title)}</span><span class="chip chip-orange">${issues.length}</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr>
+          <th style="text-align:left;padding:8px 12px;color:var(--text2);border-top:1px solid var(--border)">${esc(tx.employee||'Empleado')}</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--text2);border-top:1px solid var(--border)">${esc(tx.date||'Fecha')}</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--text2);border-top:1px solid var(--border)">${esc(tx.problem||'Problema')}</th>
+          <th style="text-align:right;padding:8px 12px;color:var(--text2);border-top:1px solid var(--border)">${esc(tx.openManual||'Corregir')}</th>
+        </tr></thead>
+        <tbody>${issues.map(i=>`<tr>
+          <td style="padding:9px 12px;border-top:1px solid var(--border)"><div class="fw7">${safeEmpName(i.emp)}</div><div class="fs10 muted">${esc(i.emp.position||'')}</div></td>
+          <td style="padding:9px 12px;border-top:1px solid var(--border)">${esc(i.date)}</td>
+          <td style="padding:9px 12px;border-top:1px solid var(--border);color:var(--orange)">${esc(tx.absenceProblem||'Entrada no registrada')}</td>
+          <td style="padding:9px 12px;border-top:1px solid var(--border);text-align:right"><button class="btn btn-primary btn-sm" onclick="openCloseMonthManual('${esc(i.empId)}','${esc(i.dateKey)}')">${esc(tx.openManual||'Corregir')}</button></td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+  </div>`;
 }
 function toggleMonthClosed(){
   const y=repMD.getFullYear(),m=repMD.getMonth(),key=monthKey(y,m);
@@ -8589,22 +8632,64 @@ function closeMonthHTML(rows,y,m){
   return `<div class="card" style="border-color:${check.hasBlocking?'rgba(245,158,11,.35)':'rgba(16,185,129,.35)'};margin-bottom:14px">
     <div class="card-header" style="justify-content:space-between"><span>${tx.title} · ${fmtMonth(repMD)}</span><span class="chip ${closed?'chip-green':check.hasBlocking?'chip-orange':'chip-green'}">${esc(status)}</span></div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">${check.items.map(i=>`<div style="background:var(--s3);border:1px solid ${i.bad?'rgba(245,158,11,.35)':'var(--border)'};border-radius:var(--r3);padding:10px"><div style="font-size:18px;font-weight:900;color:${i.bad?'var(--orange)':'var(--green)'}">${i.count}</div><div class="fs10 muted">${esc(i.label)}</div>${i.bad&&i.action?`<button class="btn btn-ghost btn-sm mt8" onclick="closeMonthAction('${i.key}:${key}')">${esc(i.action)}</button>`:''}</div>`).join('')}</div>
+    ${closeMonthIssuesHTML(rows,key,tx)}
     <div class="fs11 muted mb12">${check.hasBlocking?tx.review:tx.ok}</div>
     <button class="btn ${closed?'btn-ghost':'btn-primary'}" onclick="toggleMonthClosed()">${closed?tx.reopen:tx.mark}</button>
+  </div>`;
+}
+function reportDayBlocks(recs){
+  const blocks=[];let open=null;
+  recs.forEach(r=>{
+    if(r.type==='in')open=r;
+    if(r.type==='out'&&open){blocks.push(`${fmtTime(open.ts)}–${fmtTime(r.ts)}`);open=null;}
+  });
+  if(open)blocks.push(`${fmtTime(open.ts)}–...`);
+  return blocks;
+}
+function reportWorkedDetailsHTML(row,tx){
+  const details=row.dayDetails||[];
+  const body=details.length?details.map(d=>`<div style="padding:8px 0;border-top:1px solid var(--border)">
+    <div class="flex-b fs12"><span class="fw7">${esc(d.date)}</span><span class="fw8" style="color:var(--brand)">${d.hours.toFixed(1)}h</span></div>
+    <div class="fs11 muted mt4">${tx.blocks}: ${d.blocks.length?d.blocks.map(esc).join(' · '):'—'}${d.breaks?` · ${tx.pause}: ${d.breaks.toFixed(1)}h`:''}</div>
+    ${d.notes.length?`<div class="fs11 mt4" style="color:var(--orange)">${tx.notes}: ${d.notes.map(esc).join(' · ')}</div>`:''}
+  </div>`).join(''):`<div class="fs11 muted" style="padding-top:8px;border-top:1px solid var(--border)">${tx.workedEmpty}</div>`;
+  return `<details style="margin-top:8px;border-top:1px solid rgba(79,109,245,.18);padding-top:7px">
+    <summary class="fs11" style="cursor:pointer;color:var(--brand);font-weight:800">${tx.workedDetail}</summary>
+    <div style="margin-top:8px">${body}</div>
+  </details>`;
+}
+function reportAbsenceDetailsHTML(absentDates,tx){
+  if(!absentDates.length)return '';
+  return `<details style="margin-top:8px;border-top:1px solid rgba(239,68,68,.18);padding-top:7px">
+    <summary class="fs11" style="cursor:pointer;color:var(--red);font-weight:800">${tx.viewAbsenceDays}</summary>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${absentDates.map(d=>`<span class="chip chip-red">${esc(d)}</span>`).join('')}</div>
+  </details>`;
+}
+function reportCorrectionsHTML(notes,tx){
+  const unique=[...new Set((notes||[]).filter(Boolean))];
+  if(!unique.length)return '';
+  return `<div style="grid-column:1/-1;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);border-radius:var(--r3);padding:9px 10px">
+  <details>
+    <summary class="fs11" style="cursor:pointer;color:var(--orange);font-weight:800">${tx.corrections} (${unique.length})</summary>
+    <div style="margin-top:8px">${unique.map(n=>`<div class="fs11" style="color:var(--orange);padding:2px 0">${esc(n)}</div>`).join('')}</div>
+  </details>
   </div>`;
 }
 function monthlyEmployeeReport(emp,y,m){
   const tol=DB.settings?.lateTol||10;
   const recs=DB.history.filter(h=>{const d=new Date(h.ts);return h.empId===emp.id&&d.getFullYear()===y&&d.getMonth()===m&&!isBeforeEmployeeStart(emp,d);});
   const days=new Set(recs.map(h=>new Date(h.ts).toDateString()));
-  let hrs=0,breaks=0;
-  for(const ds of days){
+  let hrs=0,breaks=0;const dayDetails=[];
+  for(const ds of [...days].sort((a,b)=>new Date(a)-new Date(b))){
     const dt=new Date(ds),w=workedOn(emp.id,dt);
     if(w)hrs+=w;
-    breaks+=breakMinutesOn(emp.id,dt)/60;
+    const br=breakMinutesOn(emp.id,dt)/60;breaks+=br;
+    const dayRecs=recs.filter(h=>sameDay(h.ts,dt)).sort((a,b)=>new Date(a.ts)-new Date(b.ts));
+    const notes=[...new Set(dayRecs.filter(r=>r.note).map(r=>r.note))];
+    if(w||dayRecs.length)dayDetails.push({date:fmtDate(dt),hours:w||0,breaks:br,blocks:reportDayBlocks(dayRecs),notes});
   }
   const dim=new Date(y,m+1,0).getDate();let late=0,abs=0;
-  const absentDates=[];
+  const absentDates=[],absenceIssues=[];
   for(let d=1;d<=dim;d++){
     const date=new Date(y,m,d);
     if(date>new Date())continue;
@@ -8612,18 +8697,23 @@ function monthlyEmployeeReport(emp,y,m){
     if(!isEmployeeScheduledOn(emp,date))continue;
     const sch=plannedDaySchedule(emp,date);
     const dr=recs.filter(h=>sameDay(h.ts,date));
-    if(!dr.length&&!getAbs(emp.id,date)){abs++;absentDates.push(fmtDate(date));continue;}
+    if(!dr.length&&!getAbs(emp.id,date)){
+      abs++;
+      absentDates.push(fmtDate(date));
+      absenceIssues.push({empId:emp.id,dateKey:localDateKey(date),date:fmtDate(date),problem:'absence'});
+      continue;
+    }
     if(dr.filter(h=>h.type==='in').some(inn=>{
       const b=firstRelevantBlock(emp,new Date(inn.ts))||sch.blocks[0];
       const exp=new Date(timeOn(date,b.start).getTime()+tol*60000);
       return new Date(inn.ts)>exp;
     }))late++;
   }
-  const lateNotes=recs.filter(r=>r.type==='in'&&r.note).map(r=>`${fmtDate(r.ts)}: ${r.note}`);
+  const lateNotes=[...new Set(recs.filter(r=>r.type==='in'&&r.note).map(r=>`${fmtDate(r.ts)}: ${r.note}`))];
   const att=days.size+abs>0?((days.size/(days.size+abs))*100):0;
   const vacLeft=Math.max(0,(emp.vacWeeks||4)*5-vacUsed(emp.id));
   const payInfo=calcPay(emp,y,m),annual=annualExtraHours(emp,y);
-  return{emp,recs,days:days.size,hrs,breaks,late,abs,absentDates,lateNotes,att,vacLeft,annual,...payInfo};
+  return{emp,recs,days:days.size,hrs,breaks,late,abs,absentDates,absenceIssues,lateNotes,dayDetails,att,vacLeft,annual,...payInfo};
 }
 function renderReports(){
   if(!can('view_reports'))return;
@@ -8641,7 +8731,18 @@ function renderReports(){
   document.getElementById('rep-content').innerHTML=closeHTML+summaryHTML+annualHTML+rows.map(r=>{
     const {emp,days,hrs,breaks,late,abs,absentDates,lateNotes,att,vacLeft,annual,ot,pay}=r;
     const ac=att>=80?'var(--green)':att>=60?'var(--orange)':'var(--red)';
-    return`<div class="card mb8"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">${mkAv(emp,'av-36')}<div><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">${[[tx.workedDays,days,'var(--green)'],[tx.hours,hrs.toFixed(1)+'h','var(--brand)'],[tx.breaks,breaks.toFixed(1)+'h','var(--orange)'],[tx.late,late,'var(--orange)'],[tx.absences,abs,'var(--red)'],[tx.overtime,ot>0?'+'+ot.toFixed(1)+'h':'0h',ot>0?'var(--red)':'var(--text3)'],[tx.vacLeft,vacLeft+tx.daySuffix,'var(--orange)'],[tx.annualExtra,annual.toFixed(1)+'h','var(--cyan)']].map(([l,v,c])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div></div>`).join('')}</div>${absentDates.length?`<details style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:9px 10px;margin-bottom:10px"><summary class="fs11" style="cursor:pointer;color:var(--red);font-weight:800">${tx.viewAbsenceDays}</summary><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">${absentDates.map(d=>`<span class="chip chip-red">${esc(d)}</span>`).join('')}</div></details>`:''}${lateNotes.length?`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:9px 10px;margin-bottom:10px">${lateNotes.map(n=>`<div class="fs11" style="color:var(--orange)">${esc(n)}</div>`).join('')}</div>`:''}<div class="flex-b fs12 mb8"><span class="muted">${payModeLabel(emp)} · ${payBaseLabel(emp)}</span><span style="font-weight:800;color:var(--green)">${moneyPlain(pay)}</span></div><div class="flex-b fs11 mb4"><span class="muted">${tx.attendance}</span><span style="font-weight:700;color:${ac}">${att.toFixed(0)}%</span></div><div class="prog"><div class="prog-fill" style="width:${att.toFixed(0)}%;background:${ac}"></div></div></div>`;
+    const metricCards=[
+      [tx.workedDays,days,'var(--green)',''],
+      [tx.hours,hrs.toFixed(1)+'h','var(--brand)',reportWorkedDetailsHTML(r,tx)],
+      [tx.breaks,breaks.toFixed(1)+'h','var(--orange)',''],
+      [tx.late,late,'var(--orange)',''],
+      [tx.absences,abs,'var(--red)',reportAbsenceDetailsHTML(absentDates,tx)],
+      [tx.overtime,ot>0?'+'+ot.toFixed(1)+'h':'0h',ot>0?'var(--red)':'var(--text3)',''],
+      [tx.vacLeft,vacLeft+tx.daySuffix,'var(--orange)',''],
+      [tx.annualExtra,annual.toFixed(1)+'h','var(--cyan)','']
+    ].map(([l,v,c,extra])=>`<div style="background:var(--s3);border-radius:var(--r3);padding:9px 10px"><div style="font-size:16px;font-weight:800;color:${c}">${v}</div><div style="font-size:9px;color:var(--text2);margin-top:2px">${l}</div>${extra||''}</div>`).join('');
+    const metrics=metricCards+reportCorrectionsHTML(lateNotes,tx);
+    return`<div class="card mb8"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">${mkAv(emp,'av-36')}<div><div style="font-weight:700;font-size:13px">${safeEmpName(emp)}</div><div style="font-size:11px;color:var(--text2)">${esc(emp.position)}</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">${metrics}</div><div class="flex-b fs12 mb8"><span class="muted">${payModeLabel(emp)} · ${payBaseLabel(emp)}</span><span style="font-weight:800;color:var(--green)">${moneyPlain(pay)}</span></div><div class="flex-b fs11 mb4"><span class="muted">${tx.attendance}</span><span style="font-weight:700;color:${ac}">${att.toFixed(0)}%</span></div><div class="prog"><div class="prog-fill" style="width:${att.toFixed(0)}%;background:${ac}"></div></div></div>`;
   }).join('');
 }
 
