@@ -56,12 +56,45 @@ function plain(text: string) {
   return String(text || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
+function detectLanguage(question: string, fallback = "es") {
+  const raw = String(question || "").toLowerCase();
+  const q = plain(raw);
+  if (/\b(cosa|come|quali|quanto|vendite|vendita|ricavi|entrate|incassi|dipendenti|personale|manca|mancano|questo mese|inventario|fornitori|acquisti|crediti|documenti|timbrature|chiudere|chiusura)\b/.test(q)) return "it";
+  if (/[¿¡ñáéíóú]/i.test(raw) || /\b(que|como|cual|cuanto|ventas|ingresos|empleados|trabajadores|faltan|falta|este mes|inventario|proveedores|compras|cartera|documentos|fichajes|cerrar mes)\b/.test(q)) return "es";
+  if (/[àâçéèêëîïôùûüÿœæ]/i.test(raw) || /\b(quoi|comment|quels|combien|ventes|revenus|employes|personnel|manquent|ce mois|inventaire|fournisseurs|achats|creances|documents|pointages|cloture)\b/.test(q)) return "fr";
+  if (/[äöüß]/i.test(raw) || /\b(was|wie|welche|wieviel|verkauf|umsatz|mitarbeiter|fehlen|diesen monat|inventar|lieferanten|einkaufe|forderungen|dokumente|stempel)\b/.test(q)) return "de";
+  if (/\b(what|how|which|how many|sales|revenue|employees|missing|this month|inventory|suppliers|purchases|receivables|documents|clock|payroll)\b/.test(q)) return "en";
+  return ["es", "fr", "en", "de", "it"].includes(fallback) ? fallback : "es";
+}
+
+function fallbackAnswer(lang: string) {
+  const copy: Record<string, string> = {
+    es: "No pude consultar la IA en este momento. Puedo seguir ayudando con respuestas básicas dentro de la app.",
+    it: "Non ho potuto consultare l'IA in questo momento. Posso comunque aiutarti con risposte di base dentro l'app.",
+    fr: "Je n'ai pas pu consulter l'IA pour le moment. Je peux quand même t'aider avec les réponses de base dans l'app.",
+    en: "I could not reach the AI right now. I can still help with basic answers inside the app.",
+    de: "Ich konnte die KI gerade nicht erreichen. Ich kann dir trotzdem mit grundlegenden Antworten in der App helfen.",
+  };
+  return copy[lang] || copy.es;
+}
+
+function webFallbackNote(lang: string) {
+  const copy: Record<string, string> = {
+    es: "Nota: no pude activar la búsqueda web desde Manager Pro en este intento. Para decisiones legales o contractuales, verifica la información con una fuente oficial o un asesor local.",
+    it: "Nota: non ho potuto attivare la ricerca web da Manager Pro in questo tentativo. Per decisioni legali o contrattuali, verifica le informazioni con una fonte ufficiale o un consulente locale.",
+    fr: "Note: je n'ai pas pu activer la recherche web depuis Manager Pro lors de cet essai. Pour les décisions légales ou contractuelles, vérifie l'information avec une source officielle ou un conseiller local.",
+    en: "Note: I could not activate web search from Manager Pro on this attempt. For legal or contract decisions, verify the information with an official source or a local advisor.",
+    de: "Hinweis: Ich konnte die Websuche in Manager Pro bei diesem Versuch nicht aktivieren. Prüfe rechtliche oder vertragliche Entscheidungen mit einer offiziellen Quelle oder lokaler Beratung.",
+  };
+  return copy[lang] || copy.es;
+}
+
 function isSensitiveHrQuestion(question: string) {
   const q = plain(question);
   return /desped|despido|termin.*contrato|contrato.*termin|finaliz.*contrato|contrato.*finaliz|rescind|desvincul|renuncia|sancion|disciplin|ausencia.*injust|abandono|conflicto|acoso|queja|incapacidad|licenciement|licenziamento|kundig|dismiss|termination|fire|harassment|disciplinary/.test(q);
 }
 
-async function callAnthropic(apiKey: string, model: string, system: string, user: string, enableWebSearch: boolean) {
+async function callAnthropic(apiKey: string, model: string, system: string, user: string, enableWebSearch: boolean, responseLang = "es") {
   const baseUrl = (Deno.env.get("AI_BASE_URL") || "https://api.anthropic.com/v1").replace(/\/$/, "");
   const body: Record<string, unknown> = {
     model,
@@ -92,8 +125,8 @@ async function callAnthropic(apiKey: string, model: string, system: string, user
     body: JSON.stringify(body),
   });
   if (!aiRes.ok && enableWebSearch) {
-    const fallback = await callAnthropic(apiKey, model, system, user, false);
-    return `${fallback}\n\nNota: no pude activar la búsqueda web desde Manager Pro en este intento. Para decisiones legales o contractuales, verifica la información con una fuente oficial o un asesor local.`;
+    const fallback = await callAnthropic(apiKey, model, system, user, false, responseLang);
+    return `${fallback}\n\n${webFallbackNote(responseLang)}`;
   }
   if (!aiRes.ok) throw new Error(`Anthropic request failed: ${await aiRes.text()}`);
   const payload = await aiRes.json();
@@ -162,20 +195,23 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405);
 
+  let responseLang = "es";
   try {
     const apiKey = Deno.env.get("AI_API_KEY") || Deno.env.get("OPENAI_API_KEY");
     if (!apiKey) return jsonResponse({ error: "Missing AI_API_KEY secret" }, 500);
 
     const provider = (Deno.env.get("AI_PROVIDER") || (apiKey.startsWith("sk-ant-") ? "anthropic" : "openai")).toLowerCase();
     const model = Deno.env.get("AI_MODEL") || Deno.env.get("OPENAI_MODEL") || (provider === "anthropic" ? "claude-sonnet-4-20250514" : "gpt-4o-mini");
-    const { question = "", context = {}, history = [] } = await req.json();
+    const { question = "", language = "", context = {}, history = [] } = await req.json();
     const q = String(question || "").trim();
     if (!q) return jsonResponse({ error: "Question is required" }, 400);
+    const requestedLang = String(language || (context as Record<string, unknown>)?.lang || "es");
+    responseLang = detectLanguage(q, requestedLang);
 
     if (isSensitiveHrQuestion(q)) {
       const directSystem = [
         "You are Manager Pro's business operations and HR assistant for small businesses.",
-        "Answer in the user's language, using context.lang when available.",
+        `Answer in the same language as the user's latest question. Detected answer language: ${responseLang}. context.uiLang is only the interface language.`,
         "Write plain text only. No Markdown. No bold markers. No headings. No tables.",
         "Be more useful than a generic disclaimer: give practical HR guidance, conversation strategy, documentation steps, risks to verify, and what Manager Pro can record.",
         "For legal or contract termination topics, do not present yourself as a lawyer and do not invent exact legal rules. If the user mentions a country such as Switzerland, use current web information when web search is enabled, cite sources plainly, and still advise verification with a qualified local professional before acting.",
@@ -191,9 +227,12 @@ ${JSON.stringify(context).slice(0, 12000)}
 Recent history:
 ${JSON.stringify(history).slice(0, 3000)}
 
+Answer language:
+${responseLang}
+
 Give the final answer directly.`;
       const answer = provider === "anthropic"
-        ? await callAnthropic(apiKey, model, directSystem, directUser, shouldEnableWebSearch(q))
+        ? await callAnthropic(apiKey, model, directSystem, directUser, shouldEnableWebSearch(q), responseLang)
         : await callOpenAIText(apiKey, model, directSystem, directUser);
       return jsonResponse({
         answer: sanitizeAnswer(answer),
@@ -204,7 +243,7 @@ Give the final answer directly.`;
 
     const system = [
       "You are the manager assistant inside Manager Pro, a simple management app for small businesses.",
-      "Answer in the user's language. If context.lang is es/fr/en/de/it, use that language.",
+      `Answer in the same language as the user's latest question. Detected answer language: ${responseLang}. context.uiLang is only the interface language.`,
       "Write in plain text only. Do not use Markdown formatting. Never use bold markers, headings, tables, code fences, or markdown links. Numbered steps are allowed.",
       "Do not limit yourself to explaining the app. Help with any reasonable question a small-business manager may ask: HR, team conversations, sales, inventory, costs, operations, customer situations, planning, reports, documents, communication, and business decisions.",
       "When the question is outside the current app features, still answer helpfully. Then, if useful, add how Manager Pro can help document, track, or follow up.",
@@ -235,17 +274,20 @@ ${JSON.stringify(context).slice(0, 12000)}
 Recent assistant history:
 ${JSON.stringify(history).slice(0, 3000)}
 
+Answer language:
+${responseLang}
+
 Return JSON only.`;
 
     const enableWebSearch = provider === "anthropic" && shouldEnableWebSearch(q);
     const content = provider === "anthropic"
-      ? await callAnthropic(apiKey, model, system, user, enableWebSearch)
+      ? await callAnthropic(apiKey, model, system, user, enableWebSearch, responseLang)
       : await callOpenAICompatible(apiKey, model, system, user);
 
     return jsonResponse(normalize(extractJson(content)));
   } catch (error) {
     return jsonResponse({
-      answer: "No pude consultar la IA en este momento. Puedo seguir ayudando con respuestas basicas dentro de la app.",
+      answer: fallbackAnswer(responseLang),
       category: "other",
       shouldSaveSignal: false,
       error: error instanceof Error ? error.message : String(error),

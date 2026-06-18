@@ -4969,6 +4969,35 @@ function assistantAddMessage(role,text){
   log.innerHTML+=`<div class="assistant-msg ${role==='user'?'user':'bot'}">${assistantFormatMessage(text)}</div>`;
   log.scrollTop=log.scrollHeight;
 }
+function assistantQuestionLang(question,fallback=lang){
+  const raw=String(question||'').toLowerCase();
+  const q=raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(/\b(cosa|come|quali|quanto|vendite|vendita|ricavi|entrate|dipendenti|personale|manca|mancano|questo mese|inventario|fornitori|acquisti|crediti|documenti|timbrature|chiudere|chiusura)\b/.test(q))return'it';
+  if(/[¿¡ñáéíóú]/i.test(raw)||/\b(que|como|cual|cuanto|ventas|ingresos|empleados|trabajadores|faltan|falta|este mes|inventario|proveedores|compras|cartera|documentos|fichajes|cerrar mes)\b/.test(q))return'es';
+  if(/[àâçéèêëîïôùûüÿœæ]/i.test(raw)||/\b(quoi|comment|quels|combien|ventes|revenus|employes|personnel|manquent|ce mois|inventaire|fournisseurs|achats|creances|documents|pointages|cloture)\b/.test(q))return'fr';
+  if(/[äöüß]/i.test(raw)||/\b(was|wie|welche|wieviel|verkauf|umsatz|mitarbeiter|fehlen|diesen monat|inventar|lieferanten|einkaufe|forderungen|dokumente|stempel)\b/.test(q))return'de';
+  if(/\b(what|how|which|how many|sales|revenue|employees|missing|this month|inventory|suppliers|purchases|receivables|documents|clock|payroll)\b/.test(q))return'en';
+  return fallback||'es';
+}
+function assistantCopy(langCode){
+  const l=langCode||lang;
+  return {
+    cannotReach:{
+      es:'No pude consultar Claude desde Manager Pro en este momento. Intenta de nuevo en unos segundos.\n\nSi necesitas resolverlo ya, abre Claude aquí:\nhttps://claude.ai/new',
+      it:'Non riesco a consultare Claude da Manager Pro in questo momento. Riprova tra qualche secondo.\n\nSe devi risolverlo subito, apri Claude qui:\nhttps://claude.ai/new',
+      fr:'Je ne peux pas consulter Claude depuis Manager Pro pour le moment. Réessaie dans quelques secondes.\n\nSi tu dois le résoudre maintenant, ouvre Claude ici:\nhttps://claude.ai/new',
+      en:'I cannot reach Claude from Manager Pro right now. Try again in a few seconds.\n\nIf you need to solve it now, open Claude here:\nhttps://claude.ai/new',
+      de:'Ich kann Claude aus Manager Pro im Moment nicht erreichen. Versuche es in ein paar Sekunden erneut.\n\nWenn du es sofort lösen musst, öffne Claude hier:\nhttps://claude.ai/new'
+    }[l]||'No pude consultar Claude desde Manager Pro en este momento. Intenta de nuevo en unos segundos.\n\nhttps://claude.ai/new',
+    demoLimited:{
+      es:'En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y puede apoyarse en búsqueda web cuando aplica.\n\nTambién puedes abrir Claude:\nhttps://claude.ai/new',
+      it:'Nel demo l’assistente IA è limitato. In un account reale, Claude risponde con più contesto e può usare la ricerca web quando serve.\n\nPuoi anche aprire Claude:\nhttps://claude.ai/new',
+      fr:'Dans le demo, l’assistant IA est limité. Dans un vrai compte, Claude répond avec plus de contexte et peut utiliser la recherche web si nécessaire.\n\nTu peux aussi ouvrir Claude:\nhttps://claude.ai/new',
+      en:'In the demo, the AI assistant is limited. In a real account, Claude answers with more context and can use web search when needed.\n\nYou can also open Claude:\nhttps://claude.ai/new',
+      de:'In der Demo ist der KI-Assistent begrenzt. In einem echten Konto antwortet Claude mit mehr Kontext und kann bei Bedarf Websuche nutzen.\n\nDu kannst Claude auch hier öffnen:\nhttps://claude.ai/new'
+    }[l]||'En el demo el asistente IA es limitado.\n\nhttps://claude.ai/new'
+  };
+}
 function openManagerAssistant(){
   const a=ATX();
   if(!currentUser||currentUser?.role==='employee'){toast(a.managerOnly,'#ef4444');return;}
@@ -4989,7 +5018,7 @@ function askAssistantPreset(q){
   const el=document.getElementById('assistant-question');if(el)el.value=q;
   sendManagerAssistant();
 }
-function managerAssistantContext(){
+function managerAssistantContext(answerLang=lang){
   const today=todayStart(),month=new Date(),employees=DB.employees||[],history=DB.history||[],absences=DB.absences||[];
   const active=employees.filter(e=>e.status==='active');
   const todayRecs=history.filter(h=>sameDay(h.ts,today));
@@ -5022,6 +5051,20 @@ function managerAssistantContext(){
   const stock=stockItems(),lowStock=lowStockItems(),monthlyPurchases=inventoryMonthPurchases();
   const consumed=inventoryImpact(salesMonth).slice(0,10).map(([name,v])=>({name,qty:+Number(v.qty||0).toFixed(3),unit:v.unit,cost:+Number(v.cost||0).toFixed(2)}));
   const productCosts=sellableProducts().slice(0,25).map(p=>({name:p.name,type:p.type,price:Number(p.price)||0,estimatedUnitCost:+productUnitCost(p).toFixed(2),estimatedMargin:+((Number(p.price)||0)-productUnitCost(p)).toFixed(2),recipe:recipeText(p)}));
+  const documents=DB.documents||[],receivables=DB.receivables||[];
+  const safeDate=v=>{if(!v)return null;const d=new Date(v);return Number.isNaN(d.getTime())?null:d;};
+  const docDate=d=>safeDate(d.expiresAt||d.expiryDate||d.expirationDate||d.dueDate||d.validUntil);
+  const next30=new Date(today);next30.setDate(next30.getDate()+30);
+  const expiringDocs=documents.filter(d=>{const dt=docDate(d);return dt&&dt>=today&&dt<=next30;}).slice(0,12).map(d=>({
+    name:d.name||d.fileName||d.title||'Documento',
+    folder:d.folder||d.category||'',
+    expiresAt:d.expiresAt||d.expiryDate||d.expirationDate||d.dueDate||d.validUntil||'',
+    responsible:d.responsible||d.owner||'',
+    status:d.aiStatus||d.status||''
+  }));
+  const openReceivables=receivables.filter(r=>!['paid','closed','cancelled','canceled'].includes(String(r.status||'open').toLowerCase()));
+  const overdueReceivables=openReceivables.filter(r=>{const dt=safeDate(r.dueDate||r.due_at||r.date);return dt&&dt<today;});
+  const receivableAmount=r=>Number(r.balance??r.openAmount??r.amount??r.total??0)||0;
   return {
     app:'Manager Pro',
     business:DB.settings?.company||'Business',
@@ -5029,7 +5072,8 @@ function managerAssistantContext(){
     page:currentPage,
     area:typeof tourRoleForPage==='function'?tourRoleForPage():currentPage,
     role:currentUser?.role||'manager',
-    lang,
+    lang:answerLang,
+    uiLang:lang,
     date:new Date().toISOString(),
     settings:{lateTolerance:DB.settings?.lateTol,maxHoursWeek:DB.settings?.maxHours,currency:currencyCode(),businessSector:DB.settings?.businessSector||'general'},
     counts:{employees:employees.length,activeEmployees:active.length,todayPunches:todayRecs.length,pendingAbsences:absences.filter(a=>!a.approved).length},
@@ -5061,6 +5105,19 @@ function managerAssistantContext(){
       consumedBySales:consumed,
       productCosts
     },
+    documents:{
+      total:documents.length,
+      needsReview:documents.filter(d=>['pending','review','manual_review','error'].includes(String(d.aiStatus||d.status||'').toLowerCase())).length,
+      expiringSoon:expiringDocs
+    },
+    receivables:{
+      total:receivables.length,
+      open:openReceivables.length,
+      overdue:overdueReceivables.length,
+      openAmount:+openReceivables.reduce((a,r)=>a+receivableAmount(r),0).toFixed(2),
+      overdueAmount:+overdueReceivables.reduce((a,r)=>a+receivableAmount(r),0).toFixed(2),
+      topOverdue:overdueReceivables.slice(0,8).map(r=>({client:r.clientName||r.customer||r.name||'',amount:receivableAmount(r),dueDate:r.dueDate||r.due_at||r.date||''}))
+    },
     relationships:{
       saleDeductsInventory:'Final sales can deduct stock directly or through recipe inputs.',
       purchasesUpdateCost:'Purchases update stock and weighted average cost.',
@@ -5078,12 +5135,39 @@ function assistantPeopleCoachingAnswer(ctx){
     de:`Ja. Ziel ist nicht nur eine Ermahnung, sondern die Ursache zu verstehen, eine klare Grenze zu setzen und nachzuverfolgen.\n\nDu kannst das Gespräch so führen:\n\n1. Ruhig beginnen: "Ich möchte über die Verspätungen sprechen, nicht um dich anzugreifen, sondern weil sie das Team und den Service beeinflussen."\n\n2. Konkrete Daten nennen: "Diesen Monat sind ${lateCount} Verspätung(en) erfasst. Die aktuelle Toleranz liegt bei ${tolerance} Minuten."\n\n3. Ernsthaft fragen: "Was macht es im Moment schwierig, pünktlich zu kommen? Verkehr, Dienstplan, Müdigkeit, Organisation?"\n\n4. Ein klares Abkommen setzen: "Ab morgen brauche ich dich zur geplanten Zeit bereit. Wenn etwas passiert, informiere mich vor Schichtbeginn."\n\n5. Mit Follow-up schließen: "Wir prüfen das in einer Woche. Wenn es besser wird, gut. Wenn es weitergeht, müssen wir den nächsten Schritt formalisieren."\n\nIn Manager Pro dokumentierst du die Fakten: Anwesenheitsbericht, Verspätungsdaten, Kommentare des Mitarbeiters und eine Notiz im Profil. Für formelle Maßnahmen bitte interne Regeln und lokales Arbeitsrecht prüfen.`,
     it:`Sì. Qui l'obiettivo non è solo rimproverare, ma capire la causa, mettere un limite chiaro e fare seguito.\n\nPuoi gestire la conversazione così:\n\n1. Inizia con calma: "Voglio parlare dei ritardi, non per attaccarti, ma perché influenzano il team e il servizio."\n\n2. Usa il dato concreto: "Questo mese ho ${lateCount} ritardo/i registrati. La tolleranza attuale è di ${tolerance} minuti."\n\n3. Fai una domanda vera: "Cosa rende difficile arrivare puntuale in questo periodo? Trasporto, orario, stanchezza, organizzazione?"\n\n4. Definisci un accordo semplice: "Da domani ho bisogno che tu sia pronto all'orario programmato. Se succede qualcosa, avvisami prima dell'inizio del turno."\n\n5. Chiudi con un controllo: "Lo rivediamo tra una settimana. Se migliora, perfetto. Se continua, dovremo formalizzare un prossimo passo."\n\nIn Manager Pro conserva la parte oggettiva: report presenze, date dei ritardi, commenti del dipendente e una nota nel profilo. Per misure disciplinari formali, verifica prima regole interne e diritto del lavoro locale.`
   };
-  return copy[lang]||copy.es;
+  return copy[ctx.lang]||copy[lang]||copy.es;
 }
 function localSalesAssistantAnswer(ctx){
+  const l=ctx.lang||lang;
   const s=ctx.sales||{},inv=ctx.inventory||{},top=s.topProducts||[],payments=s.byPayment||[],team=s.byEmployee||[],low=inv.lowStock||[],currency=currencyCode();
   const noSales=!(Number(s.todaySales)||Number(s.monthSales));
   if(noSales){
+    if(l==='it')return `Non vedo ancora vendite registrate da analizzare.
+
+Per far funzionare bene Vendite:
+
+1. Crea prodotti o servizi finali in Vendite > Prodotti.
+2. Se un prodotto consuma materie prime, segnalo come preparato e aggiungi il consumo per vendita.
+3. Registra le vendite con metodo di pagamento e, se possibile, dipendente responsabile.
+4. Usa Report vendite per esportare chiusura giornaliera, vendite mensili, prodotto, metodo di pagamento, dipendente e inventario coinvolto.
+
+Quando avrai dati, potrò dirti cosa vende di più, come entra il denaro, chi vende di più, quali prodotti consumano stock e dove il margine può essere basso.`;
+    if(l==='fr')return `Je ne vois pas encore de ventes enregistrées à analyser.
+
+Pour que Vente fonctionne bien:
+
+1. Crée des produits ou services finaux dans Ventes > Produits.
+2. Si un produit consomme des matières premières, marque-le comme préparé et ajoute sa consommation par vente.
+3. Enregistre les ventes avec méthode de paiement et, si possible, employé responsable.
+4. Utilise les rapports de ventes pour exporter caisse journalière, ventes mensuelles, produit, méthode de paiement, employé et inventaire impacté.`;
+    if(l==='en')return `I do not see sales registered yet.
+
+Minimum setup:
+
+1. Create final products or services in Sales > Products.
+2. If a product consumes ingredients, mark it as prepared and add consumption per sale.
+3. Register sales with payment method and responsible employee when possible.
+4. Use Sales Reports for daily closing, monthly sales, product, payment method, employee and inventory impact.`;
     return `Todavía no veo ventas registradas para analizar.
 
 Para que el asistente pueda ayudarte bien en Ventas, el flujo mínimo es:
@@ -5095,19 +5179,85 @@ Para que el asistente pueda ayudarte bien en Ventas, el flujo mínimo es:
 
 Cuando tengas ventas, podré decirte qué se vende más, por qué método entra más dinero, qué empleado vendió más, qué productos afectan inventario y dónde puede haber margen bajo.`;
   }
-  const topTxt=top.length?`Producto o servicio más fuerte: ${top[0].name}, con ${money(top[0].total)} y ${round1(top[0].qty)} unidad(es).`:'Aún no hay un producto líder claro.';
-  const payTxt=payments.length?`Métodos de pago principales: ${payments.slice(0,3).map(x=>`${x.method}: ${money(x.total)}`).join(' · ')}.`:'No veo métodos de pago suficientes para comparar.';
-  const teamTxt=team.length?`Ventas por empleado: ${team.slice(0,3).map(x=>`${x.name}: ${money(x.total)} en ${x.sales} venta(s)`).join(' · ')}.`:'Si quieres medir ventas por empleado, registra el responsable al guardar cada venta.';
-  const invTxt=low.length?`Atención: hay ${low.length} ítem(s) con stock bajo que pueden afectar ventas: ${low.slice(0,5).map(x=>`${x.name} (${x.stock} ${x.unit})`).join(', ')}.`:'No veo bajo stock crítico conectado a ventas en este resumen.';
+  const salesBits={
+    es:{
+      top:top.length?`Producto o servicio más fuerte: ${top[0].name}, con ${money(top[0].total)} y ${round1(top[0].qty)} unidad(es).`:'Aún no hay un producto líder claro.',
+      pay:payments.length?`Métodos de pago principales: ${payments.slice(0,3).map(x=>`${x.method}: ${money(x.total)}`).join(' · ')}.`:'No veo métodos de pago suficientes para comparar.',
+      team:team.length?`Ventas por empleado: ${team.slice(0,3).map(x=>`${x.name}: ${money(x.total)} en ${x.sales} venta(s)`).join(' · ')}.`:'Si quieres medir ventas por empleado, registra el responsable al guardar cada venta.',
+      stock:low.length?`Atención: hay ${low.length} ítem(s) con stock bajo que pueden afectar ventas: ${low.slice(0,5).map(x=>`${x.name} (${x.stock} ${x.unit})`).join(', ')}.`:'No veo bajo stock crítico conectado a ventas en este resumen.'
+    },
+    fr:{
+      top:top.length?`Produit ou service principal: ${top[0].name}, avec ${money(top[0].total)} et ${round1(top[0].qty)} unité(s).`:"Il n'y a pas encore de produit leader clair.",
+      pay:payments.length?`Méthodes de paiement principales: ${payments.slice(0,3).map(x=>`${x.method}: ${money(x.total)}`).join(' · ')}.`:"Je ne vois pas assez de méthodes de paiement pour comparer.",
+      team:team.length?`Ventes par employé: ${team.slice(0,3).map(x=>`${x.name}: ${money(x.total)} sur ${x.sales} vente(s)`).join(' · ')}.`:"Pour mesurer les ventes par employé, indique le responsable lors de chaque vente.",
+      stock:low.length?`Attention: ${low.length} article(s) en stock bas peuvent affecter les ventes: ${low.slice(0,5).map(x=>`${x.name} (${x.stock} ${x.unit})`).join(', ')}.`:"Je ne vois pas de stock critique connecté aux ventes dans ce résumé."
+    },
+    en:{
+      top:top.length?`Strongest product or service: ${top[0].name}, with ${money(top[0].total)} and ${round1(top[0].qty)} unit(s).`:'There is no clear leading product yet.',
+      pay:payments.length?`Main payment methods: ${payments.slice(0,3).map(x=>`${x.method}: ${money(x.total)}`).join(' · ')}.`:'I do not see enough payment-method data to compare.',
+      team:team.length?`Sales by employee: ${team.slice(0,3).map(x=>`${x.name}: ${money(x.total)} across ${x.sales} sale(s)`).join(' · ')}.`:'To measure sales by employee, assign the responsible employee when saving each sale.',
+      stock:low.length?`Attention: ${low.length} low-stock item(s) may affect sales: ${low.slice(0,5).map(x=>`${x.name} (${x.stock} ${x.unit})`).join(', ')}.`:'I do not see critical low stock connected to sales in this summary.'
+    }
+  };
+  if(l==='it'){
+    const topIt=top.length?`Prodotto o servizio più forte: ${top[0].name}, con ${money(top[0].total)} e ${round1(top[0].qty)} unità.`:'Non c’è ancora un prodotto leader chiaro.';
+    const payIt=payments.length?`Metodi di pagamento principali: ${payments.slice(0,3).map(x=>`${x.method}: ${money(x.total)}`).join(' · ')}.`:'Non vedo abbastanza metodi di pagamento da confrontare.';
+    const teamIt=team.length?`Vendite per dipendente: ${team.slice(0,3).map(x=>`${x.name}: ${money(x.total)} in ${x.sales} vendita/e`).join(' · ')}.`:'Se vuoi misurare le vendite per dipendente, assegna un responsabile quando registri la vendita.';
+    const invIt=low.length?`Attenzione: ci sono ${low.length} articolo/i con stock basso che possono bloccare le vendite: ${low.slice(0,5).map(x=>`${x.name} (${x.stock} ${x.unit})`).join(', ')}.`:'Non vedo stock critico collegato alle vendite in questo riepilogo.';
+    return `Lettura rapida delle vendite:
+
+1. Oggi hai ${money(s.todayRevenue||0)} in ${s.todaySales||0} vendita/e.
+2. Questo mese hai ${money(s.monthRevenue||0)} in ${s.monthSales||0} vendita/e.
+3. Ticket medio: ${money(s.avgTicket||0)}.
+4. ${topIt}
+5. ${payIt}
+6. ${teamIt}
+7. ${invIt}
+
+Cosa controllerei ora:
+
+1. Verifica che il prodotto più venduto abbia ricetta e costo collegati all’inventario. Senza questo vedi i ricavi, ma non il margine reale.
+2. Esporta Report per prodotto e Report per metodo di pagamento per chiudere la cassa con dati chiari.
+3. Se vendi con un team, assegna il dipendente responsabile a ogni vendita.
+4. Se un prodotto vende molto e consuma stock, registra gli acquisti per aggiornare il costo medio in ${currency}.`;
+  }
+  if(l==='fr'){
+    const bits=salesBits.fr;
+    return `Lecture rapide des ventes:
+
+1. Aujourd’hui: ${money(s.todayRevenue||0)} sur ${s.todaySales||0} vente(s).
+2. Ce mois-ci: ${money(s.monthRevenue||0)} sur ${s.monthSales||0} vente(s).
+3. Ticket moyen: ${money(s.avgTicket||0)}.
+4. ${bits.top}
+5. ${bits.pay}
+6. ${bits.team}
+7. ${bits.stock}
+
+À vérifier maintenant: produit le plus vendu, méthode de paiement dominante, responsable de vente et stock bas connecté aux produits.`;
+  }
+  if(l==='en'){
+    const bits=salesBits.en;
+    return `Quick sales read:
+
+1. Today: ${money(s.todayRevenue||0)} across ${s.todaySales||0} sale(s).
+2. This month: ${money(s.monthRevenue||0)} across ${s.monthSales||0} sale(s).
+3. Average ticket: ${money(s.avgTicket||0)}.
+4. ${bits.top}
+5. ${bits.pay}
+6. ${bits.team}
+7. ${bits.stock}
+
+What I would check now: top product cost, payment mix, responsible employee and low stock connected to fast-selling products.`;
+  }
   return `Lectura rápida de Ventas:
 
 1. Hoy llevas ${money(s.todayRevenue||0)} en ${s.todaySales||0} venta(s).
 2. Este mes llevas ${money(s.monthRevenue||0)} en ${s.monthSales||0} venta(s).
 3. Ticket promedio: ${money(s.avgTicket||0)}.
-4. ${topTxt}
-5. ${payTxt}
-6. ${teamTxt}
-7. ${invTxt}
+4. ${salesBits.es.top}
+5. ${salesBits.es.pay}
+6. ${salesBits.es.team}
+7. ${salesBits.es.stock}
 
 Qué haría ahora como manager:
 
@@ -5117,9 +5267,37 @@ Qué haría ahora como manager:
 4. Si un producto vende mucho y baja inventario, registra compras para que el costo promedio (${currency}) se actualice y el margen sea más real.`;
 }
 function localInventoryAssistantAnswer(ctx){
+  const l=ctx.lang||lang;
   const inv=ctx.inventory||{},sales=ctx.sales||{},low=inv.lowStock||[],cons=inv.consumedBySales||[],costs=inv.productCosts||[];
   const noInventory=!(Number(inv.items)||Number(inv.purchasesThisMonth)||low.length);
   if(noInventory){
+    if(l==='it')return `Non vedo ancora abbastanza inventario da analizzare.
+
+Per iniziare:
+
+1. Crea materie prime o insumi in Inventario > Stock.
+2. Definisci l’unità corretta: kg, g, L, ml, unità, scatola o pacco.
+3. Aggiungi stock iniziale e costo iniziale se hai già un riferimento.
+4. Registra gli acquisti reali in Inventario > Acquisti. Così il costo medio ponderato si aggiorna.
+5. In Vendite > Prodotti collega i prodotti preparati ai loro insumi.`;
+    if(l==='fr')return `Je ne vois pas encore assez d'inventaire à analyser.
+
+Pour commencer:
+
+1. Crée les matières premières ou articles dans Inventaire > Stock.
+2. Définis la bonne unité: kg, g, L, ml, unité, caisse ou paquet.
+3. Ajoute le stock initial et un coût initial si tu as déjà une référence.
+4. Enregistre les achats réels dans Inventaire > Achats. Le coût moyen pondéré se mettra à jour.
+5. Dans Ventes > Produits, relie les produits préparés à leurs ingrédients.`;
+    if(l==='en')return `I do not see enough inventory data to analyze yet.
+
+To get started:
+
+1. Create raw materials or stock items in Inventory > Stock.
+2. Set the correct unit: kg, g, L, ml, unit, box or pack.
+3. Add initial stock and initial cost if you already have a reference.
+4. Register real purchases in Inventory > Purchases. That updates the weighted average cost.
+5. In Sales > Products, connect prepared products with their ingredients.`;
     return `Todavía no veo inventario suficiente para analizar.
 
 Para que Inventario empiece a funcionar de verdad:
@@ -5132,18 +5310,73 @@ Para que Inventario empiece a funcionar de verdad:
 
 Con eso podré ayudarte a detectar bajo stock, consumo por ventas, costo estimado por producto final y margen aproximado.`;
   }
-  const lowTxt=low.length?`Bajo stock: ${low.slice(0,6).map(x=>`${x.name} (${x.stock} ${x.unit}, mínimo ${x.minimum})`).join(', ')}.`:'No veo productos por debajo del mínimo.';
-  const consTxt=cons.length?`Consumo por ventas del mes: ${cons.slice(0,5).map(x=>`${x.name}: ${x.qty} ${x.unit} (${money(x.cost)})`).join(' · ')}.`:'Todavía no hay consumo conectado desde ventas; revisa recetas o productos con stock.';
   const marginRisk=costs.filter(p=>Number(p.price)>0&&Number(p.estimatedUnitCost)>0&&Number(p.estimatedMargin)<=0).slice(0,5);
-  const marginTxt=marginRisk.length?`Hay productos con margen estimado bajo o negativo: ${marginRisk.map(p=>`${p.name} (${money(p.estimatedMargin)})`).join(', ')}.`:'No veo margen negativo en los productos con costo calculable.';
+  const inventoryBits={
+    es:{
+      low:low.length?`Bajo stock: ${low.slice(0,6).map(x=>`${x.name} (${x.stock} ${x.unit}, mínimo ${x.minimum})`).join(', ')}.`:'No veo productos por debajo del mínimo.',
+      cons:cons.length?`Consumo por ventas del mes: ${cons.slice(0,5).map(x=>`${x.name}: ${x.qty} ${x.unit} (${money(x.cost)})`).join(' · ')}.`:'Todavía no hay consumo conectado desde ventas; revisa recetas o productos con stock.',
+      margin:marginRisk.length?`Hay productos con margen estimado bajo o negativo: ${marginRisk.map(p=>`${p.name} (${money(p.estimatedMargin)})`).join(', ')}.`:'No veo margen negativo en los productos con costo calculable.'
+    },
+    fr:{
+      low:low.length?`Stock bas: ${low.slice(0,6).map(x=>`${x.name} (${x.stock} ${x.unit}, minimum ${x.minimum})`).join(', ')}.`:"Je ne vois pas de produits sous le minimum.",
+      cons:cons.length?`Consommation liée aux ventes du mois: ${cons.slice(0,5).map(x=>`${x.name}: ${x.qty} ${x.unit} (${money(x.cost)})`).join(' · ')}.`:"Il n'y a pas encore de consommation connectée aux ventes; vérifie les recettes ou produits avec stock.",
+      margin:marginRisk.length?`Il y a des produits avec marge estimée faible ou négative: ${marginRisk.map(p=>`${p.name} (${money(p.estimatedMargin)})`).join(', ')}.`:"Je ne vois pas de marge négative dans les produits avec coût calculable."
+    },
+    en:{
+      low:low.length?`Low stock: ${low.slice(0,6).map(x=>`${x.name} (${x.stock} ${x.unit}, minimum ${x.minimum})`).join(', ')}.`:'I do not see products below minimum.',
+      cons:cons.length?`Consumption from sales this month: ${cons.slice(0,5).map(x=>`${x.name}: ${x.qty} ${x.unit} (${money(x.cost)})`).join(' · ')}.`:'There is no sales-linked consumption yet; check recipes or stock-controlled products.',
+      margin:marginRisk.length?`There are products with low or negative estimated margin: ${marginRisk.map(p=>`${p.name} (${money(p.estimatedMargin)})`).join(', ')}.`:'I do not see negative margin in products with calculable cost.'
+    }
+  };
+  if(l==='it'){
+    const lowIt=low.length?`Stock basso: ${low.slice(0,6).map(x=>`${x.name} (${x.stock} ${x.unit}, minimo ${x.minimum})`).join(', ')}.`:'Non vedo prodotti sotto il minimo.';
+    const consIt=cons.length?`Consumo da vendite del mese: ${cons.slice(0,5).map(x=>`${x.name}: ${x.qty} ${x.unit} (${money(x.cost)})`).join(' · ')}.`:'Non c’è ancora consumo collegato dalle vendite; controlla ricette o prodotti con stock.';
+    const marginIt=marginRisk.length?`Ci sono prodotti con margine stimato basso o negativo: ${marginRisk.map(p=>`${p.name} (${money(p.estimatedMargin)})`).join(', ')}.`:'Non vedo margine negativo nei prodotti con costo calcolabile.';
+    return `Lettura rapida dell’inventario:
+
+1. Articoli con controllo stock: ${inv.items||0}.
+2. Valore stimato dell’inventario: ${money(inv.estimatedValue||0)}.
+3. Acquisti registrati questo mese: ${inv.purchasesThisMonth||0}, per ${money(inv.purchaseValueThisMonth||0)}.
+4. ${lowIt}
+5. ${consIt}
+6. ${marginIt}
+
+Cosa farei ora: rifornire prima lo stock sotto minimo, registrare ogni acquisto con quantità e costo totale, e collegare le ricette dei prodotti venduti.`;
+  }
+  if(l==='fr'){
+    const bits=inventoryBits.fr;
+    return `Lecture rapide de l'inventaire:
+
+1. Articles avec contrôle de stock: ${inv.items||0}.
+2. Valeur estimée de l'inventaire: ${money(inv.estimatedValue||0)}.
+3. Achats enregistrés ce mois-ci: ${inv.purchasesThisMonth||0}, pour ${money(inv.purchaseValueThisMonth||0)}.
+4. ${bits.low}
+5. ${bits.cons}
+6. ${bits.margin}
+
+Ce que je ferais maintenant: réapprovisionner d'abord ce qui est sous le minimum, enregistrer chaque achat avec quantité et coût total, puis vérifier les recettes des produits vendus.`;
+  }
+  if(l==='en'){
+    const bits=inventoryBits.en;
+    return `Quick inventory read:
+
+1. Stock-controlled items: ${inv.items||0}.
+2. Estimated inventory value: ${money(inv.estimatedValue||0)}.
+3. Purchases registered this month: ${inv.purchasesThisMonth||0}, for ${money(inv.purchaseValueThisMonth||0)}.
+4. ${bits.low}
+5. ${bits.cons}
+6. ${bits.margin}
+
+What I would do now: restock items below minimum first, register every purchase with quantity and total cost, and check recipes for sold products.`;
+  }
   return `Lectura rápida de Inventario:
 
 1. Ítems con control de stock: ${inv.items||0}.
 2. Valor estimado de inventario: ${money(inv.estimatedValue||0)}.
 3. Compras registradas este mes: ${inv.purchasesThisMonth||0}, por ${money(inv.purchaseValueThisMonth||0)}.
-4. ${lowTxt}
-5. ${consTxt}
-6. ${marginTxt}
+4. ${inventoryBits.es.low}
+5. ${inventoryBits.es.cons}
+6. ${inventoryBits.es.margin}
 
 Qué haría ahora como manager:
 
@@ -5153,41 +5386,66 @@ Qué haría ahora como manager:
 4. Usa Reportes inventario: Stock actual, Stock bajo, Compras del mes, Consumo por ventas y Costo por producto final.`;
 }
 function localAssistantAnswer(question,ctx){
+  const answerLang=ctx.lang||assistantQuestionLang(question,lang);
+  ctx.lang=answerLang;
   const q=String(question||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
   let category='app_help',shouldSaveSignal=false;
-  let answer='No pude consultar la IA principal en este momento. Intenta de nuevo en unos segundos.';
+  let answer=assistantCopy(answerLang).cannotReach;
   const asksTermination=/desped|despido|termin.*contrato|contrato.*termin|finaliz.*contrato|contrato.*finaliz|rescind|cancelar.*contrato|desvincul|echar|sacar|licenciar|licenciement|licenzi|dismiss|fire|terminate|kundig/.test(q);
-  if(/(qui[eé]n|persona|empleado).*(m[aá]s|mas).*(trabaj|hora)|m[aá]s horas|mas horas|top.*trabaj/.test(q)){
+  const salesRe=/\b(venta|ventas|vendita|vendite|venduto|ricavi|entrate|incassi|ventes|sales|verkauf|umsatz|ingreso|ingresos|caja|cassa|ticket|pagamento|pagamenti|pago|payment)\b/.test(q);
+  const inventoryRe=/\b(stock|inventario|inventario|inventory|compra|compras|acquisto|acquisti|purchase|proveedor|proveedores|fornitore|fornitori|supplier|costo|costi|cost|margen|margine|margin|insumo|materia prima|materie prime|receta|ricetta|recipe|consumo)\b/.test(q);
+  const peopleRe=/\b(empleado|empleados|trabajador|trabajadores|dipendente|dipendenti|personale|employee|employees|employe|employes|mitarbeiter|personal)\b/.test(q);
+  const missingRe=/\b(falta|faltan|manca|mancano|missing|manquent|fehlen|datos|dati|informacion|informazioni|information|configurar|configure)\b/.test(q);
+  if(/(qui[eé]n|persona|empleado|dipendente|employee|personale).*(m[aá]s|mas|piu|plus|most).*(trabaj|hora|lavor|ore|hour)|m[aá]s horas|mas horas|piu ore|top.*trabaj|top.*lavor/.test(q)){
     category='reporting';
-    const top=ctx.topWorkers||[];
-    answer=top.length?`La persona que más ha trabajado este mes es ${top[0].name}, con ${top[0].hours}h registradas en ${top[0].days} día(s). Top 3: ${top.slice(0,3).map((x,i)=>`${i+1}. ${x.name}: ${x.hours}h`).join(' · ')}.`:'Todavía no hay horas suficientes registradas este mes para calcular quién ha trabajado más.';
-  }else if(/cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)/.test(q)){
+    const top=ctx.topWorkers||[],line=top.slice(0,3).map((x,i)=>`${i+1}. ${x.name}: ${x.hours}h`).join(' · ');
+    if(answerLang==='it')answer=top.length?`La persona che ha lavorato di più questo mese è ${top[0].name}, con ${top[0].hours}h registrate in ${top[0].days} giorno/i. Top 3: ${line}.`:'Non ci sono ancora abbastanza ore registrate questo mese per calcolarlo.';
+    else if(answerLang==='fr')answer=top.length?`La personne qui a le plus travaillé ce mois-ci est ${top[0].name}, avec ${top[0].hours}h sur ${top[0].days} jour(s). Top 3: ${line}.`:"Il n'y a pas encore assez d'heures enregistrées ce mois-ci.";
+    else if(answerLang==='en')answer=top.length?`The person with the most hours this month is ${top[0].name}, with ${top[0].hours}h across ${top[0].days} day(s). Top 3: ${line}.`:'There are not enough registered hours this month to calculate it yet.';
+    else answer=top.length?`La persona que más ha trabajado este mes es ${top[0].name}, con ${top[0].hours}h registradas en ${top[0].days} día(s). Top 3: ${line}.`:'Todavía no hay horas suficientes registradas este mes para calcular quién ha trabajado más.';
+  }else if(/cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)|quanti.*(dipendent|personale)|how many.*employees|combien.*employ/.test(q)){
     category='daily_ops';
-    answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.business||ctx.restaurant}.`;
-  }else if(/venta|ingreso|caja|ticket|producto.*vend|mas vendido|m[aá]s vendido|metodo.*pago|m[eé]todo.*pago/.test(q)){
+    if(answerLang==='it')answer=`Hai ${ctx.counts.employees} dipendente/i in totale e ${ctx.counts.activeEmployees} attivo/i in ${ctx.business||ctx.restaurant}.`;
+    else if(answerLang==='fr')answer=`Tu as ${ctx.counts.employees} employé(s) au total et ${ctx.counts.activeEmployees} actif(s) dans ${ctx.business||ctx.restaurant}.`;
+    else if(answerLang==='en')answer=`You have ${ctx.counts.employees} employee(s) in total and ${ctx.counts.activeEmployees} active in ${ctx.business||ctx.restaurant}.`;
+    else answer=`Tienes ${ctx.counts.employees} empleado(s) en total y ${ctx.counts.activeEmployees} activo(s) en ${ctx.business||ctx.restaurant}.`;
+  }else if(salesRe){
     category='reporting';
     answer=localSalesAssistantAnswer(ctx);
-  }else if(/stock|inventario|compra|proveedor|costo|margen|insumo|materia prima|receta|consumo/.test(q)){
+  }else if(inventoryRe){
     category='reporting';
     answer=localInventoryAssistantAnswer(ctx);
   }else if(asksTermination){
     category='daily_ops';
-    answer=isDemo()?`En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y, cuando aplica, con búsqueda web.\n\nPara investigarlo ahora puedes abrir Claude y pegar esta pregunta:\n"${question}"\n\nhttps://claude.ai/new`:`No pude conectar con Claude desde Manager Pro en este momento. Esta pregunta necesita la IA principal porque combina RH, contrato y posible riesgo legal.\n\nPuedes intentar de nuevo o abrir Claude y pegar esta pregunta:\n"${question}"\n\nhttps://claude.ai/new`;
+    answer=isDemo()?assistantCopy(answerLang).demoLimited:`${assistantCopy(answerLang).cannotReach}\n\nhttps://claude.ai/new`;
   }else if(/tarde|retard|late|ritardo|versp[aä]t|p[uü]nkt|puntual|conversaci[oó]n|conversat|hablar|parler|talk|sprechen|disciplina|disciplin|conducta|comport/.test(q)){
     category='daily_ops';
     answer=assistantPeopleCoachingAnswer(ctx);
   }else if(/cerrar|mes|reporte|n[oó]mina|salario|pago/.test(q)){
     category='reporting';
-    answer=`Antes de cerrar el mes revisa: salarios sin configurar (${ctx.alerts.missingSalary.length}), solicitudes pendientes (${ctx.counts.pendingAbsences}), pausas abiertas (${ctx.alerts.openBreaks.length}) y retardos del mes (${ctx.currentMonth.totalLate}). Estimado de nómina actual: ${moneyPlain(ctx.currentMonth.estimatedPayroll)}.`;
+    if(answerLang==='it')answer=`Prima di chiudere il mese controlla: salari non configurati (${ctx.alerts.missingSalary.length}), richieste pendenti (${ctx.counts.pendingAbsences}), pause aperte (${ctx.alerts.openBreaks.length}) e ritardi del mese (${ctx.currentMonth.totalLate}). Stima paghe attuale: ${moneyPlain(ctx.currentMonth.estimatedPayroll)}.`;
+    else if(answerLang==='fr')answer=`Avant de clôturer le mois, vérifie: salaires non configurés (${ctx.alerts.missingSalary.length}), demandes en attente (${ctx.counts.pendingAbsences}), pauses ouvertes (${ctx.alerts.openBreaks.length}) et retards du mois (${ctx.currentMonth.totalLate}). Paie estimée actuelle: ${moneyPlain(ctx.currentMonth.estimatedPayroll)}.`;
+    else if(answerLang==='en')answer=`Before closing the month, check: missing salary settings (${ctx.alerts.missingSalary.length}), pending requests (${ctx.counts.pendingAbsences}), open breaks (${ctx.alerts.openBreaks.length}) and late arrivals this month (${ctx.currentMonth.totalLate}). Current estimated payroll: ${moneyPlain(ctx.currentMonth.estimatedPayroll)}.`;
+    else answer=`Antes de cerrar el mes revisa: salarios sin configurar (${ctx.alerts.missingSalary.length}), solicitudes pendientes (${ctx.counts.pendingAbsences}), pausas abiertas (${ctx.alerts.openBreaks.length}) y retardos del mes (${ctx.currentMonth.totalLate}). Estimado de nómina actual: ${moneyPlain(ctx.currentMonth.estimatedPayroll)}.`;
   }else if(/alerta|hoy|revisar/.test(q)){
     category='daily_ops';
-    answer=`Hoy hay ${ctx.counts.todayPunches} fichajes registrados. Revisa pausas abiertas: ${ctx.alerts.openBreaks.length?ctx.alerts.openBreaks.join(', '):'ninguna'}. Solicitudes pendientes: ${ctx.counts.pendingAbsences}. Empleados sin salario: ${ctx.alerts.missingSalary.length?ctx.alerts.missingSalary.join(', '):'ninguno'}.`;
+    if(answerLang==='it')answer=`Oggi ci sono ${ctx.counts.todayPunches} timbrature registrate. Pause aperte: ${ctx.alerts.openBreaks.length?ctx.alerts.openBreaks.join(', '):'nessuna'}. Richieste pendenti: ${ctx.counts.pendingAbsences}. Dipendenti senza salario: ${ctx.alerts.missingSalary.length?ctx.alerts.missingSalary.join(', '):'nessuno'}.`;
+    else if(answerLang==='fr')answer=`Aujourd'hui il y a ${ctx.counts.todayPunches} pointages enregistrés. Pauses ouvertes: ${ctx.alerts.openBreaks.length?ctx.alerts.openBreaks.join(', '):'aucune'}. Demandes en attente: ${ctx.counts.pendingAbsences}. Employés sans salaire: ${ctx.alerts.missingSalary.length?ctx.alerts.missingSalary.join(', '):'aucun'}.`;
+    else if(answerLang==='en')answer=`Today there are ${ctx.counts.todayPunches} punches registered. Open breaks: ${ctx.alerts.openBreaks.length?ctx.alerts.openBreaks.join(', '):'none'}. Pending requests: ${ctx.counts.pendingAbsences}. Employees without salary: ${ctx.alerts.missingSalary.length?ctx.alerts.missingSalary.join(', '):'none'}.`;
+    else answer=`Hoy hay ${ctx.counts.todayPunches} fichajes registrados. Revisa pausas abiertas: ${ctx.alerts.openBreaks.length?ctx.alerts.openBreaks.join(', '):'ninguna'}. Solicitudes pendientes: ${ctx.counts.pendingAbsences}. Empleados sin salario: ${ctx.alerts.missingSalary.length?ctx.alerts.missingSalary.join(', '):'ninguno'}.`;
   }else if(/corr|antigu|manual|fichaje/.test(q)){
     category='app_help';
-    answer='Para corregir un fichaje antiguo entra en Presencias y usa el botón Manual. También puedes abrir el perfil del empleado y revisar su historial. Si el empleado lo pide desde su portal, la solicitud llega como corrección pendiente en Solicitudes.';
-  }else if(/falta|faltan|configurar|empleado/.test(q)){
+    if(answerLang==='it')answer='Per correggere una timbratura vecchia entra in Presenze e usa il pulsante Manuale. Puoi anche aprire il profilo del dipendente e controllare lo storico. Se il dipendente lo chiede dal portale, arriva come correzione pendente in Richieste.';
+    else if(answerLang==='fr')answer="Pour corriger un ancien pointage, va dans Présences et utilise le bouton Manuel. Tu peux aussi ouvrir le profil de l'employé et consulter son historique. Si l'employé le demande depuis son portail, la demande arrive comme correction en attente dans Demandes.";
+    else if(answerLang==='en')answer='To correct an old punch, go to Attendance and use the Manual button. You can also open the employee profile and review their history. If the employee requests it from the portal, it appears as a pending correction in Requests.';
+    else answer='Para corregir un fichaje antiguo entra en Presencias y usa el botón Manual. También puedes abrir el perfil del empleado y revisar su historial. Si el empleado lo pide desde su portal, la solicitud llega como corrección pendiente en Solicitudes.';
+  }else if((peopleRe&&missingRe)||/falta|faltan|configurar|empleado/.test(q)){
     category='data_quality';
-    answer=`Datos para revisar: ${ctx.alerts.missingSalary.length?`salario de ${ctx.alerts.missingSalary.join(', ')}`:'no veo salarios faltantes en este resumen'}. También conviene confirmar inicio de contrato, PIN, horario base y vacaciones de cada empleado.`;
+    const missing=ctx.alerts.missingSalary||[];
+    if(answerLang==='it')answer=`Informazioni da controllare nei dipendenti: ${missing.length?`salario di ${missing.join(', ')}`:'non vedo salari mancanti in questo riepilogo'}. Conviene anche verificare data di inizio contratto, PIN, orario base, giorni di vacanza e documenti archiviati per ogni dipendente.`;
+    else if(answerLang==='fr')answer=`Informations à vérifier chez les employés: ${missing.length?`salaire de ${missing.join(', ')}`:"je ne vois pas de salaires manquants dans ce résumé"}. Vérifie aussi début de contrat, PIN, horaire de base, vacances et documents archivés.`;
+    else if(answerLang==='en')answer=`Employee information to review: ${missing.length?`salary for ${missing.join(', ')}`:'I do not see missing salaries in this summary'}. Also confirm contract start date, PIN, base schedule, vacation balance and archived documents for each employee.`;
+    else answer=`Datos para revisar: ${missing.length?`salario de ${missing.join(', ')}`:'no veo salarios faltantes en este resumen'}. También conviene confirmar inicio de contrato, PIN, horario base, vacaciones y documentos archivados de cada empleado.`;
   }else if(/^(\s*)?(que|qué|como|cómo|revisa|revisar|analiza|analizar|ayuda|ayudame|ayúdame|estado|resumen|panel|que hago|qué hago)/.test(q)&&String(ctx.page||'').startsWith('sales')){
     category='reporting';
     answer=localSalesAssistantAnswer(ctx);
@@ -5196,17 +5454,18 @@ function localAssistantAnswer(question,ctx){
     answer=localInventoryAssistantAnswer(ctx);
   }else{
     category='feature_request';shouldSaveSignal=true;
-    answer=isDemo()?`En el demo el asistente IA es limitado. En una cuenta real, esta pregunta la responde Claude con más contexto y puede apoyarse en búsqueda web cuando aplica.\n\nTambién puedes abrir Claude:\nhttps://claude.ai/new`:`No pude consultar Claude desde Manager Pro en este momento. Intenta de nuevo en unos segundos.\n\nSi necesitas resolverlo ya, abre Claude aquí:\nhttps://claude.ai/new`;
+    answer=isDemo()?assistantCopy(answerLang).demoLimited:assistantCopy(answerLang).cannotReach;
   }
   return {answer,category,shouldSaveSignal};
 }
 function isAssistantDataQuestion(question){
   const q=String(question||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  const genericAreaQuestion=/\b(que hago|que reviso|que debo|como voy|como va|resumen|analiza|analizar|ayuda|ayudame|estado|panel|indicadores|reporte|reportes|insights?)\b/.test(q);
-  return /(quien|persona|empleado|trabajador).*(mas).*(trabaj|hora)|top.*trabaj/.test(q)
-    || /cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)/.test(q)
-    || /venta|ingreso|caja|ticket|producto.*vend|mas vendido|metodo.*pago/.test(q)
-    || /stock|inventario|compra|proveedor|costo|margen|insumo|materia prima|receta|consumo/.test(q)
+  const genericAreaQuestion=/\b(que hago|que reviso|que debo|como voy|como va|resumen|analiza|analizar|ayuda|ayudame|estado|panel|indicadores|reporte|reportes|insights?|cosa faccio|cosa vedo|cosa succede|riepilogo|analizza|aiuto|stato|rapporti|qu'est-ce|quoi faire|resume|analyse|help|summary|status)\b/.test(q);
+  return /(quien|persona|empleado|trabajador|dipendente|personale|employee).*(mas|piu|plus|most).*(trabaj|hora|lavor|ore|hour)|top.*(trabaj|lavor)/.test(q)
+    || /cu[aá]nt[oa]s?.*(empleado|trabajador|persona)|total.*(empleado|trabajador)|quanti.*(dipendent|personale)|how many.*employees|combien.*employ/.test(q)
+    || /\b(venta|ventas|vendita|vendite|venduto|ricavi|entrate|incassi|ventes|sales|verkauf|umsatz|ingreso|ingresos|caja|cassa|ticket|pagamento|pagamenti|pago|payment)\b/.test(q)
+    || /\b(stock|inventario|inventory|compra|compras|acquisto|acquisti|purchase|proveedor|proveedores|fornitore|fornitori|supplier|costo|costi|cost|margen|margine|margin|insumo|materia prima|materie prime|receta|ricetta|recipe|consumo)\b/.test(q)
+    || (/\b(empleado|empleados|trabajador|trabajadores|dipendente|dipendenti|personale|employee|employees|employe|employes|mitarbeiter|personal)\b/.test(q)&&/\b(falta|faltan|manca|mancano|missing|manquent|fehlen|datos|dati|informacion|informazioni|information|configurar|configure)\b/.test(q))
     || /^(revisa|mostrar|muestra|ver|listar|lista|cuantas tengo|cuantos tengo).*(salario|nomina|pago|ausencia|retardo|pausa)/.test(q)
     || (genericAreaQuestion&&['sales','salesProducts','salesReports','inventory','inventoryStock','inventoryPurchases','inventorySuppliers','inventoryReports'].includes(currentPage));
 }
@@ -5221,10 +5480,13 @@ async function sendManagerAssistant(){
   assistantBusy=true;if(btn){btn.disabled=true;btn.textContent=a.thinking;}
   if(input)input.value='';
   assistantAddMessage('user',question);
-  let ctx={app:'Manager Pro',page:currentPage,lang,alerts:{missingSalary:[],openBreaks:[]},counts:{pendingAbsences:0,todayPunches:0},currentMonth:{totalLate:0,estimatedPayroll:'0.00'},topWorkers:[]};
+  const answerLang=assistantQuestionLang(question,lang);
+  let ctx={app:'Manager Pro',page:currentPage,lang:answerLang,uiLang:lang,alerts:{missingSalary:[],openBreaks:[]},counts:{pendingAbsences:0,todayPunches:0},currentMonth:{totalLate:0,estimatedPayroll:'0.00'},topWorkers:[]};
   try{
     if(!isDemo())await withTimeout(loadSB(),8000,'No se pudo actualizar desde Supabase');
-    ctx=managerAssistantContext();
+    ctx=managerAssistantContext(answerLang);
+    ctx.lang=answerLang;
+    ctx.uiLang=lang;
     if(isAssistantDataQuestion(question)){
       const local=localAssistantAnswer(question,ctx);
       assistantAddMessage('bot',local.answer);
@@ -5232,7 +5494,7 @@ async function sendManagerAssistant(){
     }
     let result=null;
     if(!isDemo()){
-      const {data,error}=await withTimeout(sb.functions.invoke('manager-assistant',{body:{question,context:ctx,history:assistantHistory.slice(-8)}}),20000,'La IA tardó demasiado');
+      const {data,error}=await withTimeout(sb.functions.invoke('manager-assistant',{body:{question,language:answerLang,context:ctx,history:assistantHistory.slice(-8)}}),20000,'La IA tardó demasiado');
       if(error)throw error;
       result=data;
     }else{
