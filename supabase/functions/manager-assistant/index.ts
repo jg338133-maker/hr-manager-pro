@@ -253,6 +253,8 @@ Give the final answer directly.`;
       "For dismissal, termination, formal discipline, legal, payroll, tax, medical, or contract-risk matters, do not give legal advice and do not invent local rules. Still help the manager prepare safely: verify facts, contact the employee, review contract/internal rules, document in Manager Pro, prepare a respectful conversation, and check local labor law or a professional before acting.",
       "If a user says an employee has missed work and wants to dismiss them, do not answer that you lack enough information. Start with a cautious sentence like: 'Con lo que me dices, primero separaría hechos, contacto y riesgo antes de tomar la decisión.' Then give an actionable plan.",
       "For data questions, use the app context across all areas. Connect people, schedules, sales, inventory, purchases, product costs, reports, documents and risks when the relationship is useful. If live data is missing, say what is missing and give the closest useful action.",
+      "Treat the app context as the source of truth for business data. When a question mentions one area, also inspect related areas before answering: sales can depend on stock, purchases, employees and schedules; payroll can depend on attendance, shifts, absences and salaries; receivables can depend on clients, documents and follow-ups; documents can create due dates and operational risks.",
+      "When answering a business-data question, name the specific areas you used or could not use, for example: 'Veo ventas e inventario, pero no hay compras registradas'.",
       "If context.area or context.page is Sales, Sales Products, Sales Reports, Inventory, Stock, Purchases, Suppliers, or Inventory Reports, behave as an operations analyst for that area. Do not answer with generic navigation only. Use the numbers in context.sales and context.inventory first, then explain what the manager should check next.",
       "For sales questions, prioritize in this order: today's revenue, number of sales, monthly revenue, average ticket, top products/services, payment methods, employee responsible, inventory impact, margin risk, and reports to export. If there are no sales, give the exact setup flow to create sellable products/services and register the first sale.",
       "For inventory questions, prioritize in this order: stock items, low stock, purchases this month, estimated inventory value, sales consumption, weighted average cost, product recipes, suppliers, and inventory reports. If there is little inventory data, explain the minimum setup: inputs, units, initial cost, purchases, suppliers, and recipes connected to sales.",
@@ -284,7 +286,15 @@ Return JSON only.`;
       ? await callAnthropic(apiKey, model, system, user, enableWebSearch, responseLang)
       : await callOpenAICompatible(apiKey, model, system, user);
 
-    return jsonResponse(normalize(extractJson(content)));
+    try {
+      return jsonResponse(normalize(extractJson(content)));
+    } catch (_parseError) {
+      return jsonResponse({
+        answer: sanitizeAnswer(content) || fallbackAnswer(responseLang),
+        category: "other",
+        shouldSaveSignal: false,
+      });
+    }
   } catch (error) {
     return jsonResponse({
       answer: fallbackAnswer(responseLang),

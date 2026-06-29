@@ -5487,21 +5487,24 @@ async function sendManagerAssistant(){
     ctx=managerAssistantContext(answerLang);
     ctx.lang=answerLang;
     ctx.uiLang=lang;
-    if(isAssistantDataQuestion(question)){
+    const useRemoteAssistant=Boolean(sb && !isDemo());
+    ctx.assistantMode=useRemoteAssistant?'claude_primary':'local_demo';
+    if(!useRemoteAssistant && isAssistantDataQuestion(question)){
       const local=localAssistantAnswer(question,ctx);
       assistantAddMessage('bot',local.answer);
       return;
     }
     let result=null;
-    if(!isDemo()){
-      const {data,error}=await withTimeout(sb.functions.invoke('manager-assistant',{body:{question,language:answerLang,context:ctx,history:assistantHistory.slice(-8)}}),20000,'La IA tardó demasiado');
+    if(useRemoteAssistant){
+      const {data,error}=await withTimeout(sb.functions.invoke('manager-assistant',{body:{question,language:answerLang,context:ctx,history:assistantHistory.slice(-8)}}),30000,'La IA tardó demasiado');
       if(error)throw error;
       result=data;
     }else{
       result=localAssistantAnswer(question,ctx);
     }
     const fallback=localAssistantAnswer(question,ctx);
-    const answer=result?.error?fallback.answer:(result?.answer||fallback.answer);
+    if(result?.error)console.warn('Assistant function fallback:',result.error);
+    const answer=result?.answer||fallback.answer;
     assistantAddMessage('bot',answer);
     if(result?.shouldSaveSignal){
       try{await sbSaveAssistantSignal({question,answer,category:result.category||'feature_request',page:currentPage,metadata:{context:ctx}});toast(a.saved,'#10b981');}
