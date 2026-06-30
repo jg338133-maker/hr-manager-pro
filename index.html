@@ -144,6 +144,13 @@ input[type=date],input[type=time]{color-scheme:dark}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .check-row{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:13px;font-weight:800}
 .check-row input{width:16px;height:16px;accent-color:var(--brand)}
+.fg label.wa-switch{display:flex;align-items:center;gap:10px;margin:0;font-size:14px;font-weight:800;color:var(--text);cursor:pointer;user-select:none}
+.fg label.wa-switch input{position:absolute;width:1px;height:1px;padding:0;margin:0;opacity:0;pointer-events:none}
+.wa-switch-ui{width:42px;height:28px;border-radius:999px;border:2px solid var(--border);background:var(--s2);position:relative;transition:.18s ease;box-shadow:inset 0 0 0 1px rgba(0,0,0,.02)}
+.wa-switch-ui::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:999px;background:var(--text2);transition:.18s ease;box-shadow:0 2px 8px rgba(0,0,0,.16)}
+.wa-switch input:checked + .wa-switch-ui{border-color:var(--brand);background:var(--brand)}
+.wa-switch input:checked + .wa-switch-ui::after{left:17px;background:#fff}
+.wa-switch input:focus-visible + .wa-switch-ui{outline:3px solid rgba(37,99,235,.22);outline-offset:2px}
 .recipe-box{display:none;margin:6px 0 18px;padding:12px;border:1px solid var(--border);border-radius:var(--r2);background:var(--s3)}
 .recipe-row{display:grid;grid-template-columns:1fr 140px 34px;gap:8px;align-items:end;margin-top:8px}
 .recipe-row .btn{height:42px;padding:0;border-radius:12px}
@@ -1848,6 +1855,24 @@ body.manager-theme .dash-status-value{color:#007d72}
     <div class="fg"><label>Téléphone</label><input type="tel" id="ef-phone" placeholder="+41 79 000 00 00"></div>
     <div class="fg"><label>Email</label><input type="email" id="ef-email"></div>
   </div>
+  <div class="fg" style="background:var(--s3);border:1px solid var(--line);border-radius:var(--r3);padding:12px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+      <div>
+        <label style="margin:0">Recordatorios WhatsApp</label>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Envía un aviso antes del turno y otro si no marca entrada.</div>
+      </div>
+      <label class="wa-switch" title="Activar recordatorios WhatsApp">
+        <input type="checkbox" id="ef-wa-enabled">
+        <span class="wa-switch-ui" aria-hidden="true"></span>
+        <span>Activo</span>
+      </label>
+    </div>
+    <div class="frow" style="margin-top:10px">
+      <div class="fg"><label>Número WhatsApp</label><input type="tel" id="ef-wa-phone" placeholder="+41 79 000 00 00"></div>
+      <div class="fg"><label>Antes del turno (min)</label><input type="number" id="ef-rem-before" min="0" max="60" value="5"></div>
+    </div>
+    <div class="fg" style="margin-bottom:0"><label>Después si no fichó (min)</label><input type="number" id="ef-rem-after" min="1" max="120" value="10"></div>
+  </div>
   <div class="frow">
     <div class="fg"><label>Type salaire</label>
       <select id="ef-paytype" onchange="updatePL()">
@@ -2869,7 +2894,7 @@ async function loadSB(){
       sb.from('shifts').select('*').eq('restaurant_id',REST_ID),
       sb.from('restaurants').select('*').eq('id',REST_ID).single()
     ]);
-    if(e.data)DB.employees=e.data.map(x=>({id:x.id,name:x.name,last:x.last_name||'',num:x.employee_number||'',position:x.position||'',dept:x.department||'',phone:x.phone||'',email:x.email||'',startDate:x.start_date||'',createdAt:x.created_at||'',contract:x.contract_type||'CDI',payType:x.pay_type||'hourly',rate:x.hourly_rate||0,salary:x.monthly_salary||0,vacWeeks:x.vacation_weeks||5,avs:x.avs_number||'',emergency:x.emergency_contact||'',notes:x.notes||'',status:x.status||'active',photo:x.photo_url||null,color:x.color||'#4f6ef7',schedules:x.schedules||{},pin:x.pin||'0000'}));
+    if(e.data)DB.employees=e.data.map(x=>({id:x.id,name:x.name,last:x.last_name||'',num:x.employee_number||'',position:x.position||'',dept:x.department||'',phone:x.phone||'',email:x.email||'',startDate:x.start_date||'',createdAt:x.created_at||'',contract:x.contract_type||'CDI',payType:x.pay_type||'hourly',rate:x.hourly_rate||0,salary:x.monthly_salary||0,vacWeeks:x.vacation_weeks||5,avs:x.avs_number||'',emergency:x.emergency_contact||'',notes:x.notes||'',status:x.status||'active',photo:x.photo_url||null,color:x.color||'#4f6ef7',schedules:x.schedules||{},pin:x.pin||'0000',waPhone:x.whatsapp_phone||'',waEnabled:x.whatsapp_reminders_enabled===true,waConsent:x.whatsapp_consent_at||'',reminderBefore:Number(x.reminder_before_minutes)||5,reminderAfter:Number(x.reminder_after_minutes)||10}));
     if(a.data)DB.history=a.data.map(x=>({id:x.id,empId:x.employee_id,empName:x.employee_name||'',type:x.type,ts:x.timestamp,note:x.note||''}));
     if(ab.data)DB.absences=ab.data.map(x=>({id:x.id,empId:x.employee_id,type:x.type,start:x.start_date,end:x.end_date,approved:x.approved,notes:x.notes||''}));
     if(sh.data){DB.shifts={};sh.data.forEach(x=>{const blocks=normalizeBlocks({blocks:x.blocks,start:x.start_time,end:x.end_time},'restaurant');DB.shifts[`${x.employee_id}_${x.shift_date}`]={type:x.shift_type,in:x.start_time,out:x.end_time,blocks,notes:x.notes||''};});}
@@ -2948,7 +2973,7 @@ async function loadMaster(){
 
 async function sbSaveEmp(emp){
   if(isDemo())return;
-  const{error}=await sb.from('employees').upsert({id:emp.id,restaurant_id:REST_ID,name:emp.name,last_name:emp.last||'',employee_number:emp.num||'',position:emp.position||'',department:emp.dept||'',phone:emp.phone||'',email:emp.email||'',start_date:emp.startDate||null,contract_type:emp.contract||'CDI',pay_type:emp.payType||'hourly',hourly_rate:emp.rate||0,monthly_salary:emp.salary||0,vacation_weeks:emp.vacWeeks||5,avs_number:emp.avs||'',emergency_contact:emp.emergency||'',notes:emp.notes||'',status:emp.status||'active',photo_url:emp.photo||null,color:emp.color||'#4f6ef7',schedules:emp.schedules||{},pin:emp.pin||'0000'});
+  const{error}=await sb.from('employees').upsert({id:emp.id,restaurant_id:REST_ID,name:emp.name,last_name:emp.last||'',employee_number:emp.num||'',position:emp.position||'',department:emp.dept||'',phone:emp.phone||'',email:emp.email||'',start_date:emp.startDate||null,contract_type:emp.contract||'CDI',pay_type:emp.payType||'hourly',hourly_rate:emp.rate||0,monthly_salary:emp.salary||0,vacation_weeks:emp.vacWeeks||5,avs_number:emp.avs||'',emergency_contact:emp.emergency||'',notes:emp.notes||'',status:emp.status||'active',photo_url:emp.photo||null,color:emp.color||'#4f6ef7',schedules:emp.schedules||{},pin:emp.pin||'0000',whatsapp_phone:emp.waPhone||'',whatsapp_reminders_enabled:emp.waEnabled===true,whatsapp_consent_at:emp.waEnabled?(emp.waConsent||new Date().toISOString()):null,reminder_before_minutes:emp.reminderBefore||5,reminder_after_minutes:emp.reminderAfter||10});
   if(error)console.error(error);
 }
 function docFromSBRow(x){return{id:x.id,empId:x.employee_id||'',folder:x.folder||'employees',type:x.type||'other',name:x.name||'',fileName:x.file_name||'',mimeType:x.mime_type||'',size:x.size_bytes||0,data:x.file_data||'',notes:x.notes||'',aiSummary:x.ai_summary||'',aiMetadata:x.ai_metadata||{},aiStatus:x.ai_status||'pending',expiresAt:x.expires_at||'',createdAt:x.created_at||new Date().toISOString()};}
@@ -7866,6 +7891,11 @@ function openEmpModal(id){
   if(aiJson)aiJson.value='';
   const fields={name:'name',last:'last',num:'num',start:'startDate',phone:'phone',email:'email',vac:'vacWeeks',avs:'avs',emergency:'emergency',notes:'notes'};
   Object.entries(fields).forEach(([f,k])=>{const el=document.getElementById('ef-'+f);if(el)el.value=emp?.[k]||'';});
+  const waPhone=document.getElementById('ef-wa-phone'),waEnabled=document.getElementById('ef-wa-enabled'),remBefore=document.getElementById('ef-rem-before'),remAfter=document.getElementById('ef-rem-after');
+  if(waPhone)waPhone.value=emp?.waPhone||emp?.phone||'';
+  if(waEnabled)waEnabled.checked=emp?.waEnabled===true;
+  if(remBefore)remBefore.value=emp?.reminderBefore||5;
+  if(remAfter)remAfter.value=emp?.reminderAfter||10;
   document.getElementById('ef-start').value=emp?.startDate||localDateKey(new Date());
   document.getElementById('ef-vac').value=emp?.vacWeeks||5;
   document.getElementById('ef-paytype').value=emp?.payType||'hourly';
@@ -7950,7 +7980,8 @@ function saveEmp(){
   const existing=editEmpId?DB.employees.find(e=>e.id===editEmpId):null;
   const typedPin=(document.getElementById('ef-pin').value||'').replace(/\D/g,'').slice(0,4);
   const generatedPin=typedPin||existing?.pin||newPin();
-  const data={id:editEmpId||uid(),name,last:clean(document.getElementById('ef-last').value),num:clean(document.getElementById('ef-num').value),position:clean(document.getElementById('ef-pos').value),dept:clean(document.getElementById('ef-dept').value),startDate:document.getElementById('ef-start').value,createdAt:existing?.createdAt||new Date().toISOString(),phone:clean(document.getElementById('ef-phone').value),email:empEmail,contract:clean(document.getElementById('ef-contract').value),status:document.getElementById('ef-status').value,payType,rate:payType==='hourly'?rateVal:0,salary:payType==='monthly'?rateVal:0,vacWeeks:parseInt(document.getElementById('ef-vac').value)||5,avs:clean(document.getElementById('ef-avs').value),emergency:clean(document.getElementById('ef-emergency').value),notes:clean(document.getElementById('ef-notes').value),photo:photoData,schedules:getSchedEd(),pin:generatedPin,color:editEmpId?(existing?.color||EMP_COLORS[DB.employees.length%EMP_COLORS.length]):EMP_COLORS[DB.employees.length%EMP_COLORS.length]};
+  const waEnabled=document.getElementById('ef-wa-enabled')?.checked===true;
+  const data={id:editEmpId||uid(),name,last:clean(document.getElementById('ef-last').value),num:clean(document.getElementById('ef-num').value),position:clean(document.getElementById('ef-pos').value),dept:clean(document.getElementById('ef-dept').value),startDate:document.getElementById('ef-start').value,createdAt:existing?.createdAt||new Date().toISOString(),phone:clean(document.getElementById('ef-phone').value),email:empEmail,contract:clean(document.getElementById('ef-contract').value),status:document.getElementById('ef-status').value,payType,rate:payType==='hourly'?rateVal:0,salary:payType==='monthly'?rateVal:0,vacWeeks:parseInt(document.getElementById('ef-vac').value)||5,avs:clean(document.getElementById('ef-avs').value),emergency:clean(document.getElementById('ef-emergency').value),notes:clean(document.getElementById('ef-notes').value),photo:photoData,schedules:getSchedEd(),pin:generatedPin,color:editEmpId?(existing?.color||EMP_COLORS[DB.employees.length%EMP_COLORS.length]):EMP_COLORS[DB.employees.length%EMP_COLORS.length],waPhone:clean(document.getElementById('ef-wa-phone')?.value||document.getElementById('ef-phone').value),waEnabled,waConsent:waEnabled?(existing?.waConsent||new Date().toISOString()):'',reminderBefore:Math.max(0,parseInt(document.getElementById('ef-rem-before')?.value)||5),reminderAfter:Math.max(1,parseInt(document.getElementById('ef-rem-after')?.value)||10)};
   if(editEmpId){const i=DB.employees.findIndex(e=>e.id===editEmpId);if(i>=0)DB.employees[i]={...DB.employees[i],...data};}
   else DB.employees.push(data);
   if(!editEmpId&&pendingContractDoc){

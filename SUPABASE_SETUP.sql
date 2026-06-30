@@ -219,6 +219,7 @@ alter table public.sales_products enable row level security;
 alter table public.sales enable row level security;
 alter table public.inventory_suppliers enable row level security;
 alter table public.inventory_purchases enable row level security;
+alter table public.attendance_reminder_logs enable row level security;
 
 create or replace function public.is_super_admin()
 returns boolean
@@ -333,6 +334,12 @@ create policy "employee documents scoped all"
 on public.employee_documents for all
 using (restaurant_id = public.current_restaurant_id() or public.is_super_admin())
 with check (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
+
+drop policy if exists "attendance reminder logs scoped select" on public.attendance_reminder_logs;
+create policy "attendance reminder logs scoped select"
+on public.attendance_reminder_logs for select
+to authenticated
+using (restaurant_id = public.current_restaurant_id() or public.is_super_admin());
 
 drop policy if exists "assistant signals scoped all" on public.manager_assistant_signals;
 create policy "assistant signals scoped all"
@@ -721,6 +728,15 @@ alter table public.restaurants add column if not exists opening_hours jsonb defa
 alter table public.restaurants add column if not exists sales_panel_widgets jsonb default null;
 alter table public.restaurants add column if not exists business_sector text default 'general';
 alter table public.restaurants add column if not exists onboarding_completed boolean default false;
+
+-- WhatsApp attendance reminders.
+alter table public.restaurants add column if not exists manager_whatsapp text default '';
+alter table public.restaurants add column if not exists attendance_whatsapp_enabled boolean not null default false;
+alter table public.employees add column if not exists whatsapp_phone text default '';
+alter table public.employees add column if not exists whatsapp_reminders_enabled boolean not null default false;
+alter table public.employees add column if not exists whatsapp_consent_at timestamptz;
+alter table public.employees add column if not exists reminder_before_minutes integer not null default 5;
+alter table public.employees add column if not exists reminder_after_minutes integer not null default 10;
 alter table public.shifts add column if not exists blocks jsonb default '[]'::jsonb;
 update public.employees set pin = '0000' where pin is null or pin = '';
 update public.restaurants set emoji = '🍽️' where emoji is null or emoji = '';
@@ -730,9 +746,42 @@ update public.restaurants set status = 'active' where status is null or status =
 update public.restaurants set opening_hours = '{}'::jsonb where opening_hours is null;
 update public.restaurants set business_sector = 'general' where business_sector is null or trim(business_sector) = '';
 update public.restaurants set onboarding_completed = false where onboarding_completed is null;
+update public.employees set reminder_before_minutes = 5 where reminder_before_minutes is null or reminder_before_minutes < 0;
+update public.employees set reminder_after_minutes = 10 where reminder_after_minutes is null or reminder_after_minutes < 1;
 create unique index if not exists shifts_employee_date_unique on public.shifts(employee_id, shift_date);
 create index if not exists employee_documents_employee_idx on public.employee_documents(employee_id, created_at desc);
 create index if not exists employee_documents_folder_idx on public.employee_documents(restaurant_id, folder, created_at desc);
+
+create table if not exists public.attendance_reminder_logs (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.restaurants(id) on delete cascade,
+  employee_id uuid not null references public.employees(id) on delete cascade,
+  shift_date date not null,
+  shift_start timestamptz not null,
+  reminder_type text not null check (reminder_type in ('before_start','late_employee','late_manager','daily_summary')),
+  channel text not null default 'whatsapp',
+  recipient text default '',
+  status text not null default 'pending',
+  provider text default 'twilio',
+  provider_message_id text default '',
+  error text default '',
+  created_at timestamptz default now(),
+  sent_at timestamptz,
+  unique(employee_id, shift_date, shift_start, reminder_type)
+);
+alter table public.attendance_reminder_logs enable row level security;
+grant select on public.attendance_reminder_logs to authenticated;
+create index if not exists attendance_reminder_logs_restaurant_idx on public.attendance_reminder_logs(restaurant_id, shift_date desc, created_at desc);
+
+do $$
+begin
+  alter table public.attendance_reminder_logs
+    drop constraint if exists attendance_reminder_logs_reminder_type_check;
+
+  alter table public.attendance_reminder_logs
+    add constraint attendance_reminder_logs_reminder_type_check
+    check (reminder_type in ('before_start','late_employee','late_manager','daily_summary'));
+end $$;
 
 -- Employee self-service login by email + PIN.
 -- This lets employees access only their own badge screen without knowing the restaurant id.
